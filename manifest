@@ -1,0 +1,19 @@
+title=Picasa Web Albums (v3)
+subtitle=View your Picasa photos and videos
+#
+major_version=3
+minor_version=325
+build_version=00000
+#
+mm_icon_focus_hd=pkg:/images/mm_icon_focus_hd.png
+mm_icon_side_hd=pkg:/images/mm_icon_side_hd.png
+mm_icon_focus_sd=pkg:/images/mm_icon_focus_sd.png
+mm_icon_side_sd=pkg:/images/mm_icon_side_sd.png
+#
+splash_screen_hd=pkg:/images/Splash-HD-1280x720.png
+splash_screen_sd=pkg:/images/Splash-SD-720x480.png
+splash_color=#ebebeb
+#
+screensaver_title=Picasa (v3)
+screensaver_private=0
+#
