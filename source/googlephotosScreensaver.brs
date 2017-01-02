@@ -8,7 +8,7 @@ Sub RunScreensaver()
     
     Init()
     REM oa = Oauth()
-    REM picasa = LoadPicasa()
+    REM googlephotos = LoadGooglePhotos()
     
     sstype=RegRead("ScreensaverType","Settings")
     REM if sstype<>invalid then sstype=Val(sstype)
@@ -23,19 +23,30 @@ Sub RunScreensaver()
     end if
 
     if not m.oa.linked() or sstype=0 then
-        rsp=m.picasa.ExecServerAPI("featured?max-results=300&v=2.0&fields=entry(media:group(media:content))&imgmax=400", invalid)
+        rsp="invalid"
     else
-        rsp=m.picasa.ExecServerAPI("?kind=photo&max-results=300&v=2.0&fields=entry(media:group(media:content))&imgmax=400")
+        rsp=m.googlephotos.ExecServerAPI("?kind=photo&max-results=300&v=2.0&fields=entry(media:group(media:content))&imgmax=400")
     end if
 
     canvasItems=[]
     if isxmlelement(rsp) then 
-        images=picasa_new_image_list(rsp.entry)
+        images=googlephotos_new_image_list(rsp.entry)
+        print "DEBUG "; image
         for each image in images
-            canvasItems.Push(image.GetURL())
+            if image.GetURL().instr(".MOV") <> -1 Or image.GetURL().instr(".mp4") <> -1 then
+                print "Ignore: "; image.GetURL()
+            else
+                print "Push: "; image.GetURL()
+                canvasItems.Push(image.GetURL())
+            end if    
         end for
     end if    
-    
+
+    'If unlinked, we'll advertise our channel!  :-) 
+    if canvasItems.count() = 0 then
+        canvasItems.Push("https://image.roku.com/developer_channels/prod/3eedea580e39763e6220974c270504123e8a11aaa9248c0e308c3526003f19b8.png")
+    end if
+
     canvas.SetMessagePort(port)
     canvas.PurgeCachedImages()
     canvas.SetRequireAllImagesToDraw(true)
@@ -104,34 +115,16 @@ Sub RunScreenSaverSettings()
     
     linked=m.oa.linked()
     
-    if linked then
-        
-        sstype=RegRead("ScreensaverType","Settings")
-        if sstype<>invalid then sstype=Val(sstype)
-        
-        if sstype=invalid then
-            typetext="not set (Your Photos)"
-        else
-            if sstype=0 then
-                typetext="Featured Photos"
-            else
-                typetext="Your Photos"
-            end if
-        end if
-    end if
-    
     port = CreateObject("roMessagePort")
     screen = CreateObject("roParagraphScreen")
     screen.SetMessagePort(port)
     
-    screen.AddHeaderText("Screensaver Settings")
+    screen.AddHeaderText("About Screensaver")
     if linked then
-        screen.AddParagraph("Choose the type of photos to show in your screensaver")
-        screen.AddParagraph("Current setting: "+typetext)
-        screen.AddButton(0, "Featured Photos")
-        screen.AddButton(1, "Your Photos")
+        screen.AddParagraph("Your Google Photos account is successfully linked. This screensavor will randomly display your personal photos")
+        screen.AddParagraph("Thank you for using the Google Photos channel!")
     else
-        screen.AddParagraph("Your Picasa Web Albums account is not linked.  You will view Featured Photos.  Link your account through the regular Picasa channel to view your personal photos.")
+        screen.AddParagraph("Your Google Photos account is not linked.  Please link your account through the Google Photos channel to view your personal photos.")
     end if
     screen.AddButton(99, "Back")
     screen.Show()

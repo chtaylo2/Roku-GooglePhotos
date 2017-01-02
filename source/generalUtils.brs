@@ -326,8 +326,7 @@ End Function
 Function friendlyDate(seconds As Integer) As String
     calcDate = CreateObject("roDateTime")
     calcDate.FromSeconds(seconds)
-    'showDate = calcDate.AsDateString("long-date")
-    showDate = "DATE - TODO..Need to figure out how to convert correctly"
+    showDate = calcDate.AsDateString("long-date")
     return showDate
 End Function
 

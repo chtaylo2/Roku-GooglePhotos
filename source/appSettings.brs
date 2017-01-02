@@ -2,7 +2,6 @@
 ' Get the list of menu items to show on the Settings screen
 Function getSettingsList() As Dynamic
     currentSlideshowDelay = RegRead("SlideshowDelay","Settings")
-    'currentServerPort = RegRead("server_port", "preferences", "Not Set")
     
     if currentSlideshowDelay=invalid then
         delaytext="Not set (default 3 seconds)"
@@ -10,22 +9,51 @@ Function getSettingsList() As Dynamic
         delaytext=currentSlideshowDelay+" seconds"
     end if
 
+    currentSlideshowRes = RegRead("SlideshowRes","Settings")
+
+    if currentSlideshowRes=invalid then
+        device = createObject("roDeviceInfo")
+        is4k = (val(device.GetVideoMode()) = 2160)
+        is1080p = (val(device.GetVideoMode()) = 1080)
+
+        if is4k then
+            restext="Not set (default FHD)"
+        else if is1080p
+            restext="Not set (default HD)"
+        else
+            restext="Not set (default SD)"
+        end if
+    else
+        restext=currentSlideshowRes
+    end if
+
     settingsList = [
         {
-            Title:"Set Slideshow Delay",
+            Title:"Set Photo Download Resolution",
             ID:"1",
+            ShortDescriptionLine1: "Current setting: " + restext
+            ShortDescriptionLine2: "Defines photo size downloaded"
+        },
+        {
+            Title:"Set Slideshow Delay",
+            ID:"2",
             ShortDescriptionLine1: "Current setting: " + delaytext
             ShortDescriptionLine2: "Defines photo delay during slideshow"
         },
         {
             Title:"Deactivate Player",
-            ID:"2",
+            ID:"3",
             ShortDescriptionLine1: ""
-            ShortDescriptionLine2: "Remove link from Picasa account"
+            ShortDescriptionLine2: "Remove link from Google Photos account"
+        },{
+            Title:"Link additional Google Photos acccount",
+            ID:"4",
+            ShortDescriptionLine1: ""
+            ShortDescriptionLine2: "Link additional Google Photos acccount"
         },
         {
             Title:"About",
-            ID:"2",
+            ID:"5",
             ShortDescriptionLine1: ""
             ShortDescriptionLine2: "About this channel"
         }
@@ -33,8 +61,7 @@ Function getSettingsList() As Dynamic
     return settingsList
 End Function
 
-Sub picasa_browse_settings()
-    'screen=uitkPreShowPosterMenu("","Settings")
+Sub googlephotos_browse_settings()
     screen=CreateObject("roListScreen")
     screen.SetContent(getSettingsList())
     port = CreateObject("roMessagePort")
@@ -42,14 +69,7 @@ Sub picasa_browse_settings()
     screen.SetBreadcrumbText("", "Settings")
     screen.show()
     
-    'settingmenu = [
-    '    {ShortDescriptionLine1:"Slideshow Delay", ShortDescriptionLine2:"Change slideshow delay", HDPosterUrl:highlights[4], SDPosterUrl:highlights[4]},
-    '    {ShortDescriptionLine1:"Deactivate Player", ShortDescriptionLine2:"Remove link from Picasa account", HDPosterUrl:highlights[5], SDPosterUrl:highlights[5]},
-    '    {ShortDescriptionLine1:"About", ShortDescriptionLine2:"About the channel", HDPosterUrl:highlights[6], SDPosterUrl:highlights[6]},
-    ']
-    'onselect = [0, m, "SlideshowSpeed","DelinkPlayer","About"]
-    
-    menuSelections = [picasa_set_slideshow_speed, picasa_delink, picasa_about]
+    menuSelections = [googlephotos_set_slideshow_res, googlephotos_set_slideshow_speed, googlephotos_delink, googlephotos_comingSoon, googlephotos_about]
     
     while(true)
         msg = wait(0,port)
@@ -65,7 +85,75 @@ Sub picasa_browse_settings()
     
 End Sub
 
-Sub picasa_set_slideshow_speed()
+Sub googlephotos_set_slideshow_res()
+    ssres=RegRead("SlideshowRes","Settings")
+
+    device = createObject("roDeviceInfo")
+    is4k = (val(device.GetVideoMode()) = 2160)
+    is1080p = (val(device.GetVideoMode()) = 1080)
+
+    if ssres=invalid then
+        if is4k then
+            restext="Not set (default FHD)"
+        else if is1080p
+            restext="Not set (default HD)"   
+        else
+            restext="Not set (default SD)"
+        end if
+    else
+        restext=ssres
+    end if
+
+    port = CreateObject("roMessagePort")
+    screen = CreateObject("roParagraphScreen")
+    screen.SetMessagePort(port)
+    screen.SetBreadcrumbText("", "Settings")
+    screen.AddHeaderText("Photo Download Resolution")
+    screen.AddParagraph("This setting defines the photo size downloaded during your slideshow. If you have a slow internet connection, it's recommended to decrease this setting.")
+    screen.AddParagraph("Current setting: " + restext)
+    if is4k then
+        screen.AddButton(2, "Full High Definition (FHD)")
+    end if
+    if is4k Or is1080p then
+        screen.AddButton(1, "High Definition (HD)")
+    end if
+    screen.AddButton(0, "Standard Definition (SD)")
+    screen.Show()
+
+    while true
+        msg = wait(0, screen.GetMessagePort())
+
+        if type(msg) = "roParagraphScreenEvent"
+            if msg.isScreenClosed()
+                print "Screen closed"
+                exit while
+            else if msg.isButtonPressed()
+                print "Button pressed: "; msg.GetIndex(); " " msg.GetData()
+                res=msg.GetIndex()
+
+                if res<>invalid then
+                    if res=0 then
+                        RegWrite("SlideshowRes","SD","Settings")
+                        m.SlideshowRes="SD"
+                    else if res=1
+                        RegWrite("SlideshowRes","HD","Settings")
+                        m.SlideshowRes="HD"
+                    else if res=2
+                        RegWrite("SlideshowRes","FHD","Settings")
+                        m.SlideshowRes="FHD"
+                    end if
+                end if
+
+                exit while
+            else
+                print "Unknown event: "; msg.GetType(); " msg: "; msg.GetMessage()
+                exit while
+            end if
+        end if
+    end while
+End Sub
+
+Sub googlephotos_set_slideshow_speed()
     ssdur=RegRead("SlideshowDelay","Settings")
     if ssdur=invalid then
         delaytext="Not set (default 3 seconds)"
@@ -99,7 +187,7 @@ Sub picasa_set_slideshow_speed()
                 print "Button pressed: "; msg.GetIndex(); " " msg.GetData()
                 button_idx=msg.GetIndex()
                 if button_idx = 0 then
-                    speed=picasa_set_custom_slideshow_speed()
+                    speed=googlephotos_set_custom_slideshow_speed()
                 else
                     speed=button_idx
                 end if
@@ -118,7 +206,7 @@ Sub picasa_set_slideshow_speed()
     end while
 End Sub
 
-Function picasa_set_custom_slideshow_speed()
+Function googlephotos_set_custom_slideshow_speed()
     port = CreateObject("roMessagePort")
     pin = CreateObject("roPinEntryDialog")
     pin.SetMessagePort(port)
@@ -157,15 +245,19 @@ Function picasa_set_custom_slideshow_speed()
     end while
 End Function
 
-Sub picasa_delink()
-    ans=ShowDialog2Buttons("Deactivate Player","Remove link to your Picasa account?","Confirm","Cancel")
+Sub googlephotos_comingSoon()
+    ans=ShowDialog1Button("Link additional account","Ability to link additional account coming soon!","Back")
+End Sub
+
+Sub googlephotos_delink()
+    ans=ShowDialog2Buttons("Deactivate Player","Remove link to your Google Photos account?","Confirm","Cancel")
     if ans=0 then 
         oa = Oauth()
         oa.erase()
     end if
 End Sub
 
-Sub picasa_about()
+Sub googlephotos_about()
     port = CreateObject("roMessagePort")
     screen = CreateObject("roParagraphScreen")
     screen.SetMessagePort(port)
@@ -175,12 +267,9 @@ Sub picasa_about()
     
     screen.AddParagraph("The channel is not affiliated with Google.")
 
-    para = "The Picasa Web Albums Channel (v1) was originally developed by Chris Hoffman. "
-    para = para + "Picasa Web Albums Channel (v2) was developed by Belltown which added OAuth2 and bug fixes."
-    screen.AddParagraph(para)
-    
-    screen.AddParagraph("This version of the channel (v3) was developed by Chris Taylor which adds a number of functionality improvements. ")
-    screen.AddParagraph("If you have any questions or comments, post them in forums.roku.com in the General Discussions forum (preferably in an existing Picasa thread).")
+    screen.AddParagraph("The Google Photos Channeal, current version (v3) was developed by Chris Taylor which adds a numbers of functional improvements. It has also been rebranded for Google Photos as Picasa has been discontinued by Google.")
+    screen.AddParagraph("The original Picasa Web Albums Channel (v1) was developed by Chris Hoffman and Belltown developing (v2) which added OAuth2 and other bug fixes.")
+    screen.AddParagraph("If you have any questions or comments, post them in forums.roku.com in the General Discussions forum.")
 
     screen.AddButton(1, "Back")
     screen.Show()

@@ -4,7 +4,7 @@ Sub doRegistration()
     
     if not oa.linked()
         ' We're not already linked, so attempt to link
-        while doPicasaEnroll() <> 0
+        while doGooglePhotosEnroll() <> 0
         end while
         
         ' Check if the link was successful
@@ -22,11 +22,36 @@ Sub doRegistration()
  
 End Sub
 
-Function doPicasaEnroll() As Integer
-    print "regScreen: doPicasaEnroll"
+Sub doAdditionalReg()
+
+    oa = Oauth()
+    
+    'if not oa.linked()
+        ' We're not already linked, so attempt to link
+        while doGooglePhotosEnroll() <> 0
+        end while
+        
+        ' Check if the link was successful
+        if oa.linked()
+            ' Successful link, save access token and refresh token in registry
+            oa.save()
+            print "doRegistration. linked. oauth: "; oa.dump()
+            showCongratulationsScreen()
+        else
+            ' We are not linked, delete access token and refresh token from registry
+            oa.erase()
+            print "doRegistration. not linked"
+        end if
+    'end if
+ 
+End Sub
+
+
+Function doGooglePhotosEnroll() As Integer
+    print "regScreen: doGooglePhotosEnroll"
     status = 0    ' 0 => finished, <> 0 => retry needed
 
-    picasa = LoadPicasa()
+    googlephotos = LoadGooglePhotos()
     oa = Oauth()
     ts = CreateObject("roTimespan")
 
@@ -35,11 +60,11 @@ Function doPicasaEnroll() As Integer
     if status = 0
         ' We have a code - start the poll duration timer
         ts.Mark()
-        print "doPicasaEnroll. User Code: "; oa.userCode
+        print "doGooglePhotosEnroll. User Code: "; oa.userCode
     else
         ' Failed to get a code
-        print "doPicasaEnroll: failed to retrieve user code"
-        print "doPicasaEnroll. oauth: "; oa.dump()
+        print "doGooglePhotosEnroll: failed to retrieve user code"
+        print "doGooglePhotosEnroll. oauth: "; oa.dump()
 
         ans=ShowDialog2Buttons("OAuth2 user code request failed", oa.errorMsg, "Try Again", "Back")
         if ans=0
@@ -83,7 +108,7 @@ Function doPicasaEnroll() As Integer
             msg = wait((oa.interval + oa.pollDelay) * 1000, regscreen.GetMessagePort())
             if msg = invalid
                 if ts.TotalSeconds() >= oa.pollExpiresIn
-                    ans=ShowDialog2Buttons("Request timed out", "Unable to link to Picasa within time limit.", "Try Again", "Back")
+                    ans=ShowDialog2Buttons("Request timed out", "Unable to link to Google Photos within time limit.", "Try Again", "Back")
                     if ans=0 then 
                         status = 1    ' Retry
                     end if
@@ -159,7 +184,7 @@ Function displayRegistrationScreen() As Object
     regscreen.SetMessagePort(CreateObject("roMessagePort"))
     
     regscreen.SetTitle("")
-    regscreen.AddParagraph("Please link your Roku player to your Picasa Web Albums account")
+    regscreen.AddParagraph("Please link your Roku player to your Google Photos account")
     regscreen.AddFocalText(" ", "spacing-dense")
     regscreen.AddFocalText("From your computer, go to:" + Chr(10), "spacing-dense")
     regscreen.AddFocalText(oa.verificationUrl, "spacing-dense")
@@ -182,7 +207,7 @@ Sub showCongratulationsScreen()
     screen.SetMessagePort(port)
     
     screen.AddHeaderText("Congratulations!")
-    screen.AddParagraph("You have successfully linked your Roku player to your Picasa Web Albums account")
+    screen.AddParagraph("You have successfully linked your Roku player to your Google Photos account")
     screen.AddParagraph("Select 'Start' to begin.")
     screen.AddButton(1, "Start")
     screen.Show()

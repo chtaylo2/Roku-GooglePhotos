@@ -28,7 +28,7 @@ Function InitOauth(clientId As String, clientSecret As String) As Object
     this.RefreshTokens           = oauth_refresh_tokens
 
     this.sign                    = oauth_sign
-    this.section                 = "Picasa-Auth"
+    this.section                 = "GooglePhotos-Auth"
     this.items                   = CreateObject("roList")
     this.load                    = loadReg    ' from regScreen.brs
     this.save                    = saveReg    ' from regScreen.brs
@@ -78,14 +78,14 @@ Function oauth_request_user_code() As Integer
 
     m.pollDelay                  = 0
 
-    picasa = LoadPicasa()
+    googlephotos = LoadGooglePhotos()
 
     http = NewHttp(m.oauth_prefix+"/device/code",invalid,"POST")
     http.AddHeader("Content-Type","application/x-www-form-URLEncoded")
 
     params = ""
     params = params + "client_id="    + URLEncode(m.clientId)
-    params = params + "&scope="       + URLEncode(picasa.scope)
+    params = params + "&scope="       + URLEncode(googlephotos.scope)
 
     rsp = http.postFromStringWithTimeout(params, 10)
 

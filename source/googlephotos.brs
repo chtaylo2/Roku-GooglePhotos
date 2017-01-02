@@ -1,52 +1,52 @@
 
-Function LoadPicasa() As Object
+Function LoadGooglePhotos() As Object
     ' global singleton
-    return m.picasa
+    return m.googlephotos
 End Function
 
-Function InitPicasa() As Object
+Function InitGooglePhotos() As Object
     ' constructor
     this = CreateObject("roAssociativeArray")
     this.scope = "https://picasaweb.google.com/data"
     this.prefix = this.scope + "/feed/api"
     
-    this.ExecServerAPI = picasa_exec_api
+    this.ExecServerAPI = googlephotos_exec_api
     
-    'Picasa
-    this.BrowsePicasa = picasa_browse
-    this.BrowseFeatured = picasa_featured
-    this.PhotoSearch = picasa_photo_search
+    'GooglePhotos
+    this.BrowseGooglePhotos = googlephotos_browse
+    this.BrowseFeatured = googlephotos_featured
+    this.PhotoSearch = googlephotos_photo_search
     
-	'Search
-	this.SearchAlbums = picasa_user_search
+    'Search
+    this.SearchAlbums = googlephotos_user_search
 	
     'Album
-    this.BrowseAlbums = picasa_browse_albums
-    this.newAlbumListFromXML = picasa_new_album_list
-    this.newAlbumFromXML = picasa_new_album
-    this.getAlbumMetaData = picasa_get_album_meta
-    this.DisplayAlbum = picasa_display_album
+    this.BrowseAlbums = googlephotos_browse_albums
+    this.newAlbumListFromXML = googlephotos_new_album_list
+    this.newAlbumFromXML = googlephotos_new_album
+    this.getAlbumMetaData = googlephotos_get_album_meta
+    this.DisplayAlbum = googlephotos_display_album
 
     'Tags
-    this.BrowseTags = picasa_browse_tags
-    this.newTagListFromXML = picasa_new_tag_list
-    this.newTagFromXML = picasa_new_tag
+    this.BrowseTags = googlephotos_browse_tags
+    this.newTagListFromXML = googlephotos_new_tag_list
+    this.newTagFromXML = googlephotos_new_tag
     
     'Favorites
-    this.BrowseFavorites = picasa_browse_favorites
-    this.DisplayFavorites = picasa_display_favorites
-    this.newFavListFromXML = picasa_new_fav_list
-    this.getFavMetaData = picasa_get_fav_meta
+    this.BrowseFavorites = googlephotos_browse_favorites
+    this.DisplayFavorites = googlephotos_display_favorites
+    this.newFavListFromXML = googlephotos_new_fav_list
+    this.getFavMetaData = googlephotos_get_fav_meta
     
     'Video
-    this.BrowseVideos = picasa_browse_videos
+    this.BrowseVideos = googlephotos_browse_videos
     
-    this.RandomPhotos = picasa_random_photos
-    this.BrowseSettings = picasa_browse_settings
+    this.ShufflePhotos = googlephotos_random_photos
+    this.BrowseSettings = googlephotos_browse_settings
 
-    this.SlideshowSpeed = picasa_set_slideshow_speed
-    this.DelinkPlayer = picasa_delink
-    this.About = picasa_about
+    this.SlideshowSpeed = googlephotos_set_slideshow_speed
+    this.DelinkPlayer = googlephotos_delink
+    this.About = googlephotos_about
  
     'Set Slideshow Duration
     ssdur=RegRead("SlideshowDelay","Settings")
@@ -56,13 +56,14 @@ Function InitPicasa() As Object
         this.SlideshowDuration=Val(ssdur)
     end if   
     
-    print "Picasa: init complete"
+    print "GooglePhotos: init complete"
+
     return this
 End Function
 
 
-Function picasa_exec_api(url_stub="" As String, username="default" As Dynamic)
-	print "picasa_exec_api - enter"
+Function googlephotos_exec_api(url_stub="" As String, username="default" As Dynamic)
+	print "googlephotos_exec_api - enter"
 	
     rsp = invalid
     oa = Oauth()
@@ -85,7 +86,7 @@ Function picasa_exec_api(url_stub="" As String, username="default" As Dynamic)
         xml=http.getToStringWithTimeout(10)
         
 		responseCode = http.GetResponseCode()
-		print "picasa_exec_api - attempt #"; i; " responseCode: "; responseCode
+		print "googlephotos_exec_api - attempt #"; i; " responseCode: "; responseCode
 
         if responseCode >= 400 and responseCode < 500
             ' Expired access token or some other authentication error - refresh access token then retry
@@ -98,9 +99,9 @@ Function picasa_exec_api(url_stub="" As String, username="default" As Dynamic)
 			
             if i = maxAttempts
                 if status <> 0
-                    ShowErrorDialog("There is a problem with the Picasa API access token" + LF + LF + oa.errorMsg + LF + LF + "Exit the channel then try again later","API Authentication Error")
+                    ShowErrorDialog("There is a problem with the Google Photos API access token" + LF + LF + oa.errorMsg + LF + LF + "Exit the channel then try again later","API Authentication Error")
                 else
-                    ShowErrorDialog("Picasa API Access Error" + LF + LF + http.GetFailureReason() + LF + LF + "Exit the channel then try again later","API Authentication Error")
+                    ShowErrorDialog("Google Photos API Access Error" + LF + LF + http.GetFailureReason() + LF + LF + "Exit the channel then try again later","API Authentication Error")
                 endif
                 oa.erase()
                 return invalid
@@ -108,7 +109,7 @@ Function picasa_exec_api(url_stub="" As String, username="default" As Dynamic)
         else if responseCode <> 200
             ' Some other HTTP error - retry
             if i = maxAttempts
-                ShowErrorDialog("Invalid return code from Picasa API" + LF + LF + http.GetFailureReason() + LF + LF + "Exit the channel then try again later","API Error")
+                ShowErrorDialog("Invalid return code from Google Photos API" + LF + LF + http.GetFailureReason() + LF + LF + "Exit the channel then try again later","API Error")
                 return invalid
             endif
             Sleep(500)
@@ -121,7 +122,7 @@ Function picasa_exec_api(url_stub="" As String, username="default" As Dynamic)
     'print xml
     rsp=ParseXML(xml)
     if rsp=invalid then
-        ShowErrorDialog("Unable to parse Picasa API response" + LF + LF + "Exit the channel then try again later","API Error")
+        ShowErrorDialog("Unable to parse Google Photos API response" + LF + LF + "Exit the channel then try again later","API Error")
     end if
     
     return rsp
@@ -129,17 +130,17 @@ End Function
 
 ' ********************************************************************
 ' ********************************************************************
-' ***** Picasa
-' ***** Picasa
+' ***** GooglePhotos
+' ***** GooglePhotos
 ' ********************************************************************
 ' ********************************************************************
-Sub picasa_browse()
+Sub googlephotos_browse()
     screen=uitkPreShowPosterMenu()
 
     highlights=m.highlights
     
     menudata=[
-        {ShortDescriptionLine1:"Featured", DescriptionLine2:"What's featured now on Picasa", HDPosterUrl:highlights[2], SDPosterUrl:highlights[2]},
+        {ShortDescriptionLine1:"Featured", DescriptionLine2:"What's featured now on Google Photos", HDPosterUrl:highlights[2], SDPosterUrl:highlights[2]},
         {ShortDescriptionLine1:"Community Search", ShortDescriptionLine2:"Search community photos", HDPosterUrl:highlights[3], SDPosterUrl:highlights[3]},
     ]
     onselect=[0, m, "BrowseFeatured","PhotoSearch"]
@@ -148,15 +149,15 @@ Sub picasa_browse()
 
 End Sub
 
-Sub picasa_featured()
-    rsp=m.ExecServerAPI("featured?max-results=200&v=2.0&fields=entry(title,gphoto:id,media:group(media:description,media:content,media:thumbnail))&thumbsize=220&imgmax=912",invalid)
+Sub googlephotos_featured()
+    rsp=m.ExecServerAPI("featured?max-results=200&v=2.0&fields=entry(title,gphoto:id,media:group(media:description,media:content,media:thumbnail))&thumbsize=220&imgmax=" + GetResolution(),invalid)
     if rsp<>invalid then
-        featured=picasa_new_image_list(rsp.entry)
+        featured=googlephotos_new_image_list(rsp.entry)
         DisplayImageSet(featured, "Featured", 0, m.SlideshowDuration)
     end if
 End Sub
 
-Sub picasa_photo_search()
+Sub googlephotos_photo_search()
     port=CreateObject("roMessagePort") 
     screen=CreateObject("roSearchScreen")
     screen.SetMessagePort(port)
@@ -177,7 +178,7 @@ Sub picasa_photo_search()
                 keyword=msg.GetMessage()
                 dialog=ShowPleaseWait("Please wait","Searching community images for "+keyword)
                 rsp=m.ExecServerAPI("all?kind=photo&q="+keyword+"&max-results=200",invalid)
-                images=picasa_new_image_list(rsp.entry)
+                images=googlephotos_new_image_list(rsp.entry)
                 dialog.Close()
                 if images.Count()>0 then
                     history.Push(keyword)
@@ -200,7 +201,7 @@ End Sub
 ' ********************************************************************
 ' ********************************************************************
 
-Sub picasa_browse_albums(username="default", nickname=invalid)    
+Sub googlephotos_browse_albums(username="default", nickname=invalid)    
     breadcrumb_name=""
     if username<>"default" and nickname<>invalid then
         breadcrumb_name=nickname
@@ -212,8 +213,8 @@ Sub picasa_browse_albums(username="default", nickname=invalid)
     albums=m.newAlbumListFromXML(rsp.entry)
     
     if albums.Count()>0 then
-        onselect = [1, albums, m, function(albums, picasa, set_idx):picasa.DisplayAlbum(albums[set_idx]):end function]
-        uitkDoPosterMenu(picasa_get_album_meta(albums), screen, onselect)
+        onselect = [1, albums, m, function(albums, googlephotos, set_idx):googlephotos.DisplayAlbum(albums[set_idx]):end function]
+        uitkDoPosterMenu(googlephotos_get_album_meta(albums), screen, onselect)
     else
         uitkDoMessage("You have no albums containing any photos", screen)
     end if
@@ -221,7 +222,7 @@ Sub picasa_browse_albums(username="default", nickname=invalid)
 End Sub
 
 
-Function picasa_new_album_list(xmllist As Object) As Object
+Function googlephotos_new_album_list(xmllist As Object) As Object
     albumlist=CreateObject("roList")
     for each record in xmllist
         album=m.newAlbumFromXML(record)
@@ -233,9 +234,9 @@ Function picasa_new_album_list(xmllist As Object) As Object
     return albumlist
 End Function
 
-Function picasa_new_album(xml As Object) As Object
+Function googlephotos_new_album(xml As Object) As Object
     album = CreateObject("roAssociativeArray")
-    album.picasa=m
+    album.googlephotos=m
     album.xml=xml
 
     album.GetUsername=function():return m.xml.GetNamedElements("gphoto:user")[0].GetText():end function
@@ -247,7 +248,7 @@ Function picasa_new_album(xml As Object) As Object
     return album
 End Function
 
-Function picasa_get_album_meta(albums As Object)
+Function googlephotos_get_album_meta(albums As Object)
     albummetadata=[]
     for each album in albums
         thumb=album.GetThumb()
@@ -257,15 +258,16 @@ Function picasa_get_album_meta(albums As Object)
 End Function
 
 Function album_get_images()
-    rsp=m.picasa.ExecServerAPI("/albumid/"+m.GetID()+"?kind=photo&v=2.0&fields=entry(title,gphoto:timestamp,gphoto:id,gphoto:videostatus,media:group(media:description,media:content,media:thumbnail))&thumbsize=220&imgmax=912",m.GetUsername())
+    rsp=m.googlephotos.ExecServerAPI("/albumid/"+m.GetID()+"?kind=photo&v=2.0&fields=entry(title,gphoto:timestamp,gphoto:id,gphoto:videostatus,media:group(media:description,media:content,media:thumbnail))&thumbsize=220&imgmax="+GetResolution(),m.GetUsername())
+    print "GooglePhotos Res: " + GetResolution()
     if not isxmlelement(rsp) then 
         return invalid
     end if
 	
-    return picasa_new_image_list(rsp.entry)
+    return googlephotos_new_image_list(rsp.entry)
 End Function
 
-Sub picasa_display_album(album As Object)
+Sub googlephotos_display_album(album As Object)
     print "DisplayAlbum: init"
     medialist=album.GetImages()
     
@@ -274,9 +276,10 @@ Sub picasa_display_album(album As Object)
     for each media in medialist
         if media.IsVideo() then
             videos.Push(media)
+            print "VIDEO: "; media.GetURL()
         else
             images.Push(media)
-            print media.GetURL()
+            print "IMAGE: "; media.GetURL()
         end if
     end for
     
@@ -298,7 +301,7 @@ Sub picasa_display_album(album As Object)
             onselect = [1, [images, videos], title, album_select]
             uitkDoPosterMenu(albummenudata, screen, onselect)
         else 'Video only album
-            picasa_browse_videos(videos, title)
+            googlephotos_browse_videos(videos, title)
         end if
     else 'Photo only album			
             screen=uitkPreShowPosterMenu(title,"Album")
@@ -320,7 +323,7 @@ End Sub
 
 Sub album_select(media, title, set_idx)
     if set_idx=0 then
-        'DisplayImageSet(media[0], title, 0, m.picasa.SlideshowDuration)
+        'DisplayImageSet(media[0], title, 0, m.googlephotos.SlideshowDuration)
 		
 		screen=uitkPreShowPosterMenu(title,"Album")
         listIcon="pkg:/images/browse.png"
@@ -338,19 +341,19 @@ Sub album_select(media, title, set_idx)
         uitkDoPosterMenu(albummenudata, screen, onselect)				
 
     else 
-        picasa_browse_videos(media[1], title)
+        googlephotos_browse_videos(media[1], title)
     end if
 End Sub
 
 Sub album_play_browse_select(media, title, set_idx)
     if set_idx=0 then 
-        DisplayImageSet(media[0], title, 0, m.picasa.SlideshowDuration) 
+        DisplayImageSet(media[0], title, 0, m.googlephotos.SlideshowDuration) 
     else 
         BrowseImages(media[0], title)
     end if
 End Sub
 
-Sub picasa_user_search(username="default", nickname=invalid)
+Sub googlephotos_user_search(username="default", nickname=invalid)
     port=CreateObject("roMessagePort") 
     screen=CreateObject("roSearchScreen")
     screen.SetMessagePort(port)
@@ -370,8 +373,8 @@ Sub picasa_user_search(username="default", nickname=invalid)
             else if msg.isFullResult()
                 keyword=msg.GetMessage()
                 dialog=ShowPleaseWait("Please wait","Searching your albums for '" + keyword + "'")
-				rsp=m.ExecServerAPI("?kind=photo&v=2.0&q="+keyword+"&max-results=200&thumbsize=220&imgmax=912",username)
-                images=picasa_new_image_list(rsp.entry)
+				rsp=m.ExecServerAPI("?kind=photo&v=2.0&q="+keyword+"&max-results=200&thumbsize=220&imgmax=" + GetResolution(),username)
+                images=googlephotos_new_image_list(rsp.entry)
                 dialog.Close()
                 if images.Count()>0 then
                     history.Push(keyword)
@@ -411,7 +414,7 @@ End Sub
 ' ***** Tags
 ' ********************************************************************
 ' ********************************************************************
-Sub picasa_browse_tags(username="default", nickname=invalid)    
+Sub googlephotos_browse_tags(username="default", nickname=invalid)    
     breadcrumb_name=""
     if username<>"default" and nickname<>invalid then
         breadcrumb_name=nickname
@@ -424,14 +427,14 @@ Sub picasa_browse_tags(username="default", nickname=invalid)
     tags=m.newTagListFromXML(rsp.entry, username)
     
     if tags.Count()>0 then
-        onselect = [1, tags, m, function(tags, picasa, set_idx):picasa.DisplayAlbum(tags[set_idx]):end function]
-        uitkDoPosterMenu(picasa_get_album_meta(tags), screen, onselect)
+        onselect = [1, tags, m, function(tags, googlephotos, set_idx):googlephotos.DisplayAlbum(tags[set_idx]):end function]
+        uitkDoPosterMenu(googlephotos_get_album_meta(tags), screen, onselect)
     else
         uitkDoMessage("No photos have been tagged", screen)
     end if
 End Sub
 
-Function picasa_new_tag_list(xmllist As Object, username) As Object
+Function googlephotos_new_tag_list(xmllist As Object, username) As Object
     taglist=CreateObject("roList")
     for each record in xmllist
         tag=m.newTagFromXML(record, username)
@@ -442,9 +445,9 @@ Function picasa_new_tag_list(xmllist As Object, username) As Object
     return taglist
 End Function
 
-Function picasa_new_tag(xml As Object, username) As Object
+Function googlephotos_new_tag(xml As Object, username) As Object
     tag = CreateObject("roAssociativeArray")
-    tag.picasa=m
+    tag.googlephotos=m
     tag.xml=xml
     tag.username=username
     tag.GetUsername=function():return m.username:end function
@@ -455,12 +458,12 @@ Function picasa_new_tag(xml As Object, username) As Object
 End Function
 
 Function tag_get_images()
-    rsp=m.picasa.ExecServerAPI("?kind=photo&tag="+m.GetTitle()+"&thumbsize=220&imgmax=912",m.GetUsername())
+    rsp=m.googlephotos.ExecServerAPI("?kind=photo&tag="+m.GetTitle()+"&thumbsize=220&imgmax=" + GetResolution(),m.GetUsername())
     if not isxmlelement(rsp) then 
         return invalid
     end if
     
-    return picasa_new_image_list(rsp.entry)
+    return googlephotos_new_image_list(rsp.entry)
 End Function
 
 ' ********************************************************************
@@ -469,10 +472,39 @@ End Function
 ' ***** Images
 ' ********************************************************************
 ' ********************************************************************
-Function picasa_new_image_list(xmllist As Object) As Object
+
+Function GetResolution()
+    ssres = RegRead("SlideshowRes","Settings")
+
+    if ssres=invalid then
+        device = createObject("roDeviceInfo")
+        is4k = (val(device.GetVideoMode()) = 2160)
+        is1080p = (val(device.GetVideoMode()) = 1080)
+
+        if is4k then
+            res="1600"
+        else if is1080p
+            res="1280"
+        else
+            res="720"
+        end if
+    else
+        if ssres="FHD" then
+            res="1600"
+        else if ssres="HD"
+            res="1280"
+        else
+            res="720"
+        end if
+    end if
+
+    return res
+End Function
+
+Function googlephotos_new_image_list(xmllist As Object) As Object
     images=CreateObject("roList")
     for each record in xmllist
-        image=picasa_new_image(record)
+        image=googlephotos_new_image(record)
         if image.GetURL()<>invalid then
             images.Push(image)
         end if
@@ -481,14 +513,14 @@ Function picasa_new_image_list(xmllist As Object) As Object
     return images
 End Function
 
-Function picasa_new_image(xml As Object) As Object
+Function googlephotos_new_image(xml As Object) As Object
     image = CreateObject("roAssociativeArray")
     image.xml=xml
     image.GetTitle=function():return m.xml.GetNamedElements("title")[0].GetText():end function
     image.GetID=function():return m.xml.GetNamedElements("gphoto:id")[0].GetText():end function
     image.GetURL=image_get_url
     image.GetThumb=get_thumb
-	image.GetTimestamp=function():return m.xml.GetNamedElements("gphoto:timestamp")[0].GetText():end function
+    image.GetTimestamp=function():return Left(m.xml.GetNamedElements("gphoto:timestamp")[0].GetText(), 10):end function
     image.IsVideo=function():return (m.xml.GetNamedElements("gphoto:videostatus")[0]<>invalid):end function
     image.GetVideoStatus=function():return m.xml.GetNamedElements("gphoto:videostatus")[0].GetText():end function
     return image
@@ -535,7 +567,7 @@ End Function
 ' ***** Favorites
 ' ********************************************************************
 ' ********************************************************************
-Sub picasa_browse_favorites(username="default", nickname=invalid)
+Sub googlephotos_browse_favorites(username="default", nickname=invalid)
     breadcrumb_name=""
     if username<>"default" and nickname<>invalid then
         breadcrumb_name=nickname
@@ -545,17 +577,17 @@ Sub picasa_browse_favorites(username="default", nickname=invalid)
     
     rsp=m.ExecServerAPI("/contacts?kind=user",username)
     if not isxmlelement(rsp) then return
-    favs=picasa_new_fav_list(rsp.entry)
+    favs=googlephotos_new_fav_list(rsp.entry)
     
     if favs.Count() > 0 then
-        onselect = [1, favs, m, function(ff, picasa, set_idx):picasa.DisplayFavorites(ff[set_idx]):end function]
+        onselect = [1, favs, m, function(ff, googlephotos, set_idx):googlephotos.DisplayFavorites(ff[set_idx]):end function]
         uitkDoPosterMenu(m.getFavMetaData(favs), screen, onselect)
     else
         uitkDoMessage("You do not have any favorites", screen)
     end if
 End Sub
 
-Sub picasa_display_favorites(fav As Object)
+Sub googlephotos_display_favorites(fav As Object)
     user=fav.GetUser()
     nickname=fav.GetNickname()
     
@@ -563,9 +595,9 @@ Sub picasa_display_favorites(fav As Object)
     
     'Get highlights from recent photo feed
     highlights=[]
-    rsp=m.ExecServerAPI("?kind=photo&max-results=5&v=2.0&fields=entry(media:group(media:description,media:content,media:thumbnail))&thumbsize=220&imgmax=912",user)
+    rsp=m.ExecServerAPI("?kind=photo&max-results=5&v=2.0&fields=entry(media:group(media:description,media:content,media:thumbnail))&thumbsize=220&imgmax=" + GetResolution(),user)
     if isxmlelement(rsp) then 
-        images=picasa_new_image_list(rsp.entry)
+        images=googlephotos_new_image_list(rsp.entry)
         for each image in images
             highlights.Push(image.GetThumb())
         end for
@@ -581,15 +613,15 @@ Sub picasa_display_favorites(fav As Object)
         {ShortDescriptionLine1:"Albums", ShortDescriptionLine2:"Browse Recently Updated Albums", HDPosterUrl:highlights[0], SDPosterUrl:highlights[0]},
         {ShortDescriptionLine1:"Tags", ShortDescriptionLine2:"Browse Tags", HDPosterUrl:highlights[1], SDPosterUrl:highlights[1]},
         {ShortDescriptionLine1:"Favorites", ShortDescriptionLine2:"Browse Favorites", HDPosterUrl:highlights[2], SDPosterUrl:highlights[2]},
-        {ShortDescriptionLine1:"Random Photos", ShortDescriptionLine2:"Display slideshow of random photos", HDPosterUrl:highlights[3], SDPosterUrl:highlights[3]},
+        {ShortDescriptionLine1:"Shuffle Photos", ShortDescriptionLine2:"Display slideshow of random photos", HDPosterUrl:highlights[3], SDPosterUrl:highlights[3]},
     ]
     
-    onclick=[0, m, ["BrowseAlbums", user, nickname], ["BrowseTags", user, nickname], ["BrowseFavorites", user, nickname], ["RandomPhotos", user]]
+    onclick=[0, m, ["BrowseAlbums", user, nickname], ["BrowseTags", user, nickname], ["BrowseFavorites", user, nickname], ["ShufflePhotos", user]]
     
     uitkDoPosterMenu(menudata, screen, onclick)
 End Sub
 
-Function picasa_new_fav_list(xmllist As Object)
+Function googlephotos_new_fav_list(xmllist As Object)
     favs=[]
     for each record in xmllist
         fav = CreateObject("roAssociativeArray")
@@ -604,7 +636,7 @@ Function picasa_new_fav_list(xmllist As Object)
     return favs
 End Function
 
-Function picasa_get_fav_meta(fav As Object)
+Function googlephotos_get_fav_meta(fav As Object)
     favmetadata=[]
     for each f in fav
         favmetadata.Push({ShortDescriptionLine1: f.GetNickname(), ShortDescriptionLine2: f.GetURL(), HDPosterUrl: f.GetThumb(), SDPosterUrl: f.GetThumb()})
@@ -619,8 +651,8 @@ End Function
 ' ***** Random Slideshow
 ' ********************************************************************
 ' ********************************************************************
-Sub picasa_random_photos(username="default")
-    screen=uitkPreShowPosterMenu("","Random Photos")
+Sub googlephotos_random_photos(username="default")
+    screen=uitkPreShowPosterMenu("","Shuffle Photos")
     
     rsp=m.ExecServerAPI("?kind=album&v=2.0&fields=entry(title,gphoto:numphotos,gphoto:user,gphoto:id,media:group(media:description,media:thumbnail))",username)
     if not isxmlelement(rsp) then return
@@ -695,7 +727,7 @@ Sub BrowseImages(images AS Object, title="" As String)
     while true
         selected=uitkDoGrid(images_get_meta(images), screen)
         if selected>-1 then
-            DisplayImageSet(images, title, selected, m.picasa.SlideshowDuration)
+            DisplayImageSet(images, title, selected, m.googlephotos.SlideshowDuration)
         else
             return
         end if
@@ -708,14 +740,14 @@ End Sub
 ' ***** Videos
 ' ********************************************************************
 ' ********************************************************************
-Sub picasa_browse_videos(videos As Object, title As String)
+Sub googlephotos_browse_videos(videos As Object, title As String)
     if videos.Count()=1 then
         DisplayVideo(GetVideoMetaData(videos)[0])
     else
         screen=uitkPreShowPosterMenu(title,"Videos")
         metadata=GetVideoMetaData(videos)
         
-        onselect = [1, metadata, m, function(video, picasa, set_idx):DisplayVideo(video[set_idx]):end function]
+        onselect = [1, metadata, m, function(video, googlephotos, set_idx):DisplayVideo(video[set_idx]):end function]
         uitkDoPosterMenu(metadata, screen, onselect)
     end if
 End Sub
