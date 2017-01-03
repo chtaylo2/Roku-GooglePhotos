@@ -216,7 +216,7 @@ Sub googlephotos_browse_albums(username="default", nickname=invalid)
         onselect = [1, albums, m, function(albums, googlephotos, set_idx):googlephotos.DisplayAlbum(albums[set_idx]):end function]
         uitkDoPosterMenu(googlephotos_get_album_meta(albums), screen, onselect)
     else
-        uitkDoMessage("You have no albums containing any photos", screen)
+        uitkDoMessage("You do not have any albums containing photos", screen)
     end if
 
 End Sub
@@ -288,17 +288,22 @@ Sub googlephotos_display_album(album As Object)
     if videos.Count()>0 then        
         if images.Count()>0 then 'Combined photo and photo album
             screen=uitkPreShowPosterMenu(title,"Album")
+			listIcon="pkg:/images/browse.png"
             
             albummenudata = [
-                {ShortDescriptionLine1:Pluralize(images.Count(),"Photo"),
+                {ShortDescriptionLine1:Pluralize(images.Count(),"Photo") + " - Start Slideshow",
                  HDPosterUrl:images[0].GetThumb(),
                  SDPosterUrl:images[0].GetThumb()},
                 {ShortDescriptionLine1:Pluralize(videos.Count(),"Video"),
                  HDPosterUrl:videos[0].GetThumb(),
                  SDPosterUrl:videos[0].GetThumb()},
+                {ShortDescriptionLine1:"Browse Photos",
+                 HDPosterUrl:listIcon,
+                 SDPosterUrl:listIcon},
             ]
             
-            onselect = [1, [images, videos], title, album_select]
+            
+			onselect = [1, [images, videos], title, album_select]
             uitkDoPosterMenu(albummenudata, screen, onselect)
         else 'Video only album
             googlephotos_browse_videos(videos, title)
@@ -323,25 +328,13 @@ End Sub
 
 Sub album_select(media, title, set_idx)
     if set_idx=0 then
-        'DisplayImageSet(media[0], title, 0, m.googlephotos.SlideshowDuration)
+        DisplayImageSet(media[0], title, 0, m.googlephotos.SlideshowDuration)
 		
-		screen=uitkPreShowPosterMenu(title,"Album")
-        listIcon="pkg:/images/browse.png"
-			
-        albummenudata = [
-            {ShortDescriptionLine1:Pluralize(media[0].Count(),"Photo") + " - Start Slideshow",
-             HDPosterUrl:media[0][0].GetThumb(),
-             SDPosterUrl:media[0][0].GetThumb()},
-            {ShortDescriptionLine1:"Browse Photos",
-             HDPosterUrl:listIcon,
-             SDPosterUrl:listIcon},
-       ]
-            
-        onselect = [1, [media[0], media[1]], title, album_play_browse_select]
-        uitkDoPosterMenu(albummenudata, screen, onselect)				
-
-    else 
+    else if set_idx=1 then
         googlephotos_browse_videos(media[1], title)
+		
+	else if set_idx=2 then
+	    BrowseImages(media[0], title)
     end if
 End Sub
 
@@ -548,7 +541,7 @@ End Function
 Function images_get_meta(images As Object)
     imagemetadata=[]
     for each image in images
-        imagemetadata.Push({Title: image.GetTitle(), Description: friendlyDate(strtoi(image.GetTimestamp())), HDPosterUrl: image.GetThumb(), SDPosterUrl: image.GetThumb()})
+        imagemetadata.Push({Title: image.GetTitle(), Description: "  " + friendlyDate(strtoi(image.GetTimestamp())), HDPosterUrl: image.GetThumb(), SDPosterUrl: image.GetThumb()})
     next
     return imagemetadata
 End Function

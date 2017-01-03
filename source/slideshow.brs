@@ -8,7 +8,7 @@ Sub AddNextImageToSlideShow(ss, imagelist, counter)
         image.Info.url=image.GetURL()
         
         if counter>0 then image.Info.TextOverlayUR=itostr(counter)+" of "+itostr(imagelist.Count())
-        image.Info.TextOverlayBody=image.GetTitle() + " - " + friendlyDate(strtoi(image.GetTimestamp()))
+        image.Info.TextOverlayBody=image.GetTitle() + "  -  " + friendlyDate(strtoi(image.GetTimestamp()))
         ss.AddContent(image.Info)
     end if
 End Sub

@@ -41,15 +41,16 @@ Function getSettingsList() As Dynamic
             ShortDescriptionLine2: "Defines photo delay during slideshow"
         },
         {
-            Title:"Deactivate Player",
+            Title:"Link additional Google Photos account",
             ID:"3",
             ShortDescriptionLine1: ""
-            ShortDescriptionLine2: "Remove link from Google Photos account"
-        },{
-            Title:"Link additional Google Photos acccount",
+            ShortDescriptionLine2: "Link additional Google Photos account"
+        },
+        {
+            Title:"Deactivate Player",
             ID:"4",
             ShortDescriptionLine1: ""
-            ShortDescriptionLine2: "Link additional Google Photos acccount"
+            ShortDescriptionLine2: "Remove link from Google Photos account"
         },
         {
             Title:"About",
@@ -69,7 +70,7 @@ Sub googlephotos_browse_settings()
     screen.SetBreadcrumbText("", "Settings")
     screen.show()
     
-    menuSelections = [googlephotos_set_slideshow_res, googlephotos_set_slideshow_speed, googlephotos_delink, googlephotos_comingSoon, googlephotos_about]
+    menuSelections = [googlephotos_set_slideshow_res, googlephotos_set_slideshow_speed, googlephotos_comingSoon, googlephotos_delink, googlephotos_about]
     
     while(true)
         msg = wait(0,port)
@@ -254,6 +255,9 @@ Sub googlephotos_delink()
     if ans=0 then 
         oa = Oauth()
         oa.erase()
+        
+        ans2=ShowDialog1Button("Success","You have successfully unlinked this Roku device.","Close")
+        doRegistration()
     end if
 End Sub
 
@@ -263,11 +267,11 @@ Sub googlephotos_about()
     screen.SetMessagePort(port)
     screen.SetBreadcrumbText("", "Settings")
     
-    screen.AddHeaderText("About the channel")
+    screen.AddHeaderText("About this channel")
     
     screen.AddParagraph("The channel is not affiliated with Google.")
 
-    screen.AddParagraph("The Google Photos Channeal, current version (v3) was developed by Chris Taylor which adds a numbers of functional improvements. It has also been rebranded for Google Photos as Picasa has been discontinued by Google.")
+    screen.AddParagraph("The Google Photos Channel, current version (v3) was developed by Chris Taylor which adds a numbers of functional improvements. It has also been rebranded for Google Photos as Picasa has been discontinued by Google.")
     screen.AddParagraph("The original Picasa Web Albums Channel (v1) was developed by Chris Hoffman and Belltown developing (v2) which added OAuth2 and other bug fixes.")
     screen.AddParagraph("If you have any questions or comments, post them in forums.roku.com in the General Discussions forum.")
 

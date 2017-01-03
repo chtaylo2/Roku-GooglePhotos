@@ -123,6 +123,9 @@ Function doGooglePhotosEnroll() As Integer
                     elseif msg.isButtonPressed()
                         if msg.GetIndex() = 0
                             status = 1        ' Make sure we loop again to get a new code
+                        else if msg.GetIndex() = 1
+                            googlephotos_about()
+                            status = 1        ' Make sure we loop again to get a new code
                         end if
                         return status
                     end if
@@ -184,7 +187,8 @@ Function displayRegistrationScreen() As Object
     regscreen.SetMessagePort(CreateObject("roMessagePort"))
     
     regscreen.SetTitle("")
-    regscreen.AddParagraph("Please link your Roku player to your Google Photos account")
+    regscreen.SetBreadcrumbText("", "Registration")
+    regscreen.AddParagraph("Please link this Roku device to your Google Photos account")
     regscreen.AddFocalText(" ", "spacing-dense")
     regscreen.AddFocalText("From your computer, go to:" + Chr(10), "spacing-dense")
     regscreen.AddFocalText(oa.verificationUrl, "spacing-dense")
@@ -192,7 +196,8 @@ Function displayRegistrationScreen() As Object
     regscreen.SetRegistrationCode(oa.userCode)
     regscreen.AddParagraph("This screen will automatically update as soon as your activation completes")
     regscreen.AddButton(0, "Get a new code")
-    regscreen.AddButton(1, "Back")
+    regscreen.AddButton(1, "About channel")
+    'regscreen.AddButton(1, "Back")
     regscreen.Show()
     
     return regscreen
@@ -207,9 +212,9 @@ Sub showCongratulationsScreen()
     screen.SetMessagePort(port)
     
     screen.AddHeaderText("Congratulations!")
-    screen.AddParagraph("You have successfully linked your Roku player to your Google Photos account")
-    screen.AddParagraph("Select 'Start' to begin.")
-    screen.AddButton(1, "Start")
+    screen.AddParagraph("You have successfully linked this Roku device to your Google Photos account")
+    screen.AddParagraph("Select 'Continue' to begin.")
+    screen.AddButton(1, "Continue")
     screen.Show()
     
     while true

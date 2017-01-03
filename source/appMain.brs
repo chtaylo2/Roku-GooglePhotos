@@ -58,13 +58,13 @@ Sub initTheme()
     
     theme.OverhangPrimaryLogoOffsetSD_X = "72"
     theme.OverhangPrimaryLogoOffsetSD_Y = "10"
-    theme.OverhangSliceSD 		= "pkg:/images/Overhang_BackgroundSlice_SD43.png"
-    theme.OverhangPrimaryLogoSD  	= "pkg:/images/Logo_Overhang_SD.png"
+    theme.OverhangSliceSD 		        = "pkg:/images/Overhang_BackgroundSlice_SD43.png"
+    theme.OverhangPrimaryLogoSD  	    = "pkg:/images/Logo_Overhang_SD.png"
     
     theme.OverhangPrimaryLogoOffsetHD_X = "123"
     theme.OverhangPrimaryLogoOffsetHD_Y = "10"
-    theme.OverhangSliceHD 		= "pkg:/images/Overhang_BackgroundSlice_HD.png"
-    theme.OverhangPrimaryLogoHD  	= "pkg:/images/Logo_Overhang_HD.png"
+    theme.OverhangSliceHD 		        = "pkg:/images/Overhang_BackgroundSlice_HD.png"
+    theme.OverhangPrimaryLogoHD  	    = "pkg:/images/Logo_Overhang_HD.png"
     
     theme.GridScreenLogoHD          	= "pkg:/images/Logo_Overhang_HD.png"
     theme.GridScreenOverhangSliceHD 	= "pkg:/images/Overhang_BackgroundSlice_HD.png"
@@ -78,13 +78,13 @@ Sub initTheme()
     theme.GridScreenLogoOffsetSD_Y  	= "10"
     theme.GridScreenOverhangHeightSD	= "95"
 	
-    theme.BackgroundColor 		= "#EBEBEB"
-    theme.GridScreenBackgroundColor	= "#EBEBEB"
-    theme.BreadcrumbDelimiter		= "#808080"
-    theme.BreadcrumbTextLeft		= "#808080"
-    theme.BreadcrumbTextRight		= "#B3B3B3"
-    theme.GridScreenListNameColor   	= "#808080"
-    theme.GridScreenRetrievingColor	= "#808080"
+    theme.BackgroundColor 		        = "#EBEBEB"
+    theme.GridScreenBackgroundColor	    = "#EBEBEB"
+    theme.BreadcrumbDelimiter		    = "#808080"
+    theme.BreadcrumbTextLeft		    = "#808080"
+    theme.BreadcrumbTextRight		    = "#B3B3B3"
+    theme.GridScreenListNameColor       = "#808080"
+    theme.GridScreenRetrievingColor	    = "#808080"
 	
     app.SetTheme(theme)
 	
