@@ -3,16 +3,17 @@
 '
 '    Display "menu" items in a Poster Screen.   
 '
-function uitkPreShowPosterMenu(breadA=invalid, breadB=invalid) As Object
+function uitkPreShowPosterMenu(breadA=invalid, breadB=invalid, liststyle="arced-square") As Object
+
     port=CreateObject("roMessagePort")
     screen = CreateObject("roPosterScreen")
     screen.SetMessagePort(port)
     screen.SetCertificatesFile("common:/certs/ca-bundle.crt")
-    screen.InitClientCertificates()
+    screen.InitClientCertificates()    
     if breadA<>invalid and breadB<>invalid then
         screen.SetBreadcrumbText(breadA, breadB)
     end if
-    screen.SetListStyle("arced-square")
+    screen.SetListStyle(liststyle)
     screen.SetListDisplayMode("zoom-to-fill")
     screen.Show()
 

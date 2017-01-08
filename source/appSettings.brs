@@ -70,7 +70,7 @@ Sub googlephotos_browse_settings()
     screen.SetBreadcrumbText("", "Settings")
     screen.show()
     
-    menuSelections = [googlephotos_set_slideshow_res, googlephotos_set_slideshow_speed, googlephotos_comingSoon, googlephotos_delink, googlephotos_about]
+    menuSelections = [googlephotos_set_slideshow_res, googlephotos_set_slideshow_speed, doAdditionalReg, googlephotos_delink, googlephotos_about]
     
     while(true)
         msg = wait(0,port)
