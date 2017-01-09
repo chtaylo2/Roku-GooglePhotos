@@ -47,7 +47,7 @@ Function getSettingsList() As Dynamic
             ShortDescriptionLine2: "Link additional Google Photos account"
         },
         {
-            Title:"Deactivate Player",
+            Title:"Deactivate link from device",
             ID:"4",
             ShortDescriptionLine1: ""
             ShortDescriptionLine2: "Remove link from Google Photos account"
@@ -251,13 +251,22 @@ Sub googlephotos_comingSoon()
 End Sub
 
 Sub googlephotos_delink()
-    ans=ShowDialog2Buttons("Deactivate Player","Remove link to your Google Photos account?","Confirm","Cancel")
+
+    oa = Oauth()
+    userIndex = oa.accessTokenIndex()
+
+    ans=ShowDialog2Buttons("Deactivate Link","Remove " + oa.userInfoName[userIndex] + "'s photo link from this device?","Confirm","Cancel")
     if ans=0 then 
         oa = Oauth()
-        oa.erase()
+        oa.currentAccessTokenInod = userIndex
+
+        for each item in oa.items
+            oa[item].Delete(userIndex)
+        end for
+        oa.save()
         
         ans2=ShowDialog1Button("Success","You have successfully unlinked this Roku device.","Close")
-        doRegistration()
+        RunUserInterface()
     end if
 End Sub
 
@@ -273,7 +282,7 @@ Sub googlephotos_about()
 
     screen.AddParagraph("The Google Photos Channel, current version (v3) was developed by Chris Taylor which adds a numbers of functional improvements. It has also been rebranded for Google Photos as Picasa has been discontinued by Google.")
     screen.AddParagraph("The original Picasa Web Albums Channel (v1) was developed by Chris Hoffman and Belltown developing (v2) which added OAuth2 and other bug fixes.")
-    screen.AddParagraph("If you have any questions or comments, post them in forums.roku.com in the General Discussions forum.")
+    screen.AddParagraph("If you have any questions or comments, please see [Tips and Tricks > Report Bugs or Feature Request] from the main screen.")
 
     screen.AddButton(1, "Back")
     screen.Show()

@@ -100,16 +100,16 @@ Sub ShowMainMenu(userIndex=0 As Integer)
     favoriteIcon="pkg:/images/favorite.png"
     tagsIcon="pkg:/images/tags.png"
     randomIcon="pkg:/images/random_icon.png"
+	tipsIcon="pkg:/images/tipsandtricks.png"
     
     menudata=[
         {ShortDescriptionLine1:"My Albums", ShortDescriptionLine2:"Browse your albums", HDPosterUrl:photoIcon, SDPosterUrl:photoIcon},
         {ShortDescriptionLine1:"Search", ShortDescriptionLine2:"Search your albums", HDPosterUrl:searchIcon, SDPosterUrl:searchIcon},
-        {ShortDescriptionLine1:"Tags", ShortDescriptionLine2:"Browse your tags", HDPosterUrl:tagsIcon, SDPosterUrl:tagsIcon},
-        {ShortDescriptionLine1:"Favorites", ShortDescriptionLine2:"Browse your favorites", HDPosterUrl:favoriteIcon, SDPosterUrl:favoriteIcon},
         {ShortDescriptionLine1:"Shuffle Photos", ShortDescriptionLine2:"Display a random slideshow of your photos", HDPosterUrl:randomIcon, SDPosterUrl:randomIcon},
+		{ShortDescriptionLine1:"Tips and Tricks", ShortDescriptionLine2:"Get the most out of Google Photos!", HDPosterUrl:tipsIcon, SDPosterUrl:tipsIcon},
         {ShortDescriptionLine1:"Settings", ShortDescriptionLine2:"Edit channel settings", HDPosterUrl:settingsIcon, SDPosterUrl:settingsIcon},
     ]
-    onselect=[0, m.googlephotos, "BrowseAlbums","SearchAlbums","BrowseTags","BrowseFavorites","ShufflePhotos", "BrowseSettings"]
+    onselect=[0, m.googlephotos, "BrowseAlbums", "SearchAlbums", "ShufflePhotos", "TipsAndTricks", "BrowseSettings"]
     
     uitkDoPosterMenu(menudata, screen, onselect)    
     

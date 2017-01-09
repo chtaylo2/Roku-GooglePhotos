@@ -338,7 +338,7 @@ End Function
 Function oauth_sign(http As Object, userIndex As Integer)
 
     ' Save our current selection
-    m.currentAccessTokenInd  = userIndex
+    m.currentAccessTokenInd = userIndex
     
     if m.accessToken[m.currentAccessTokenInd] <> ""
         http.AddHeader("Authorization", "Bearer " + m.accessToken[m.currentAccessTokenInd])

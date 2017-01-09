@@ -7,7 +7,7 @@ End Function
 Function InitGooglePhotos() As Object
     ' constructor
 	
-	this = CreateObject("roAssociativeArray")
+    this = CreateObject("roAssociativeArray")
     this.scope = "https://picasaweb.google.com/data"
     this.prefix = this.scope + "/feed/api"
     
@@ -43,6 +43,7 @@ Function InitGooglePhotos() As Object
     this.BrowseVideos = googlephotos_browse_videos
     
     this.ShufflePhotos = googlephotos_random_photos
+    this.TipsAndTricks = googlephotos_browse_tips
     this.BrowseSettings = googlephotos_browse_settings
 
     this.SlideshowSpeed = googlephotos_set_slideshow_speed
@@ -354,7 +355,7 @@ End Sub
 Sub album_play_browse_select(media, title, set_idx)
     if set_idx=0 then 
         DisplayImageSet(media[0], title, 0, m.googlephotos.SlideshowDuration) 
-    else 
+    else if set_idx=1 then
         BrowseImages(media[0], title)
     end if
 End Sub
@@ -390,7 +391,6 @@ Sub googlephotos_user_search(username="default", nickname=invalid)
                 if images.Count()>0 then
                     history.Push(keyword)
                     screen.AddSearchTerm(keyword)
-                    'DisplayImageSet(images, keyword, 0, m.SlideshowDuration)
 					screen.Close()
 					
 					screen=uitkPreShowPosterMenu(oa.userInfoName[userIndex],"Search Results")
@@ -400,7 +400,6 @@ Sub googlephotos_user_search(username="default", nickname=invalid)
 					albummenudata = [
 						{ShortDescriptionLine1:Pluralize(images.Count(),"Photo") + " - Start Slideshow", HDPosterUrl:images[0].GetThumb(), SDPosterUrl:images[0].GetThumb()},
 						{ShortDescriptionLine1:"Browse Photos", HDPosterUrl:listIcon, SDPosterUrl:listIcon},
-						{ShortDescriptionLine1:"NewSearch", HDPosterUrl:searchIcon, SDPosterUrl:searchIcon},
 					]
             
 					onselect = [1, [images, videos], "Search Results", album_play_browse_select]
@@ -415,7 +414,6 @@ Sub googlephotos_user_search(username="default", nickname=invalid)
         end if
     end while
 End Sub
-
 
 ' ********************************************************************
 ' ********************************************************************
