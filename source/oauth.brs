@@ -319,7 +319,7 @@ Function oauth_refresh_tokens() As Integer
 			end if
 
             'Query User info - Refresh
-            status = m.RequestUserInfo(currentAccessTokenInd, true)
+            status = m.RequestUserInfo(m.currentAccessTokenInd, true)
 
             if m.accessToken[m.currentAccessTokenInd]  = ""    then m.errorMsg = "Missing access_token"    : status = 1
             if m.tokenType                             = ""    then m.errorMsg = "Missing token_type"      : status = 1

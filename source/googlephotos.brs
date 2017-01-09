@@ -395,14 +395,12 @@ Sub googlephotos_user_search(username="default", nickname=invalid)
 					
 					screen=uitkPreShowPosterMenu(oa.userInfoName[userIndex],"Search Results")
 					listIcon="pkg:/images/browse.png"
+					searchIcon="pkg:/images/search.png"
 			
 					albummenudata = [
-						{ShortDescriptionLine1:Pluralize(images.Count(),"Photo") + " - Start Slideshow",
-						 HDPosterUrl:images[0].GetThumb(),
-						 SDPosterUrl:images[0].GetThumb()},
-						{ShortDescriptionLine1:"Browse Photos",
-						 HDPosterUrl:listIcon,
-						 SDPosterUrl:listIcon},
+						{ShortDescriptionLine1:Pluralize(images.Count(),"Photo") + " - Start Slideshow", HDPosterUrl:images[0].GetThumb(), SDPosterUrl:images[0].GetThumb()},
+						{ShortDescriptionLine1:"Browse Photos", HDPosterUrl:listIcon, SDPosterUrl:listIcon},
+						{ShortDescriptionLine1:"NewSearch", HDPosterUrl:searchIcon, SDPosterUrl:searchIcon},
 					]
             
 					onselect = [1, [images, videos], "Search Results", album_play_browse_select]

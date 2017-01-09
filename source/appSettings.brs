@@ -4,7 +4,7 @@ Function getSettingsList() As Dynamic
     currentSlideshowDelay = RegRead("SlideshowDelay","Settings")
     
     if currentSlideshowDelay=invalid then
-        delaytext="Not set (default 3 seconds)"
+        delaytext="3 seconds"
     else
         delaytext=currentSlideshowDelay+" seconds"
     end if
@@ -17,11 +17,11 @@ Function getSettingsList() As Dynamic
         is1080p = (val(device.GetVideoMode()) = 1080)
 
         if is4k then
-            restext="Not set (default FHD)"
+            restext="FHD"
         else if is1080p
-            restext="Not set (default HD)"
+            restext="HD"
         else
-            restext="Not set (default SD)"
+            restext="SD"
         end if
     else
         restext=currentSlideshowRes
@@ -95,11 +95,11 @@ Sub googlephotos_set_slideshow_res()
 
     if ssres=invalid then
         if is4k then
-            restext="Not set (default FHD)"
+            restext="FHD"
         else if is1080p
-            restext="Not set (default HD)"   
+            restext="HD"   
         else
-            restext="Not set (default SD)"
+            restext="SD"
         end if
     else
         restext=ssres

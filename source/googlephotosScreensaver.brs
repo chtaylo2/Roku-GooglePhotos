@@ -10,22 +10,23 @@ Sub RunScreensaver()
     REM oa = Oauth()
     REM googlephotos = LoadGooglePhotos()
     
-    sstype=RegRead("ScreensaverType","Settings")
-    REM if sstype<>invalid then sstype=Val(sstype)
-    if sstype=invalid
-        if m.oa.linked()
-            sstype=1
-        else
-            sstype=0
-        end if
+    ssUser=RegRead("ScreensaverUser","Settings")
+    userIndex=0
+    if ssUser=invalid then		
+        userIndex=0
     else
-        sstype=Val(sstype)
-    end if
+        userCount=m.oa.count()
+        for i = 0 to userCount-1
+            if m.oa.userInfoEmail[i] = ssUser then userIndex = i
+        end for
+    end if	
 
-    if not m.oa.linked() or sstype=0 then
+    print "userIndex: '"; userIndex; "'"
+
+    if not m.oa.linked() then
         rsp="invalid"
     else
-        rsp=m.googlephotos.ExecServerAPI("?kind=photo&max-results=300&v=2.0&fields=entry(media:group(media:content))&imgmax=400")
+        rsp=m.googlephotos.ExecServerAPI("?kind=photo&max-results=500&v=2.0&fields=entry(media:group(media:content))&imgmax=400","default",userIndex)
     end if
 
     canvasItems=[]
@@ -114,7 +115,19 @@ Sub RunScreenSaverSettings()
     REM oa = Oauth()
     
     linked=m.oa.linked()
-    
+    userCount=m.oa.count()
+
+    ssUser=RegRead("ScreensaverUser","Settings")
+    if ssUser=invalid then		
+        typetext=m.oa.userInfoName[0]		
+    else
+        userIndex=0
+        for i=0 to userCount-1
+            if m.oa.userInfoEmail[i] = ssUser then userIndex=i
+        end for
+        typetext=m.oa.userInfoName[userIndex]				
+    end if		
+
     port = CreateObject("roMessagePort")
     screen = CreateObject("roParagraphScreen")
     screen.SetMessagePort(port)
@@ -123,6 +136,17 @@ Sub RunScreenSaverSettings()
     if linked then
         screen.AddParagraph("Your Google Photos account is successfully linked. This screensavor will randomly display your personal photos")
         screen.AddParagraph("Thank you for using the Google Photos channel!")
+    
+        if userCount > 1 then
+            screen.AddParagraph(" ")
+            screen.AddParagraph("Choose which linked user to display photos from")
+            screen.AddParagraph("Current setting: "+typetext)
+            
+            for i = 0 to userCount-1
+                screen.AddButton(i, m.oa.userInfoName[i])
+            end for
+        end if
+        
     else
         screen.AddParagraph("Your Google Photos account is not linked.  Please link your account through the Google Photos channel to view your personal photos.")
     end if
@@ -139,8 +163,9 @@ Sub RunScreenSaverSettings()
             else if msg.isButtonPressed()
                 print "Button pressed: "; msg.GetIndex(); " " msg.GetData()
                 button_idx=msg.GetIndex()
-                if button_idx = 0 or button_idx = 1 then
-                    RegWrite("ScreensaverType",Str(button_idx),"Settings")
+                if button_idx <> 99 then
+                    RegWrite("ScreensaverUser",m.oa.userInfoEmail[button_idx],"Settings")
+                    test=RegRead("ScreensaverUser","Settings")
                 end if
                 exit while
             else
