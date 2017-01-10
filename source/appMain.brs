@@ -41,7 +41,7 @@ Sub SelectLinkedUser()
         screen.SetBreadcrumbText("", "Select User")
         screen.AddParagraph("Oops, we have a problem")
 		screen.AddParagraph(" ")
-        screen.AddParagraph("There appears to be an error loading users linked to this device. This is possible if you recently upgraded this Roku Channel. Please re-register to your Google Photos account by clicking the 'continue' button below.")
+        screen.AddParagraph("There appears to be an error loading users linked to this device. It's possible this Roku Channel recently upgraded to a new version. Please re-register to your Google Photos account by clicking the 'continue' button below.")
         screen.AddButton(1, "Continue")
         screen.Show()
     
