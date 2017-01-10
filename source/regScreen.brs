@@ -5,14 +5,15 @@ Sub doRegistration()
     if not oa.linked()
         ' We're not already linked, so attempt to link
         while doGooglePhotosEnroll() <> 0
-        end while
-        
+        end while 
+    
         ' Check if the link was successful
         if oa.linked()
             ' Successful link, save access token and refresh token in registry
             oa.save()
             print "doRegistration. linked. oauth: "; oa.dump()
             showCongratulationsScreen()
+            
         else
             ' We are not linked, delete access token and refresh token from registry
             oa.erase()
@@ -26,23 +27,18 @@ Sub doAdditionalReg()
 
     oa = Oauth()
     
-    'if not oa.linked()
-        ' We're not already linked, so attempt to link
-        while doGooglePhotosEnroll() <> 0
-        end while
-        
-        ' Check if the link was successful
-        if oa.linked()
-            ' Successful link, save access token and refresh token in registry
-            oa.save()
-            print "doRegistration. linked. oauth: "; oa.dump()
-            showCongratulationsScreen()
-        else
-            ' We are not linked, delete access token and refresh token from registry
-            oa.erase()
-            print "doRegistration. not linked"
-        end if
-    'end if
+    ' We're not already linked, so attempt to link
+    while doGooglePhotosEnroll() <> 0
+    end while
+    
+    ' Check if the link was successful
+    if oa.linked()
+        ' Successful link, save access token and refresh token in registry
+        oa.save()
+        print "doRegistration. linked. oauth: "; oa.dump()
+        showCongratulationsScreen()
+        RunUserInterface()
+    end if
  
 End Sub
 
@@ -51,12 +47,13 @@ Function doGooglePhotosEnroll() As Integer
     print "regScreen: doGooglePhotosEnroll"
     status = 0    ' 0 => finished, <> 0 => retry needed
 
-    googlephotos = LoadGooglePhotos()
     oa = Oauth()
+    
     ts = CreateObject("roTimespan")
 
     ' Send an OAuth2 request for a user code
-    status = oa.RequestUserCode()    
+    status = oa.RequestUserCode()
+    
     if status = 0
         ' We have a code - start the poll duration timer
         ts.Mark()
@@ -146,28 +143,40 @@ Function loadReg() As Boolean
     for each item in m.items
         temp =  RegRead(item, m.section)
         if temp = invalid then temp = ""
-        m[item] = temp
+        m[item] = temp.Split(",")
+        if m[item][0] = "" then m[item].shift()
     end for
+
     return m.linked()
 End Function
 
 Function saveReg()
     for each item in m.items
-        RegWrite(item, m[item], m.section)
+        value=""
+        for i = 0 to m[item].Count()-1
+            if i = m[item].Count()-1 then
+               value = value+m[item][i]
+            else
+               value = value+m[item][i]+","
+            end if
+        end for
+        
+        print "SAVE REG ["; item; "] = "; value
+    
+        RegWrite(item, value, m.section)
     end for
 End Function
 
 Function eraseReg()
     for each item in m.items
         RegDelete(item, m.section)
-        m[item] = ""
+        m[item].Clear()
     end for
 End Function
 
 Function definedReg() As Boolean
     for each item in m.items
-        if not m.DoesExist(item) then return false
-        if Len(m[item])=0 then return false
+        if m[item] = invalid Or m[item].Count()=0 then return false
     end for
     return true
 End Function
@@ -175,7 +184,15 @@ End Function
 Function dumpReg() As String
     result = ""
     for each item in m.items
-        if m.DoesExist(item) then result = result + " " +item+"="+m[item]
+        value=""
+        for i = 0 to m[item].Count()-1
+            if i = m[item].Count()-1 then
+               value = value+m[item][i]
+            else
+               value = value+m[item][i]+","
+            end if
+        end for 
+        result = result + " " +item+"="+value
     end for
     return result
 End Function
@@ -197,7 +214,6 @@ Function displayRegistrationScreen() As Object
     regscreen.AddParagraph("This screen will automatically update as soon as your activation completes")
     regscreen.AddButton(0, "Get a new code")
     regscreen.AddButton(1, "About channel")
-    'regscreen.AddButton(1, "Back")
     regscreen.Show()
     
     return regscreen
