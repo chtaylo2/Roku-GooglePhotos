@@ -4,7 +4,7 @@ Function getSettingsList() As Dynamic
     currentSlideshowDelay = RegRead("SlideshowDelay","Settings")
     
     if currentSlideshowDelay=invalid then
-        delaytext="Not set (default 3 seconds)"
+        delaytext="3 seconds"
     else
         delaytext=currentSlideshowDelay+" seconds"
     end if
@@ -17,11 +17,11 @@ Function getSettingsList() As Dynamic
         is1080p = (val(device.GetVideoMode()) = 1080)
 
         if is4k then
-            restext="Not set (default FHD)"
+            restext="FHD"
         else if is1080p
-            restext="Not set (default HD)"
+            restext="HD"
         else
-            restext="Not set (default SD)"
+            restext="SD"
         end if
     else
         restext=currentSlideshowRes
@@ -47,7 +47,7 @@ Function getSettingsList() As Dynamic
             ShortDescriptionLine2: "Link additional Google Photos account"
         },
         {
-            Title:"Deactivate Player",
+            Title:"Deactivate link from device",
             ID:"4",
             ShortDescriptionLine1: ""
             ShortDescriptionLine2: "Remove link from Google Photos account"
@@ -70,7 +70,7 @@ Sub googlephotos_browse_settings()
     screen.SetBreadcrumbText("", "Settings")
     screen.show()
     
-    menuSelections = [googlephotos_set_slideshow_res, googlephotos_set_slideshow_speed, googlephotos_comingSoon, googlephotos_delink, googlephotos_about]
+    menuSelections = [googlephotos_set_slideshow_res, googlephotos_set_slideshow_speed, doAdditionalReg, googlephotos_delink, googlephotos_about]
     
     while(true)
         msg = wait(0,port)
@@ -95,11 +95,11 @@ Sub googlephotos_set_slideshow_res()
 
     if ssres=invalid then
         if is4k then
-            restext="Not set (default FHD)"
+            restext="FHD"
         else if is1080p
-            restext="Not set (default HD)"   
+            restext="HD"   
         else
-            restext="Not set (default SD)"
+            restext="SD"
         end if
     else
         restext=ssres
@@ -251,13 +251,22 @@ Sub googlephotos_comingSoon()
 End Sub
 
 Sub googlephotos_delink()
-    ans=ShowDialog2Buttons("Deactivate Player","Remove link to your Google Photos account?","Confirm","Cancel")
+
+    oa = Oauth()
+    userIndex = oa.accessTokenIndex()
+
+    ans=ShowDialog2Buttons("Deactivate Link","Remove " + oa.userInfoName[userIndex] + "'s photo link from this device?","Confirm","Cancel")
     if ans=0 then 
         oa = Oauth()
-        oa.erase()
+        oa.currentAccessTokenInod = userIndex
+
+        for each item in oa.items
+            oa[item].Delete(userIndex)
+        end for
+        oa.save()
         
         ans2=ShowDialog1Button("Success","You have successfully unlinked this Roku device.","Close")
-        doRegistration()
+        RunUserInterface()
     end if
 End Sub
 
@@ -273,7 +282,7 @@ Sub googlephotos_about()
 
     screen.AddParagraph("The Google Photos Channel, current version (v3) was developed by Chris Taylor which adds a numbers of functional improvements. It has also been rebranded for Google Photos as Picasa has been discontinued by Google.")
     screen.AddParagraph("The original Picasa Web Albums Channel (v1) was developed by Chris Hoffman and Belltown developing (v2) which added OAuth2 and other bug fixes.")
-    screen.AddParagraph("If you have any questions or comments, post them in forums.roku.com in the General Discussions forum.")
+    screen.AddParagraph("If you have any questions or comments, please see [Tips and Tricks > Report Bugs or Feature Request] from the main screen.")
 
     screen.AddButton(1, "Back")
     screen.Show()

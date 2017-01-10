@@ -6,6 +6,7 @@ End Function
 
 Function InitGooglePhotos() As Object
     ' constructor
+	
     this = CreateObject("roAssociativeArray")
     this.scope = "https://picasaweb.google.com/data"
     this.prefix = this.scope + "/feed/api"
@@ -42,6 +43,7 @@ Function InitGooglePhotos() As Object
     this.BrowseVideos = googlephotos_browse_videos
     
     this.ShufflePhotos = googlephotos_random_photos
+    this.TipsAndTricks = googlephotos_browse_tips
     this.BrowseSettings = googlephotos_browse_settings
 
     this.SlideshowSpeed = googlephotos_set_slideshow_speed
@@ -55,16 +57,18 @@ Function InitGooglePhotos() As Object
     else
         this.SlideshowDuration=Val(ssdur)
     end if   
-    
+	
     print "GooglePhotos: init complete"
 
     return this
 End Function
 
 
-Function googlephotos_exec_api(url_stub="" As String, username="default" As Dynamic)
-	print "googlephotos_exec_api - enter"
-	
+Function googlephotos_exec_api(url_stub="" As String, username="default" As Dynamic, userIndex=0 As Integer)
+
+    username="default"
+	print "googlephotos_exec_api - enter (username: "; username; " & userIndex: "; userIndex; ")"
+
     rsp = invalid
     oa = Oauth()
     
@@ -76,13 +80,15 @@ Function googlephotos_exec_api(url_stub="" As String, username="default" As Dyna
         username="user/"+username
     end if
     
+	
     ' Issue an API request.
     ' If the access token has expired then request a new one
     ' Retry if an error occurs
     maxAttempts = 3
     for i = 1 to maxAttempts
         http = NewHttp(m.prefix + "/" + username + url_stub)
-        oa.sign(http,true)
+        oa.sign(http,userIndex)
+		
         xml=http.getToStringWithTimeout(10)
         
 		responseCode = http.GetResponseCode()
@@ -150,6 +156,9 @@ Sub googlephotos_browse()
 End Sub
 
 Sub googlephotos_featured()
+
+    ' GOOGLE NO LONGER SUPPORTS FEATURED. WILL BE REMOVING IN FUTURE VERSION
+
     rsp=m.ExecServerAPI("featured?max-results=200&v=2.0&fields=entry(title,gphoto:id,media:group(media:description,media:content,media:thumbnail))&thumbsize=220&imgmax=" + GetResolution(),invalid)
     if rsp<>invalid then
         featured=googlephotos_new_image_list(rsp.entry)
@@ -158,6 +167,9 @@ Sub googlephotos_featured()
 End Sub
 
 Sub googlephotos_photo_search()
+	
+	' GOOGLE NO LONGER SUPPORTS FEATURED. WILL BE REMOVING IN FUTURE VERSION
+	
     port=CreateObject("roMessagePort") 
     screen=CreateObject("roSearchScreen")
     screen.SetMessagePort(port)
@@ -200,15 +212,15 @@ End Sub
 ' ***** Albums
 ' ********************************************************************
 ' ********************************************************************
+Sub googlephotos_browse_albums(username="default")
 
-Sub googlephotos_browse_albums(username="default", nickname=invalid)    
-    breadcrumb_name=""
-    if username<>"default" and nickname<>invalid then
-        breadcrumb_name=nickname
-    end if
+    oa = Oauth()
+    userIndex = oa.accessTokenIndex()
+	
+    breadcrumb_name=oa.userInfoName[userIndex]
     screen=uitkPreShowPosterMenu(breadcrumb_name,"My Albums")
     
-    rsp=m.ExecServerAPI("?kind=album&v=2.0&fields=entry(title,gphoto:numphotos,gphoto:user,gphoto:id,media:group(media:description,media:thumbnail))",username)
+    rsp=m.ExecServerAPI("?kind=album&v=2.0&fields=entry(title,gphoto:numphotos,gphoto:user,gphoto:id,media:group(media:description,media:thumbnail))",username,userIndex)
     if not isxmlelement(rsp) then return
     albums=m.newAlbumListFromXML(rsp.entry)
     
@@ -258,7 +270,9 @@ Function googlephotos_get_album_meta(albums As Object)
 End Function
 
 Function album_get_images()
-    rsp=m.googlephotos.ExecServerAPI("/albumid/"+m.GetID()+"?kind=photo&v=2.0&fields=entry(title,gphoto:timestamp,gphoto:id,gphoto:videostatus,media:group(media:description,media:content,media:thumbnail))&thumbsize=220&imgmax="+GetResolution(),m.GetUsername())
+    oa = Oauth()
+
+    rsp=m.googlephotos.ExecServerAPI("/albumid/"+m.GetID()+"?kind=photo&v=2.0&fields=entry(title,gphoto:timestamp,gphoto:id,gphoto:videostatus,media:group(media:description,media:content,media:thumbnail))&thumbsize=220&imgmax="+GetResolution(),m.GetUsername(),oa.accessTokenIndex())
     print "GooglePhotos Res: " + GetResolution()
     if not isxmlelement(rsp) then 
         return invalid
@@ -341,14 +355,19 @@ End Sub
 Sub album_play_browse_select(media, title, set_idx)
     if set_idx=0 then 
         DisplayImageSet(media[0], title, 0, m.googlephotos.SlideshowDuration) 
-    else 
+    else if set_idx=1 then
         BrowseImages(media[0], title)
     end if
 End Sub
 
 Sub googlephotos_user_search(username="default", nickname=invalid)
+
+    oa = Oauth()
+    userIndex = oa.accessTokenIndex()
+
     port=CreateObject("roMessagePort") 
     screen=CreateObject("roSearchScreen")
+	screen.SetBreadcrumbText(oa.userInfoName[userIndex], "Search")
     screen.SetMessagePort(port)
     
     history=CreateObject("roSearchHistory")
@@ -366,25 +385,21 @@ Sub googlephotos_user_search(username="default", nickname=invalid)
             else if msg.isFullResult()
                 keyword=msg.GetMessage()
                 dialog=ShowPleaseWait("Please wait","Searching your albums for '" + keyword + "'")
-				rsp=m.ExecServerAPI("?kind=photo&v=2.0&q="+keyword+"&max-results=200&thumbsize=220&imgmax=" + GetResolution(),username)
+				rsp=m.ExecServerAPI("?kind=photo&v=2.0&q="+keyword+"&max-results=200&thumbsize=220&imgmax=" + GetResolution(),username,userIndex)
                 images=googlephotos_new_image_list(rsp.entry)
                 dialog.Close()
                 if images.Count()>0 then
                     history.Push(keyword)
                     screen.AddSearchTerm(keyword)
-                    'DisplayImageSet(images, keyword, 0, m.SlideshowDuration)
 					screen.Close()
 					
-					screen=uitkPreShowPosterMenu("","Search Results")
+					screen=uitkPreShowPosterMenu(oa.userInfoName[userIndex],"Search Results")
 					listIcon="pkg:/images/browse.png"
+					searchIcon="pkg:/images/search.png"
 			
 					albummenudata = [
-						{ShortDescriptionLine1:Pluralize(images.Count(),"Photo") + " - Start Slideshow",
-						 HDPosterUrl:images[0].GetThumb(),
-						 SDPosterUrl:images[0].GetThumb()},
-						{ShortDescriptionLine1:"Browse Photos",
-						 HDPosterUrl:listIcon,
-						 SDPosterUrl:listIcon},
+						{ShortDescriptionLine1:Pluralize(images.Count(),"Photo") + " - Start Slideshow", HDPosterUrl:images[0].GetThumb(), SDPosterUrl:images[0].GetThumb()},
+						{ShortDescriptionLine1:"Browse Photos", HDPosterUrl:listIcon, SDPosterUrl:listIcon},
 					]
             
 					onselect = [1, [images, videos], "Search Results", album_play_browse_select]
@@ -400,22 +415,22 @@ Sub googlephotos_user_search(username="default", nickname=invalid)
     end while
 End Sub
 
+' ********************************************************************
+' ********************************************************************
+' ***** Tags
+' ***** Tags
+' ********************************************************************
+' ********************************************************************
+Sub googlephotos_browse_tags(username="default", nickname=invalid)
+   
+    ' GOOGLE NO LONGER SUPPORTS TAGS. WILL BE REMOVING IN FUTURE VERSION
 
-' ********************************************************************
-' ********************************************************************
-' ***** Tags
-' ***** Tags
-' ********************************************************************
-' ********************************************************************
-Sub googlephotos_browse_tags(username="default", nickname=invalid)    
-    breadcrumb_name=""
-    if username<>"default" and nickname<>invalid then
-        breadcrumb_name=nickname
-    end if
+    oa = Oauth()
+    userIndex = oa.accessTokenIndex()
+	
+    screen=uitkPreShowPosterMenu(oa.userInfoName[userIndex],"Tags")
     
-    screen=uitkPreShowPosterMenu(breadcrumb_name,"Tags")
-    
-    rsp=m.ExecServerAPI("?kind=tag&v=2.0&fields=entry(title)",username)
+    rsp=m.ExecServerAPI("?kind=tag&v=2.0&fields=entry(title)",username,oa.accessTokenIndex())
     if not isxmlelement(rsp) then return
     tags=m.newTagListFromXML(rsp.entry, username)
     
@@ -428,6 +443,9 @@ Sub googlephotos_browse_tags(username="default", nickname=invalid)
 End Sub
 
 Function googlephotos_new_tag_list(xmllist As Object, username) As Object
+
+    ' GOOGLE NO LONGER SUPPORTS TAGS. WILL BE REMOVING IN FUTURE VERSION
+ 
     taglist=CreateObject("roList")
     for each record in xmllist
         tag=m.newTagFromXML(record, username)
@@ -439,6 +457,9 @@ Function googlephotos_new_tag_list(xmllist As Object, username) As Object
 End Function
 
 Function googlephotos_new_tag(xml As Object, username) As Object
+
+    ' GOOGLE NO LONGER SUPPORTS TAGS. WILL BE REMOVING IN FUTURE VERSION
+
     tag = CreateObject("roAssociativeArray")
     tag.googlephotos=m
     tag.xml=xml
@@ -451,7 +472,12 @@ Function googlephotos_new_tag(xml As Object, username) As Object
 End Function
 
 Function tag_get_images()
-    rsp=m.googlephotos.ExecServerAPI("?kind=photo&tag="+m.GetTitle()+"&thumbsize=220&imgmax=" + GetResolution(),m.GetUsername())
+   
+    ' GOOGLE NO LONGER SUPPORTS FAVORITES. WILL BE REMOVING IN FUTURE VERSION
+
+    oa = Oauth()
+	
+    rsp=m.googlephotos.ExecServerAPI("?kind=photo&tag="+m.GetTitle()+"&thumbsize=220&imgmax=" + GetResolution(),m.GetUsername(),oa.accessTokenIndex())
     if not isxmlelement(rsp) then 
         return invalid
     end if
@@ -561,6 +587,9 @@ End Function
 ' ********************************************************************
 ' ********************************************************************
 Sub googlephotos_browse_favorites(username="default", nickname=invalid)
+
+    ' GOOGLE NO LONGER SUPPORTS FAVORITES. WILL BE REMOVING IN FUTURE VERSION
+
     breadcrumb_name=""
     if username<>"default" and nickname<>invalid then
         breadcrumb_name=nickname
@@ -581,6 +610,12 @@ Sub googlephotos_browse_favorites(username="default", nickname=invalid)
 End Sub
 
 Sub googlephotos_display_favorites(fav As Object)
+
+    ' GOOGLE NO LONGER SUPPORTS FAVORITES. WILL BE REMOVING IN FUTURE VERSION
+	
+	oa = Oauth()
+    userIndex = oa.accessTokenIndex()
+	
     user=fav.GetUser()
     nickname=fav.GetNickname()
     
@@ -588,7 +623,7 @@ Sub googlephotos_display_favorites(fav As Object)
     
     'Get highlights from recent photo feed
     highlights=[]
-    rsp=m.ExecServerAPI("?kind=photo&max-results=5&v=2.0&fields=entry(media:group(media:description,media:content,media:thumbnail))&thumbsize=220&imgmax=" + GetResolution(),user)
+    rsp=m.ExecServerAPI("?kind=photo&max-results=5&v=2.0&fields=entry(media:group(media:description,media:content,media:thumbnail))&thumbsize=220&imgmax=" + GetResolution(),user,userIndex)
     if isxmlelement(rsp) then 
         images=googlephotos_new_image_list(rsp.entry)
         for each image in images
@@ -615,6 +650,9 @@ Sub googlephotos_display_favorites(fav As Object)
 End Sub
 
 Function googlephotos_new_fav_list(xmllist As Object)
+
+	' GOOGLE NO LONGER SUPPORTS FAVORITES. WILL BE REMOVING IN FUTURE VERSION
+		
     favs=[]
     for each record in xmllist
         fav = CreateObject("roAssociativeArray")
@@ -630,6 +668,9 @@ Function googlephotos_new_fav_list(xmllist As Object)
 End Function
 
 Function googlephotos_get_fav_meta(fav As Object)
+
+    ' GOOGLE NO LONGER SUPPORTS FAVORITES. WILL BE REMOVING IN FUTURE VERSION
+
     favmetadata=[]
     for each f in fav
         favmetadata.Push({ShortDescriptionLine1: f.GetNickname(), ShortDescriptionLine2: f.GetURL(), HDPosterUrl: f.GetThumb(), SDPosterUrl: f.GetThumb()})
@@ -645,9 +686,13 @@ End Function
 ' ********************************************************************
 ' ********************************************************************
 Sub googlephotos_random_photos(username="default")
-    screen=uitkPreShowPosterMenu("","Shuffle Photos")
+
+    oa = Oauth()
+    userIndex = oa.accessTokenIndex()
+
+    screen=uitkPreShowPosterMenu(oa.userInfoName[userIndex],"Shuffle Photos")
     
-    rsp=m.ExecServerAPI("?kind=album&v=2.0&fields=entry(title,gphoto:numphotos,gphoto:user,gphoto:id,media:group(media:description,media:thumbnail))",username)
+    rsp=m.ExecServerAPI("?kind=album&v=2.0&fields=entry(title,gphoto:numphotos,gphoto:user,gphoto:id,media:group(media:description,media:thumbnail))",username,userIndex)
     if not isxmlelement(rsp) then return
     albums=m.newAlbumListFromXML(rsp.entry)
     
