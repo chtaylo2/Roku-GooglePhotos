@@ -20,6 +20,12 @@ Sub RunUserInterface()
     googlephotos = LoadGooglePhotos()
     
     ' Attempt to register if we are not already registered
+
+    usersLoaded = oa.count()
+    if usersLoaded=invalid then
+        ShowInvalidUser()
+    end if
+
     doRegistration()
 
     SelectLinkedUser()
@@ -33,58 +39,61 @@ Sub SelectLinkedUser()
 
     usersLoaded = oa.count()
     if usersLoaded=invalid then
-        oa.erase()
+        ShowInvalidUser()
+    else if usersLoaded > 1 then
+        screen=uitkPreShowPosterMenu("","Select User", "flat-category")
     
-        port = CreateObject("roMessagePort")
-        screen = CreateObject("roParagraphScreen")
-        screen.SetMessagePort(port)
-        screen.SetBreadcrumbText("", "Select User")
-        screen.AddParagraph("Oops, we have a problem")
-		screen.AddParagraph(" ")
-        screen.AddParagraph("There appears to be an error loading users linked to this device. It's possible this Roku Channel recently upgraded to a new version. Please re-register to your Google Photos account by clicking the 'continue' button below.")
-        screen.AddButton(1, "Continue")
-        screen.Show()
-    
-        while true
-            msg = wait(0, screen.GetMessagePort())
-        
-            if type(msg) = "roParagraphScreenEvent"
-                if msg.isScreenClosed()
-                    print "Screen closed"
-                    exit while                
-                else if msg.isButtonPressed()
-                    doRegistration()
-                    exit while
-                else
-                    print "Unknown event: "; msg.GetType(); " msg: "; msg.GetMessage()
-                    exit while
-                endif
-            endif
-        end while
-    else
-	
-	    if usersLoaded > 1 then
-            screen=uitkPreShowPosterMenu("","Select User", "flat-category")
-    
-            userdata=[]
-            for i = 0 to usersLoaded-1
-		        print "User: "; oa.userInfoName[i]
-		        userdata.Push({ShortDescriptionLine1: oa.userInfoName[i], ShortDescriptionLine2: oa.userInfoEmail[i], HDPosterUrl: oa.userInfoPhoto[i], SDPosterUrl: oa.userInfoPhoto[i]})
-		    end for
+        userdata=[]
+        for i = 0 to usersLoaded-1
+            print "User: "; oa.userInfoName[i]
+            userdata.Push({ShortDescriptionLine1: oa.userInfoName[i], ShortDescriptionLine2: oa.userInfoEmail[i], HDPosterUrl: oa.userInfoPhoto[i], SDPosterUrl: oa.userInfoPhoto[i]})
+        end for
 		
-            onselect = [1, users, m, function(users, googlephotos, set_idx):ShowMainMenu(set_idx):end function]
-            uitkDoPosterMenu(userdata, screen, onselect)
-        else
-		    ShowMainMenu(0)
-	    end if
+        onselect = [1, users, m, function(users, googlephotos, set_idx):ShowMainMenu(set_idx):end function]
+        uitkDoPosterMenu(userdata, screen, onselect)
+    else
+       ShowMainMenu(0)
     end if
     
+End Sub
+
+Sub ShowInvalidUser()
+
+    oa = Oauth()
+    oa.erase()
+
+    port = CreateObject("roMessagePort")
+    screen = CreateObject("roParagraphScreen")
+    screen.SetMessagePort(port)
+    screen.SetBreadcrumbText("", "Select User")
+    screen.AddParagraph("Oops, we have a problem")
+    screen.AddParagraph(" ")
+    screen.AddParagraph("There's an error loading users linked to this device. It's possible this Roku Channel recently upgraded to a new version allowing multiple accounts. Please re-register to your Google Photos account by clicking the 'continue' button below.")
+    screen.AddButton(1, "Continue")
+    screen.Show()
+
+    while true
+        msg = wait(0, screen.GetMessagePort())
+
+        if type(msg) = "roParagraphScreenEvent"
+            if msg.isScreenClosed()
+                print "Screen closed"
+                exit while
+            else if msg.isButtonPressed()
+                doRegistration()
+                exit while
+            else
+                print "Unknown event: "; msg.GetType(); " msg: "; msg.GetMessage()
+                exit while
+            endif
+        endif
+    end while
 End Sub
 
 Sub ShowMainMenu(userIndex=0 As Integer)
 
     oa = Oauth()
-	oa.currentAccessTokenInd = userIndex
+    oa.currentAccessTokenInd = userIndex
 	
     ' Pop up start of UI for some instant feedback while we load the icon data
     screen=uitkPreShowPosterMenu(oa.userInfoName[userIndex], "Main Menu")
