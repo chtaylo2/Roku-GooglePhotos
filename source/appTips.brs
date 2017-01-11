@@ -18,8 +18,13 @@ Function getTipsList() As Dynamic
             ShortDescriptionLine2: "Albums are the best way to stay orginized, find out how!"
         },
         {
-            Title:"Reporting Bugs or Feature Requests",
+            Title:"What happened to Tags and Favorites?",
             ID:"4",
+            ShortDescriptionLine2: "We'll explain.."
+        }
+        {
+            Title:"Reporting Bugs or Feature Requests",
+            ID:"5",
             ShortDescriptionLine2: "We'd love to hear your feedback"
         }
     ]
@@ -34,7 +39,7 @@ Sub googlephotos_browse_tips()
     screen.SetBreadcrumbText("", "Tips and Tricks")
     screen.show()
     
-    menuSelections = [googlephotos_tips_smartsearch, googlephotos_tips_screensaver, googlephotos_tips_albums, googlephotos_tips_feedback]
+    menuSelections = [googlephotos_tips_smartsearch, googlephotos_tips_screensaver, googlephotos_tips_albums, googlephotos_tips_tags, googlephotos_tips_feedback]
     
     while(true)
         msg = wait(0,port)
@@ -138,6 +143,31 @@ Function googlephotos_tips_albums()
         end if
     end while
 End Function
+
+Sub googlephotos_tips_tags()
+    port = CreateObject("roMessagePort")
+    screen = CreateObject("roParagraphScreen")
+    screen.SetMessagePort(port)
+    screen.SetBreadcrumbText("Tags and Favorites", "Tips and Tricks")
+    screen.AddHeaderText("What happened to Tags and Favorites?")
+    screen.AddParagraph("When Picasa finally shutdown in 2016, in lieu of Google Photos, Google removed some functionality. Tags, Favorites and Community Searching were the most notable; not including the beloved desktop application.")
+    screen.AddParagraph("We're sorry to have to take this out of this Roku channel, but give albums a try if you have not already done so. They are very powerful and serve much the same purposes as tags/favorites did.")
+    screen.Show()
+
+    while true
+        msg = wait(0, screen.GetMessagePort())
+
+        if type(msg) = "roParagraphScreenEvent"
+            if msg.isScreenClosed()
+                print "Screen closed"
+                exit while
+            else
+                print "Unknown event: "; msg.GetType(); " msg: "; msg.GetMessage()
+                exit while
+            end if
+        end if
+    end while
+End Sub
 
 Sub googlephotos_tips_feedback()
     port = CreateObject("roMessagePort")
