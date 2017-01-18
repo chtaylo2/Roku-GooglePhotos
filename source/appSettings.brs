@@ -47,7 +47,7 @@ Function getSettingsList() As Dynamic
             ShortDescriptionLine2: "Link additional Google Photos account"
         },
         {
-            Title:"Deactivate link from device",
+            Title:"Remove account link from device",
             ID:"4",
             ShortDescriptionLine1: ""
             ShortDescriptionLine2: "Remove link from Google Photos account"
@@ -254,8 +254,10 @@ Sub googlephotos_delink()
 
     oa = Oauth()
     userIndex = oa.accessTokenIndex()
-
-    ans=ShowDialog2Buttons("Deactivate Link","Remove " + oa.userInfoName[userIndex] + "'s photo link from this device?","Confirm","Cancel")
+    
+    tmpName=""
+    if oa.userInfoName[userIndex]<>invalid then tmpName = oa.userInfoName[userIndex] + "'s "
+    ans=ShowDialog2Buttons("Deactivate Link","Remove " + tmpName + "photo link from this device?","Confirm","Cancel")
     if ans=0 then 
         oa = Oauth()
         oa.currentAccessTokenInod = userIndex

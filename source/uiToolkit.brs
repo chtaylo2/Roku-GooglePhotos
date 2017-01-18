@@ -9,8 +9,9 @@ function uitkPreShowPosterMenu(breadA=invalid, breadB=invalid, liststyle="arced-
     screen = CreateObject("roPosterScreen")
     screen.SetMessagePort(port)
     screen.SetCertificatesFile("common:/certs/ca-bundle.crt")
-    screen.InitClientCertificates()    
+    screen.InitClientCertificates()
     if breadA<>invalid and breadB<>invalid then
+        breadA=breadA.Replace("Legacy User", "")
         screen.SetBreadcrumbText(breadA, breadB)
     end if
     screen.SetListStyle(liststyle)
