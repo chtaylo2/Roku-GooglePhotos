@@ -15,6 +15,7 @@ Sub RunUserInterface()
         return
     end if
 	
+	
     Init()
     oa = Oauth()
     googlephotos = LoadGooglePhotos()
@@ -42,7 +43,7 @@ Sub SelectLinkedUser()
         ShowInvalidUser()
     else if usersLoaded > 1 then
         screen=uitkPreShowPosterMenu("","Select User", "flat-category")
-    
+	
         userdata=[]
         for i = 0 to usersLoaded-1
             print "User: "; oa.userInfoName[i]

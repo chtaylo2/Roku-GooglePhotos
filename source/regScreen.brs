@@ -17,7 +17,8 @@ Sub doRegistration()
         else
             ' We are not linked, delete access token and refresh token from registry
             oa.erase()
-            print "doRegistration. not linked"
+            print "doRegistration. not linked - forcing registration screen"
+            doRegistration()
         end if
     end if
  
@@ -103,6 +104,7 @@ Function doGooglePhotosEnroll() As Integer
         'indicating they either want to quit or fetch a new registration code
         while true
             msg = wait((oa.interval + oa.pollDelay) * 1000, regscreen.GetMessagePort())
+
             if msg = invalid
                 if ts.TotalSeconds() >= oa.pollExpiresIn
                     ans=ShowDialog2Buttons("Request timed out", "Unable to link to Google Photos within time limit.", "Try Again", "Back")
@@ -147,6 +149,13 @@ Function loadReg() As Boolean
         if m[item][0] = "" then m[item].shift()
     end for
 
+    'Legacy Support
+    if m.accessToken[0]<>invalid and m.userInfoName[0]=invalid then
+        m.userInfoName.Push("Legacy User")
+        m.userInfoEmail.Push("Relink account to pull user details (then remove this link in Settings)")
+        m.userInfoPhoto.Push("pkg:/images/userdefault.png")
+    end if
+    
     return m.linked()
 End Function
 
@@ -175,6 +184,14 @@ Function eraseReg()
 End Function
 
 Function definedReg() As Boolean
+
+    'Legacy Support
+    if m.accessToken[0]<>invalid and m.userInfoName[0]=invalid then
+        m.userInfoName.Push("Legacy User")
+        m.userInfoEmail.Push("Relink account to pull user details (then remove this link in Settings)")
+        m.userInfoPhoto.Push("pkg:/images/userdefault.png")
+    end if
+
     for each item in m.items
         if m[item] = invalid Or m[item].Count()=0 then return false
     end for
@@ -205,7 +222,7 @@ Function displayRegistrationScreen() As Object
     
     regscreen.SetTitle("")
     regscreen.SetBreadcrumbText("", "Registration")
-    regscreen.AddParagraph("Please link this Roku device to your Google Photos account")
+    regscreen.AddParagraph("To link this Roku device to your Google Photos account")
     regscreen.AddFocalText(" ", "spacing-dense")
     regscreen.AddFocalText("From your computer, go to:" + Chr(10), "spacing-dense")
     regscreen.AddFocalText(oa.verificationUrl, "spacing-dense")

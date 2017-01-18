@@ -182,7 +182,7 @@ Function oauth_poll_for_tokens() As Integer
 
             'Query User info
             status = m.RequestUserInfo(m.accessToken.Count()-1, false)
-            
+
             if m.tokenType       = "" then m.errorMsg = "Missing token_type"      : status = 1
             if m.tokenExpiresIn  = 0  then m.errorMsg = "Missing expires_in"      : status = 1
         end if
@@ -228,6 +228,11 @@ Function oauth_request_userinfo(userIndex As Integer, isrefresh=false As Boolean
             infoName  = getString(json,"name")
             infoEmail = getString(json,"email")
             infoPhoto = getString(json,"picture")
+
+            'Special Charactor management
+            infoName  = infoName.Replace(".", "")
+            infoName  = strReplaceSpecial(infoName)
+            infoEmail = strReplaceSpecial(infoEmail)
 
             if isrefresh = true then
                 m.userInfoName[m.currentAccessTokenInd]  = infoName
@@ -319,7 +324,11 @@ Function oauth_refresh_tokens() As Integer
 			end if
 
             'Query User info - Refresh
-            status = m.RequestUserInfo(m.currentAccessTokenInd, true)
+            if m.userInfoName[m.currentAccessTokenInd]="Legacy User" then
+                status = 0
+            else
+                status = m.RequestUserInfo(m.currentAccessTokenInd, true)
+            end if
 
             if m.accessToken[m.currentAccessTokenInd]  = ""    then m.errorMsg = "Missing access_token"    : status = 1
             if m.tokenType                             = ""    then m.errorMsg = "Missing token_type"      : status = 1
