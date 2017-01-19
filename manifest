@@ -2,8 +2,8 @@ title=Google Photos
 subtitle=View your Google Photos Albums photos and videos
 #
 major_version=3
-minor_version=640
-build_version=20170117
+minor_version=675
+build_version=20170119
 #
 mm_icon_focus_fhd=pkg:/images/mm_icon_focus_hd.png
 mm_icon_focus_hd=pkg:/images/mm_icon_focus_hd.png

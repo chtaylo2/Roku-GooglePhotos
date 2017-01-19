@@ -1,9 +1,8 @@
 Sub RunScreensaver()
-    ba=CreateObject("roByteArray")
-    canvas=CreateObject("roImageCanvas")
+    screen=CreateObject("roSGScreen")
+    photo=CreateObject("roAssociativeArray")
     port=CreateObject("roMessagePort")
     device=CreateObject("roDeviceInfo")
-    
     ds=device.GetDisplaySize()
     
     Init()
@@ -19,17 +18,15 @@ Sub RunScreensaver()
         for i = 0 to userCount-1
             if m.oa.userInfoEmail[i] = ssUser then userIndex = i
         end for
-    end if	
-
-    print "userIndex: '"; userIndex; "'"
-
+    end if
+    
     if not m.oa.linked() then
         rsp="invalid"
     else
-        rsp=m.googlephotos.ExecServerAPI("?kind=photo&max-results=500&v=2.0&fields=entry(media:group(media:content))&imgmax=400","default",userIndex)
+        rsp=m.googlephotos.ExecServerAPI("?kind=photo&max-results=500&v=2.0&fields=entry(media:group(media:content))&imgmax=900","default",userIndex)
     end if
 
-    canvasItems=[]
+    photoItems=[]
     if isxmlelement(rsp) then 
         images=googlephotos_new_image_list(rsp.entry)
         print "DEBUG "; image
@@ -38,69 +35,101 @@ Sub RunScreensaver()
                 print "Ignore: "; image.GetURL()
             else
                 print "Push: "; image.GetURL()
-                canvasItems.Push(image.GetURL())
+                photoItems.Push(image.GetURL())
             end if    
         end for
     end if    
 
-    'If unlinked, we'll advertise our channel!  :-) 
-    if canvasItems.count() = 0 then
-        canvasItems.Push("https://image.roku.com/developer_channels/prod/3eedea580e39763e6220974c270504123e8a11aaa9248c0e308c3526003f19b8.png")
+    'If unlinked, we'll advertise our channel! ..And a couple Easter Eggs are always cool :-) 
+    if photoItems.count() = 0 then
+        photoItems.Push("pkg:/images/mm_icon_focus_hd.png")
+        photoItems.Push("pkg:/images/mm_icon_focus_hd.png")
+        photoItems.Push("pkg:/images/cat_pic_1.jpg")
+        photoItems.Push("pkg:/images/cat_pic_2.jpg")
     end if
 
-    canvas.SetMessagePort(port)
-    canvas.PurgeCachedImages()
-    canvas.SetRequireAllImagesToDraw(true)
-    canvas.SetLayer(0, {Color:"#FF000000", CompositionMode:"Source"})
-    canvas.Show()
-    counter=Rnd(canvasItems.Count())-1
+    photo.GetNext=function(photoItems):return Rnd(photoItems.Count())-1:end function
+
+    ' Build the custom scene
+    screen.setMessagePort(port)
+    scene = screen.createScene("compPhotoScroll")
+    screen.show()
+
+    ' Initial photo loads
+    scene.image1Uri=photoItems[photo.GetNext(photoItems)]
+    scene.image5Uri=photoItems[photo.GetNext(photoItems)]
+    scene.image6Uri=photoItems[photo.GetNext(photoItems)]
+    scene.image4Uri=photoItems[photo.GetNext(photoItems)]
+    scene.image8Uri=photoItems[photo.GetNext(photoItems)]
+    scene.image2Uri=photoItems[photo.GetNext(photoItems)]
+    scene.image3Uri=photoItems[photo.GetNext(photoItems)]
+    scene.image7Uri=photoItems[photo.GetNext(photoItems)]    
+    
+    ' Start the animiation
+    scene.controlAnimate1="start"
+    scene.controlAnimate5="start"
+    sleep(5000)
+    scene.controlAnimate6="start"
+    sleep(5000)
+    scene.controlAnimate4="start"
+    scene.controlAnimate8="start"
+    sleep(5000)
+    scene.controlAnimate2="start"
+    scene.controlAnimate3="start"
+    scene.controlAnimate7="start"
+
     while(true)
-        'Reset counter if end
-        nextimg=Rnd(canvasItems.Count())-1
-        
-        canvasItem=[
-            {url: canvasItems[counter],
-             TargetRect:{x:Rnd(ds.w-420), y:Rnd(ds.h-300)}},
-            {url: canvasItems[nextimg],
-            TargetRect:{x:-1000, y:-1000}}   'Off the screen to preload     
-        ]
-        
-        canvas.SetLayer(2, {Color:"#FF000000", CompositionMode:"Source"})
-        canvas.SetLayer(1, canvasItem)
-        HandleCanvasPort(port, 1000, canvas)
-        
-        for i=255 to -1 step -8
-            if i=-1 then i=0
-            ba[0]=i
-            ab=ba.ToHexString()
-            canvas.SetLayer(2, {Color:"#"+ab+"000000", CompositionMode:"Source_Over"})
-            canvas.Show()
-            HandleCanvasPort(port, 32, canvas)
-        end for
-        
-        HandleCanvasPort(port, 12000, canvas)
-        
-        for i=0 to 256 step 8
-            if i=256 then i=255
-            ba[0]=i
-            ab=ba.ToHexString()
-            canvas.SetLayer(2, {Color:"#"+ab+"000000", CompositionMode:"Source_Over"})
-            canvas.Show()
-            HandleCanvasPort(port, 32, canvas)
-        end for
-        
-        counter=nextimg
+        if (scene.image1translation[1] = -400) then
+            scene.image1Uri=photoItems[photo.GetNext(photoItems)]
+            scene.controlAnimate1="start"
+        end if
+ 
+        if (scene.image2translation[1] = -400) then
+            scene.image2Uri=photoItems[photo.GetNext(photoItems)]
+            scene.controlAnimate2="start"
+        end if
+
+        if (scene.image3translation[1] = -400) then
+            scene.image3Uri=photoItems[photo.GetNext(photoItems)]
+            scene.controlAnimate3="start"
+        end if
+
+        if (scene.image4translation[1] = -400) then
+            scene.image4Uri=photoItems[photo.GetNext(photoItems)]
+            scene.controlAnimate4="start"
+        end if
+
+        if (scene.image5translation[1] = -400) then
+            scene.image5Uri=photoItems[photo.GetNext(photoItems)]
+            scene.controlAnimate5="start"
+        end if
+
+        if (scene.image6translation[1] = -400) then
+            scene.image6Uri=photoItems[photo.GetNext(photoItems)]
+            scene.controlAnimate6="start"
+        end if
+            
+        if (scene.image7translation[1] = -400) then
+            scene.image7Uri=photoItems[photo.GetNext(photoItems)]
+            scene.controlAnimate7="start"
+        end if
+            
+        if (scene.image8translation[1] = -400) then
+            scene.image8Uri=photoItems[photo.GetNext(photoItems)]
+            scene.controlAnimate8="start"
+        end if       
     end while
 End Sub
 
-Sub HandleCanvasPort(port, wait, canvas)
+
+Sub HandlePortWait(port, wait, screen)
     msg = wait(wait, port)
     if type(msg) = "roImageCanvasEvent" then
         if (msg.isRemoteKeyPressed()) then
             i = msg.GetIndex()
             print "Key Pressed - " ; msg.GetIndex()
             ' Up - Close the screen.
-            canvas.close()
+            screen.close()
             end
         else if (msg.isScreenClosed()) then
             print "Closed"
