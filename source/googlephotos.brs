@@ -42,6 +42,7 @@ Function InitGooglePhotos() As Object
     'Video
     this.BrowseVideos = googlephotos_browse_videos
     
+    this.GetResolution = googlephotos_get_resolution
     this.ShufflePhotos = googlephotos_random_photos
     this.TipsAndTricks = googlephotos_browse_tips
     this.BrowseSettings = googlephotos_browse_settings
@@ -50,6 +51,9 @@ Function InitGooglePhotos() As Object
     this.DelinkPlayer = googlephotos_delink
     this.About = googlephotos_about
  
+    'Screensaver
+    this.BrowseSSaverSettings = googlephotos_browse_ssaversettings
+	
     'Set Slideshow Duration
     ssdur=RegRead("SlideshowDelay","Settings")
     if ssdur=invalid then
@@ -159,7 +163,7 @@ Sub googlephotos_featured()
 
     ' GOOGLE NO LONGER SUPPORTS FEATURED. WILL BE REMOVING IN FUTURE VERSION
 
-    rsp=m.ExecServerAPI("featured?max-results=200&v=2.0&fields=entry(title,gphoto:id,media:group(media:description,media:content,media:thumbnail))&thumbsize=220&imgmax=" + GetResolution(),invalid)
+    rsp=m.ExecServerAPI("featured?max-results=200&v=2.0&fields=entry(title,gphoto:id,media:group(media:description,media:content,media:thumbnail))&thumbsize=220&imgmax=" + googlephotos_get_resolution(),invalid)
     if rsp<>invalid then
         featured=googlephotos_new_image_list(rsp.entry)
         DisplayImageSet(featured, "Featured", 0, m.SlideshowDuration)
@@ -272,8 +276,8 @@ End Function
 Function album_get_images()
     oa = Oauth()
 
-    rsp=m.googlephotos.ExecServerAPI("/albumid/"+m.GetID()+"?kind=photo&v=2.0&fields=entry(title,gphoto:timestamp,gphoto:id,gphoto:videostatus,media:group(media:description,media:content,media:thumbnail))&thumbsize=220&imgmax="+GetResolution(),m.GetUsername(),oa.accessTokenIndex())
-    print "GooglePhotos Res: " + GetResolution()
+    rsp=m.googlephotos.ExecServerAPI("/albumid/"+m.GetID()+"?kind=photo&v=2.0&fields=entry(title,gphoto:timestamp,gphoto:id,gphoto:videostatus,media:group(media:description,media:content,media:thumbnail))&thumbsize=220&imgmax="+googlephotos_get_resolution(),m.GetUsername(),oa.accessTokenIndex())
+    print "GooglePhotos Res: " + googlephotos_get_resolution()
     if not isxmlelement(rsp) then 
         return invalid
     end if
@@ -385,7 +389,7 @@ Sub googlephotos_user_search(username="default", nickname=invalid)
             else if msg.isFullResult()
                 keyword=msg.GetMessage()
                 dialog=ShowPleaseWait("Please wait","Searching your albums for '" + keyword + "'")
-				rsp=m.ExecServerAPI("?kind=photo&v=2.0&q="+keyword+"&max-results=200&thumbsize=220&imgmax=" + GetResolution(),username,userIndex)
+				rsp=m.ExecServerAPI("?kind=photo&v=2.0&q="+keyword+"&max-results=200&thumbsize=220&imgmax=" + googlephotos_get_resolution(),username,userIndex)
                 images=googlephotos_new_image_list(rsp.entry)
                 dialog.Close()
                 if images.Count()>0 then
@@ -477,7 +481,7 @@ Function tag_get_images()
 
     oa = Oauth()
 	
-    rsp=m.googlephotos.ExecServerAPI("?kind=photo&tag="+m.GetTitle()+"&thumbsize=220&imgmax=" + GetResolution(),m.GetUsername(),oa.accessTokenIndex())
+    rsp=m.googlephotos.ExecServerAPI("?kind=photo&tag="+m.GetTitle()+"&thumbsize=220&imgmax=" + googlephotos_get_resolution(),m.GetUsername(),oa.accessTokenIndex())
     if not isxmlelement(rsp) then 
         return invalid
     end if
@@ -492,7 +496,7 @@ End Function
 ' ********************************************************************
 ' ********************************************************************
 
-Function GetResolution()
+Function googlephotos_get_resolution()
     ssres = RegRead("SlideshowRes","Settings")
 
     if ssres=invalid then
@@ -623,7 +627,7 @@ Sub googlephotos_display_favorites(fav As Object)
     
     'Get highlights from recent photo feed
     highlights=[]
-    rsp=m.ExecServerAPI("?kind=photo&max-results=5&v=2.0&fields=entry(media:group(media:description,media:content,media:thumbnail))&thumbsize=220&imgmax=" + GetResolution(),user,userIndex)
+    rsp=m.ExecServerAPI("?kind=photo&max-results=5&v=2.0&fields=entry(media:group(media:description,media:content,media:thumbnail))&thumbsize=220&imgmax=" + googlephotos_get_resolution(),user,userIndex)
     if isxmlelement(rsp) then 
         images=googlephotos_new_image_list(rsp.entry)
         for each image in images

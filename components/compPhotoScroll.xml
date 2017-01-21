@@ -21,29 +21,26 @@
         <field id="image7Translation" type="node" alias="Image7.translation" />
         <field id="image8Translation" type="node" alias="Image8.translation" />
 		
-		<field id="controlAnimate1" type="node" alias="animateImage1.control" />
-		<field id="controlAnimate2" type="node" alias="animateImage2.control" />
-		<field id="controlAnimate3" type="node" alias="animateImage3.control" />
-		<field id="controlAnimate4" type="node" alias="animateImage4.control" />
-		<field id="controlAnimate5" type="node" alias="animateImage5.control" />
-		<field id="controlAnimate6" type="node" alias="animateImage6.control" />
-		<field id="controlAnimate7" type="node" alias="animateImage7.control" />
-		<field id="controlAnimate8" type="node" alias="animateImage8.control" />
+        <field id="controlAnimate1" type="node" alias="animateImage1.control" />
+        <field id="controlAnimate2" type="node" alias="animateImage2.control" />
+        <field id="controlAnimate3" type="node" alias="animateImage3.control" />
+        <field id="controlAnimate4" type="node" alias="animateImage4.control" />
+        <field id="controlAnimate5" type="node" alias="animateImage5.control" />
+        <field id="controlAnimate6" type="node" alias="animateImage6.control" />
+        <field id="controlAnimate7" type="node" alias="animateImage7.control" />
+        <field id="controlAnimate8" type="node" alias="animateImage8.control" />
     </interface>
 
     <script type = "text/brightscript" >
+        <![CDATA[
 
-    <![CDATA[
-
-        sub init()
-		print "Enter compPhotoScroll init"
-		m.top.backgroundColor = "0x000000FF"
-        m.top.backgroundURI = ""
+            sub init()
+                print "Enter compPhotoScroll init"
+                m.top.backgroundColor = "0x000000FF"
+                m.top.backgroundURI = ""
+            end sub
 	
-	end sub
-	
-    ]]>
-
+        ]]>
     </script>
 
     <children>
@@ -125,6 +122,7 @@
 				keyValue="[[700,720],[700,-400]]"
 			/>		
 		</Animation>
+
 
 		<Poster 
 			id = "Image5"

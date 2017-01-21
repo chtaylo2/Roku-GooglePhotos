@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="compPhotoFade" extends="Scene" >
+
+    <interface>
+        <field id="primaryImageUri" type="node" alias="PrimaryImage.uri" />
+		<field id="primaryImageHeight" type="node" alias="PrimaryImage.loadHeight" />
+		<field id="primaryImageWidth" type="node" alias="PrimaryImage.loadWidth" />
+		<field id="loyoutGrouphorizAlignment" type="node" alias="PrimaryLayout.horizAlignment" />
+		<field id="loyoutGroupvertAlignment" type="node" alias="PrimaryLayout.vertAlignment" />
+		<field id="loyoutGroupTranslation" type="node" alias="PrimaryLayout.translation" />
+        <field id="controlFade" type="node" alias="FadeAnimation.control" />
+    </interface>    
+        
+    <script type = "text/brightscript" >
+        <![CDATA[
+
+            sub init()
+                device=CreateObject("roDeviceInfo")
+                ds=device.GetDisplaySize()
+				
+                print "Enter compPhotoFade init"
+                m.top.backgroundColor = "0x000000FF"
+                m.top.backgroundURI = ""
+				
+				m.FadeBackground = m.top.findNode("FadeBackground")
+                m.FadeBackground.width = ds.w
+				m.FadeBackground.height = ds.h
+            end sub		
+        ]]>
+    </script>
+
+    <children>
+        <LayoutGroup 
+            id = "PrimaryLayout"
+            translation = "[0,0]" >
+        
+            <Poster 
+		        id = "PrimaryImage"
+                loadWidth = "0.0"
+                loadHeight = "0.0"
+                loadDisplayMode = "scaleToFit"
+	        />
+    
+        </LayoutGroup>
+		
+	    <Rectangle
+		    id = "FadeBackground"
+		    color = "0x000000"
+		    height = "0.0"
+		    width = "0.0"
+		    opacity = "0"
+	    />
+
+	    <Animation
+		    id = "FadeAnimation"
+		    repeat = "false"
+		    easeFunction = "inQuad"
+		    duration = "4.0">
+		    <FloatFieldInterpolator
+			    id = "FadeInterpolator"
+			    key = "[0.0,0.25,0.75,1.0]"
+			    KeyValue = "[0.0,1.0,1.0,0.0]"
+			    fieldToInterp = "FadeBackground.opacity"
+		    />
+	    </Animation>
+    </children>
+</component>
