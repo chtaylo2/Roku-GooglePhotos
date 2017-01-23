@@ -33,13 +33,11 @@
 
     <script type = "text/brightscript" >
         <![CDATA[
-
             sub init()
                 print "Enter compPhotoScroll init"
                 m.top.backgroundColor = "0x000000FF"
                 m.top.backgroundURI = ""
             end sub
-	
         ]]>
     </script>
 

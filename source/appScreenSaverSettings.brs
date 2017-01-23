@@ -152,8 +152,8 @@ Sub googlephotos_set_ss_link()
     port = CreateObject("roMessagePort")
     screen = CreateObject("roParagraphScreen")
     screen.SetMessagePort(port)
-    
-    screen.AddHeaderText("About Screensaver")
+    screen.SetBreadcrumbText("Screensaver Display", "Settings")
+    screen.AddHeaderText("Screensaver Display User")
     if linked then
         screen.AddParagraph("Your Google Photos account is successfully linked. This screensavor will randomly display the personal photos from the user selected below.")
         screen.AddParagraph(" ")

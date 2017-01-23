@@ -15,7 +15,7 @@ Sub RunScreensaver()
     if ssUser=invalid then		
         userIndex=0
     else if ssUser="All (Random)" then
-        'userName="All (Random)"
+        userIndex=100
     else
         userCount=m.oa.count()
         for i = 0 to userCount-1
@@ -33,38 +33,57 @@ Sub RunScreensaver()
         ssMethodSel=ssMethod			
     end if
     
-    
+    photoItems=[]
     if not m.oa.linked() then
         rsp="invalid"
     else
-        rsp=m.googlephotos.ExecServerAPI("?kind=photo&max-results=500&v=2.0&fields=entry(media:group(media:content))&imgmax="+m.googlephotos.GetResolution(),"default",userIndex)
-    end if
+    
+        'If userIndex is set to 100, means user wants random photos from each linked account shown. 
+        if userIndex=100 then
+            userCount=m.oa.count()
+            for i = 0 to userCount-1
+                rsp=m.googlephotos.ExecServerAPI("?kind=photo&max-results=300&v=2.0&fields=entry(media:group(media:content))&imgmax="+m.googlephotos.GetResolution(),"default",i)
 
-    photoItems=[]
-    if isxmlelement(rsp) then 
-        images=googlephotos_new_image_list(rsp.entry)
-        print "DEBUG "; image
-        for each image in images
-            if image.GetURL().instr(".MOV") <> -1 Or image.GetURL().instr(".mp4") <> -1 then
-                print "Ignore: "; image.GetURL()
-            else
-                print "Push: "; image.GetURL()
-                photoItems.Push(image.GetURL())
-            end if    
-        end for
-    end if    
+                if isxmlelement(rsp) then 
+                    images=googlephotos_new_image_list(rsp.entry)
+                    for each image in images
+                        if image.GetURL().instr(".MOV") <> -1 Or image.GetURL().instr(".mp4") <> -1 then
+                            print "Ignore: "; image.GetURL()
+                        else
+                            print "Push: "; image.GetURL()
+                            photoItems.Push(image.GetURL())
+                        end if    
+                    end for
+                end if
+            end for
+        else
+            rsp=m.googlephotos.ExecServerAPI("?kind=photo&max-results=500&v=2.0&fields=entry(media:group(media:content))&imgmax="+m.googlephotos.GetResolution(),"default",userIndex)
+
+            if isxmlelement(rsp) then 
+                images=googlephotos_new_image_list(rsp.entry)
+                for each image in images
+                    if image.GetURL().instr(".MOV") <> -1 Or image.GetURL().instr(".mp4") <> -1 then
+                        print "Ignore: "; image.GetURL()
+                    else
+                        print "Push: "; image.GetURL()
+                        photoItems.Push(image.GetURL())
+                    end if    
+                end for
+            end if
+        end if
+    end if
 
     'If unlinked, we'll advertise our channel! ..And a couple Easter Eggs are always cool :-) 
     if photoItems.count() = 0 then
-        photoItems.Push("pkg:/images/mm_icon_focus_hd.png")
-        photoItems.Push("pkg:/images/mm_icon_focus_hd.png")
+        photoItems.Push("pkg:/images/screensaver_splash.png")
+        photoItems.Push("pkg:/images/screensaver_splash.png")
         photoItems.Push("pkg:/images/cat_pic_1.jpg")
         photoItems.Push("pkg:/images/cat_pic_2.jpg")
     end if
 
     photo.GetNext=function(photoItems):return Rnd(photoItems.Count())-1:end function
     
-    print "TEST: "; ssMethodSel
+    print "Display method selected: "; ssMethodSel
     
     if (ssMethodSel="Fading Photo - Large" or ssMethodSel="Fading Photo - Small") then
     
@@ -79,27 +98,27 @@ Sub RunScreensaver()
             tmpHeight = ds.h / 2
             scene.primaryImageWidth = ds.w
             scene.primaryImageHeight = ds.h
-            scene.loyoutGrouphorizAlignment = "center"
-            scene.loyoutGroupvertAlignment = "center"
+            scene.layoutGrouphorizAlignment = "center"
+            scene.layoutGroupvertAlignment = "center"
         else
             'Small Photo Mode
             tmpWidth = Rnd(ds.w-400)
             tmpHeight = Rnd(ds.h-400)
             scene.primaryImageWidth = 400
             scene.primaryImageHeight = 400
-            scene.loyoutGrouphorizAlignment = "left"
-            scene.loyoutGroupvertAlignment = "left"
+            scene.layoutGrouphorizAlignment = "left"
+            scene.layoutGroupvertAlignment = "left"
         end if
         
         tmpTranslation = []
         tmpTranslation.Push(tmpWidth)
         tmpTranslation.Push(tmpHeight)
-        scene.loyoutGroupTranslation = tmpTranslation
+        scene.layoutGroupTranslation = tmpTranslation
         
         scene.primaryImageUri=photoItems[photo.GetNext(photoItems)]
         
         while(true)
-            msg = wait(5000, port)
+            msg = wait(12000, port)
             if (msg <> invalid)
                 msgType = type(msg)
                 if msgType = "roSGScreenEvent"
@@ -114,7 +133,7 @@ Sub RunScreensaver()
                     tmpTranslation = []
                     tmpTranslation.Push(Rnd(ds.w-400))
                     tmpTranslation.Push(Rnd(ds.h-400))
-                    scene.loyoutGroupTranslation = tmpTranslation
+                    scene.layoutGroupTranslation = tmpTranslation
                 end if
             end if
         end while
