@@ -13,11 +13,6 @@ Function InitGooglePhotos() As Object
     
     this.ExecServerAPI = googlephotos_exec_api
     
-    'GooglePhotos
-    this.BrowseGooglePhotos = googlephotos_browse
-    this.BrowseFeatured = googlephotos_featured
-    this.PhotoSearch = googlephotos_photo_search
-    
     'Search
     this.SearchAlbums = googlephotos_user_search
 	
@@ -27,17 +22,6 @@ Function InitGooglePhotos() As Object
     this.newAlbumFromXML = googlephotos_new_album
     this.getAlbumMetaData = googlephotos_get_album_meta
     this.DisplayAlbum = googlephotos_display_album
-
-    'Tags
-    this.BrowseTags = googlephotos_browse_tags
-    this.newTagListFromXML = googlephotos_new_tag_list
-    this.newTagFromXML = googlephotos_new_tag
-    
-    'Favorites
-    this.BrowseFavorites = googlephotos_browse_favorites
-    this.DisplayFavorites = googlephotos_display_favorites
-    this.newFavListFromXML = googlephotos_new_fav_list
-    this.getFavMetaData = googlephotos_get_fav_meta
     
     'Video
     this.BrowseVideos = googlephotos_browse_videos
@@ -67,6 +51,11 @@ Function InitGooglePhotos() As Object
     return this
 End Function
 
+' ********************************************************************
+' ********************************************************************
+' ***** GooglePhotos Functions
+' ********************************************************************
+' ********************************************************************
 
 Function googlephotos_exec_api(url_stub="" As String, username="default" As Dynamic, userIndex=0 As Integer)
 
@@ -138,82 +127,10 @@ Function googlephotos_exec_api(url_stub="" As String, username="default" As Dyna
     return rsp
 End Function
 
-' ********************************************************************
-' ********************************************************************
-' ***** GooglePhotos
-' ***** GooglePhotos
-' ********************************************************************
-' ********************************************************************
-Sub googlephotos_browse()
-    screen=uitkPreShowPosterMenu()
-
-    highlights=m.highlights
-    
-    menudata=[
-        {ShortDescriptionLine1:"Featured", DescriptionLine2:"What's featured now on Google Photos", HDPosterUrl:highlights[2], SDPosterUrl:highlights[2]},
-        {ShortDescriptionLine1:"Community Search", ShortDescriptionLine2:"Search community photos", HDPosterUrl:highlights[3], SDPosterUrl:highlights[3]},
-    ]
-    onselect=[0, m, "BrowseFeatured","PhotoSearch"]
-    
-    uitkDoPosterMenu(menudata, screen, onselect)  
-
-End Sub
-
-Sub googlephotos_featured()
-
-    ' GOOGLE NO LONGER SUPPORTS FEATURED. WILL BE REMOVING IN FUTURE VERSION
-
-    rsp=m.ExecServerAPI("featured?max-results=200&v=2.0&fields=entry(title,gphoto:id,media:group(media:description,media:content,media:thumbnail))&thumbsize=220&imgmax=" + googlephotos_get_resolution(),invalid)
-    if rsp<>invalid then
-        featured=googlephotos_new_image_list(rsp.entry)
-        DisplayImageSet(featured, "Featured", 0, m.SlideshowDuration)
-    end if
-End Sub
-
-Sub googlephotos_photo_search()
-	
-	' GOOGLE NO LONGER SUPPORTS FEATURED. WILL BE REMOVING IN FUTURE VERSION
-	
-    port=CreateObject("roMessagePort") 
-    screen=CreateObject("roSearchScreen")
-    screen.SetMessagePort(port)
-    
-    history=CreateObject("roSearchHistory")
-    screen.SetSearchTerms(history.GetAsArray())
-    
-    screen.Show()
-    
-    while true
-        msg = wait(0, port)
-        
-        if type(msg) = "roSearchScreenEvent" then
-            print "Event: "; msg.GetType(); " msg: "; msg.GetMessage()
-            if msg.isScreenClosed() then
-                return
-            else if msg.isFullResult()
-                keyword=msg.GetMessage()
-                dialog=ShowPleaseWait("Please wait","Searching community images for "+keyword)
-                rsp=m.ExecServerAPI("all?kind=photo&q="+keyword+"&max-results=200",invalid)
-                images=googlephotos_new_image_list(rsp.entry)
-                dialog.Close()
-                if images.Count()>0 then
-                    history.Push(keyword)
-                    screen.AddSearchTerm(keyword)
-                    DisplayImageSet(images, keyword, 0, m.SlideshowDuration)
-                else
-                    ShowErrorDialog("No images match your search","Search results")
-                end if
-            else if msg.isCleared() then
-                history.Clear()
-            end if
-        end if
-    end while
-End Sub
 
 ' ********************************************************************
 ' ********************************************************************
-' ***** Albums
-' ***** Albums
+' ***** Album Functions
 ' ********************************************************************
 ' ********************************************************************
 Sub googlephotos_browse_albums(username="default")
@@ -236,7 +153,6 @@ Sub googlephotos_browse_albums(username="default")
     end if
 
 End Sub
-
 
 Function googlephotos_new_album_list(xmllist As Object) As Object
     albumlist=CreateObject("roList")
@@ -364,6 +280,13 @@ Sub album_play_browse_select(media, title, set_idx)
     end if
 End Sub
 
+
+' ********************************************************************
+' ********************************************************************
+' ***** Search Functions
+' ********************************************************************
+' ********************************************************************
+
 Sub googlephotos_user_search(username="default", nickname=invalid)
 
     oa = Oauth()
@@ -419,80 +342,10 @@ Sub googlephotos_user_search(username="default", nickname=invalid)
     end while
 End Sub
 
-' ********************************************************************
-' ********************************************************************
-' ***** Tags
-' ***** Tags
-' ********************************************************************
-' ********************************************************************
-Sub googlephotos_browse_tags(username="default", nickname=invalid)
-   
-    ' GOOGLE NO LONGER SUPPORTS TAGS. WILL BE REMOVING IN FUTURE VERSION
-
-    oa = Oauth()
-    userIndex = oa.accessTokenIndex()
-	
-    screen=uitkPreShowPosterMenu(oa.userInfoName[userIndex],"Tags")
-    
-    rsp=m.ExecServerAPI("?kind=tag&v=2.0&fields=entry(title)",username,oa.accessTokenIndex())
-    if not isxmlelement(rsp) then return
-    tags=m.newTagListFromXML(rsp.entry, username)
-    
-    if tags.Count()>0 then
-        onselect = [1, tags, m, function(tags, googlephotos, set_idx):googlephotos.DisplayAlbum(tags[set_idx]):end function]
-        uitkDoPosterMenu(googlephotos_get_album_meta(tags), screen, onselect)
-    else
-        uitkDoMessage("No photos have been tagged", screen)
-    end if
-End Sub
-
-Function googlephotos_new_tag_list(xmllist As Object, username) As Object
-
-    ' GOOGLE NO LONGER SUPPORTS TAGS. WILL BE REMOVING IN FUTURE VERSION
- 
-    taglist=CreateObject("roList")
-    for each record in xmllist
-        tag=m.newTagFromXML(record, username)
-	print "Tags: "; tag
-        taglist.Push(tag)
-    next
-    
-    return taglist
-End Function
-
-Function googlephotos_new_tag(xml As Object, username) As Object
-
-    ' GOOGLE NO LONGER SUPPORTS TAGS. WILL BE REMOVING IN FUTURE VERSION
-
-    tag = CreateObject("roAssociativeArray")
-    tag.googlephotos=m
-    tag.xml=xml
-    tag.username=username
-    tag.GetUsername=function():return m.username:end function
-    tag.GetTitle=function():return m.xml.title[0].GetText():end function
-    tag.GetThumb=function():return "pkg:/images/icon_s.png":end function
-    tag.GetImages=tag_get_images
-    return tag
-End Function
-
-Function tag_get_images()
-   
-    ' GOOGLE NO LONGER SUPPORTS FAVORITES. WILL BE REMOVING IN FUTURE VERSION
-
-    oa = Oauth()
-	
-    rsp=m.googlephotos.ExecServerAPI("?kind=photo&tag="+m.GetTitle()+"&thumbsize=220&imgmax=" + googlephotos_get_resolution(),m.GetUsername(),oa.accessTokenIndex())
-    if not isxmlelement(rsp) then 
-        return invalid
-    end if
-    
-    return googlephotos_new_image_list(rsp.entry)
-End Function
 
 ' ********************************************************************
 ' ********************************************************************
-' ***** Images
-' ***** Images
+' ***** Images Functions
 ' ********************************************************************
 ' ********************************************************************
 
@@ -584,109 +437,10 @@ Function get_thumb()
     return "pkg:/images/icon_s.png"
 End Function
 
-' ********************************************************************
-' ********************************************************************
-' ***** Favorites
-' ***** Favorites
-' ********************************************************************
-' ********************************************************************
-Sub googlephotos_browse_favorites(username="default", nickname=invalid)
-
-    ' GOOGLE NO LONGER SUPPORTS FAVORITES. WILL BE REMOVING IN FUTURE VERSION
-
-    breadcrumb_name=""
-    if username<>"default" and nickname<>invalid then
-        breadcrumb_name=nickname
-    end if
-    
-    screen=uitkPreShowPosterMenu(breadcrumb_name,"Favorites")
-    
-    rsp=m.ExecServerAPI("/contacts?kind=user",username)
-    if not isxmlelement(rsp) then return
-    favs=googlephotos_new_fav_list(rsp.entry)
-    
-    if favs.Count() > 0 then
-        onselect = [1, favs, m, function(ff, googlephotos, set_idx):googlephotos.DisplayFavorites(ff[set_idx]):end function]
-        uitkDoPosterMenu(m.getFavMetaData(favs), screen, onselect)
-    else
-        uitkDoMessage("You do not have any favorites", screen)
-    end if
-End Sub
-
-Sub googlephotos_display_favorites(fav As Object)
-
-    ' GOOGLE NO LONGER SUPPORTS FAVORITES. WILL BE REMOVING IN FUTURE VERSION
-	
-	oa = Oauth()
-    userIndex = oa.accessTokenIndex()
-	
-    user=fav.GetUser()
-    nickname=fav.GetNickname()
-    
-    screen=uitkPreShowPosterMenu("",nickname)
-    
-    'Get highlights from recent photo feed
-    highlights=[]
-    rsp=m.ExecServerAPI("?kind=photo&max-results=5&v=2.0&fields=entry(media:group(media:description,media:content,media:thumbnail))&thumbsize=220&imgmax=" + googlephotos_get_resolution(),user,userIndex)
-    if isxmlelement(rsp) then 
-        images=googlephotos_new_image_list(rsp.entry)
-        for each image in images
-            highlights.Push(image.GetThumb())
-        end for
-    end if
-    
-    for i=0 to 3
-        if highlights[i]=invalid then
-            highlights[i]="pkg:/images/icon_s.png"
-        end if
-    end for
-    
-    menudata = [
-        {ShortDescriptionLine1:"Albums", ShortDescriptionLine2:"Browse Recently Updated Albums", HDPosterUrl:highlights[0], SDPosterUrl:highlights[0]},
-        {ShortDescriptionLine1:"Tags", ShortDescriptionLine2:"Browse Tags", HDPosterUrl:highlights[1], SDPosterUrl:highlights[1]},
-        {ShortDescriptionLine1:"Favorites", ShortDescriptionLine2:"Browse Favorites", HDPosterUrl:highlights[2], SDPosterUrl:highlights[2]},
-        {ShortDescriptionLine1:"Shuffle Photos", ShortDescriptionLine2:"Display slideshow of random photos", HDPosterUrl:highlights[3], SDPosterUrl:highlights[3]},
-    ]
-    
-    onclick=[0, m, ["BrowseAlbums", user, nickname], ["BrowseTags", user, nickname], ["BrowseFavorites", user, nickname], ["ShufflePhotos", user]]
-    
-    uitkDoPosterMenu(menudata, screen, onclick)
-End Sub
-
-Function googlephotos_new_fav_list(xmllist As Object)
-
-	' GOOGLE NO LONGER SUPPORTS FAVORITES. WILL BE REMOVING IN FUTURE VERSION
-		
-    favs=[]
-    for each record in xmllist
-        fav = CreateObject("roAssociativeArray")
-        fav.xml=record
-        fav.GetUser=function():return m.xml.GetNamedElements("gphoto:user")[0].GetText():end function
-        fav.GetNickname=function():return m.xml.GetNamedElements("gphoto:nickname")[0].GetText():end function
-        fav.GetThumb=function():return m.xml.GetNamedElements("gphoto:thumbnail")[0].GetText():end function
-        fav.GetURL=function():return m.xml.author.uri[0].GetText():end function
-        favs.Push(fav)
-    end for
-    
-    return favs
-End Function
-
-Function googlephotos_get_fav_meta(fav As Object)
-
-    ' GOOGLE NO LONGER SUPPORTS FAVORITES. WILL BE REMOVING IN FUTURE VERSION
-
-    favmetadata=[]
-    for each f in fav
-        favmetadata.Push({ShortDescriptionLine1: f.GetNickname(), ShortDescriptionLine2: f.GetURL(), HDPosterUrl: f.GetThumb(), SDPosterUrl: f.GetThumb()})
-    next
-    
-    return favmetadata
-End Function
 
 ' ********************************************************************
 ' ********************************************************************
-' ***** Random Slideshow
-' ***** Random Slideshow
+' ***** Random Slideshow Functions
 ' ********************************************************************
 ' ********************************************************************
 Sub googlephotos_random_photos(username="default")
@@ -776,10 +530,10 @@ Sub BrowseImages(images AS Object, title="" As String)
     end while
 End Sub
 
+
 ' ********************************************************************
 ' ********************************************************************
-' ***** Videos
-' ***** Videos
+' ***** Videos Functions
 ' ********************************************************************
 ' ********************************************************************
 Sub googlephotos_browse_videos(videos As Object, title As String)
@@ -833,7 +587,6 @@ Function GetVideoMetaData(videos As Object)
     
     return metadata
 End Function
-
 
 Function DisplayVideo(content As Object)
     print "Displaying video: "

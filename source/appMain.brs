@@ -21,7 +21,6 @@ Sub RunUserInterface()
     googlephotos = LoadGooglePhotos()
     
     ' Attempt to register if we are not already registered
-
     usersLoaded = oa.count()
     if usersLoaded=invalid then
         ShowInvalidUser()
@@ -107,8 +106,6 @@ Sub ShowMainMenu(userIndex=0 As Integer)
     photoIcon="pkg:/images/icon_photo_big.png"
     searchIcon="pkg:/images/search.png"
     settingsIcon="pkg:/images/gear.png"
-    favoriteIcon="pkg:/images/favorite.png"
-    tagsIcon="pkg:/images/tags.png"
     randomIcon="pkg:/images/random_icon.png"
 	tipsIcon="pkg:/images/tipsandtricks.png"
     
