@@ -111,6 +111,8 @@ Sub googlephotos_set_slideshow_res()
     screen.SetBreadcrumbText("", "Settings")
     screen.AddHeaderText("Photo Download Resolution")
     screen.AddParagraph("This setting defines the photo size downloaded during your slideshow. If you have a slow internet connection, it's recommended to decrease this setting.")
+    screen.AddParagraph(" ")
+    screen.AddParagraph("You will only see options your Roku player supports.")
     screen.AddParagraph("Current setting: " + restext)
     if is4k then
         screen.AddButton(2, "Full High Definition (FHD)")
