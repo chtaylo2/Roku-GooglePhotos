@@ -248,10 +248,6 @@ Function googlephotos_set_custom_slideshow_speed()
     end while
 End Function
 
-Sub googlephotos_comingSoon()
-    ans=ShowDialog1Button("Link additional account","Ability to link additional account coming soon!","Back")
-End Sub
-
 Sub googlephotos_delink()
 
     oa = Oauth()
@@ -308,4 +304,44 @@ Sub googlephotos_about()
         endif
     end while
 End Sub
+
+Function googlephotos_get_slideshow_speed()
+    'Set Slideshow Duration
+    ssdur=RegRead("SlideshowDelay","Settings")
+    if ssdur=invalid then
+        dur=3
+    else
+        dur=Val(ssdur)
+    end if  
+
+    return dur
+End Function
+
+Function googlephotos_get_resolution()
+    ssres = RegRead("SlideshowRes","Settings")
+
+    if ssres=invalid then
+        device = createObject("roDeviceInfo")
+        is4k = (val(device.GetVideoMode()) = 2160)
+        is1080p = (val(device.GetVideoMode()) = 1080)
+
+        if is4k then
+            res="1600"
+        else if is1080p
+            res="1280"
+        else
+            res="720"
+        end if
+    else
+        if ssres="FHD" then
+            res="1600"
+        else if ssres="HD"
+            res="1280"
+        else
+            res="720"
+        end if
+    end if
+
+    return res
+End Function
 

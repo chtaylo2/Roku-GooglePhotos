@@ -5,46 +5,41 @@ Function LoadGooglePhotos() As Object
 End Function
 
 Function InitGooglePhotos() As Object
-    ' constructor
-	
-    this = CreateObject("roAssociativeArray")
-    this.scope = "https://picasaweb.google.com/data"
-    this.prefix = this.scope + "/feed/api"
+
+    this                      = CreateObject("roAssociativeArray")
+    this.scope                = "https://picasaweb.google.com/data"
+    this.prefix               = this.scope + "/feed/api"
     
-    this.ExecServerAPI = googlephotos_exec_api
+    this.ExecServerAPI        = googlephotos_exec_api
     
     'Search
-    this.SearchAlbums = googlephotos_user_search
+    this.SearchAlbums         = googlephotos_user_search
 	
     'Album
-    this.BrowseAlbums = googlephotos_browse_albums
-    this.newAlbumListFromXML = googlephotos_new_album_list
-    this.newAlbumFromXML = googlephotos_new_album
-    this.getAlbumMetaData = googlephotos_get_album_meta
-    this.DisplayAlbum = googlephotos_display_album
+    this.BrowseAlbums         = googlephotos_browse_albums
+    this.newAlbumListFromXML  = googlephotos_new_album_list
+    this.newAlbumFromXML      = googlephotos_new_album
+    this.getAlbumMetaData     = googlephotos_get_album_meta
+    this.DisplayAlbum         = googlephotos_display_album
     
     'Video
-    this.BrowseVideos = googlephotos_browse_videos
-    
-    this.GetResolution = googlephotos_get_resolution
-    this.ShufflePhotos = googlephotos_random_photos
-    this.TipsAndTricks = googlephotos_browse_tips
-    this.BrowseSettings = googlephotos_browse_settings
-
-    this.SlideshowSpeed = googlephotos_set_slideshow_speed
-    this.DelinkPlayer = googlephotos_delink
-    this.About = googlephotos_about
+    this.BrowseVideos         = googlephotos_browse_videos
+	
+	'Main / Settings
+    this.ShufflePhotos        = googlephotos_random_photos
+    this.TipsAndTricks        = googlephotos_browse_tips
+    this.BrowseSettings       = googlephotos_browse_settings
+    this.SetSlideshowSpeed    = googlephotos_set_slideshow_speed
+	this.SetResoltion         = googlephotos_set_slideshow_res
+    this.DelinkPlayer         = googlephotos_delink
+    this.About                = googlephotos_about
  
     'Screensaver
     this.BrowseSSaverSettings = googlephotos_browse_ssaversettings
 	
-    'Set Slideshow Duration
-    ssdur=RegRead("SlideshowDelay","Settings")
-    if ssdur=invalid then
-        this.SlideshowDuration=3
-    else
-        this.SlideshowDuration=Val(ssdur)
-    end if   
+	'Pull setting
+	this.GetResolution        = googlephotos_get_resolution
+	this.GetSlideShowSpeed    = googlephotos_get_slideshow_speed 
 	
     print "GooglePhotos: init complete"
 
@@ -262,7 +257,7 @@ End Sub
 
 Sub album_select(media, title, set_idx)
     if set_idx=0 then
-        DisplayImageSet(media[0], title, 0, m.googlephotos.SlideshowDuration)
+        DisplayImageSet(media[0], title, 0, googlephotos_get_slideshow_speed())
 		
     else if set_idx=1 then
         googlephotos_browse_videos(media[1], title)
@@ -274,7 +269,7 @@ End Sub
 
 Sub album_play_browse_select(media, title, set_idx)
     if set_idx=0 then 
-        DisplayImageSet(media[0], title, 0, m.googlephotos.SlideshowDuration) 
+        DisplayImageSet(media[0], title, 0, googlephotos_get_slideshow_speed()) 
     else if set_idx=1 then
         BrowseImages(media[0], title)
     end if
@@ -348,34 +343,6 @@ End Sub
 ' ***** Images Functions
 ' ********************************************************************
 ' ********************************************************************
-
-Function googlephotos_get_resolution()
-    ssres = RegRead("SlideshowRes","Settings")
-
-    if ssres=invalid then
-        device = createObject("roDeviceInfo")
-        is4k = (val(device.GetVideoMode()) = 2160)
-        is1080p = (val(device.GetVideoMode()) = 1080)
-
-        if is4k then
-            res="1600"
-        else if is1080p
-            res="1280"
-        else
-            res="720"
-        end if
-    else
-        if ssres="FHD" then
-            res="1600"
-        else if ssres="HD"
-            res="1280"
-        else
-            res="720"
-        end if
-    end if
-
-    return res
-End Function
 
 Function googlephotos_new_image_list(xmllist As Object) As Object
     images=CreateObject("roList")
@@ -459,7 +426,7 @@ Sub googlephotos_random_photos(username="default")
     else
         ss=PrepDisplaySlideShow()
         screen.Close()
-        ss.SetPeriod(m.SlideshowDuration)
+        ss.SetPeriod(googlephotos_get_slideshow_speed())
         port=ss.GetMessagePort()
         
         image_univ=[]
@@ -511,7 +478,7 @@ Sub googlephotos_random_photos(username="default")
                 end while
                 
                 'Sleeping for Slideshow Duration - 2.5 seconds
-                sleep((m.SlideshowDuration-2.5)*1000)
+                sleep((googlephotos_get_slideshow_speed()-2.5)*1000)
             end if
         end while
     end if
@@ -523,7 +490,7 @@ Sub BrowseImages(images AS Object, title="" As String)
     while true
         selected=uitkDoGrid(images_get_meta(images), screen)
         if selected>-1 then
-            DisplayImageSet(images, title, selected, m.googlephotos.SlideshowDuration)
+            DisplayImageSet(images, title, selected, googlephotos_get_slideshow_speed())
         else
             return
         end if
