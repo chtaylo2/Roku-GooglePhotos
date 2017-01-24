@@ -186,8 +186,8 @@ Function uitkDoGrid(imagedata, screen, onselect_callback=invalid) As Integer
         endif 
     next
 
-    'Turnoff description box by default
-    screen.SetDescriptionVisible(0)
+    'Turnon description box by default. This also helps if there's only 1 photo in row.
+    screen.SetDescriptionVisible(1)
 
     while true
         msg = wait(0, screen.GetMessagePort())
