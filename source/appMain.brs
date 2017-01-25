@@ -20,6 +20,15 @@ Sub RunUserInterface()
     oa = Oauth()
     googlephotos = LoadGooglePhotos()
     
+	
+    'Show new features popup once
+    lastPopup = RegRead("FeaturePopup","Settings")
+    if lastPopup=invalid then
+        googlephotos.FeaturesPopup()
+	else if (lastPopup <> googlephotos.releaseVersion) then
+        googlephotos.FeaturesPopup()
+    end if	
+	
     ' Attempt to register if we are not already registered
     usersLoaded = oa.count()
     if usersLoaded=invalid then

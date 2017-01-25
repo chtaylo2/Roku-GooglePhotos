@@ -7,6 +7,8 @@ End Function
 Function InitGooglePhotos() As Object
 
     this                      = CreateObject("roAssociativeArray")
+	
+    this.releaseVersion       = "1.6"
     this.scope                = "https://picasaweb.google.com/data"
     this.prefix               = this.scope + "/feed/api"
     
@@ -25,21 +27,24 @@ Function InitGooglePhotos() As Object
     'Video
     this.BrowseVideos         = googlephotos_browse_videos
 	
-	'Main / Settings
+    'Main / Settings
     this.ShufflePhotos        = googlephotos_random_photos
     this.TipsAndTricks        = googlephotos_browse_tips
     this.BrowseSettings       = googlephotos_browse_settings
     this.SetSlideshowSpeed    = googlephotos_set_slideshow_speed
-	this.SetResoltion         = googlephotos_set_slideshow_res
+    this.SetResoltion         = googlephotos_set_slideshow_res
     this.DelinkPlayer         = googlephotos_delink
     this.About                = googlephotos_about
  
     'Screensaver
     this.BrowseSSaverSettings = googlephotos_browse_ssaversettings
 	
-	'Pull setting
-	this.GetResolution        = googlephotos_get_resolution
-	this.GetSlideShowSpeed    = googlephotos_get_slideshow_speed 
+    'Features Popup
+    this.FeaturesPopup        = googlephotos_featurespopup
+	
+    'Pull setting
+    this.GetResolution        = googlephotos_get_resolution
+    this.GetSlideShowSpeed    = googlephotos_get_slideshow_speed
 	
     print "GooglePhotos: init complete"
 
