@@ -3,7 +3,7 @@
 '
 '    Display "menu" items in a Poster Screen.   
 '
-function uitkPreShowPosterMenu(breadA=invalid, breadB=invalid, liststyle="arced-square") As Object
+function uitkPreShowPosterMenu(showWait=0, breadA=invalid, breadB=invalid, liststyle="arced-square") As Object
 
     port=CreateObject("roMessagePort")
     screen = CreateObject("roPosterScreen")
@@ -16,6 +16,9 @@ function uitkPreShowPosterMenu(breadA=invalid, breadB=invalid, liststyle="arced-
     end if
     screen.SetListStyle(liststyle)
     screen.SetListDisplayMode("zoom-to-fill")
+    if showWait = 1 then
+        screen.ShowMessage("Processing, please wait..")
+    end if
     screen.Show()
 
     return screen

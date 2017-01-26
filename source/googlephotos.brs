@@ -23,6 +23,7 @@ Function InitGooglePhotos() As Object
     this.newAlbumFromXML      = googlephotos_new_album
     this.getAlbumMetaData     = googlephotos_get_album_meta
     this.DisplayAlbum         = googlephotos_display_album
+    this.AlbumPages           = googlephotos_album_pages
     
     'Video
     this.BrowseVideos         = googlephotos_browse_videos
@@ -39,9 +40,9 @@ Function InitGooglePhotos() As Object
     'Screensaver
     this.BrowseSSaverSettings = googlephotos_browse_ssaversettings
 	
-    'Features Popup
+    'Popups
     this.FeaturesPopup        = googlephotos_featurespopup
-	
+
     'Pull setting
     this.GetResolution        = googlephotos_get_resolution
     this.GetSlideShowSpeed    = googlephotos_get_slideshow_speed
@@ -139,14 +140,14 @@ Sub googlephotos_browse_albums(username="default")
     userIndex = oa.accessTokenIndex()
 	
     breadcrumb_name=oa.userInfoName[userIndex]
-    screen=uitkPreShowPosterMenu(breadcrumb_name,"My Albums")
+    screen=uitkPreShowPosterMenu(1, breadcrumb_name,"My Albums")
     
-    rsp=m.ExecServerAPI("?kind=album&v=2.0&fields=entry(title,gphoto:numphotos,gphoto:user,gphoto:id,media:group(media:description,media:thumbnail))",username,userIndex)
+    rsp=m.ExecServerAPI("?kind=album&v=2.0&fields=entry(title,gphoto:numphotos,gphoto:user,gphoto:id,media:group(media:description,media:thumbnail))&thumbsize=220",username,userIndex)
     if not isxmlelement(rsp) then return
     albums=m.newAlbumListFromXML(rsp.entry)
     
     if albums.Count()>0 then
-        onselect = [1, albums, m, function(albums, googlephotos, set_idx):googlephotos.DisplayAlbum(albums[set_idx]):end function]
+        onselect = [1, albums, m, function(albums, googlephotos, set_idx):googlephotos.AlbumPages(albums[set_idx]):end function]
         uitkDoPosterMenu(googlephotos_get_album_meta(albums), screen, onselect)
     else
         uitkDoMessage("You do not have any albums containing photos", screen)
@@ -176,7 +177,6 @@ Function googlephotos_new_album(xml As Object) As Object
     album.GetID=function():return m.xml.GetNamedElements("gphoto:id")[0].GetText():end function
     album.GetImageCount=function():return Val(m.xml.GetNamedElements("gphoto:numphotos")[0].GetText()):end function
     album.GetThumb=get_thumb
-    album.GetImages=album_get_images
     return album
 End Function
 
@@ -189,11 +189,44 @@ Function googlephotos_get_album_meta(albums As Object)
     return albummetadata
 End Function
 
-Function album_get_images()
-    oa = Oauth()
+Function googlephotos_get_album_pages(album As Object)
+    albumpages   = []
+    totalPages   = album.GetImageCount() / 1000
+	currentCount = album.GetImageCount()
+	page_start   = 0
+	page_end     = 0
+	title        = album.GetTitle()
+	thumb        = album.GetThumb()
+	
+    for i = 1 to ceiling(totalPages)
+		page_start = 1 + page_end
+		if currentCount > 1000 then
+		   page_end=page_end + 1000
+		   currentCount = currentCount - 1000
+		else
+           page_end=page_end + currentCount
+		end if
+		
+		page_start_dply = str(page_start)
+		page_start_dply = page_start_dply.Replace(" ", "")
+        page_end_dply   = str(page_end)
+        page_end_dply   = page_end_dply.Replace(" ", "")
+        albumpages.Push({Title: "Media Page "+str(i), ShortDescriptionLine1: title, ShortDescriptionLine2: "Items: "+page_start_dply+" thru "+page_end_dply, HDPosterUrl: thumb, SDPosterUrl: thumb})
+    end for
+	
+    return albumpages
+End Function
 
-    rsp=m.googlephotos.ExecServerAPI("/albumid/"+m.GetID()+"?kind=photo&v=2.0&fields=entry(title,gphoto:timestamp,gphoto:id,gphoto:videostatus,media:group(media:description,media:content,media:thumbnail))&thumbsize=220&imgmax="+googlephotos_get_resolution(),m.GetUsername(),oa.accessTokenIndex())
-    print "GooglePhotos Res: " + googlephotos_get_resolution()
+Function album_get_images(album As Object, startIndex=1 as Integer)
+
+    oa = Oauth()
+	
+	start = str(startIndex)
+	start = start.Replace(" ", "")
+
+    rsp=m.googlephotos.ExecServerAPI("/albumid/"+album.GetID()+"?start-index="+start+"&max-results=1000kind=photo&v=2.0&fields=entry(title,gphoto:timestamp,gphoto:id,gphoto:videostatus,media:group(media:description,media:content,media:thumbnail))&thumbsize=220&imgmax="+googlephotos_get_resolution(),album.GetUsername(),oa.accessTokenIndex())
+    print "GooglePhotos StartIndex: "; start
+	print "GooglePhotos Res: "; googlephotos_get_resolution()
     if not isxmlelement(rsp) then 
         return invalid
     end if
@@ -201,31 +234,46 @@ Function album_get_images()
     return googlephotos_new_image_list(rsp.entry)
 End Function
 
-Sub googlephotos_display_album(album As Object)
+Sub googlephotos_display_album(album As Object, index=0 As Integer)
+
     print "DisplayAlbum: init"
-    medialist=album.GetImages()
+	
+    title      = album.GetTitle()
+    totalPages = ceiling(album.GetImageCount() / 1000)
+    screen     = uitkPreShowPosterMenu(1, title,"Album")
+	
+    startIndex = 1
+    if index > 0 then startIndex=(index*1000)+1
+    medialist=album_get_images(album, startIndex)
     
     videos=[]
     images=[]
     for each media in medialist
         if media.IsVideo() then
             videos.Push(media)
-            print "VIDEO: "; media.GetURL()
+            'print "VIDEO: "; media.GetURL()
         else
             images.Push(media)
-            print "IMAGE: "; media.GetURL()
+            'print "IMAGE: "; media.GetURL()
         end if
     end for
     
-    title=album.GetTitle()
+   pagesShow  = ""
+   if totalPages > 1 then
+       currentPage = str(index + 1)
+       currentPage = currentPage.Replace(" ", "")
+       totalPages  = str(totalPages)
+       totalPages  = totalPages.Replace(" ", "")
+       pagesShow   = "Page "+currentPage+" of "+totalPages
+    end if
     
     if videos.Count()>0 then        
         if images.Count()>0 then 'Combined photo and photo album
-            screen=uitkPreShowPosterMenu(title,"Album")
-			listIcon="pkg:/images/browse.png"
+            listIcon="pkg:/images/browse.png"
             
             albummenudata = [
                 {ShortDescriptionLine1:Pluralize(images.Count(),"Photo") + " - Start Slideshow",
+                 ShortDescriptionLine2:pagesShow,
                  HDPosterUrl:images[0].GetThumb(),
                  SDPosterUrl:images[0].GetThumb()},
                 {ShortDescriptionLine1:Pluralize(videos.Count(),"Video"),
@@ -236,18 +284,17 @@ Sub googlephotos_display_album(album As Object)
                  SDPosterUrl:listIcon},
             ]
             
-            
-			onselect = [1, [images, videos], title, album_select]
+            onselect = [1, [images, videos], title, album_select]
             uitkDoPosterMenu(albummenudata, screen, onselect)
         else 'Video only album
             googlephotos_browse_videos(videos, title)
         end if
     else 'Photo only album			
-            screen=uitkPreShowPosterMenu(title,"Album")
             listIcon="pkg:/images/browse.png"
 			
             albummenudata = [
                 {ShortDescriptionLine1:Pluralize(images.Count(),"Photo") + " - Start Slideshow",
+                 ShortDescriptionLine2:pagesShow,
                  HDPosterUrl:images[0].GetThumb(),
                  SDPosterUrl:images[0].GetThumb()},
                 {ShortDescriptionLine1:"Browse Photos",
@@ -258,6 +305,36 @@ Sub googlephotos_display_album(album As Object)
             onselect = [1, [images, videos], title, album_play_browse_select]
             uitkDoPosterMenu(albummenudata, screen, onselect)				
     end if
+End Sub
+
+Sub googlephotos_browse_pages(album As Object)
+    screen=CreateObject("roListScreen")
+    screen.SetContent(googlephotos_get_album_pages(album))
+    port = CreateObject("roMessagePort")
+    screen.SetMessagePort(port)
+    screen.SetBreadcrumbText("Select Page", "Album")
+    screen.show()
+	
+    while(true)
+        msg = wait(0,port)
+        if msg.isScreenClosed() then 'ScreenClosed event
+            exit while
+        else if (type(msg) = "roListScreenEvent")
+            if(msg.isListItemSelected())
+				googlephotos_display_album(album, msg.GetIndex())
+            endif
+        endif
+    end while
+End Sub
+
+Sub googlephotos_album_pages(album As Object)
+    if album.GetImageCount() > 1000 then
+        lastPopup = RegRead("ThousandPopup","Settings")
+        if lastPopup=invalid then googlephotos_thousandpopup()
+	    googlephotos_browse_pages(album)
+	else
+        googlephotos_display_album(album)
+	end if
 End Sub
 
 Sub album_select(media, title, set_idx)
@@ -320,7 +397,7 @@ Sub googlephotos_user_search(username="default", nickname=invalid)
                     screen.AddSearchTerm(keyword)
 					screen.Close()
 					
-					screen=uitkPreShowPosterMenu(oa.userInfoName[userIndex],"Search Results")
+					screen=uitkPreShowPosterMenu(1, oa.userInfoName[userIndex],"Search Results")
 					listIcon="pkg:/images/browse.png"
 					searchIcon="pkg:/images/search.png"
 			
@@ -420,7 +497,7 @@ Sub googlephotos_random_photos(username="default")
     oa = Oauth()
     userIndex = oa.accessTokenIndex()
 
-    screen=uitkPreShowPosterMenu(oa.userInfoName[userIndex],"Shuffle Photos")
+    screen=uitkPreShowPosterMenu(1, oa.userInfoName[userIndex],"Shuffle Photos")
     
     rsp=m.ExecServerAPI("?kind=album&v=2.0&fields=entry(title,gphoto:numphotos,gphoto:user,gphoto:id,media:group(media:description,media:thumbnail))",username,userIndex)
     if not isxmlelement(rsp) then return
@@ -458,7 +535,7 @@ Sub googlephotos_random_photos(username="default")
             if album_cache.DoesExist(itostr(album_idx)) then
                 imagelist=album_cache.Lookup(itostr(album_idx))
             else
-                imagelist=albums[album_idx].GetImages()
+                imagelist=album_get_images(albums[album_idx])
                 if imagelist=invalid then 
                     album_skip.AddReplace(itostr(album_idx),1)
                     goto next_image
@@ -512,7 +589,7 @@ Sub googlephotos_browse_videos(videos As Object, title As String)
     if videos.Count()=1 then
         DisplayVideo(GetVideoMetaData(videos)[0])
     else
-        screen=uitkPreShowPosterMenu(title,"Videos")
+        screen=uitkPreShowPosterMenu(1, title,"Videos")
         metadata=GetVideoMetaData(videos)
         
         onselect = [1, metadata, m, function(video, googlephotos, set_idx):DisplayVideo(video[set_idx]):end function]
