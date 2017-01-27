@@ -175,7 +175,7 @@ Sub RunScreensaver()
         scene.controlAnimate7="start"
 
         'FHD Support
-		endPoint=-400*multiplier
+        endPoint=-400*multiplier
 
         'Need to find a way to concatenate variables to reduce this while loop.
         while(true)
