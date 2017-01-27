@@ -48,7 +48,6 @@ Sub googlephotos_browse_tips()
         else if (type(msg) = "roListScreenEvent")
             if(msg.isListItemSelected())
                 menuSelections[msg.GetIndex()]()
-                screen.SetContent(getTipsList())
             endif
         endif
     end while

@@ -8,7 +8,7 @@ Sub RunUserInterface()
     initTheme()
 
     ' Pop up start of UI for some instant feedback while we load the icon data
-    screen=uitkPreShowPosterMenu("", "")
+    screen=uitkPreShowPosterMenu(0, "", "")
 	
     if screen=invalid then
         print "unexpected error in uitkPreShowPosterMenu"
@@ -20,8 +20,16 @@ Sub RunUserInterface()
     oa = Oauth()
     googlephotos = LoadGooglePhotos()
     
+	
+    'Show new features popup once
+    lastPopup = RegRead("FeaturePopup","Settings")
+    if lastPopup=invalid then
+        googlephotos.FeaturesPopup()
+	else if (lastPopup <> googlephotos.releaseVersion) then
+        googlephotos.FeaturesPopup()
+    end if	
+	
     ' Attempt to register if we are not already registered
-
     usersLoaded = oa.count()
     if usersLoaded=invalid then
         ShowInvalidUser()
@@ -42,7 +50,7 @@ Sub SelectLinkedUser()
     if usersLoaded=invalid then
         ShowInvalidUser()
     else if usersLoaded > 1 then
-        screen=uitkPreShowPosterMenu("","Select User", "flat-category")
+        screen=uitkPreShowPosterMenu(0, "","Select User", "flat-category")
 	
         userdata=[]
         for i = 0 to usersLoaded-1
@@ -60,6 +68,8 @@ End Sub
 
 Sub ShowInvalidUser()
 
+    ''TODO: Need to see if this is still even needed. May not be now because of the legacy user addition
+	
     oa = Oauth()
     oa.erase()
 
@@ -97,7 +107,7 @@ Sub ShowMainMenu(userIndex=0 As Integer)
     oa.currentAccessTokenInd = userIndex
 	
     ' Pop up start of UI for some instant feedback while we load the icon data
-    screen=uitkPreShowPosterMenu(oa.userInfoName[userIndex], "Main Menu")
+    screen=uitkPreShowPosterMenu(0, oa.userInfoName[userIndex], "Main Menu")
 	
     if screen=invalid then
         print "unexpected error in uitkPreShowPosterMenu"
@@ -107,8 +117,6 @@ Sub ShowMainMenu(userIndex=0 As Integer)
     photoIcon="pkg:/images/icon_photo_big.png"
     searchIcon="pkg:/images/search.png"
     settingsIcon="pkg:/images/gear.png"
-    favoriteIcon="pkg:/images/favorite.png"
-    tagsIcon="pkg:/images/tags.png"
     randomIcon="pkg:/images/random_icon.png"
 	tipsIcon="pkg:/images/tipsandtricks.png"
     

@@ -234,28 +234,35 @@ Function oauth_request_userinfo(userIndex As Integer, isrefresh=false As Boolean
             infoName  = strReplaceSpecial(infoName)
             infoEmail = strReplaceSpecial(infoEmail)
 
+            if infoName  = "" then infoName  = "Google Photos User"
+            if infoEmail = "" then infoName  = "No email on file"
+            if infoPhoto = "" then infoPhoto = "pkg:/images/userdefault.png"
+            
             if isrefresh = true then
                 m.userInfoName[m.currentAccessTokenInd]  = infoName
                 m.userInfoEmail[m.currentAccessTokenInd] = infoEmail
                 m.userInfoPhoto[m.currentAccessTokenInd] = infoPhoto
             else
             
-                for i = 0 to m.userInfoEmail.Count()-1
-                    if m.userInfoEmail[i] = infoEmail then
-                        m.accessToken.Pop()
-                        m.refreshToken.Pop()
-                        ShowDialog1Button("Notice", "Account '"+infoEmail+"' already linked to device", "OK")
-                        return 0
-                    end if
-                end for
+                if infoEmail <> "No email on file" then
+                    for i = 0 to m.userInfoEmail.Count()-1
+                        if m.userInfoEmail[i] = infoEmail then
+                            m.accessToken.Pop()
+                            m.refreshToken.Pop()
+                            ShowDialog1Button("Notice", "Account '"+infoEmail+"' already linked to device", "OK")
+                            return 0
+                        end if
+                    end for
+                end if
             
                 m.userInfoName.Push(infoName)
                 m.userInfoEmail.Push(infoEmail)
                 m.userInfoPhoto.Push(infoPhoto)
             end if
             
-            if infoName  = "" then m.errorMsg = "Missing User Data" : status = 1
-            if infoPhoto = "" then m.errorMsg = "Missing User Data" : status = 1
+            if infoEmail = "" then m.errorMsg = "Missing User Data (Email)" : status = 1
+            if infoName  = "" then m.errorMsg = "Missing User Data (Name)" : status = 1
+            if infoPhoto = "" then m.errorMsg = "Missing User Data (Photo" : status = 1
         end if
     endif
 
