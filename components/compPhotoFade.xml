@@ -2,7 +2,6 @@
 <component name="compPhotoFade" extends="Scene" >
 
     <interface>
-        <!-- Define the dynamic image fields -->
         <field id="primaryImageUri" type="node" alias="PrimaryImage.uri" />
         <field id="primaryImageHeight" type="node" alias="PrimaryImage.loadHeight" />
         <field id="primaryImageWidth" type="node" alias="PrimaryImage.loadWidth" />

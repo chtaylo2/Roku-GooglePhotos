@@ -85,6 +85,12 @@ Sub RunScreensaver()
     
     print "Display method selected: "; ssMethodSel
     
+    multiplier = 1
+    if ds.w = 1920 then
+        print "FHD detected"
+        multiplier = 1.5
+    end if
+    
     if (ssMethodSel="Fading Photo - Large" or ssMethodSel="Fading Photo - Small") then
     
         ' Fading Screensaver
@@ -102,10 +108,10 @@ Sub RunScreensaver()
             scene.layoutGroupvertAlignment = "center"
         else
             'Small Photo Mode
-            tmpWidth = Rnd(ds.w-400)
-            tmpHeight = Rnd(ds.h-400)
-            scene.primaryImageWidth = 400
-            scene.primaryImageHeight = 400
+            tmpWidth = Rnd(ds.w-(400*multiplier))
+            tmpHeight = Rnd(ds.h-(400*multiplier))
+            scene.primaryImageWidth = 400*multiplier
+            scene.primaryImageHeight = 400*multiplier
             scene.layoutGrouphorizAlignment = "left"
             scene.layoutGroupvertAlignment = "left"
         end if
@@ -131,8 +137,8 @@ Sub RunScreensaver()
                 scene.primaryImageUri=photoItems[photo.GetNext(photoItems)]
                 if (ssMethodSel="Fading Photo - Small") then
                     tmpTranslation = []
-                    tmpTranslation.Push(Rnd(ds.w-400))
-                    tmpTranslation.Push(Rnd(ds.h-400))
+                    tmpTranslation.Push(Rnd(ds.w-(400*multiplier)))
+                    tmpTranslation.Push(Rnd(ds.h-(400*multiplier)))
                     scene.layoutGroupTranslation = tmpTranslation
                 end if
             end if
@@ -153,8 +159,8 @@ Sub RunScreensaver()
         scene.image8Uri=photoItems[photo.GetNext(photoItems)]
         scene.image2Uri=photoItems[photo.GetNext(photoItems)]
         scene.image3Uri=photoItems[photo.GetNext(photoItems)]
-        scene.image7Uri=photoItems[photo.GetNext(photoItems)]    
-    
+        scene.image7Uri=photoItems[photo.GetNext(photoItems)]
+        
         ' Start the animiation
         scene.controlAnimate1="start"
         scene.controlAnimate5="start"
@@ -168,44 +174,47 @@ Sub RunScreensaver()
         scene.controlAnimate3="start"
         scene.controlAnimate7="start"
 
+        'FHD Support
+		endPoint=-400*multiplier
+
         'Need to find a way to concatenate variables to reduce this while loop.
         while(true)
-            if (scene.image1translation[1] = -400) then
+            if (scene.image1translation[1] = endPoint) then
                 scene.image1Uri=photoItems[photo.GetNext(photoItems)]
                 scene.controlAnimate1="start"
             end if
  
-            if (scene.image2translation[1] = -400) then
+            if (scene.image2translation[1] = endPoint) then
                 scene.image2Uri=photoItems[photo.GetNext(photoItems)]
                 scene.controlAnimate2="start"
             end if
 
-            if (scene.image3translation[1] = -400) then
+            if (scene.image3translation[1] = endPoint) then
                 scene.image3Uri=photoItems[photo.GetNext(photoItems)]
                 scene.controlAnimate3="start"
             end if
         
-            if (scene.image4translation[1] = -400) then
+            if (scene.image4translation[1] = endPoint) then
                 scene.image4Uri=photoItems[photo.GetNext(photoItems)]
                 scene.controlAnimate4="start"
             end if
 
-            if (scene.image5translation[1] = -400) then
+            if (scene.image5translation[1] = endPoint) then
                 scene.image5Uri=photoItems[photo.GetNext(photoItems)]
                 scene.controlAnimate5="start"
             end if
 
-            if (scene.image6translation[1] = -400) then
+            if (scene.image6translation[1] = endPoint) then
                 scene.image6Uri=photoItems[photo.GetNext(photoItems)]
                 scene.controlAnimate6="start"
             end if
             
-            if (scene.image7translation[1] = -400) then
+            if (scene.image7translation[1] = endPoint) then
                 scene.image7Uri=photoItems[photo.GetNext(photoItems)]
                 scene.controlAnimate7="start"
             end if
             
-            if (scene.image8translation[1] = -400) then
+            if (scene.image8translation[1] = endPoint) then
                 scene.image8Uri=photoItems[photo.GetNext(photoItems)]
                 scene.controlAnimate8="start"
             end if       
