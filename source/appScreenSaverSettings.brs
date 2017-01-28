@@ -7,16 +7,20 @@ Function getSSaverSettingsList() As Dynamic
     userCount=oa.count()
     
     ssUser=RegRead("SSaverUser","Settings")
-    if ssUser=invalid then		
-        userName=m.oa.userInfoName[0]
-    else if ssUser="All (Random)" then
-        userName="All (Random)"
+    if linked then
+        if ssUser=invalid then		
+            userName=m.oa.userInfoName[0]
+        else if ssUser="All (Random)" then
+            userName="All (Random)"
+        else
+            userIndex=0
+            for i=0 to userCount-1
+                if m.oa.userInfoEmail[i] = ssUser then userIndex=i
+            end for
+            userName=m.oa.userInfoName[userIndex]				
+        end if
     else
-        userIndex=0
-        for i=0 to userCount-1
-            if m.oa.userInfoEmail[i] = ssUser then userIndex=i
-        end for
-        userName=m.oa.userInfoName[userIndex]				
+        userName="Unlinked Account"
     end if
     
     ssMethod=RegRead("SSaverMethod","Settings")
