@@ -6,10 +6,10 @@
 ' 3. Click 'Create Project'; in the 'New project' pop-up enter the Project name
 ' 4. Click 'Create'
 ' 5. Wait for the screen to refresh and show the Project Dashboard
-' 6. Click 'APIs & auth' in the left-hand panel, then click 'Credentials'
-' 7. Open the 'Add credentials' drop-down menu then select 'OAuth 2.0 client ID'
-' 8. Click 'Configure consent screen'
-' 9. Fill in the 'Product name' field then click 'Save'
+' 6. Click 'API Manager' in the top-left-hand drop down menu, then click 'Credentials'
+' 7. Click the 'OAuth Consent Screen' tab
+' 8. Fill in the 'Product name' field then click 'Save'
+' 9. Click the 'Credentials' tab then select 'OAuth client ID' under the 'Create Credentials' drop down button
 ' 10. On the 'Create client ID' screen, select an Application type of 'Other', Enter 'Roku' in the name field, then click 'Create'
 ' 11. Copy the key values: 'Here is your client ID' and 'Here is your client secret' into the strings below. Click OK
 ' 12. Double-check that the copied values exactly match the values on the Developer Console (e.g. you didn't miss a character off the end).
