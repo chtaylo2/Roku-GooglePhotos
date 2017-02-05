@@ -3,7 +3,7 @@ Function getTipsList() As Dynamic
 
     tipsList = [
         {
-            Title:"Utilizing Google's Smart Search",
+            Title:"Using Google's Smart Search",
             ID:"1",
             ShortDescriptionLine2: "Smart search including person, place or thing recognition"
         },
@@ -15,7 +15,7 @@ Function getTipsList() As Dynamic
         {
             Title:"Setting up Albums in Google Photos",
             ID:"3",
-            ShortDescriptionLine2: "Albums are the best way to stay orginized, find out how!"
+            ShortDescriptionLine2: "Albums are the best way to stay organized, find out how!"
         },
         {
             Title:"What happened to Tags and Favorites?",
@@ -60,7 +60,7 @@ Sub googlephotos_tips_smartsearch()
     screen.SetMessagePort(port)
     screen.SetBreadcrumbText("Smart Search", "Tips and Tricks")
     screen.AddHeaderText("Find people, things and places in your photos")
-    screen.AddParagraph("This is by far one of best features of Google Photos. Smart search allows you to search for anything. A friends name, a location, a color; the options are endless. This channel supports all of these searches!")
+    screen.AddParagraph("This is by far one of best features of Google Photos. Smart search allows you to search for anything. A friend's name, a location, a color; the options are endless. This channel supports all of these searches!")
     screen.AddParagraph(" ")
     screen.AddParagraph(" To apply names to faces:")
     screen.AddParagraph("   STEP 1: Using your computer (photos.google.com/search) or Google Photos smartphone app.")
@@ -89,8 +89,8 @@ Sub googlephotos_tips_screensaver()
     screen = CreateObject("roParagraphScreen")
     screen.SetMessagePort(port)
     screen.SetBreadcrumbText("Screensaver", "Tips and Tricks")
-    screen.AddHeaderText("Google Photo's Screensaver")
-    screen.AddParagraph("Built into this Roku channel is a screensaver which lets will stream your photos while the device is inactive.")
+    screen.AddHeaderText("Google Photos Screensaver")
+    screen.AddParagraph("Built into this Roku channel is a screensaver which lets you stream your photos while the device is inactive.")
     screen.AddParagraph(" ")
     screen.AddParagraph(" To enable screensaver:")
     screen.AddParagraph("   STEP 1: Roku Home > Settings > Screensaver > select [Google Photos]")
@@ -121,9 +121,9 @@ Function googlephotos_tips_albums()
     screen.SetMessagePort(port)
     screen.SetBreadcrumbText("Album Tips", "Tips and Tricks")
     screen.AddHeaderText("Google Photo Albums")
-    screen.AddParagraph("Photo albums let you orginize your photos quick and easy. You no longer have to break out the glue gun and it's much more powerful then your grandmothers dusty album book!")
-    screen.AddParagraph("On the Google Photos site (photos.google.com) or Google Photos smartphone app, simply create an album and select photos you want added. You may also add text and locations to help you with searching later on. (See 'Smart Search' tip) ")
-    screen.AddParagraph("Ten years down the road, you'll be happy the photos are orginized and easily found.")
+    screen.AddParagraph("Photo albums let you organize your photos quickly and easily. You no longer have to break out the glue gun and it's much more powerful than your grandmother's dusty album book!")
+    screen.AddParagraph("On the Google Photos site (photos.google.com) or Google Photos smartphone app, simply create an album and select the photos you want added. You may also add text and locations to help you with searching later on. (See 'Smart Search' tip) ")
+    screen.AddParagraph("Ten years down the road, you'll be happy the photos are organized and easily found.")
     screen.AddParagraph(" ")
     screen.AddParagraph("For more details: https://support.google.com/photos/answer/6128849")
     screen.Show()
