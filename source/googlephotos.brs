@@ -142,7 +142,7 @@ Sub googlephotos_browse_albums(username="default")
     breadcrumb_name=oa.userInfoName[userIndex]
     screen=uitkPreShowPosterMenu(1, breadcrumb_name,"My Albums")
     
-    rsp=m.ExecServerAPI("?kind=album&v=2.0&fields=entry(title,gphoto:numphotos,gphoto:user,gphoto:id,media:group(media:description,media:thumbnail))&thumbsize=220",username,userIndex)
+    rsp=m.ExecServerAPI("?kind=album&v=3.0&fields=entry(title,gphoto:numphotos,gphoto:user,gphoto:id,media:group(media:description,media:thumbnail))&thumbsize=220",username,userIndex)
     if not isxmlelement(rsp) then return
     albums=m.newAlbumListFromXML(rsp.entry)
     
@@ -224,7 +224,7 @@ Function album_get_images(album As Object, startIndex=1 as Integer)
 	start = str(startIndex)
 	start = start.Replace(" ", "")
 
-    rsp=m.googlephotos.ExecServerAPI("/albumid/"+album.GetID()+"?start-index="+start+"&max-results=1000kind=photo&v=2.0&fields=entry(title,gphoto:timestamp,gphoto:id,gphoto:videostatus,media:group(media:description,media:content,media:thumbnail))&thumbsize=220&imgmax="+googlephotos_get_resolution(),album.GetUsername(),oa.accessTokenIndex())
+    rsp=m.googlephotos.ExecServerAPI("/albumid/"+album.GetID()+"?start-index="+start+"&max-results=1000kind=photo&v=3.0&fields=entry(title,gphoto:timestamp,gphoto:id,gphoto:videostatus,media:group(media:description,media:content,media:thumbnail))&thumbsize=220&imgmax="+googlephotos_get_resolution(),album.GetUsername(),oa.accessTokenIndex())
     print "GooglePhotos StartIndex: "; start
 	print "GooglePhotos Res: "; googlephotos_get_resolution()
     if not isxmlelement(rsp) then 
@@ -389,7 +389,7 @@ Sub googlephotos_user_search(username="default", nickname=invalid)
             else if msg.isFullResult()
                 keyword=msg.GetMessage()
                 dialog=ShowPleaseWait("Please wait","Searching your albums for '" + keyword + "'")
-				rsp=m.ExecServerAPI("?kind=photo&v=2.0&q="+keyword+"&max-results=200&thumbsize=220&imgmax=" + googlephotos_get_resolution(),username,userIndex)
+				rsp=m.ExecServerAPI("?kind=photo&v=3.0&q="+keyword+"&max-results=200&thumbsize=220&imgmax=" + googlephotos_get_resolution(),username,userIndex)
                 images=googlephotos_new_image_list(rsp.entry)
                 dialog.Close()
                 if images.Count()>0 then
@@ -499,7 +499,7 @@ Sub googlephotos_random_photos(username="default")
 
     screen=uitkPreShowPosterMenu(1, oa.userInfoName[userIndex],"Shuffle Photos")
     
-    rsp=m.ExecServerAPI("?kind=album&v=2.0&fields=entry(title,gphoto:numphotos,gphoto:user,gphoto:id,media:group(media:description,media:thumbnail))",username,userIndex)
+    rsp=m.ExecServerAPI("?kind=album&v=3.0&fields=entry(title,gphoto:numphotos,gphoto:user,gphoto:id,media:group(media:description,media:thumbnail))",username,userIndex)
     if not isxmlelement(rsp) then return
     albums=m.newAlbumListFromXML(rsp.entry)
     
