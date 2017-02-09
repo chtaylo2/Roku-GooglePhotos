@@ -83,7 +83,7 @@ Function googlephotos_exec_api(url_stub="" As String, username="default" As Dyna
         http = NewHttp(m.prefix + "/" + username + url_stub)
         oa.sign(http,userIndex)
 		
-        xml=http.getToStringWithTimeout(10)
+        xml=http.getToStringWithTimeout(20)
         
 		responseCode = http.GetResponseCode()
 		print "googlephotos_exec_api - attempt #"; i; " responseCode: "; responseCode
@@ -109,7 +109,11 @@ Function googlephotos_exec_api(url_stub="" As String, username="default" As Dyna
         else if responseCode <> 200
             ' Some other HTTP error - retry
             if i = maxAttempts
-                ShowErrorDialog("Invalid return code from Google Photos API" + LF + LF + http.GetFailureReason() + LF + LF + "Exit the channel then try again later","API Error")
+		failure=http.GetFailureReason()
+		if failure=""
+			failure="API requests have timed out. Possible network issues?"
+		end if
+                ShowErrorDialog("Invalid return code from Google Photos API" + LF + LF + failure + LF + LF + "Exit the channel then try again later","API Error")
                 return invalid
             endif
             Sleep(500)
