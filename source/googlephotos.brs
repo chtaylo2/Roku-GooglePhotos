@@ -83,7 +83,7 @@ Function googlephotos_exec_api(url_stub="" As String, username="default" As Dyna
         http = NewHttp(m.prefix + "/" + username + url_stub)
         oa.sign(http,userIndex)
 		
-        xml=http.getToStringWithTimeout(10)
+        xml=http.getToStringWithTimeout(20)
         
 		responseCode = http.GetResponseCode()
 		print "googlephotos_exec_api - attempt #"; i; " responseCode: "; responseCode
@@ -109,7 +109,11 @@ Function googlephotos_exec_api(url_stub="" As String, username="default" As Dyna
         else if responseCode <> 200
             ' Some other HTTP error - retry
             if i = maxAttempts
-                ShowErrorDialog("Invalid return code from Google Photos API" + LF + LF + http.GetFailureReason() + LF + LF + "Exit the channel then try again later","API Error")
+		failure=http.GetFailureReason()
+		if failure=""
+			failure="API requests have timed out. Possible network issues?"
+		end if
+                ShowErrorDialog("Invalid return code from Google Photos API" + LF + LF + failure + LF + LF + "Exit the channel then try again later","API Error")
                 return invalid
             endif
             Sleep(500)
@@ -142,7 +146,7 @@ Sub googlephotos_browse_albums(username="default")
     breadcrumb_name=oa.userInfoName[userIndex]
     screen=uitkPreShowPosterMenu(1, breadcrumb_name,"My Albums")
     
-    rsp=m.ExecServerAPI("?kind=album&v=2.0&fields=entry(title,gphoto:numphotos,gphoto:user,gphoto:id,media:group(media:description,media:thumbnail))&thumbsize=220",username,userIndex)
+    rsp=m.ExecServerAPI("?kind=album&v=3.0&fields=entry(title,gphoto:numphotos,gphoto:user,gphoto:id,media:group(media:description,media:thumbnail))&thumbsize=220",username,userIndex)
     if not isxmlelement(rsp) then return
     albums=m.newAlbumListFromXML(rsp.entry)
     
@@ -224,7 +228,7 @@ Function album_get_images(album As Object, startIndex=1 as Integer)
 	start = str(startIndex)
 	start = start.Replace(" ", "")
 
-    rsp=m.googlephotos.ExecServerAPI("/albumid/"+album.GetID()+"?start-index="+start+"&max-results=1000kind=photo&v=2.0&fields=entry(title,gphoto:timestamp,gphoto:id,gphoto:videostatus,media:group(media:description,media:content,media:thumbnail))&thumbsize=220&imgmax="+googlephotos_get_resolution(),album.GetUsername(),oa.accessTokenIndex())
+    rsp=m.googlephotos.ExecServerAPI("/albumid/"+album.GetID()+"?start-index="+start+"&max-results=1000kind=photo&v=3.0&fields=entry(title,gphoto:timestamp,gphoto:id,gphoto:videostatus,media:group(media:description,media:content,media:thumbnail))&thumbsize=220&imgmax="+googlephotos_get_resolution(),album.GetUsername(),oa.accessTokenIndex())
     print "GooglePhotos StartIndex: "; start
 	print "GooglePhotos Res: "; googlephotos_get_resolution()
     if not isxmlelement(rsp) then 
@@ -389,7 +393,7 @@ Sub googlephotos_user_search(username="default", nickname=invalid)
             else if msg.isFullResult()
                 keyword=msg.GetMessage()
                 dialog=ShowPleaseWait("Please wait","Searching your albums for '" + keyword + "'")
-				rsp=m.ExecServerAPI("?kind=photo&v=2.0&q="+keyword+"&max-results=200&thumbsize=220&imgmax=" + googlephotos_get_resolution(),username,userIndex)
+				rsp=m.ExecServerAPI("?kind=photo&v=3.0&q="+keyword+"&max-results=1000&thumbsize=220&imgmax=" + googlephotos_get_resolution(),username,userIndex)
                 images=googlephotos_new_image_list(rsp.entry)
                 dialog.Close()
                 if images.Count()>0 then
@@ -400,9 +404,12 @@ Sub googlephotos_user_search(username="default", nickname=invalid)
 					screen=uitkPreShowPosterMenu(1, oa.userInfoName[userIndex],"Search Results")
 					listIcon="pkg:/images/browse.png"
 					searchIcon="pkg:/images/search.png"
-			
+
+					' It's unclear what the limit is, only it's around 1000
+					additional=""
+					if images.Count()>900 then additional="Search results reached Google's limit"
 					albummenudata = [
-						{ShortDescriptionLine1:Pluralize(images.Count(),"Photo") + " - Start Slideshow", HDPosterUrl:images[0].GetThumb(), SDPosterUrl:images[0].GetThumb()},
+						{ShortDescriptionLine1:Pluralize(images.Count(),"Photo") + " - Start Slideshow", ShortDescriptionLine2:additional, HDPosterUrl:images[0].GetThumb(), SDPosterUrl:images[0].GetThumb()},
 						{ShortDescriptionLine1:"Browse Photos", HDPosterUrl:listIcon, SDPosterUrl:listIcon},
 					]
             
@@ -499,7 +506,7 @@ Sub googlephotos_random_photos(username="default")
 
     screen=uitkPreShowPosterMenu(1, oa.userInfoName[userIndex],"Shuffle Photos")
     
-    rsp=m.ExecServerAPI("?kind=album&v=2.0&fields=entry(title,gphoto:numphotos,gphoto:user,gphoto:id,media:group(media:description,media:thumbnail))",username,userIndex)
+    rsp=m.ExecServerAPI("?kind=album&v=3.0&fields=entry(title,gphoto:numphotos,gphoto:user,gphoto:id,media:group(media:description,media:thumbnail))",username,userIndex)
     if not isxmlelement(rsp) then return
     albums=m.newAlbumListFromXML(rsp.entry)
     

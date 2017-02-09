@@ -42,7 +42,7 @@ Sub RunScreensaver()
         if userIndex=100 then
             userCount=m.oa.count()
             for i = 0 to userCount-1
-                rsp=m.googlephotos.ExecServerAPI("?kind=photo&max-results=300&v=2.0&fields=entry(media:group(media:content))&imgmax="+m.googlephotos.GetResolution(),"default",i)
+                rsp=m.googlephotos.ExecServerAPI("?kind=photo&max-results=300&v=3.0&fields=entry(media:group(media:content))&imgmax="+m.googlephotos.GetResolution(),"default",i)
 
                 if isxmlelement(rsp) then 
                     images=googlephotos_new_image_list(rsp.entry)
@@ -57,7 +57,7 @@ Sub RunScreensaver()
                 end if
             end for
         else
-            rsp=m.googlephotos.ExecServerAPI("?kind=photo&max-results=500&v=2.0&fields=entry(media:group(media:content))&imgmax="+m.googlephotos.GetResolution(),"default",userIndex)
+            rsp=m.googlephotos.ExecServerAPI("?kind=photo&max-results=500&v=3.0&fields=entry(media:group(media:content))&imgmax="+m.googlephotos.GetResolution(),"default",userIndex)
 
             if isxmlelement(rsp) then 
                 images=googlephotos_new_image_list(rsp.entry)
