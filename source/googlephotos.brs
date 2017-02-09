@@ -407,7 +407,7 @@ Sub googlephotos_user_search(username="default", nickname=invalid)
 
 					' It's unclear what the limit is, only it's around 1000
 					additional=""
-					if images.Count()>900 then additional="Search results reached Googles limit"
+					if images.Count()>900 then additional="Search results reached Google's limit"
 					albummenudata = [
 						{ShortDescriptionLine1:Pluralize(images.Count(),"Photo") + " - Start Slideshow", ShortDescriptionLine2:additional, HDPosterUrl:images[0].GetThumb(), SDPosterUrl:images[0].GetThumb()},
 						{ShortDescriptionLine1:"Browse Photos", HDPosterUrl:listIcon, SDPosterUrl:listIcon},
