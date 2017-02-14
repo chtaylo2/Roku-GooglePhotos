@@ -35,11 +35,17 @@ Sub RunUserInterface()
         ShowInvalidUser()
     end if
 
-    doRegistration()
+    while true
+        regStatus = doRegistration()
+        if regStatus<>1
+            exit while
+        end if
+    end while
 
-    SelectLinkedUser()
+    if regStatus<>invalid
+        SelectLinkedUser()
+    end if
 	
-    sleep(25)
 End Sub
 
 Sub SelectLinkedUser()

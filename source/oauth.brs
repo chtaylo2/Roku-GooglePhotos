@@ -325,10 +325,10 @@ Function oauth_refresh_tokens() As Integer
             m.accessToken[m.currentAccessTokenInd]  = getString(json,"access_token")
             m.tokenType                             = getString(json,"token_type")
             m.tokenExpiresIn                        = getInteger(json,"expires_in")
-            refreshToken		                    = getString(json,"refresh_token")
-			if refreshToken <> ""
-				m.refreshToken[m.currentAccessTokenInd] = refreshToken
-			end if
+            refreshToken                            = getString(json,"refresh_token")
+            if refreshToken <> ""
+                m.refreshToken[m.currentAccessTokenInd] = refreshToken
+            end if
 
             'Query User info - Refresh
             if m.userInfoName[m.currentAccessTokenInd]="Legacy User" then

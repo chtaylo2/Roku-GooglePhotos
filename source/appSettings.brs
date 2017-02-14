@@ -80,6 +80,7 @@ Sub googlephotos_browse_settings()
             if(msg.isListItemSelected())
                 menuSelections[msg.GetIndex()]()
                 screen.SetContent(getSettingsList())
+                screen.SetFocusedListItem(msg.GetIndex())
             endif
         endif
     end while

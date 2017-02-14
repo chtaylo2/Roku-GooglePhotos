@@ -1,48 +1,62 @@
-Sub doRegistration()
+Function doRegistration()
 
     oa = Oauth()
     
     if not oa.linked()
         ' We're not already linked, so attempt to link
-        while doGooglePhotosEnroll() <> 0
-        end while 
-    
+        while true
+            status = doGooglePhotosEnroll()
+            if status<>1
+                exit while
+            end if
+        end while
+   
         ' Check if the link was successful
         if oa.linked()
             ' Successful link, save access token and refresh token in registry
             oa.save()
             print "doRegistration. linked. oauth: "; oa.dump()
             showCongratulationsScreen()
+
+            return 0
             
         else
             ' We are not linked, delete access token and refresh token from registry
             oa.erase()
             print "doRegistration. not linked - forcing registration screen"
-            doRegistration()
+            ans=ShowDialog2Buttons("Registration Status", "Google Photos registration was unsuccessful", "Try Again", "Exit Channel")
+            if ans=0 then
+                return 1
+            else
+                return invalid
+            end if
         end if
+    else
+        return 0
     end if
  
-End Sub
+End Function
 
 Sub doAdditionalReg()
 
     oa = Oauth()
-    
+    usersLoaded = oa.count()
+   
     ' We're not already linked, so attempt to link
     while doGooglePhotosEnroll() <> 0
     end while
     
-    ' Check if the link was successful
-    if oa.linked()
-        ' Successful link, save access token and refresh token in registry
-        oa.save()
-        print "doRegistration. linked. oauth: "; oa.dump()
+    ' Successful link, save access token and refresh token in registry
+    oa.save()
+    print "doRegistration. linked. oauth: "; oa.dump()
+    usersLoadedCompare = oa.count()
+
+    if usersLoaded<>usersLoadedCompare then
         showCongratulationsScreen()
         RunUserInterface()
     end if
  
 End Sub
-
 
 Function doGooglePhotosEnroll() As Integer
     print "regScreen: doGooglePhotosEnroll"
