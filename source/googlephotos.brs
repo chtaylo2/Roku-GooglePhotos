@@ -16,6 +16,7 @@ Function InitGooglePhotos() As Object
     
     'Search
     this.SearchAlbums         = googlephotos_user_search
+    this.SearchResults        = googlephotos_search_results
 	
     'Album
     this.BrowseAlbums         = googlephotos_browse_albums
@@ -393,29 +394,14 @@ Sub googlephotos_user_search(username="default", nickname=invalid)
             else if msg.isFullResult()
                 keyword=msg.GetMessage()
                 dialog=ShowPleaseWait("Please wait","Searching your albums for '" + keyword + "'")
-				rsp=m.ExecServerAPI("?kind=photo&v=3.0&q="+keyword+"&max-results=1000&thumbsize=220&imgmax=" + googlephotos_get_resolution(),username,userIndex)
+                rsp=m.ExecServerAPI("?kind=photo&v=3.0&q="+keyword+"&max-results=1000&thumbsize=220&imgmax=" + googlephotos_get_resolution(),username,userIndex)
                 images=googlephotos_new_image_list(rsp.entry)
                 dialog.Close()
                 if images.Count()>0 then
                     history.Push(keyword)
                     screen.AddSearchTerm(keyword)
-					screen.Close()
-					
-					screen=uitkPreShowPosterMenu(1, oa.userInfoName[userIndex],"Search Results")
-					listIcon="pkg:/images/browse.png"
-					searchIcon="pkg:/images/search.png"
 
-					' It's unclear what the limit is, only it's around 1000
-					additional=""
-					if images.Count()>900 then additional="Search results reached Google's limit"
-					albummenudata = [
-						{ShortDescriptionLine1:Pluralize(images.Count(),"Photo") + " - Start Slideshow", ShortDescriptionLine2:additional, HDPosterUrl:images[0].GetThumb(), SDPosterUrl:images[0].GetThumb()},
-						{ShortDescriptionLine1:"Browse Photos", HDPosterUrl:listIcon, SDPosterUrl:listIcon},
-					]
-            
-					onselect = [1, [images, videos], "Search Results", album_play_browse_select]
-					uitkDoPosterMenu(albummenudata, screen, onselect)						
-					
+                    m.SearchResults(images)
                 else
                     ShowErrorDialog("No images match your search","Search results")
                 end if
@@ -426,6 +412,27 @@ Sub googlephotos_user_search(username="default", nickname=invalid)
     end while
 End Sub
 
+Function googlephotos_search_results(images As Object) As Object
+
+    oa = Oauth()
+    userIndex = oa.accessTokenIndex()
+
+    screen=uitkPreShowPosterMenu(1, oa.userInfoName[userIndex],"Search Results")
+    listIcon="pkg:/images/browse.png"
+    searchIcon="pkg:/images/search.png"
+
+    ' It's unclear what the limit is, only it's around 1000
+    additional=""
+    if images.Count()>900 then additional="Search results reached Google's limit"
+    albummenudata = [
+       {ShortDescriptionLine1:Pluralize(images.Count(),"Photo") + " - Start Slideshow", ShortDescriptionLine2:additional, HDPosterUrl:images[0].GetThumb(), SDPosterUrl:images[0].GetThumb()},
+       {ShortDescriptionLine1:"Browse Photos", HDPosterUrl:listIcon, SDPosterUrl:listIcon},
+    ]
+
+    onselect = [1, [images, videos], "Search Results", album_play_browse_select]
+    uitkDoPosterMenu(albummenudata, screen, onselect)
+
+End Function
 
 ' ********************************************************************
 ' ********************************************************************

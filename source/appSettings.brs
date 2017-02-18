@@ -80,6 +80,7 @@ Sub googlephotos_browse_settings()
             if(msg.isListItemSelected())
                 menuSelections[msg.GetIndex()]()
                 screen.SetContent(getSettingsList())
+                screen.SetFocusedListItem(msg.GetIndex())
             endif
         endif
     end while
@@ -278,11 +279,10 @@ Sub googlephotos_about()
     
     screen.AddHeaderText("About this channel")
     
-    screen.AddParagraph("The channel is not affiliated with Google.")
-
-    screen.AddParagraph("The Google Photos Channel, current version (v3) was developed by Chris Taylor which adds a numbers of functional improvements. It has also been rebranded for Google Photos as Picasa has been discontinued by Google.")
-    screen.AddParagraph("The original Picasa Web Albums Channel (v1) was developed by Chris Hoffman and Belltown developing (v2) which added OAuth2 and other bug fixes.")
+    screen.AddParagraph("The PhotoView for Google Photos Channel, current version (v3) was developed by Chris Taylor which adds a numbers of functional improvements. The channel has also been rebranded.")
+    screen.AddParagraph("The original Picasa Web Albums Channel (v1) was developed by Chris Hoffman and Belltown developing (v2).")
     screen.AddParagraph("If you have any questions or comments, please see [Tips and Tricks > Report Bugs or Feature Request] from the main screen.")
+    screen.AddParagraph("Legal Notice: Google and the Google logo are registered trademarks of Google Inc.")
 
     screen.AddButton(1, "Back")
     screen.Show()

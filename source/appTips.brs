@@ -8,7 +8,7 @@ Function getTipsList() As Dynamic
             ShortDescriptionLine2: "Smart search including person, place or thing recognition"
         },
         {
-            Title:"Setting up Google Photo's Screensaver",
+            Title:"Setting up screensaver for Google Photos",
             ID:"2",
             ShortDescriptionLine2: "Did you know this channel is also a screensaver?"
         },
@@ -89,11 +89,11 @@ Sub googlephotos_tips_screensaver()
     screen = CreateObject("roParagraphScreen")
     screen.SetMessagePort(port)
     screen.SetBreadcrumbText("Screensaver", "Tips and Tricks")
-    screen.AddHeaderText("Google Photos Screensaver")
+    screen.AddHeaderText("Screensaver for Google Photos")
     screen.AddParagraph("Built into this Roku channel is a screensaver which lets you stream your photos while the device is inactive.")
     screen.AddParagraph(" ")
     screen.AddParagraph(" To enable screensaver:")
-    screen.AddParagraph("   STEP 1: Roku Home > Settings > Screensaver > select [Google Photos]")
+    screen.AddParagraph("   STEP 1: Roku Home > Settings > Screensaver > select [PhotoView for Google Photos]")
     screen.AddParagraph("   STEP 2: In the Custom Settings, select a linked account (if you have multiple)")
     screen.AddParagraph("   STEP 3: Back out to [Wait time] and ensure screensaver is active")
     screen.AddParagraph(" ")
