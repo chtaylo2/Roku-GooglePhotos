@@ -38,15 +38,80 @@ Sub RunScreensaver()
         rsp="invalid"
     else
     
+    
+        if (ssMethodSel="Fading Photo - Large" or ssMethodSel="Fading Photo - Small") then
+           ' Fading Screensaver
+            screen.setMessagePort(port)
+            scene = screen.createScene("compPhotoFade")  
+            screen.show()    
+        else
+            ' Multi-Scrolling Screensaver
+            screen.setMessagePort(port)
+            scene = screen.createScene("compPhotoScroll") 
+            screen.show()        
+        end if
+        
         'If userIndex is set to 100, means user wants random photos from each linked account shown. 
         if userIndex=100 then
             userCount=m.oa.count()
             for i = 0 to userCount-1
-                rsp=m.googlephotos.ExecServerAPI("?kind=photo&max-results=300&v=3.0&fields=entry(media:group(media:content))&imgmax="+m.googlephotos.GetResolution(),"default",i)
+                rsp=m.googlephotos.ExecServerAPI("?kind=album&v=3.0&fields=entry(title,gphoto:numphotos,gphoto:user,gphoto:id,media:group(media:description,media:thumbnail))","default",i)
+    
+                album_cache_count=0
+                albums=googlephotos_new_album_list(rsp.entry)
+                if albums.Count()>0 then
+                    for each album in albums
 
-                if isxmlelement(rsp) then 
-                    images=googlephotos_new_image_list(rsp.entry)
-                    for each image in images
+                        if album_cache_count = 0 and album.GetImageCount()>0 then
+                            ' We will always pull node 0 as this is Auto Backup, likely contains most photos
+                            album_idx=0
+                        else
+                            ' Randomly pull 5 additional albums and cache photos
+                            album_idx=Rnd(albums.Count())-1
+                        end if
+                        
+                        album_cache_count=album_cache_count+1
+                        
+                        imagelist=album_get_images(albums[album_idx])
+                        albums.delete(album_idx)
+                    
+                        for each image in imagelist
+                            if image.GetURL().instr(".MOV") <> -1 Or image.GetURL().instr(".mp4") <> -1 then
+                                print "Ignore: "; image.GetURL()
+                            else
+                                print "Push: "; image.GetURL()
+                                photoItems.Push(image.GetURL())
+                            end if    
+                        end for
+                        
+                        if album_cache_count>=5
+                            exit for
+                        end if
+                        
+                    end for
+                end if
+            end for
+        else
+            rsp=m.googlephotos.ExecServerAPI("?kind=album&v=3.0&fields=entry(title,gphoto:numphotos,gphoto:user,gphoto:id,media:group(media:description,media:thumbnail))",username,userIndex)
+
+            album_cache_count=0
+            albums=googlephotos_new_album_list(rsp.entry)
+            if albums.Count()>0 then
+                for each album in albums
+                    if album_cache_count = 0 and album.GetImageCount()>0 then
+                        ' We will always pull node 0 as this is Auto Backup, likely contains most photos
+                        album_idx=0
+                    else
+                        ' Randomly pull 5 additional albums and cache photos
+                        album_idx=Rnd(albums.Count())-1
+                    end if
+                    
+                    album_cache_count=album_cache_count+1
+                    
+                    imagelist=album_get_images(albums[album_idx])
+                    albums.delete(album_idx)
+                
+                    for each image in imagelist
                         if image.GetURL().instr(".MOV") <> -1 Or image.GetURL().instr(".mp4") <> -1 then
                             print "Ignore: "; image.GetURL()
                         else
@@ -54,20 +119,11 @@ Sub RunScreensaver()
                             photoItems.Push(image.GetURL())
                         end if    
                     end for
-                end if
-            end for
-        else
-            rsp=m.googlephotos.ExecServerAPI("?kind=photo&max-results=500&v=3.0&fields=entry(media:group(media:content))&imgmax="+m.googlephotos.GetResolution(),"default",userIndex)
-
-            if isxmlelement(rsp) then 
-                images=googlephotos_new_image_list(rsp.entry)
-                for each image in images
-                    if image.GetURL().instr(".MOV") <> -1 Or image.GetURL().instr(".mp4") <> -1 then
-                        print "Ignore: "; image.GetURL()
-                    else
-                        print "Push: "; image.GetURL()
-                        photoItems.Push(image.GetURL())
-                    end if    
+                    
+                    if album_cache_count>=5
+                        exit for
+                    end if
+                    
                 end for
             end if
         end if
@@ -90,14 +146,10 @@ Sub RunScreensaver()
         print "FHD detected"
         multiplier = 1.5
     end if
+
     
     if (ssMethodSel="Fading Photo - Large" or ssMethodSel="Fading Photo - Small") then
-    
-        ' Fading Screensaver
-        screen.setMessagePort(port)
-        scene = screen.createScene("compPhotoFade")  
-        screen.show()
-    
+        
         if (ssMethodSel="Fading Photo - Large") then
             'Full Screen Mode
             tmpWidth = ds.w / 2
@@ -122,6 +174,8 @@ Sub RunScreensaver()
         scene.layoutGroupTranslation = tmpTranslation
         
         scene.primaryImageUri=photoItems[photo.GetNext(photoItems)]
+
+        scene.loadingvisible="false"
         
         while(true)
             msg = wait(12000, port)
@@ -145,11 +199,6 @@ Sub RunScreensaver()
         end while
 
     else
-    
-        ' Multi-Scrolling Screensaver
-        screen.setMessagePort(port)
-        scene = screen.createScene("compPhotoScroll")  
-        screen.show()
 
         ' Initial photo loads
         scene.image1Uri=photoItems[photo.GetNext(photoItems)]
@@ -161,10 +210,16 @@ Sub RunScreensaver()
         scene.image3Uri=photoItems[photo.GetNext(photoItems)]
         scene.image7Uri=photoItems[photo.GetNext(photoItems)]
         
+        scene.loadingtext="Completed. Enjoy!"
+        
         ' Start the animiation
         scene.controlAnimate1="start"
         scene.controlAnimate5="start"
-        sleep(5000)
+        
+        sleep(1000)
+        scene.loadingvisible="false"
+        
+        sleep(4000)
         scene.controlAnimate6="start"
         sleep(5000)
         scene.controlAnimate4="start"
@@ -173,6 +228,8 @@ Sub RunScreensaver()
         scene.controlAnimate2="start"
         scene.controlAnimate3="start"
         scene.controlAnimate7="start"
+
+
 
         'FHD Support
         endPoint=-400*multiplier

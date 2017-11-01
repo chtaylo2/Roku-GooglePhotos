@@ -18,13 +18,18 @@ Function getTipsList() As Dynamic
             ShortDescriptionLine2: "Albums are the best way to stay organized, find out how!"
         },
         {
-            Title:"What happened to Tags and Favorites?",
+            Title:"Where are my Shared Albums?",
             ID:"4",
+            ShortDescriptionLine2: "Shared Albums support"
+        },
+        {
+            Title:"What happened to Tags and Favorites?",
+            ID:"5",
             ShortDescriptionLine2: "We'll explain.."
         }
         {
             Title:"Reporting Bugs or Feature Requests",
-            ID:"5",
+            ID:"6",
             ShortDescriptionLine2: "We'd love to hear your feedback"
         }
     ]
@@ -39,7 +44,7 @@ Sub googlephotos_browse_tips()
     screen.SetBreadcrumbText("", "Tips and Tricks")
     screen.show()
     
-    menuSelections = [googlephotos_tips_smartsearch, googlephotos_tips_screensaver, googlephotos_tips_albums, googlephotos_tips_tags, googlephotos_tips_feedback]
+    menuSelections = [googlephotos_tips_smartsearch, googlephotos_tips_screensaver, googlephotos_tips_albums, googlephotos_tips_sharedalbums, googlephotos_tips_tags, googlephotos_tips_feedback]
     
     while(true)
         msg = wait(0,port)
@@ -114,6 +119,34 @@ Sub googlephotos_tips_screensaver()
         end if
     end while
 End Sub
+
+Function googlephotos_tips_sharedalbums()
+    port = CreateObject("roMessagePort")
+    screen = CreateObject("roParagraphScreen")
+    screen.SetMessagePort(port)
+    screen.SetBreadcrumbText("Shared Album Tips", "Tips and Tricks")
+    screen.AddHeaderText("Google Photo Shared Albums")
+    screen.AddParagraph("Google Photos API does not currently allow viewing of albums which are shared to you. As of this writing, Google has no plans on adding this feature.")
+    screen.AddParagraph("We still have our fingers crossed this will one day work and encourage you to voice your support!")
+    screen.AddParagraph(" ")
+    screen.AddParagraph(" ")
+    screen.AddParagraph("For more details: https://developers.google.com/picasa-web/faq")
+    screen.Show()
+
+    while true
+        msg = wait(0, screen.GetMessagePort())
+
+        if type(msg) = "roParagraphScreenEvent"
+            if msg.isScreenClosed()
+                print "Screen closed"
+                exit while
+            else
+                print "Unknown event: "; msg.GetType(); " msg: "; msg.GetMessage()
+                exit while
+            end if
+        end if
+    end while
+End Function
 
 Function googlephotos_tips_albums()
     port = CreateObject("roMessagePort")

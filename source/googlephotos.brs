@@ -8,7 +8,7 @@ Function InitGooglePhotos() As Object
 
     this                      = CreateObject("roAssociativeArray")
 	
-    this.releaseVersion       = "1.6"
+    this.releaseVersion       = "1.7"
     this.scope                = "https://picasaweb.google.com/data"
     this.prefix               = this.scope + "/feed/api"
     
@@ -163,9 +163,12 @@ End Sub
 Function googlephotos_new_album_list(xmllist As Object) As Object
     albumlist=CreateObject("roList")
     for each record in xmllist
-        album=m.newAlbumFromXML(record)
+        album=googlephotos_new_album(record)
         if album.GetImageCount() > 0 then
-            albumlist.Push(album)
+			' Do not show photos from Google Hangout albums or any marked with "Private" in name
+			if album.GetTitle().instr("Hangout:") = -1 and album.GetTitle().instr("rivate") = -1 then
+				albumlist.Push(album)
+			end if
         end if
     next
     
@@ -182,6 +185,7 @@ Function googlephotos_new_album(xml As Object) As Object
     album.GetID=function():return m.xml.GetNamedElements("gphoto:id")[0].GetText():end function
     album.GetImageCount=function():return Val(m.xml.GetNamedElements("gphoto:numphotos")[0].GetText()):end function
     album.GetThumb=get_thumb
+	
     return album
 End Function
 
@@ -229,7 +233,7 @@ Function album_get_images(album As Object, startIndex=1 as Integer)
 	start = str(startIndex)
 	start = start.Replace(" ", "")
 
-    rsp=m.googlephotos.ExecServerAPI("/albumid/"+album.GetID()+"?start-index="+start+"&max-results=1000kind=photo&v=3.0&fields=entry(title,gphoto:timestamp,gphoto:id,gphoto:videostatus,media:group(media:description,media:content,media:thumbnail))&thumbsize=220&imgmax="+googlephotos_get_resolution(),album.GetUsername(),oa.accessTokenIndex())
+    rsp=m.googlephotos.ExecServerAPI("/albumid/"+album.GetID()+"?start-index="+start+"&max-results=1000kind=photo&v=3.0&fields=entry(title,gphoto:timestamp,gphoto:id,gphoto:streamId,gphoto:videostatus,media:group(media:description,media:content,media:thumbnail))&thumbsize=220&imgmax="+googlephotos_get_resolution(),album.GetUsername(),oa.accessTokenIndex())
     print "GooglePhotos StartIndex: "; start
 	print "GooglePhotos Res: "; googlephotos_get_resolution()
     if not isxmlelement(rsp) then 
@@ -395,7 +399,7 @@ Sub googlephotos_user_search(username="default", nickname=invalid)
                 keyword=msg.GetMessage()
                 dialog=ShowPleaseWait("Please wait","Searching your albums for '" + keyword + "'")
                 rsp=m.ExecServerAPI("?kind=photo&v=3.0&q="+keyword+"&max-results=1000&thumbsize=220&imgmax=" + googlephotos_get_resolution(),username,userIndex)
-                images=googlephotos_new_image_list(rsp.entry)
+                images=googlephotos_new_image_list(rsp.entry, 1)
                 dialog.Close()
                 if images.Count()>0 then
                     history.Push(keyword)
@@ -440,12 +444,14 @@ End Function
 ' ********************************************************************
 ' ********************************************************************
 
-Function googlephotos_new_image_list(xmllist As Object) As Object
+Function googlephotos_new_image_list(xmllist As Object, showall=0 as Integer) As Object
     images=CreateObject("roList")
     for each record in xmllist
         image=googlephotos_new_image(record)
         if image.GetURL()<>invalid then
-            images.Push(image)
+			if image.GetStreamID.instr(":archive:") = -1 or showall=1
+				images.Push(image)
+			end if
         end if
     next
     
@@ -462,6 +468,14 @@ Function googlephotos_new_image(xml As Object) As Object
     image.GetTimestamp=function():return Left(m.xml.GetNamedElements("gphoto:timestamp")[0].GetText(), 10):end function
     image.IsVideo=function():return (m.xml.GetNamedElements("gphoto:videostatus")[0]<>invalid):end function
     image.GetVideoStatus=function():return m.xml.GetNamedElements("gphoto:videostatus")[0].GetText():end function
+	
+	i=0
+	image.GetStreamID = ""
+	for each streamid in xml.GetNamedElements("gphoto:streamId")
+		image.GetStreamID = ":" + image.GetStreamID + ":" + xml.GetNamedElements("gphoto:streamId")[i].GetText()
+		i=i+1
+	end for
+	
     return image
 End Function
 
@@ -516,7 +530,6 @@ Sub googlephotos_random_photos(username="default")
     rsp=m.ExecServerAPI("?kind=album&v=3.0&fields=entry(title,gphoto:numphotos,gphoto:user,gphoto:id,media:group(media:description,media:thumbnail))",username,userIndex)
     if not isxmlelement(rsp) then return
     albums=m.newAlbumListFromXML(rsp.entry)
-    
     if albums.Count()=0 then
         uitkDoMessage("You have no albums containing any photos", screen)
     else
