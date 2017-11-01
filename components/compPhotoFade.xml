@@ -2,6 +2,10 @@
 <component name="compPhotoFade" extends="Scene" >
 
     <interface>
+		
+        <field id="loadingvisible" type="node" alias="Loading.visible" />
+        <field id="loadingtext" type="node" alias="Loading.text" />
+		
         <field id="primaryImageUri" type="node" alias="PrimaryImage.uri" />
         <field id="primaryImageHeight" type="node" alias="PrimaryImage.loadHeight" />
         <field id="primaryImageWidth" type="node" alias="PrimaryImage.loadWidth" />
@@ -21,14 +25,23 @@
                 m.top.backgroundColor = "0x000000FF"
                 m.top.backgroundURI = ""
 				
+                m.Loading = m.top.findNode("Loading")
                 m.FadeBackground = m.top.findNode("FadeBackground")
+				
+                m.Loading.width=ds.w
+                m.Loading.height=ds.h
+				
                 m.FadeBackground.width = ds.w
                 m.FadeBackground.height = ds.h
+				
             end sub		
         ]]>
     </script>
 
     <children>
+		
+	<Label id="Loading" translation="[0,0]" font="font:MediumBoldSystemFont" text="Loading images, Please wait" horizAlign = "center" vertAlign = "center" visible="true" />
+		
         <LayoutGroup 
             id = "PrimaryLayout"
             translation = "[0,0]" >

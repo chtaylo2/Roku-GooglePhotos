@@ -2,6 +2,10 @@
 <component name="compPhotoScroll" extends="Scene" >
 
     <interface>
+		
+        <field id="loadingvisible" type="node" alias="Loading.visible" />
+        <field id="loadingtext" type="node" alias="Loading.text" />
+		
         <field id="image1Uri" type="node" alias="Image1.uri" />
         <field id="image2Uri" type="node" alias="Image2.uri" />
         <field id="image3Uri" type="node" alias="Image3.uri" />
@@ -33,6 +37,9 @@
     <script type = "text/brightscript" >
         <![CDATA[
             sub init()
+			
+                m.top.setFocus(true)
+			
                 print "Enter compPhotoScroll init"
                 m.top.backgroundColor = "0x000000FF"
                 m.top.backgroundURI = ""
@@ -48,6 +55,8 @@
                     sizemulti     = 1.6
                 end if
 	
+								
+                m.Loading = m.top.findNode("Loading")
                 m.Poster1 = m.top.findNode("Image1")
                 m.Poster2 = m.top.findNode("Image2")
                 m.Poster3 = m.top.findNode("Image3")
@@ -64,6 +73,9 @@
                 m.ventor6 = m.top.findNode("ventorInterp6")
                 m.ventor7 = m.top.findNode("ventorInterp7")
                 m.ventor8 = m.top.findNode("ventorInterp8")
+	
+                m.Loading.width=ds.w
+                m.Loading.height=ds.h
 	
                 'Image 1 adjustments
                 tmpStart = []
@@ -141,6 +153,10 @@
     </script>
 
     <children>
+		
+		
+		<Label id="Loading" translation="[0,0]" font="font:MediumBoldSystemFont" text="Loading images, Please wait" horizAlign = "center" vertAlign = "center" visible="true" />
+		
 		<Poster id = "Image1" loadDisplayMode = "scaleToFit" />
 		<Animation id = "animateImage1" repeat = "false" duration = "30" easeFunction = "linear" >
             <Vector2DFieldInterpolator id = "ventorInterp1" fieldToInterp="Image1.translation" key="[0, 1]" />		

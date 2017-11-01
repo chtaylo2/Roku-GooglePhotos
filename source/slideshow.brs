@@ -9,6 +9,10 @@ Sub AddNextImageToSlideShow(ss, imagelist, counter)
         
         if counter>0 then image.Info.TextOverlayUR=itostr(counter)+" of "+itostr(imagelist.Count())
         image.Info.TextOverlayBody=image.GetTitle() + "  -  " + friendlyDate(strtoi(image.GetTimestamp()))
+        
+        print image.GetStreamID
+
+        
         ss.AddContent(image.Info)
     end if
 End Sub
