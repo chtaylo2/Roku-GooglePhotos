@@ -1,0 +1,7 @@
+<Content>
+<item title="Set Photo Download Resolution" description="Defines photo size downloaded. If you have a slow internet connection, it's recommended to decrease this setting." />
+<item title="Set Slideshow Delay" description="This setting defines the length of delay between photos during your slideshow." />
+<item title="Link additional Google Photos account" description="Link an additional Google Photos account to this Roku device. There is no limit on the number of accounts you can link." />
+<item title="Remove account link from device" description="Remove Google Photos account link from this device" />
+<item title="About" description="The PhotoView for Google Photos Channel, current version.... BLAH BLAH" />
+</Content>

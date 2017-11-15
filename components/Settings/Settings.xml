@@ -1,0 +1,50 @@
+<?xml version = "1.0" encoding = "utf-8" ?>
+
+<component name = "Settings" extends = "Group" initialFocus = "settingsLabelList" >
+
+  <interface>
+    <field id = "itemFocused" type = "node" alias = "settingsLabelList.itemFocused" onChange = "showfocus" />
+    <field id = "itemSelected" type = "node" alias = "settingsLabelList.itemSelected" onChange = "showselected" />
+  </interface>
+
+  <script type="text/brightscript" uri="pkg:/components/Settings/Settings.brs" />
+  
+  <children>
+    
+    <LabelList
+      id = "settingsLabelList"
+      translation = "[ 80, 180 ]"
+      itemSize = "[480,40]"
+      itemSpacing = "[0,20]"
+      color="#808080"
+      vertFocusAnimationStyle="floatingFocus">
+    
+      <Rectangle 
+        id = "infoRectangle" 
+        translation = "[ 550, 0 ]" 
+        height = "490" 
+        width = "600" 
+        color = "#606060" >
+
+        <Label 
+          id = "infoLabel" 
+          translation = "[ 15, 15 ]" 
+          height = "460" 
+          width = "580" 
+          wrap = "true"
+          color = "#F8F8F8"
+          font = "font:SmallSystemFont" />
+  
+        <RadioButtonList
+          id = "settingSubList"
+          visible = "false"
+          itemSize = "[370,40]"
+          translation = "[ 115, 120 ]"/>
+        
+      </Rectangle>
+      
+    </LabelList>
+    
+  </children>
+
+</component>
