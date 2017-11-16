@@ -5,9 +5,11 @@
   <interface>
     <field id = "itemFocused" type = "node" alias = "settingsLabelList.itemFocused" onChange = "showfocus" />
     <field id = "itemSelected" type = "node" alias = "settingsLabelList.itemSelected" onChange = "showselected" />
+    <field id = "itemSubSelected" type = "node" alias = "settingSubList.itemSelected" onChange = "showsubselected" />
   </interface>
 
   <script type="text/brightscript" uri="pkg:/components/Settings/Settings.brs" />
+  <script type="text/brightscript" uri="pkg:/components/Utils/HelperFunctions.brs" />
   
   <children>
     
