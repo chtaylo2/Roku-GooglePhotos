@@ -1,8 +1,0 @@
-<Content>
-<item title="1 second" titleseason="SlideshowDelay" description="1" />
-<item title="3 seconds (Default)" titleseason="SlideshowDelay" description="3" />
-<item title="5 seconds" titleseason="SlideshowDelay" description="5" />
-<item title="10 Seconds" titleseason="SlideshowDelay" description="10" />
-<item title="30 seconds" titleseason="SlideshowDelay" description="30" />
-<item title="Custom Setting" titleseason="SlideshowDelay" description="0" />
-</Content>
