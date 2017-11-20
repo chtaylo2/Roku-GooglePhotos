@@ -1,20 +1,17 @@
 
 sub init()
+    'ContentReader components are used to read in local XML content.
+    'This does not handle remote content over http(s)
+    
     m.top.functionName = "getContent"
 end sub
 
 
 sub getContent()
     content = createObject("roSGNode", "ContentNode")
-
     contentxml = createObject("roXMLElement")
-
-    xmlstring = ReadAsciiFile(m.top.contenturi)
+    xmlstring = ReadAsciiFile(m.top.file)
     contentxml.parse(xmlstring)
-      
-    'readInternet = createObject("roUrlTransfer")
-    'readInternet.setUrl(m.top.contenturi)
-    'contentxml.parse(readInternet.GetToString())
 
     if contentxml.getName()="Content"
         for each item in contentxml.GetNamedElements("item")

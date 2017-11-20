@@ -3,7 +3,7 @@
 <component name = "ContentReader" extends = "Task" >
 
   <interface>
-    <field id = "contenturi" type = "uri" />
+    <field id = "file" type = "string" />
     <field id = "content" type = "node" />
   </interface>
 

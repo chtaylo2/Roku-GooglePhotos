@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<component name = "Registration" extends = "Group">
+  
+  <script type="text/brightscript" uri="pkg:/components/AuthLinking/Registration.brs"/>
+  <script type="text/brightscript" uri="pkg:/components/Utils/HelperFunctions.brs" />
+  <script type="text/brightscript" uri="pkg:/components/Utils/private-git.brs" />
+  
+  <children>
+
+    <Label
+      id="Row1"
+      font="font:MediumBoldSystemFont"
+      color="#808080"
+      height="100"
+      width="800"
+      wrap="true"
+      text="To link this Roku device to your Google Photos account, go to:"
+      translation="[150,200]" />
+
+    <Label
+      id="Row2"
+      font="font:LargeBoldSystemFont"
+      color="#808080"
+      horizAlign="center"
+      height="100"
+      width="1250"
+      wrap="true"
+      text="Loading.."
+      translation="[0,270]" />
+
+    <Label
+      id="Row3"
+      font="font:MediumBoldSystemFont"
+      color="#808080"
+      horizAlign="center"
+      height="100"
+      width="1250"
+      wrap="true"
+      text="and enter code:"
+      translation="[0, 335]" />
+    
+    <Label
+      id="Row4"
+      font="font:LargeBoldSystemFont"
+      color="#808080"
+      horizAlign="center"
+      width="1250"
+      text="Loading.."
+      translation="[0, 400]" />
+
+    <Label
+      id="Row5"
+      font="font:SmallBoldSystemFont"
+      color="#808080"
+      horizAlign="center"
+      height="100"
+      width="1250"
+      wrap="true"
+      text="This screen will automatically update as soon as your activation completes"
+      translation="[0, 500]" />
+
+    <ButtonGroup
+      id="buttonGroup"
+      translation="[950, 550]"/>
+
+    <Timer
+      id="LoginTimer"
+      duration="5" />
+    
+  </children>
+
+</component>

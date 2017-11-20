@@ -1,8 +1,9 @@
 <?xml version = "1.0" encoding = "utf-8" ?>
 
-<component name = "GooglePhotosMainScene" extends = "Scene" initialFocus = "homeGrid" >
+<component name = "GooglePhotosMainScene" extends = "Scene" >
 
   <script type="text/brightscript" uri="pkg:/components/GooglePhotosMainScene.brs" />
+  <script type="text/brightscript" uri="pkg:/components/Utils/HelperFunctions.brs" />
 
   <children >
 
@@ -11,40 +12,8 @@
       logoBaselineOffset = "70"
       logoUri="pkg:/images/Logo_Overhang_HD.png" />
 
-    <MarkupGrid 
-      id = "homeGrid" 
-      translation = "[ 30, 240 ]" 
-      itemComponentName = "markupgridItem" 
-      numColumns = "5" 
-      numRows = "1" 
-      itemSize = "[ 220, 250 ]" 
-      itemSpacing = "[ 20, 20 ]"
-      drawFocusFeedback = "false" />
-
     <Label
-      id="itemLabelMain1"
-      height="720"
-      width="1280"
-      font="font:LargeBoldSystemFont"
-      color="#808080"
-      text = "My Albums"
-      horizAlign = "center"
-      vertAlign = "center"
-      translation="[0,175]" />
-    
-    <Label
-      id="itemLabelMain2"
-      height="720"
-      width="1280"
-      font="font:MediumSystemFont"
-      color="#808080"
-      text = "Browse your albums"
-      horizAlign = "center"
-      vertAlign = "center"
-      translation="[0,225]" />
-    
-    <Label
-      id="itemLabelMain3"
+      id="itemHeader"
       height="720"
       width="1200"
       font="font:MediumBoldSystemFont"

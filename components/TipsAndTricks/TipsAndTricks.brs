@@ -7,7 +7,7 @@ sub init()
     'Read in content
     m.readContentTask = createObject("roSGNode", "ContentReader")
     m.readContentTask.observeField("content", "setlist")
-    m.readContentTask.contenturi = "pkg:/data/TipsAndTricks/tipsContent.xml"
+    m.readContentTask.file = "pkg:/data/TipsAndTricks/tipsContent.xml"
     m.readContentTask.control = "RUN"
 end sub
 

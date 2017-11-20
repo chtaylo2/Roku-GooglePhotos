@@ -5,76 +5,86 @@ sub init()
     m.top.backgroundColor = "#EBEBEB"     
       
     m.top.setFocus(true)
-
+    
     'Define SG nodes
-    m.markupgrid = m.top.findNode("homeGrid")
-    m.itemLabelMain1 = m.top.findNode("itemLabelMain1")
-    m.itemLabelMain2 = m.top.findNode("itemLabelMain2")
-    m.itemLabelMain3 = m.top.findNode("itemLabelMain3")
-      
-    m.itemLabelMain3.text = "Chris Taylor • Main Menu"
-      
-    'Read in content
-    m.readMarkupGridTask = createObject("roSGNode", "ContentReader")
-    m.readMarkupGridTask.contenturi = "pkg:/data/homeGridContent.xml"
-    m.readMarkupGridTask.observeField("content", "showmarkupgrid")
-    m.readMarkupGridTask.control = "RUN"
+    m.itemHeader = m.top.findNode("itemHeader")
+    
+    'Observe user selected
+    m.global.selectedUser = -1
+    m.global.observeField("selectedUser", "mainLoad")
+    
+    checkRegistration()
+    
 end sub
 
 
-sub showmarkupgrid()
-    'Populate grid content
-    m.markupgrid.content = m.readMarkupGridTask.content
-      
-    'Select default item
-    m.markupgrid.jumpToItem = 2
-      
-    'Watch for events
-    m.markupgrid.observeField("itemFocused", "onItemFocused") 
-    m.markupgrid.observeField("itemSelected", "onItemSelected")
-end sub
+Function checkRegistration()
+
+    ' Load in the OAuth Registry entries
+    loadReg()
+
+    'Check for linked user
+    usersLoaded = oauth_count()
+    if usersLoaded = 0 then
+        m.itemHeader.text   = "Registration"
+        m.screenActive      = createObject("roSGNode", "Registration")
+        m.screenActive.id   = "Registration"
+        m.top.appendChild(m.screenActive)
+        m.screenActive.setFocus(true)
+    else
+        usersLoaded = oauth_count()
+        if usersLoaded = 1 then
+            'Show only registered user
+            m.global.selectedUser = 0
+        else
+            selectionLoad()
+        end if
+    end if
+End function
 
 
-sub onItemFocused()
-    'Item focused
-    focusedItem = m.markupgrid.content.getChild(m.markupgrid.itemFocused)
-    m.itemLabelMain1.text = focusedItem.shortdescriptionline1
-    m.itemLabelMain2.text = focusedItem.shortdescriptionline2
-end sub
-
-
-sub onItemSelected()
-    'Item selected
-    selectedItem = m.markupgrid.content.getChild(m.markupgrid.itemSelected)
-    screenToDisplay = selectedItem.shortdescriptionline1
-      
-    m.markupgrid.visible = false
-    m.itemLabelMain1.visible = false
-    m.itemLabelMain2.visible = false
-      
-    m.itemLabelMain3.text = screenToDisplay
-    m.screenActive = createObject("roSGNode", screenToDisplay)
+Function selectionLoad()
+    m.itemHeader.text   = "Select User"
+    m.screenActive      = createObject("roSGNode", "UserSelection")
+    m.screenActive.id   = "UserSelection"
     m.top.appendChild(m.screenActive)
     m.screenActive.setFocus(true)
-end sub
+End function
 
 
-function onKeyEvent(key as String, press as Boolean) as Boolean
+Function mainLoad(event as object)
+    if (event.GetData() <> -1 and event.GetData() <> -2)
+        'A user was selected, display!
+        m.itemHeader.text = ""
+        m.top.removeChild(m.screenActive)
+        m.screenActive      = createObject("roSGNode", "MainMenu")
+        m.screenActive.id   = "MainMenu"
+        m.top.appendChild(m.screenActive)
+        m.screenActive.setFocus(true)
+    else if event.GetData() = -2
+        'A user was unregistered
+        m.top.removeChild(m.screenActive)
+        m.screenActive = invalid
+
+        checkRegistration()
+    end if
+End function
+
+
+Function onKeyEvent(key as String, press as Boolean) as Boolean
     if press then
-        if key = "back"        
-            if (m.screenActive <> invalid)
-                m.top.removeChild(m.screenActive)
-                m.screenActive = invalid
-
-                m.itemLabelMain3.text = "Chris Taylor • Main Menu"
-                m.markupgrid.visible = true
-                m.itemLabelMain1.visible = true
-                m.itemLabelMain2.visible = true
-                m.markupgrid.setFocus(true)
-                
+        if key = "back"
+            if m.screenActive.id <> "Registration"
+                if (m.screenActive <> invalid)
+                    m.top.removeChild(m.screenActive)
+                    m.screenActive = invalid
+                    selectionLoad()
+                    return true
+                end if
+            else
                 return true
             end if
         end if
     end if
     return false
-end function
+End function

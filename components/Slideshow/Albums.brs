@@ -1,13 +1,6 @@
 
 sub init()
-
-    ' Load in the OAuth Registry entries
-    loadReg()
-
     'Define SG nodes
-    m.pinRectangle = m.top.findNode("pinRectangle")
-    m.pinPad = m.top.findNode("pinPad")
-    
     m.settingsList = m.top.findNode("settingsLabelList")
     m.settingSubList = m.top.findNode("settingSubList")
     m.regEntry = m.top.findNode("RegistryTask")
@@ -16,7 +9,7 @@ sub init()
     'Read in Content
     m.readContentTask = createObject("roSGNode", "ContentReader")
     m.readContentTask.observeField("content", "setlist")
-    m.readContentTask.file = "pkg:/data/Settings/settingsContent.xml"
+    m.readContentTask.contenturi = "pkg:/data/Settings/settingsContent.xml"
     m.readContentTask.control = "RUN"
 end sub
 
@@ -125,24 +118,7 @@ end sub
 sub showselected()
     'Process item selected
     if m.settingsList.itemSelected = 0 OR m.settingsList.itemSelected = 1 then
-        'SETTINGS
-        m.settingSubList.setFocus(true)
-    else if m.settingsList.itemSelected = 2 then
-        'REGISTER NEW USER
-        'm.screenActive = createObject("roSGNode", "Registration")
-        'm.top.appendChild(m.screenActive)
-        'm.screenActive.setFocus(true)
-    else if m.settingsList.itemSelected = 3 then
-        'UNREGISTER USER
-
-        loadItems()
-        for each item in m.items
-            m.[item].Delete(m.global.selectedUser)
-        end for
-        saveReg()
-        
-        m.global.selectedUser = -2
-        
+        m.settingSubList.setFocus(true)       
     end if
 end sub
 
@@ -150,12 +126,6 @@ end sub
 sub showsubselected()
     'Store item selected in registry
     itemcontent = m.settingSubList.content.getChild(m.settingSubList.itemSelected)
-    
-    if itemcontent.description = "0" then
-        m.pinRectangle.visible = true
-        m.pinPad.setFocus(true)  
-    end if
-    
     RegWrite(itemcontent.titleseason, itemcontent.description, "Settings")
     
     'Re-store the current selected item locally
@@ -167,15 +137,11 @@ end sub
 
 function onKeyEvent(key as String, press as Boolean) as Boolean
     if press then
-    
-        print "TEST: "; m.pinPad.hasFocus()
         if key = "right"
             m.settingsList.itemSelected = m.settingsList.itemFocused
-            m.pinRectangle.visible = false
-            return true
-        else if (key = "back" or key = "left") and (m.settingsList.hasFocus() = false )
+            return true      
+        else if (key = "back" or key = "left") and m.settingsList.hasFocus() = false
             m.settingsList.setFocus(true)
-            m.pinRectangle.visible = false
             return true
         end if
     end if

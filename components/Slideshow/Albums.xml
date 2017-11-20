@@ -1,6 +1,6 @@
 <?xml version = "1.0" encoding = "utf-8" ?>
 
-<component name = "Settings" extends = "Group" initialFocus = "settingsLabelList" >
+<component name = "My Albums" extends = "Group" initialFocus = "settingsLabelList" >
 
   <interface>
     <field id = "itemFocused" type = "node" alias = "settingsLabelList.itemFocused" onChange = "showfocus" />
@@ -42,26 +42,10 @@
           visible = "false"
           itemSize = "[370,40]"
           translation = "[ 115, 120 ]"/>
-       
+        
       </Rectangle>
+      
     </LabelList>
-    
-    <Rectangle 
-      id = "pinRectangle" 
-      height = "305" 
-      width = "270" 
-      color = "#858585"
-      translation = "[ 500, 200 ]"
-      visible = "false" >
-         
-      <PinPad 
-        id = "pinPad" 
-        pinLength = "3"
-        secureMode = "false"
-        translation = "[ 0, 7 ]" />
-    
-    </Rectangle>
-
     
   </children>
 
