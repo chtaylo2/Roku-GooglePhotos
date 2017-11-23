@@ -28,6 +28,21 @@ Function RegDelete(key, section=invalid)
 End Function
       
 
+Function loadCommon()
+      ' Common varables for needed for Oauth and GooglePhotos API
+      
+      m.releaseVersion  = "1.7"
+      m.gp_scope        = "https://picasaweb.google.com/data"
+      m.gp_prefix       = m.gp_scope + "/feed/api/user/default"
+      
+      m.clientId        = getClientId()
+      m.clientSecret    = getClientSecret()
+    
+      m.oauth_prefix    = "https://accounts.google.com/o/oauth2"
+      m.oauth_scope     = "https://picasaweb.google.com/data https://www.googleapis.com/auth/userinfo.email"
+      
+End Function
+
 Function loadItems()
       m.section   = "GooglePhotos-Auth"
       m.items     = CreateObject("roList")
@@ -149,14 +164,81 @@ End Function
 '*********************************************************
 Function oauth_count()
     
-    loadItems()
-    for each item in m.items
-        if m.accessToken.Count() <> m.[item].Count() then
-            print "accessToken / "; item; " counts do not match"
-            return invalid
-        end if
-    end for
+      loadItems()
+      for each item in m.items
+            if m.accessToken.Count() <> m.[item].Count() then
+                  print "accessToken / "; item; " counts do not match"
+                  return invalid
+            end if
+      end for
     
-    return m.accessToken.Count()
+      return m.accessToken.Count()
 
+End Function
+
+
+'*********************************************************
+'**
+'** create a header object with authorization token
+'**
+'*********************************************************
+Function oauth_sign(userIndex As Integer) as Object 
+
+      ' Save our current selection
+      m.currentAccessTokenInd = userIndex
+    
+      signedHeader = {}
+    
+      if m.accessToken[userIndex] <> ""
+            signedHeader["Authorization"] = "Bearer " + m.accessToken[userIndex]
+            print "Creating Signed Headers: "; m.accessToken[userIndex]
+      end if
+      
+      return signedHeader
+
+End Function
+
+
+sub makeRequest(headers as Object, url as String, method as String, post_params as String, num as Integer)
+    print "HelperFunctions [makeRequest]"
+    context = createObject("roSGNode", "Node")
+    params = {
+        headers: headers,
+        uri: url,
+        method: method,
+        params: post_params
+    }
+
+    context.addFields({
+        parameters: params,
+        num: num,
+        response: {}
+    })
+
+    m.UriHandler.request = { context: context }    
+end sub
+
+
+'******************************************************
+'Parse a string into a roXMLElement
+'
+'return invalid on error, else the xml object
+'******************************************************
+Function ParseXML(str As String) As dynamic
+      if str = invalid return invalid
+      xml=CreateObject("roXMLElement")
+      if not xml.Parse(str) return invalid
+      return xml
+End Function
+
+
+'******************************************************
+'isxmlelement
+'
+'Determine if the given object supports the ifXMLElement interface
+'******************************************************
+Function isxmlelement(obj as dynamic) As Boolean
+      if obj = invalid return false
+      if GetInterface(obj, "ifXMLElement") = invalid return false
+      return true
 End Function

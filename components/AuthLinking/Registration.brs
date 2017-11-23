@@ -19,12 +19,8 @@ sub init()
     'm.Button.observeField("buttonSelected", "onButtonPress")
     m.buttongroup.setFocus(true)
     
-    ' Common varables for oauth
-    m.clientId                      = getClientId()
-    m.clientSecret                  = getClientSecret()
-    
-    m.oauth_prefix                  = "https://accounts.google.com/o/oauth2"
-    m.oauth_scope                   = "https://picasaweb.google.com/data https://www.googleapis.com/auth/userinfo.email"
+    'Load common variables
+    loadCommon()
     
     'Kick off token generation
     loadReg()
@@ -149,6 +145,7 @@ sub onCheckAuth(event as object)
 end sub
 
 
+''NOT USED YET
 sub onButtonPress(event as object)
   print "onButtonPress"
   if m.button.text <> "Unlink The Device"
@@ -160,26 +157,6 @@ sub onButtonPress(event as object)
     m.LoginTimer.repeat = true
     m.LoginTimer.control = "start"
   end if
-end sub
-
-
-sub makeRequest(headers as object, url as String, method as String, post_params as String, num as Integer)
-    print "[makeRequest]"
-    context = createObject("roSGNode", "Node")
-    params = {
-        headers: headers,
-        uri: url,
-        method: method,
-        params: post_params
-    }
-
-    context.addFields({
-        parameters: params,
-        num: num,
-        response: {}
-    })
-
-    m.UriHandler.request = { context: context }    
 end sub
 
 

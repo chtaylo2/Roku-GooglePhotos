@@ -1,151 +1,122 @@
 
 sub init()
-    'Define SG nodes
-    m.settingsList = m.top.findNode("settingsLabelList")
-    m.settingSubList = m.top.findNode("settingSubList")
-    m.regEntry = m.top.findNode("RegistryTask")
-    m.infoLabel = m.top.findNode("infoLabel")
-      
-    'Read in Content
-    m.readContentTask = createObject("roSGNode", "ContentReader")
-    m.readContentTask.observeField("content", "setlist")
-    m.readContentTask.contenturi = "pkg:/data/Settings/settingsContent.xml"
-    m.readContentTask.control = "RUN"
+    m.UriHandler = createObject("roSGNode","Photo UrlHandler")
+    m.UriHandler.observeField("response","handleResponse")
+
+    m.albummarkupgrid = m.top.findNode("albumGrid")
+	m.itemLabelMain1  = m.top.findNode("itemLabelMain1")
+
+	m.content = createObject("RoSGNode","ContentNode")
+	
+    'Load common variables
+    loadCommon()
+	
+	loadReg()
+	doGetAlbumList()
+	
 end sub
 
 
-sub setlist()
-    'Setup content list for different settings
-    setresolution()
-    setdelay()
+sub doGetAlbumList()
+    print "Albums.brs [doGetAlbumList]"
 
-    'Populate primary list content
-    m.settingsList.content = m.readContentTask.content
-    m.settingsList.setFocus(true)
+	signedHeader = oauth_sign(m.global.selectedUser)
+	print "HEADER: "; signedHeader
+
+    makeRequest(signedHeader, m.gp_prefix + "?kind=album&v=3.0&fields=entry(title,gphoto:numphotos,gphoto:user,gphoto:id,media:group(media:description,media:thumbnail))&thumbsize=220", "GET", "", 0)
 end sub
 
 
-sub setresolution()
-    'Populate screen resolution list content
-    regStore = "SlideshowRes"
-    regSelection = RegRead(regStore, "Settings")
-    radioSelection = 0
+sub handleResponse(event as object)
+    print "Albums.brs [handleResponse]"
+  
+    response = event.getData()
 
-    device = createObject("roDeviceInfo")
-    is4k = (val(device.GetVideoMode()) = 2160)
-    is1080p = (val(device.GetVideoMode()) = 1080)
+    rsp=ParseXML(response.content)
+	print rsp
+    'if rsp=invalid then
+    '    ShowErrorDialog("Unable to parse Google Photos API response" + LF + LF + "Exit the channel then try again later","API Error")
+    'end if
+	
+    albums=googleAlbumListing(rsp.entry)
+	googleAlbumDisplay(albums)
 
-    m.content = createObject("RoSGNode","ContentNode")
-    
-    if regSelection = "0" then radioSelection = 0
-    addItem(m.content, "Standard Definition (SD)", "0", regStore)
-
-    if is4k Or is1080p then
-        if regSelection = "1" then radioSelection = 1
-        addItem(m.content, "High Definition (HD)", "1", regStore)
-    end if
-    
-    if is4k then
-        if regSelection = "2" then radioSelection = 2
-        addItem(m.content, "Full High Definition (FHD)", "2", regStore)
-    end if
-
-    'Store content node and current registry selection
-    m.settingsRes = m.content
-    m.settingsRescheckedItem = radioSelection
 end sub
 
 
-sub setdelay()
-    'Populate photo delay list content
-    regStore = "SlideshowDelay"
-    regSelection = RegRead(regStore, "Settings")
-    radioSelection = 0
-
-    m.content = createObject("RoSGNode","ContentNode")
-    if regSelection = "1" then radioSelection = 0
-    addItem(m.content, "1 second", "1", regStore)
-    if regSelection = "3" then radioSelection = 1
-    addItem(m.content, "3 seconds (Default)", "3", regStore)
-    if regSelection = "5" then radioSelection = 2
-    addItem(m.content, "5 seconds", "5", regStore)
-    if regSelection = "10" then radioSelection = 3
-    addItem(m.content, "10 Seconds", "10", regStore)
-    if regSelection = "30" then radioSelection = 4
-    addItem(m.content, "30 seconds", "30", regStore)
-    if regSelection = "0" then radioSelection = 5
-    addItem(m.content, "Custom Setting", "0", regStore)
-    
-    'Store content node and current registry selection
-    m.settingsDelay = m.content
-    m.settingsDelaycheckedItem = radioSelection
+sub onItemFocused()
+    'Item focused
+    focusedItem = m.albummarkupgrid.content.getChild(m.albummarkupgrid.itemFocused)
+    m.itemLabelMain1.text = focusedItem.shortdescriptionline1
 end sub
 
 
-sub addItem(store as object, itemtext as string, itemdesc as string, itemsection as string)
+sub onItemSelected()
+    'Item selected
+    print "SELECTED: "; m.albummarkupgrid.itemSelected
+    'm.global.selectedUser = m.albummarkupgrid.itemSelected
+end sub
+
+
+sub addItem(store as object, hdgridposterurl as string, shortdescriptionline1 as string)
     item = store.createChild("ContentNode")
-    item.title = itemtext
-    item.description = itemdesc
-    item.titleseason = itemsection
+    item.hdgridposterurl = hdgridposterurl
+    item.shortdescriptionline1 = shortdescriptionline1
+	item.x = "200"
 end sub
 
 
-sub showfocus()
-    'Show info for focused item
-    if m.settingsList.content<>invalid then
-        itemcontent = m.settingsList.content.getChild(m.settingsList.itemFocused)
-        m.infoLabel.text = itemcontent.description
-        
-        if m.settingsList.itemFocused = 0 then
-            m.settingSubList.visible = "true"
-            m.settingSubList.content = m.settingsRes
-            m.settingSubList.checkedItem = m.settingsRescheckedItem
-        else if m.settingsList.itemFocused = 1 then
-            m.settingSubList.visible = "true"
-            m.settingSubList.content = m.settingsDelay
-            m.settingSubList.checkedItem = m.settingsDelaycheckedItem
-        else if m.settingsList.itemFocused = 2 then
-            m.settingSubList.visible = "false"
-        else if m.settingsList.itemFocused = 3 then
-            m.settingSubList.visible = "false"
-        else if m.settingsList.itemFocused = 4 then
-            m.settingSubList.visible = "false"
+Function googleAlbumListing(xmllist As Object) As Object
+    albumlist=CreateObject("roList")
+    for each record in xmllist
+        album=googleAlbumCreateRecord(record)
+        if album.GetImageCount() > 0 then
+			' Do not show photos from Google Hangout albums or any marked with "Private" in name
+			if album.GetTitle().instr("Hangout:") = -1 and album.GetTitle().instr("rivate") = -1 then
+				albumlist.Push(album)
+			end if
         end if
-    end if 
-end sub
-
-
-sub showselected()
-    'Process item selected
-    if m.settingsList.itemSelected = 0 OR m.settingsList.itemSelected = 1 then
-        m.settingSubList.setFocus(true)       
-    end if
-end sub
-
-
-sub showsubselected()
-    'Store item selected in registry
-    itemcontent = m.settingSubList.content.getChild(m.settingSubList.itemSelected)
-    RegWrite(itemcontent.titleseason, itemcontent.description, "Settings")
+    next
     
-    'Re-store the current selected item locally
-    if m.settingsList.itemSelected = 0 then m.settingsRescheckedItem = m.settingSubList.itemSelected
-    if m.settingsList.itemSelected = 1 then m.settingsDelaycheckedItem = m.settingSubList.itemSelected
-    
-end sub
+    return albumlist
+End Function
 
 
-function onKeyEvent(key as String, press as Boolean) as Boolean
-    if press then
-        if key = "right"
-            m.settingsList.itemSelected = m.settingsList.itemFocused
-            return true      
-        else if (key = "back" or key = "left") and m.settingsList.hasFocus() = false
-            m.settingsList.setFocus(true)
-            return true
-        end if
+Function googleAlbumCreateRecord(xml As Object) As Object
+    album = CreateObject("roAssociativeArray")
+    album.xml=xml
+
+    album.GetUsername=function():return m.xml.GetNamedElements("gphoto:user")[0].GetText():end function
+    album.GetTitle=function():return m.xml.title[0].GetText():end function
+    album.GetID=function():return m.xml.GetNamedElements("gphoto:id")[0].GetText():end function
+    album.GetImageCount=function():return Val(m.xml.GetNamedElements("gphoto:numphotos")[0].GetText()):end function
+    album.GetThumb=get_thumb
+	
+    return album
+End Function
+
+
+Function googleAlbumDisplay(albums As Object)
+    for each album in albums
+        addItem(m.content, album.GetThumb(), album.GetTitle())
+    end for
+	
+	m.albummarkupgrid.content = m.content
+	
+	'Center the MarkUp Box
+    markupRectAlbum = m.albummarkupgrid.boundingRect()
+    centerx = (1280 - markupRectAlbum.width) / 2
+    m.albummarkupgrid.translation = [ centerx+18, 240 ]
+	
+	m.albummarkupgrid.observeField("itemFocused", "onItemFocused") 
+    m.albummarkupgrid.observeField("itemSelected", "onItemSelected")
+End Function
+
+
+Function get_thumb()
+    if m.xml.GetNamedElements("media:group")[0].GetNamedElements("media:thumbnail").Count()>0 then
+        return m.xml.GetNamedElements("media:group")[0].GetNamedElements("media:thumbnail")[0].GetAttributes()["url"]
     end if
-
-    'If nothing above is true, we'll fall back to the previous screen.
-    return false
-end function
+    
+    return "pkg:/images/icon_s.png"
+End Function
