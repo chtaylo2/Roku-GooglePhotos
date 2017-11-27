@@ -6,7 +6,8 @@
 	
   <interface>
   	<field id="request" type="assocarray"/>
-    <field id="response" type="assocarray" alwaysNotify="true"/>
+    <field id="albumList" type="assocarray" alwaysNotify="true"/>
+	<field id="albumImages" type="assocarray" alwaysNotify="true"/>
   </interface>
   
 </component>

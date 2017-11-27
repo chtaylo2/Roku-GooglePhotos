@@ -3,7 +3,7 @@
 <component name = "MainMenu" extends = "Group" initialFocus = "homeGrid" >
   
   <script type="text/brightscript" uri="pkg:/components/MainMenu/MainMenu.brs" />
-  <script type="text/brightscript" uri="pkg:/components/Utils/HelperFunctions.brs" />
+  <script type="text/brightscript" uri="pkg:/components/Utils/Common.brs" />
 
   <children >
 

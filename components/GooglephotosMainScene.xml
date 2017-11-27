@@ -3,7 +3,7 @@
 <component name = "GooglePhotosMainScene" extends = "Scene" >
 
   <script type="text/brightscript" uri="pkg:/components/GooglePhotosMainScene.brs" />
-  <script type="text/brightscript" uri="pkg:/components/Utils/HelperFunctions.brs" />
+  <script type="text/brightscript" uri="pkg:/components/Utils/Common.brs" />
 
   <children >
 

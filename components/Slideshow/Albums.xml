@@ -3,7 +3,8 @@
 <component name = "My Albums" extends = "Group" initialFocus = "albumGrid" >
 
    <script type = "text/brightscript" uri = "pkg:/components/SlideShow/Albums.brs" />
-   <script type = "text/brightscript" uri = "pkg:/components/Utils/HelperFunctions.brs" />
+   <script type = "text/brightscript" uri = "pkg:/components/SlideShow/SlideshowHelper.brs" />
+   <script type = "text/brightscript" uri = "pkg:/components/Utils/Common.brs" />
    <script type = "text/brightscript" uri = "pkg:/components/Utils/private-git.brs" />
 
    <children>

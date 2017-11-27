@@ -130,7 +130,9 @@ sub processResponse(msg as Object)
 		job.context.context.response = result
 		if msg.GetResponseCode() = 200
 			if result.num = 0
-				provideResponse(job)
+				m.top.albumList = job.context.context.response
+			else if result.num = 1
+				m.top.albumImages = job.context.context.response
 			end if
 		else
 			print "Error: status code was: " + (msg.GetResponseCode()).toStr()

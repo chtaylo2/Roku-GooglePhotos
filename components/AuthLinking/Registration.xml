@@ -3,7 +3,7 @@
 <component name = "Registration" extends = "Group">
   
   <script type="text/brightscript" uri="pkg:/components/AuthLinking/Registration.brs"/>
-  <script type="text/brightscript" uri="pkg:/components/Utils/HelperFunctions.brs" />
+  <script type="text/brightscript" uri="pkg:/components/Utils/Common.brs" />
   <script type="text/brightscript" uri="pkg:/components/Utils/private-git.brs" />
   
   <children>

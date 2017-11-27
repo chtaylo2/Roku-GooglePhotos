@@ -1,7 +1,7 @@
 
 ' This is our global function declaration script.
 ' Since ROKU doesn't support global functions, the following must be added to each XML file where needed
-' <script type="text/brightscript" uri="pkg:/components/Utils/HelperFunctions.brs" />
+' <script type="text/brightscript" uri="pkg:/components/Utils/Common.brs" />
 
 
 Function RegRead(key, section=invalid)
@@ -201,6 +201,9 @@ End Function
 
 sub makeRequest(headers as Object, url as String, method as String, post_params as String, num as Integer)
     print "HelperFunctions [makeRequest]"
+    
+    print "URL: "; url
+    
     context = createObject("roSGNode", "Node")
     params = {
         headers: headers,
@@ -219,6 +222,35 @@ sub makeRequest(headers as Object, url as String, method as String, post_params 
 end sub
 
 
+Function getResolution()
+      ssres = RegRead("SlideshowRes","Settings")
+
+      if ssres=invalid then
+            device = createObject("roDeviceInfo")
+            is4k = (val(device.GetVideoMode()) = 2160)
+            is1080p = (val(device.GetVideoMode()) = 1080)
+
+            if is4k then
+                  resolution = "1600"
+            else if is1080p
+                  resolution = "1280"
+            else
+                  resolution = "720"
+            end if
+      else
+            if ssres="FHD" then
+                  resolution = "1600"
+            else if ssres="HD"
+                  resolution = "1280"
+            else
+                  resolution = "720"
+            end if
+      end if
+
+    return resolution
+End Function
+
+
 '******************************************************
 'Parse a string into a roXMLElement
 '
@@ -233,12 +265,50 @@ End Function
 
 
 '******************************************************
-'isxmlelement
-'
 'Determine if the given object supports the ifXMLElement interface
 '******************************************************
 Function isxmlelement(obj as dynamic) As Boolean
       if obj = invalid return false
       if GetInterface(obj, "ifXMLElement") = invalid return false
       return true
+End Function
+
+
+'******************************************************
+'Return Ceiling of number
+'******************************************************
+Function ceiling(x):
+      i = int(x)
+      if i < x then i = i + 1
+      return i
+End Function
+
+
+'******************************************************
+'Convert int to string. This is necessary because
+'the builtin Stri(x) prepends whitespace
+'******************************************************
+Function itostr(i As Integer) As String
+      str = Stri(i)
+      return strTrim(str)
+End Function
+
+
+'******************************************************
+'Trim a string
+'******************************************************
+Function strTrim(str As String) As String
+      st=CreateObject("roString")
+      st.SetString(str)
+      return st.Trim()
+End Function
+
+
+'******************************************************
+'Pluralize simple strings like "1 minute" or "2 minutes"
+'******************************************************
+Function Pluralize(val As Integer, str As String) As String
+      ret = itostr(val) + " " + str
+      if val <> 1 ret = ret + "s"
+      return ret
 End Function

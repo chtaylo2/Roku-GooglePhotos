@@ -1,0 +1,40 @@
+<?xml version = "1.0" encoding = "utf-8" ?> 
+
+<component name = "Slideshow" extends = "Group" >
+
+   <interface>
+	  <field id = "content" type = "array" />
+   </interface>
+  
+   <script type = "text/brightscript" uri = "pkg:/components/SlideShow/Slideshow.brs" />
+   <script type = "text/brightscript" uri = "pkg:/components/SlideShow/SlideshowHelper.brs" />
+   <script type = "text/brightscript" uri = "pkg:/components/Utils/Common.brs" />
+   <script type = "text/brightscript" uri = "pkg:/components/Utils/private-git.brs" />
+   
+   <children>
+
+	  <Rectangle
+		 id = "FadeBackground"
+		 color = "0x000000"
+         height = "720"
+         width = "1280"
+         opacity = ".5" />
+			
+	  <LayoutGroup 
+		 id = "PrimaryLayout"
+		 translation = "[0,0]" >
+ 
+		 <Poster 
+			id = "PrimaryImage"
+			loadWidth = "0.0"
+			loadHeight = "0.0" />
+    
+	  </LayoutGroup>
+	  	
+	  <Timer
+		 id="RotationTimer"
+		 duration="2" />
+			
+    </children>
+
+</component>

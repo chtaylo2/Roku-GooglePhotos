@@ -9,7 +9,7 @@
   </interface>
 
   <script type="text/brightscript" uri="pkg:/components/Settings/Settings.brs" />
-  <script type="text/brightscript" uri="pkg:/components/Utils/HelperFunctions.brs" />
+  <script type="text/brightscript" uri="pkg:/components/Utils/Common.brs" />
   
   <children>
     
