@@ -4,6 +4,7 @@ sub Main()
 end sub
 
 sub showGooglePhotosScreen()
+    m.mgr = CreateObject("roTextureManager")
     screen = CreateObject("roSGScreen")
     m.port = CreateObject("roMessagePort")
     device = CreateObject("roDeviceInfo")
@@ -14,7 +15,7 @@ sub showGooglePhotosScreen()
  
     ds=device.GetDisplaySize()
     
-    m.global.addFields( {screenWidth: ds.w, screenHeight: ds.h, selectedUser: 0} )
+    m.global.addFields( {screenWidth: ds.w, screenHeight: ds.h} )
     m.global.addFields( {selectedUser: 0} )
     
     screen.show()

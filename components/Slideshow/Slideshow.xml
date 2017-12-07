@@ -18,23 +18,65 @@
 		 color = "0x000000"
          height = "720"
          width = "1280"
-         opacity = ".5" />
-			
-	  <LayoutGroup 
-		 id = "PrimaryLayout"
-		 translation = "[0,0]" >
- 
-		 <Poster 
-			id = "PrimaryImage"
-			loadWidth = "0.0"
-			loadHeight = "0.0" />
+         opacity = "1" />
+
+	  <!-- For transition animation -->
+	  <Poster
+		 id = "Background"
+		 width = "1280"
+		 height = "720"
+		 color = "0x000000"
+		 opacity = "0.9" />
+	
+	  <Poster 
+		 id = "PrimaryImage"
+		 loadWidth = "0.0"
+		 loadHeight = "0.0"
+		 loadDisplayMode = "scaleToFit" />
+		 
+	  <Rectangle
+		 id = "FadeForeground"
+		 color = "0x000000"
+		 height = "720"
+		 width = "1280"
+		 opacity = "0" />		 
+    	    
+	  <Animation
+		 id = "FadeOUTAnimation"
+		 repeat = "false"
+		 easeFunction = "inQuad"
+		 duration = "0.2">
+
+		 <FloatFieldInterpolator
+			id = "FadeOUTInterpolator"
+			key = "[0.0,1.0]"
+			KeyValue = "[0.0,1.0]"
+			fieldToInterp = "FadeForeground.opacity" />
+
+	  </Animation>
     
-	  </LayoutGroup>
+	  <Animation
+		 id = "FadeINAnimation"
+		 repeat = "false"
+		 easeFunction = "inQuad"
+		 duration = "0.3">
+
+		 <FloatFieldInterpolator
+			id = "FadeINInterpolator"
+			key = "[0.0,1.0]"
+			KeyValue = "[1.0,0.0]"
+			fieldToInterp = "FadeForeground.opacity" />
+
+	  </Animation>
 	  	
 	  <Timer
 		 id="RotationTimer"
+		 duration="5" />
+   
+	  <Timer
+		 id="DownloadTimer"
 		 duration="2" />
 			
-    </children>
+   </children>
 
 </component>

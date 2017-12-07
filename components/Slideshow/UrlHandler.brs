@@ -128,11 +128,13 @@ sub processResponse(msg as Object)
 		' could handle various error codes, retry, etc. here
 		m.jobsById.delete(idKey)
 		job.context.context.response = result
-		if msg.GetResponseCode() = 200
+		if (msg.GetResponseCode() = 200) or (msg.GetResponseCode() = 403)
 			if result.num = 0
 				m.top.albumList = job.context.context.response
 			else if result.num = 1
 				m.top.albumImages = job.context.context.response
+			else if result.num = 2
+				m.top.refreshToken = job.context.context.response
 			end if
 		else
 			print "Error: status code was: " + (msg.GetResponseCode()).toStr()

@@ -41,6 +41,13 @@
       vertAlign = "center"
       translation="[0,250]" />
 
+   <Poster 
+      id = "PrimaryImage"
+      width="60"
+      height="60"
+      translation="[1180, 630]"
+      uri = "pkg:/images/gear.png" />
+
    </children>
 
 </component>

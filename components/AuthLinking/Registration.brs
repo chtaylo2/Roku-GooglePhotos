@@ -28,6 +28,7 @@ sub init()
     
 end sub
 
+
 sub doGenerateToken()
     print "Registration.brs [doGenerateToken]"
 
@@ -72,6 +73,7 @@ sub onNewToken(event as object)
     m.LoginTimer.repeat = true
     m.LoginTimer.control = "start"
 end sub
+
 
 sub onCheckAuth(event as object)
     print "Registration.brs [onCheckAuth]"
@@ -143,62 +145,3 @@ sub onCheckAuth(event as object)
         m.LoginTimer.control = "start"
     end if
 end sub
-
-
-''NOT USED YET
-sub onButtonPress(event as object)
-  print "onButtonPress"
-  if m.button.text <> "Unlink The Device"
-    makeRequest({}, m.gen, "GET", 0)
-    m.LoginTimer.repeat = true
-    m.LoginTimer.control = "start"
-  else
-    makeRequest({}, m.dis, "GET", 2)
-    m.LoginTimer.repeat = true
-    m.LoginTimer.control = "start"
-  end if
-end sub
-
-
-'******************************************************************************
-'**
-'** Extract a string from an associative array returned by ParseJson
-'** Return the default value if the field is missing, invalid or the wrong type
-'**
-'******************************************************************************
-Function getString(json As Dynamic,fieldName As String,defaultValue="" As String) As String
-    returnValue = defaultValue
-    if json <> Invalid
-        if type(json) = "roAssociativeArray" or GetInterface(json,"ifAssociativeArray")
-            fieldValue = json.LookupCI(fieldName)
-            if fieldValue <> Invalid
-                if type(fieldValue) = "roString" or type(fieldValue) = "String" or GetInterface(fieldValue,"ifString") <> Invalid
-                    returnValue = fieldValue
-                end if
-            end if
-        end if
-    end if
-    return returnValue
-End Function
-
-
-'******************************************************************************
-'**
-'** Extract an integer from an associative array returned by ParseJson
-'** Return the default value if the field is missing, invalid or the wrong type
-'**
-'******************************************************************************
-Function getInteger(json As Dynamic,fieldName As String,defaultValue=0 As Integer) As Integer
-    returnValue = defaultValue
-    if json <> Invalid
-        if type(json) = "roAssociativeArray" or GetInterface(json,"ifAssociativeArray")
-            fieldValue = json.LookupCI(fieldName)
-            if fieldValue <> Invalid
-                if type(fieldValue) = "roInteger" or type(fieldValue) = "Integer" or type(fieldValue) = "roInt" or GetInterface(fieldValue,"ifInt") <> Invalid
-                    returnValue = fieldValue
-                end if
-            end if
-        end if
-    end if
-    return returnValue
-End Function

@@ -4,6 +4,33 @@
 ' <script type="text/brightscript" uri="pkg:/components/Utils/Common.brs" />
 
 
+Function loadCommon()
+      ' Common varables for needed for Oauth and GooglePhotos API
+      
+      m.releaseVersion  = "1.7"
+      m.gp_scope        = "https://picasaweb.google.com/data"
+      m.gp_prefix       = m.gp_scope + "/feed/api/user/default"
+      
+      m.clientId        = getClientId()
+      m.clientSecret    = getClientSecret()
+    
+      m.oauth_prefix    = "https://accounts.google.com/o/oauth2"
+      m.oauth_scope     = "https://picasaweb.google.com/data https://www.googleapis.com/auth/userinfo.email"
+      
+End Function
+
+
+Function loadItems()
+      m.section   = "GooglePhotos-Auth"
+      m.items     = CreateObject("roList")
+      m.items.push("accessToken")
+      m.items.push("refreshToken")
+      m.items.push("userInfoName")
+      m.items.push("userInfoEmail")
+      m.items.push("userInfoPhoto")
+End Function
+
+
 Function RegRead(key, section=invalid)
       if section = invalid then section = "Default"
       sec = CreateObject("roRegistrySection", section)
@@ -25,32 +52,6 @@ Function RegDelete(key, section=invalid)
       sec = CreateObject("roRegistrySection", section)
       sec.Delete(key)
       sec.Flush()
-End Function
-      
-
-Function loadCommon()
-      ' Common varables for needed for Oauth and GooglePhotos API
-      
-      m.releaseVersion  = "1.7"
-      m.gp_scope        = "https://picasaweb.google.com/data"
-      m.gp_prefix       = m.gp_scope + "/feed/api/user/default"
-      
-      m.clientId        = getClientId()
-      m.clientSecret    = getClientSecret()
-    
-      m.oauth_prefix    = "https://accounts.google.com/o/oauth2"
-      m.oauth_scope     = "https://picasaweb.google.com/data https://www.googleapis.com/auth/userinfo.email"
-      
-End Function
-
-Function loadItems()
-      m.section   = "GooglePhotos-Auth"
-      m.items     = CreateObject("roList")
-      m.items.push("accessToken")
-      m.items.push("refreshToken")
-      m.items.push("userInfoName")
-      m.items.push("userInfoEmail")
-      m.items.push("userInfoPhoto")
 End Function
 
 
@@ -200,7 +201,7 @@ End Function
 
 
 sub makeRequest(headers as Object, url as String, method as String, post_params as String, num as Integer)
-    print "HelperFunctions [makeRequest]"
+    print "Common.brs [makeRequest]"
     
     print "URL: "; url
     
@@ -246,10 +247,19 @@ Function getResolution()
                   resolution = "720"
             end if
       end if
-
-    return resolution
+      
+      return resolution
 End Function
 
+
+Function GetURL_Image()
+  
+    http = CreateObject("roUrlTransfer")
+    http.SetPort(CreateObject("roMessagePort"))
+    http.SetUrl("http://www.xxx.com/roku/detail/art/big/midtown.jpg")
+    http.AsyncGetToFile("tmp:/detail.jpg")
+End Function
+   
 
 '******************************************************
 'Parse a string into a roXMLElement
@@ -311,4 +321,44 @@ Function Pluralize(val As Integer, str As String) As String
       ret = itostr(val) + " " + str
       if val <> 1 ret = ret + "s"
       return ret
+End Function
+
+
+'******************************************************************************
+' Extract a string from an associative array returned by ParseJson
+' Return the default value if the field is missing, invalid or the wrong type
+'******************************************************************************
+Function getString(json As Dynamic,fieldName As String,defaultValue="" As String) As String
+      returnValue = defaultValue
+      if json <> Invalid
+            if type(json) = "roAssociativeArray" or GetInterface(json,"ifAssociativeArray")
+                  fieldValue = json.LookupCI(fieldName)
+                  if fieldValue <> Invalid
+                        if type(fieldValue) = "roString" or type(fieldValue) = "String" or GetInterface(fieldValue,"ifString") <> Invalid
+                              returnValue = fieldValue
+                        end if
+                  end if
+            end if
+      end if
+      return returnValue
+End Function
+
+
+'******************************************************************************
+' Extract an integer from an associative array returned by ParseJson
+' Return the default value if the field is missing, invalid or the wrong type
+'******************************************************************************
+Function getInteger(json As Dynamic,fieldName As String,defaultValue=0 As Integer) As Integer
+      returnValue = defaultValue
+      if json <> Invalid
+            if type(json) = "roAssociativeArray" or GetInterface(json,"ifAssociativeArray")
+                  fieldValue = json.LookupCI(fieldName)
+                  if fieldValue <> Invalid
+                        if type(fieldValue) = "roInteger" or type(fieldValue) = "Integer" or type(fieldValue) = "roInt" or GetInterface(fieldValue,"ifInt") <> Invalid
+                              returnValue = fieldValue
+                        end if
+                  end if
+            end if
+      end if
+      return returnValue
 End Function

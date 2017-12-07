@@ -3,6 +3,7 @@ Sub init()
     m.UriHandler = createObject("roSGNode","Photo UrlHandler")
     m.UriHandler.observeField("albumList","handleGetAlbumList")
 	m.UriHandler.observeField("albumImages","handleGetAlbumImages")
+	m.UriHandler.observeField("refreshToken","handleRefreshToken")
 
     m.albummarkupgrid = m.top.findNode("albumGrid")
 	m.itemLabelMain1  = m.top.findNode("itemLabelMain1")
@@ -48,19 +49,35 @@ Sub doGetAlbumImages(album As Object, index=0 as Integer)
 End Sub
 
 
+sub doRefreshToken()
+    print "Albums.brs [doRefreshToken]"
+
+    params = "client_id="                  + m.clientId
+    params = params + "&client_secret="    + m.clientSecret
+    params = params + "&refresh_token="    + m.refreshToken[m.global.selectedUser]
+    params = params + "&grant_type="       + "refresh_token"
+
+    makeRequest({}, m.oauth_prefix+"/token", "POST", params, 2)
+end sub
+
+
 Sub handleGetAlbumList(event as object)
     print "Albums.brs [handleGetAlbumList]"
   
     response = event.getData()
 
-    rsp=ParseXML(response.content)
-	print rsp
-    'if rsp=invalid then
-    '    ShowErrorDialog("Unable to parse Google Photos API response" + LF + LF + "Exit the channel then try again later","API Error")
-    'end if
+	if response.code <> 200 then
+		doRefreshToken()
+	else
+		rsp=ParseXML(response.content)
+		print rsp
+		'if rsp=invalid then
+		'    ShowErrorDialog("Unable to parse Google Photos API response" + LF + LF + "Exit the channel then try again later","API Error")
+		'end if
 	
-    m.albumsObject = googleAlbumListing(rsp.entry)
-	googleDisplayAlbums(m.albumsObject)
+		m.albumsObject = googleAlbumListing(rsp.entry)
+		googleDisplayAlbums(m.albumsObject)
+	end if
 End Sub
 
 
@@ -69,15 +86,18 @@ Sub handleGetAlbumImages(event as object)
   
     response = event.getData()
 	
-    rsp=ParseXML(response.content)
-	print rsp
-    'if rsp=invalid then
-    '    ShowErrorDialog("Unable to parse Google Photos API response" + LF + LF + "Exit the channel then try again later","API Error")
-    'end if
-	
-	m.imagesObject = googleImageListing(rsp.entry)
-	googleDisplayImageMenu(m.albumsObject[m.albummarkupgrid.itemSelected], m.imagesObject)
-
+	if response.code <> 200 then
+		doRefreshToken()
+	else
+	    rsp=ParseXML(response.content)
+		print rsp
+	    'if rsp=invalid then
+	    '    ShowErrorDialog("Unable to parse Google Photos API response" + LF + LF + "Exit the channel then try again later","API Error")
+	    'end if
+		
+		m.imagesObject = googleImageListing(rsp.entry)
+		googleDisplayImageMenu(m.albumsObject[m.albummarkupgrid.itemSelected], m.imagesObject)
+	end if
 End Sub
 
 
@@ -99,16 +119,15 @@ Sub onItemSelected()
 		googleAlbumPages(m.albumsObject[m.albummarkupgrid.itemSelected])
 	else if selection.id = "GP_SLIDESHOW_START" then 
 		print "START SHOW"
-		print "IMAGES: "; m.images[0]
-		m.screenActive      = createObject("roSGNode", "Slideshow")
-		m.screenActive.content = m.images
+		m.screenActive = createObject("roSGNode", "Slideshow")
+		m.screenActive.content = m.imagesMetaData
 		m.top.appendChild(m.screenActive)
 		m.screenActive.setFocus(true)
 		
 	else if selection.id = "GP_VIDEO_BROWSE" then
-		print "VIDEO BROWSE"
+		print "VIDEO BROWSE - NOT DONE YET"
 	else if selection.id = "GP_IMAGE_BROWSE" then
-		print "IMAGE BROWSE"
+		print "IMAGE BROWSE - NOT DONE YET"
 	end if
 End Sub
 
@@ -156,15 +175,20 @@ Sub googleDisplayImageMenu(album As Object, imageList As Object)
 	totalPages     = ceiling(album.GetImageCount() / 1000)
 	listIcon       = "pkg:/images/browse.png"
     
-	videos=[]
-	m.images=[]
+	m.videosMetaData=[]
+	m.imagesMetaData=[]
 	for each media in imageList
+		tmp           = {}
+		tmp.url       = media.GetURL()
+		tmp.thumbnail = media.GetThumb()
+		tmp.timestamp = media.GetTimestamp()
+		
 		if media.IsVideo() then
-			videos.Push(media)
-			print "VIDEO: "; media.GetURL()
+			m.videosMetaData.Push(tmp)
+			print "VIDEO: "; tmp.url
 		else
-			m.images.Push(media)
-			print "IMAGE: "; media.GetURL()
+			m.imagesMetaData.Push(tmp)
+			print "IMAGE: "; tmp.url
 		end if
 	end for
     
@@ -177,16 +201,16 @@ Sub googleDisplayImageMenu(album As Object, imageList As Object)
 		pagesShow   = "Page "+currentPage+" of "+totalPages
 	end if
 
-	if videos.Count()>0 then        
-		if m.images.Count()>0 then 'Combined photo and photo album
-			addItem(m.menuSelected, "GP_SLIDESHOW_START", m.images[0].GetThumb(), Pluralize(m.images.Count(),"Photo") + " - Start Slideshow", pagesShow)
-			addItem(m.menuSelected, "GP_VIDEO_BROWSE", videos[0].GetThumb(), Pluralize(videos.Count(),"Video"), pagesShow)
+	if m.videosMetaData.Count()>0 then        
+		if m.imagesMetaData.Count()>0 then 'Combined photo and photo album
+			addItem(m.menuSelected, "GP_SLIDESHOW_START", m.imagesMetaData[0].thumbnail, Pluralize(m.imagesMetaData.Count(),"Photo") + " - Start Slideshow", pagesShow)
+			addItem(m.menuSelected, "GP_VIDEO_BROWSE", m.videosMetaData[0].thumbnail, Pluralize(m.videosMetaData.Count(),"Video"), pagesShow)
 			addItem(m.menuSelected, "GP_IMAGE_BROWSE", listIcon, "Browse Photos", "")
 '		else 'Video only album
 '            googlephotos_browse_videos(videos, title)
 		end if
 	else 'Photo only album			
-		addItem(m.menuSelected, "GP_SLIDESHOW_START", m.images[0].GetThumb(), Pluralize(m.images.Count(),"Photo") + " - Start Slideshow", pagesShow)
+		addItem(m.menuSelected, "GP_SLIDESHOW_START", m.imagesMetaData[0].thumbnail, Pluralize(m.imagesMetaData.Count(),"Photo") + " - Start Slideshow", pagesShow)
 		addItem(m.menuSelected, "GP_IMAGE_BROWSE", listIcon, "Browse Photos", "")
 	end if
 	

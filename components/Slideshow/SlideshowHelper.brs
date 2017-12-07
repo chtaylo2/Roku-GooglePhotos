@@ -3,6 +3,57 @@
 ' Since ROKU doesn't support global functions, the following must be added to each XML file where needed
 ' <script type="text/brightscript" uri="pkg:/components/Utils/SlideshowHelper.brs" />
 
+
+'*********************************************************
+'**
+'** OAUTH HANDLERS
+'**
+'*********************************************************
+
+Function handleRefreshToken(event as object)
+    print "SlideshowHelper.brs [handleRefreshToken]"
+
+    refreshData = m.UriHandler.refreshToken
+        
+    if refreshData <> invalid
+        json = ParseJson(refreshData.content)
+        if json = invalid
+            m.errorMsg = "Unable to parse Json response"
+            status = 1
+        else if type(json) <> "roAssociativeArray"
+            m.errorMsg = "Json response is not an associative array"
+            status = -1
+        else if json.DoesExist("error")
+            m.errorMsg = "Json error response: " + json.error
+            status = 1
+        else
+            
+            ' We have our tokens
+            m.accessToken[m.global.selectedUser]  = getString(json,"access_token")
+            m.tokenType                           = getString(json,"token_type")
+            m.tokenExpiresIn                      = getInteger(json,"expires_in")
+            refreshToken                          = getString(json,"refresh_token")
+            if refreshToken <> ""
+                m.refreshToken[m.global.selectedUser] = refreshToken
+            end if
+
+            'Query User info
+            'status = m.RequestUserInfo(m.accessToken.Count()-1, false)
+
+            if m.tokenType       = "" then m.errorMsg = "Missing token_type"      : status = 1
+            if m.tokenExpiresIn  = 0  then m.errorMsg = "Missing expires_in"      : status = 1
+
+            'Save cached values to registry
+            saveReg()                
+        end if   
+    end if
+	
+	'Yes - shouldnt default to this. only temporary.
+	doGetAlbumList()
+	
+End Function
+
+
 '*********************************************************
 '**
 '** ALBUM HANDLERS

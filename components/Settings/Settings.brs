@@ -44,17 +44,17 @@ sub setresolution()
 
     m.content = createObject("RoSGNode","ContentNode")
     
-    if regSelection = "0" then radioSelection = 0
-    addItem(m.content, "Standard Definition (SD)", "0", regStore)
+    if regSelection = "SD" then radioSelection = 0
+    addItem(m.content, "Standard Definition (SD)", "SD", regStore)
 
     if is4k Or is1080p then
-        if regSelection = "1" then radioSelection = 1
-        addItem(m.content, "High Definition (HD)", "1", regStore)
+        if regSelection = "HD" then radioSelection = 1
+        addItem(m.content, "High Definition (HD)", "HD", regStore)
     end if
     
     if is4k then
-        if regSelection = "2" then radioSelection = 2
-        addItem(m.content, "Full High Definition (FHD)", "2", regStore)
+        if regSelection = "FHD" then radioSelection = 2
+        addItem(m.content, "Full High Definition (FHD)", "FHD", regStore)
     end if
 
     'Store content node and current registry selection
