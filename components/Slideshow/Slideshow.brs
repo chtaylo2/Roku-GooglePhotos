@@ -2,12 +2,12 @@
 Sub init()
 				
 	m.PrimaryImage      = m.top.findNode("PrimaryImage")
-	m.imageLoader       = m.top.findNode("imageLoader")
-	m.RotationTimer     = m.top.findNode("RotationTimer")
-	m.DownloadTimer     = m.top.findNode("DownloadTimer")
+	m.BlendedImage      = m.top.findNode("BlendedImage")
 	m.FadeINAnimation   = m.top.findNode("FadeINAnimation")
 	m.FadeOUTAnimation  = m.top.findNode("FadeOUTAnimation")
-	m.BackgroundImage   = m.top.findNode("Background")
+	m.RotationTimer     = m.top.findNode("RotationTimer")
+	m.DownloadTimer     = m.top.findNode("DownloadTimer")
+
 	
 	m.port = CreateObject("roMessagePort")
     device = CreateObject("roDeviceInfo")
@@ -157,7 +157,7 @@ Sub sendNextImage()
     print "NEXT IMAGE: "; nextID; " - "; url
 	
     m.PrimaryImage.uri = url
-	'm.BackgroundImage.uri = url
+	m.BlendedImage.uri = url
 	
 	
 	''''' THIS IS CRASHING THE ROKU...

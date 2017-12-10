@@ -13,6 +13,7 @@
    
    <children>
 
+	  <!-- Hide the primary screen -->
 	  <Rectangle
 		 id = "FadeBackground"
 		 color = "0x000000"
@@ -20,27 +21,39 @@
          width = "1280"
          opacity = "1" />
 
-	  <!-- For transition animation -->
+	  <!-- Create the blended in background -->
 	  <Poster
-		 id = "Background"
-		 width = "1280"
+		 id = "BlendedImage"
+		 loadWidth = "10.24"
+		 loadHeight = "5.76"
+		 loadDisplayMode = "scaleToFill"
 		 height = "720"
+		 width = "1280" />
+	  
+	  <!-- Create some opacity between main image -->
+	  <Rectangle
+		 id = "ImageObscure"
 		 color = "0x000000"
-		 opacity = "0.9" />
-	
+         height = "720"
+         width = "1280"
+         opacity = ".3" />
+	  
+	  <!-- Primary Image -->
 	  <Poster 
 		 id = "PrimaryImage"
 		 loadWidth = "0.0"
 		 loadHeight = "0.0"
 		 loadDisplayMode = "scaleToFit" />
-		 
+	  
+	  <!-- Fading foreground effect -->
 	  <Rectangle
 		 id = "FadeForeground"
 		 color = "0x000000"
 		 height = "720"
 		 width = "1280"
 		 opacity = "0" />		 
-    	    
+
+	  <!-- Fading OUT Animation -->    	    
 	  <Animation
 		 id = "FadeOUTAnimation"
 		 repeat = "false"
@@ -54,7 +67,8 @@
 			fieldToInterp = "FadeForeground.opacity" />
 
 	  </Animation>
-    
+
+	  <!-- Fading IN Animation -->
 	  <Animation
 		 id = "FadeINAnimation"
 		 repeat = "false"
@@ -68,7 +82,8 @@
 			fieldToInterp = "FadeForeground.opacity" />
 
 	  </Animation>
-	  	
+
+	  <!-- Required Timers -->
 	  <Timer
 		 id="RotationTimer"
 		 duration="5" />

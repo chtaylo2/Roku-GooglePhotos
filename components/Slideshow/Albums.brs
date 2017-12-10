@@ -8,13 +8,22 @@ Sub init()
     m.albummarkupgrid = m.top.findNode("albumGrid")
 	m.itemLabelMain1  = m.top.findNode("itemLabelMain1")
 	m.itemLabelMain2  = m.top.findNode("itemLabelMain2")
+	m.settingsIcon    = m.top.findNode("settingsIcon")
+	
+	m.albumPageList   = m.top.findNode("albumPageList")
+	m.albumPageThumb  = m.top.findNode("albumPageThumb")
+	m.albumPageInfo1  = m.top.findNode("albumPageInfo1")
+	m.albumPageInfo2  = m.top.findNode("albumPageInfo2")
 
 	m.content = createObject("RoSGNode","ContentNode")
 	
     'Load common variables
     loadCommon()
 	
+	'Load registration variables
 	loadReg()
+	
+	'Focus album list
 	doGetAlbumList()
 	
 End Sub
@@ -49,7 +58,7 @@ Sub doGetAlbumImages(album As Object, index=0 as Integer)
 End Sub
 
 
-sub doRefreshToken()
+Sub doRefreshToken()
     print "Albums.brs [doRefreshToken]"
 
     params = "client_id="                  + m.clientId
@@ -58,7 +67,7 @@ sub doRefreshToken()
     params = params + "&grant_type="       + "refresh_token"
 
     makeRequest({}, m.oauth_prefix+"/token", "POST", params, 2)
-end sub
+End Sub
 
 
 Sub handleGetAlbumList(event as object)
@@ -105,6 +114,7 @@ Sub onItemFocused()
     'Item focused
     focusedItem = m.albummarkupgrid.content.getChild(m.albummarkupgrid.itemFocused)
     m.itemLabelMain1.text = focusedItem.shortdescriptionline1
+	m.itemLabelMain2.text = focusedItem.shortdescriptionline2
 End Sub
 
 
@@ -114,9 +124,17 @@ Sub onItemSelected()
 
 	selection = m.albummarkupgrid.content.getChild(m.albummarkupgrid.itemSelected)
 	
-	'I wish brightscript supported case statements!
 	if selection.id = "GP_ALBUM_LISTING" then
-		googleAlbumPages(m.albumsObject[m.albummarkupgrid.itemSelected])
+		album = m.albumsObject[m.albummarkupgrid.itemSelected]
+	
+		if album.GetImageCount() > 1000 then
+			'lastPopup = RegRead("ThousandPopup","Settings")
+			'if lastPopup=invalid then googlephotos_thousandpopup()
+			googleAlbumPages(album)
+		else
+			doGetAlbumImages(album)
+		end if
+		
 	else if selection.id = "GP_SLIDESHOW_START" then 
 		print "START SHOW"
 		m.screenActive = createObject("roSGNode", "Slideshow")
@@ -135,6 +153,7 @@ End Sub
 Sub addItem(store as object, id as string, hdgridposterurl as string, shortdescriptionline1 as string, shortdescriptionline2 as string)
     item = store.createChild("ContentNode")
 	item.id = id
+	item.title = shortdescriptionline1
     item.hdgridposterurl = hdgridposterurl
     item.shortdescriptionline1 = shortdescriptionline1
 	item.shortdescriptionline2 = shortdescriptionline2
@@ -157,18 +176,64 @@ End Sub
 
 
 Sub googleAlbumPages(album As Object)
-    if album.GetImageCount() > 1000 then
-		'lastPopup = RegRead("ThousandPopup","Settings")
-        'if lastPopup=invalid then googlephotos_thousandpopup()
-	    'googlephotos_browse_pages(album)
-	else
-        doGetAlbumImages(album)
-	end if
+	
+	m.albumPages = createObject("RoSGNode","ContentNode")
+	totalPages   = album.GetImageCount() / 1000
+	currentCount = album.GetImageCount()
+	page_start   = 0
+	page_end     = 0
+	title        = album.GetTitle()
+	thumb        = album.GetThumb()
+	
+    for i = 1 to ceiling(totalPages)
+		page_start = 1 + page_end
+		if currentCount > 1000 then
+			page_end=page_end + 1000
+			currentCount = currentCount - 1000
+		else
+			page_end=page_end + currentCount
+		end if
+		
+		page_start_dply = str(page_start)
+		page_start_dply = page_start_dply.Replace(" ", "")
+        page_end_dply   = str(page_end)
+        page_end_dply   = page_end_dply.Replace(" ", "")
+		
+		addIt = ""
+		if i = 1 then
+			addIt = " - Newest"
+		end if
+		
+		addItem(m.albumPages, "GP_ALBUM_PAGES", thumb, "Media Page " + str(i) + addIt, "Items: "+page_start_dply+" thru "+page_end_dply)
+		
+    end for
+
+	m.albumPageList.content = m.albumPages
+	displayAlbumPages()
+	
+End Sub
+
+
+Sub onAlbumPageFocused()
+    'Item focused
+    focusedItem = m.albumPageList.content.getChild(m.albumPageList.itemFocused)
+    m.albumPageInfo2.text = focusedItem.shortdescriptionline2
+End Sub
+
+
+Sub onAlbumPageSelected()
+    'Item selected
+    print "SELECTED: "; m.albumPageList.itemSelected
+	
+	album = m.albumsObject[m.albummarkupgrid.itemSelected]
+	doGetAlbumImages(album, m.albumPageList.itemSelected)
 End Sub
 
 
 Sub googleDisplayImageMenu(album As Object, imageList As Object)
 	print "Albums.brs - [googleDisplayImageMenu]"
+	
+	displayAlbum()
 	
 	m.menuSelected = createObject("RoSGNode","ContentNode")
 	title          = album.GetTitle()
@@ -185,15 +250,16 @@ Sub googleDisplayImageMenu(album As Object, imageList As Object)
 		
 		if media.IsVideo() then
 			m.videosMetaData.Push(tmp)
-			print "VIDEO: "; tmp.url
+			'print "VIDEO: "; tmp.url
 		else
 			m.imagesMetaData.Push(tmp)
-			print "IMAGE: "; tmp.url
+			'print "IMAGE: "; tmp.url
 		end if
 	end for
     
 	pagesShow  = ""
 	if totalPages > 1 then
+		index = m.albumPageList.itemSelected
 		currentPage = str(index + 1)
 		currentPage = currentPage.Replace(" ", "")
 		totalPages  = str(totalPages)
@@ -227,6 +293,34 @@ Sub centerMarkupBox()
 	centerx = (1280 - markupRectAlbum.width) / 2
 
 	m.albummarkupgrid.translation = [ centerx+18, 240 ]
+End Sub
+
+
+Sub displayAlbum()
+	m.albummarkupgrid.visible = true
+	m.itemLabelMain1.visible = true
+	m.itemLabelMain2.visible = true
+	m.settingsIcon = false
+	m.albumPageList.visible = false
+	
+	m.albummarkupgrid.setFocus(true)
+	
+End Sub
+
+
+Sub displayAlbumPages()
+	m.albumPageList.visible = true
+	m.albummarkupgrid.visible = false
+	m.itemLabelMain1.visible = false
+	m.itemLabelMain2.visible = false
+	m.settingsIcon = false
+	
+	m.albumPageList.setFocus(true)
+	
+	'Watch for events
+	m.albumPageList.observeField("itemFocused", "onAlbumPageFocused") 
+    m.albumPageList.observeField("itemSelected", "onAlbumPageSelected")
+	
 End Sub
 
 
