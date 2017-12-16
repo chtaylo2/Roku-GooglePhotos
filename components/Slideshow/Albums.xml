@@ -45,7 +45,8 @@
 		 width="60"
 		 height="60"
 		 translation="[1180, 630]"
-		 uri = "pkg:/images/gear.png" />
+		 uri = "pkg:/images/gear.png"
+		 visible = "false" />
 
 	  <LabelList
 		 id = "albumPageList"
@@ -60,8 +61,7 @@
 			loadwidth="250"
 			width="250"
 			translation = "[ 525, 20 ]"
-			loadDisplayMode = "scaleTofit"
-			uri = "https://lh3.googleusercontent.com/-Jc_H61ldBqw/WiYkI7_xadI/AAAAAAAAJyA/EObcwJ_FT10QTFKtfPRFD5wP4LIGu5UvACHMYBhgL/s1280/CRUISE%2521%2521%2B019.JPG" />
+			loadDisplayMode = "scaleTofit" />
 
 		 <Label 
 			id = "albumPageInfo1" 

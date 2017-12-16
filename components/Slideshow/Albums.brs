@@ -209,6 +209,7 @@ Sub googleAlbumPages(album As Object)
     end for
 
 	m.albumPageList.content = m.albumPages
+	m.albumPageThumb.uri    = thumb
 	displayAlbumPages()
 	
 End Sub
@@ -282,6 +283,8 @@ Sub googleDisplayImageMenu(album As Object, imageList As Object)
 	
 	m.itemLabelMain2.text = ""
 	m.albummarkupgrid.content = m.menuSelected
+	m.albummarkupgrid.jumpToItem = 0
+	m.settingsIcon.visible = true
 	
 	centerMarkupBox()
 End Sub
@@ -300,7 +303,7 @@ Sub displayAlbum()
 	m.albummarkupgrid.visible = true
 	m.itemLabelMain1.visible = true
 	m.itemLabelMain2.visible = true
-	m.settingsIcon = false
+	m.settingsIcon.visible = false
 	m.albumPageList.visible = false
 	
 	m.albummarkupgrid.setFocus(true)
@@ -313,7 +316,7 @@ Sub displayAlbumPages()
 	m.albummarkupgrid.visible = false
 	m.itemLabelMain1.visible = false
 	m.itemLabelMain2.visible = false
-	m.settingsIcon = false
+	m.settingsIcon.visible = false
 	
 	m.albumPageList.setFocus(true)
 	
