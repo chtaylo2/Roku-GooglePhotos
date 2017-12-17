@@ -133,6 +133,8 @@ sub processResponse(msg as Object)
 				parseGenToken(job)
 			else if result.num = 1
 				parseAuthCheck(job)
+			else if result.num = 2
+				parseUserInfo(job)
 			end if
 		else
 			print "Error: status code was: " + (msg.GetResponseCode()).toStr()
@@ -155,4 +157,11 @@ sub parseAuthCheck(job as object)
     print "UrlHandler.brs - [parseAuthCheck]"
     result = job.context.context.response
 	m.top.poll_token_response = result	
+end sub
+
+
+sub parseUserInfo(job as object)
+    print "UrlHandler.brs - [parseUserInfo]"
+    result = job.context.context.response
+	m.top.userinfo_response = result	
 end sub

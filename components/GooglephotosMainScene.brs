@@ -2,7 +2,7 @@
 sub init()
     'Set scene properties
     m.top.backgroundURI   = ""
-    m.top.backgroundColor = "#EBEBEB"     
+    m.top.backgroundColor = "#EBEBEB"
       
     m.top.setFocus(true)
     

@@ -362,3 +362,28 @@ Function getInteger(json As Dynamic,fieldName As String,defaultValue=0 As Intege
       end if
       return returnValue
 End Function
+
+
+'******************************************************
+'Replace special charactors in string
+'******************************************************
+Function strReplaceSpecial(basestr As String) As String
+      newstr = basestr
+      newstr = newstr.Replace("'", "")
+      newstr = newstr.Replace(",", "")
+      newstr = newstr.Replace("<", "")
+      newstr = newstr.Replace(">", "")
+      newstr = newstr.Replace("$", "")
+      newstr = newstr.Replace("*", "")
+      newstr = newstr.Replace("#", "")
+      newstr = newstr.Replace("!", "")
+      newstr = newstr.Replace("%", "")
+      newstr = newstr.Replace("^", "")
+      newstr = newstr.Replace("&", "")
+      newstr = newstr.Replace("\", "")
+      newstr = newstr.Replace("|", "")
+      newstr = newstr.Replace("/", "")
+      newstr = newstr.Replace("?", "")
+      
+      return newstr
+End Function

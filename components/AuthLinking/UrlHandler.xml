@@ -5,6 +5,7 @@
   	<field id="request" type="assocarray"/>
     <field id="gen_token_response" type="assocarray" alwaysNotify="true"/>
     <field id="poll_token_response" type="assocarray" alwaysNotify="true"/>
+	<field id="userinfo_response" type="assocarray" alwaysNotify="true"/>
   </interface>
 
   <script type="text/brightscript" uri="pkg:/components/AuthLinking/UrlHandler.brs"/>

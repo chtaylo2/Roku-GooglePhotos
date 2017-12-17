@@ -39,6 +39,15 @@ sub doGenerateToken()
 end sub
 
 
+sub doQueryUserInfo()
+    print "Registration.brs [doQueryUserInfo]"
+
+    m.UriHandler.observeField("userinfo_response","onStoreUser")
+    userIndex = m.accessToken.Count()-1
+    makeRequest({}, "https://www.googleapis.com/oauth2/v3/userinfo?access_token="+m.accessToken[userIndex], "GET", "", 2)
+end sub
+
+
 sub onNewToken(event as object)
     print "Registration.brs [onNewToken]"
   
@@ -78,7 +87,7 @@ end sub
 sub onCheckAuth(event as object)
     print "Registration.brs [onCheckAuth]"
     status = -1   ' 0 => Finished (got tokens), < 0 => Retry needed, > 0 => fatal error
-    
+        
     pollData = m.UriHandler.poll_token_response
         
     if pollData <> invalid
@@ -103,29 +112,22 @@ sub onCheckAuth(event as object)
             'Stop the polling
             status = 0
             
+            'Stop watching for field changes
+            m.UriHandler.unobserveField("gen_token_response")
+            m.LoginTimer.unobserveField("fire")
+            
             ' We have our tokens    
             m.accessToken.Push(getString(json,"access_token"))
             m.refreshToken.Push(getString(json,"refresh_token"))
-            m.userInfoName.Push("Test User")
-            m.userInfoEmail.Push("some_account@gmail.com")
-            m.userInfoPhoto.Push("test")
             m.tokenType          = getString(json,"token_type")
             m.tokenExpiresIn     = getInteger(json,"expires_in")
 
             'Query User info
+            doQueryUserInfo()
             'status = m.RequestUserInfo(m.accessToken.Count()-1, false)
 
-            if m.tokenType       = "" then m.errorMsg = "Missing token_type"      : status = 1
-            if m.tokenExpiresIn  = 0  then m.errorMsg = "Missing expires_in"      : status = 1
-
-            'Save cached values to registry
-            saveReg()
-            
-            m.Row1.text = ""  
-            m.Row2.text = "Successfully Linked Account!"
-            m.Row3.text = "You have successfully linked this Roku device to your Google Photos account"
-            m.Row4.text = ""
-            m.Row5.text = ""
+            'if m.tokenType       = "" then m.errorMsg = "Missing token_type"      : status = 1
+            'if m.tokenExpiresIn  = 0  then m.errorMsg = "Missing expires_in"      : status = 1
                 
         end if   
     end if
@@ -143,5 +145,76 @@ sub onCheckAuth(event as object)
 
         m.LoginTimer.repeat = true
         m.LoginTimer.control = "start"
+    end if
+end sub
+
+
+sub onStoreUser(event as object)
+    print "Registration.brs [onCheckAuth]"
+    status = -1   ' 0 => Finished (got tokens), < 0 => Retry needed, > 0 => fatal error
+        
+    userData = m.UriHandler.userinfo_response
+    isrefresh = false
+    
+    if userData <> invalid
+        json = ParseJson(userData.content)
+        if json = invalid
+            m.errorMsg = "Unable to parse Json response"
+            status = 1
+        else if type(json) <> "roAssociativeArray"
+            m.errorMsg = "Json response is not an associative array"
+            status = -1
+        else if json.DoesExist("error")
+            m.errorMsg = "Json error response: " + json.error
+            status = 1
+        else
+            infoName  = getString(json,"name")
+            infoEmail = getString(json,"email")
+            infoPhoto = getString(json,"picture")
+
+            'Special Charactor management
+            infoName  = infoName.Replace(".", "")
+            infoName  = strReplaceSpecial(infoName)
+            infoEmail = strReplaceSpecial(infoEmail)
+
+            if infoName  = "" then infoName  = "Google Photos User"
+            if infoEmail = "" then infoName  = "No email on file"
+            if infoPhoto = "" then infoPhoto = "pkg:/images/userdefault.png"
+            
+            if isrefresh = true then
+                m.userInfoName[m.global.selectedUser]  = infoName
+                m.userInfoEmail[m.global.selectedUser] = infoEmail
+                m.userInfoPhoto[m.global.selectedUser] = infoPhoto
+            else
+            
+                if infoEmail <> "No email on file" then
+                    for i = 0 to m.userInfoEmail.Count()-1
+                        if m.userInfoEmail[i] = infoEmail then
+                            m.accessToken.Pop()
+                            m.refreshToken.Pop()
+                            'ShowDialog1Button("Notice", "Account '"+infoEmail+"' already linked to device", "OK")
+                        end if
+                    end for
+                end if
+            
+                m.userInfoName.Push(infoName)
+                m.userInfoEmail.Push(infoEmail)
+                m.userInfoPhoto.Push(infoPhoto)
+            end if
+            
+            if infoEmail = "" then m.errorMsg = "Missing User Data (Email)" : status = 1
+            if infoName  = "" then m.errorMsg = "Missing User Data (Name)" : status = 1
+            if infoPhoto = "" then m.errorMsg = "Missing User Data (Photo" : status = 1       
+
+            'Save cached values to registry
+            saveReg()
+            
+            m.Row1.text = ""  
+            m.Row2.text = "Successfully Linked Account!"
+            m.Row3.text = "You have successfully linked this Roku device to your Google Photos account"
+            m.Row4.text = ""
+            m.Row5.text = ""
+                
+        end if   
     end if
 end sub

@@ -26,7 +26,7 @@ sub showmarkupgrid()
 
     for i = 0 to usersLoaded-1
         print "User: "; m.userInfoName[i]
-        addItem(m.content, "pkg:/images/userdefault.png", m.userInfoName[i], m.userInfoEmail[i])
+        addItem(m.content,  m.userInfoPhoto[i], m.userInfoName[i], m.userInfoEmail[i])
     end for
     
     'Populate grid content
