@@ -83,6 +83,38 @@
 
 	  </Animation>
 
+	  <!-- Used to display pause screen -->
+	  <Rectangle
+		 id = "PauseScreen"
+		 color = "0x000000"
+         height = "150"
+         width = "1280"
+		 translation="[0,520]"
+         opacity = ".7"
+		 visible = "false" >
+		 
+		 <Label 
+			id = "pauseImageCount" 
+			height = "150" 
+			width = "1200"
+			horizAlign = "right"
+			vertAlign = "top"
+			color="#eaeaea"
+			font="font:SmallSystemFont"
+			translation = "[ 0, 15 ]" />
+		 
+		 <Label 
+			id = "pauseImageDetail" 
+			height = "150" 
+			width = "1280"
+			horizAlign = "center"
+			vertAlign = "center"
+			color="#eaeaea"
+			font="font:MediumSystemFont"
+			translation = "[ 0, 0 ]" />
+	  
+	  </Rectangle>
+
 	  <!-- Required Timers -->
 	  <Timer
 		 id="RotationTimer"

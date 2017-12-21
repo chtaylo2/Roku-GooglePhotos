@@ -126,6 +126,7 @@ Sub onItemSelected()
 	
 	if selection.id = "GP_ALBUM_LISTING" then
 		album = m.albumsObject[m.albummarkupgrid.itemSelected]
+		m.albumName = album.GetTitle()
 	
 		if album.GetImageCount() > 1000 then
 			'lastPopup = RegRead("ThousandPopup","Settings")
@@ -144,8 +145,24 @@ Sub onItemSelected()
 		
 	else if selection.id = "GP_VIDEO_BROWSE" then
 		print "VIDEO BROWSE - NOT DONE YET"
+		
 	else if selection.id = "GP_IMAGE_BROWSE" then
-		print "IMAGE BROWSE - NOT DONE YET"
+		print "IMAGE BROWSE"
+		
+		m.imageList = createObject("RoSGNode","ContentNode")
+		for i = 0 to m.imagesMetaData.Count()-1
+			addItem(m.imageList, "GP_BROWSE", m.imagesMetaData[i].thumbnail, "", "")
+		end for
+		
+		m.screenActive = createObject("roSGNode", "Browse")
+		m.screenActive.albumName = m.albumName + "  -  " + itostr(m.imagesMetaData.Count()) + " Photos"
+		m.screenActive.content = m.imageList
+		m.top.appendChild(m.screenActive)
+		m.screenActive.setFocus(true)
+		m.albummarkupgrid.visible = false
+		m.settingsIcon.visible    = false
+		m.itemLabelMain1.visible  = false
+		m.itemLabelMain2.visible  = false
 	end if
 End Sub
 

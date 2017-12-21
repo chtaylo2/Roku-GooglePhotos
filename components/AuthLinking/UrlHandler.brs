@@ -122,8 +122,8 @@ sub processResponse(msg as Object)
 			content: msg.GetString(),
 			num:     jobnum
 		}
-		print "URL RESULT: ";  result
-		print "MSG: "; msg
+		'print "URL RESULT: ";  result
+		'print "MSG: "; msg
 	
 		' could handle various error codes, retry, etc. here
 		m.jobsById.delete(idKey)

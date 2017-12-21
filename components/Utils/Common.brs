@@ -365,6 +365,17 @@ End Function
 
 
 '******************************************************
+'Get friendly date output given seconds
+'******************************************************
+Function friendlyDate(seconds As Integer) As String
+      calcDate = CreateObject("roDateTime")
+      calcDate.FromSeconds(seconds)
+      showDate = calcDate.AsDateString("long-date")
+      return showDate
+End Function
+
+
+'******************************************************
 'Replace special charactors in string
 '******************************************************
 Function strReplaceSpecial(basestr As String) As String

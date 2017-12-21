@@ -1,0 +1,41 @@
+<?xml version = "1.0" encoding = "utf-8" ?> 
+
+<component name = "Browse" extends = "Group" initialFocus = "ImageGrid" >
+
+   <interface>
+	  <field id = "albumName" type = "string" />
+	  <field id = "content" type = "node" />
+   </interface>
+  
+   <script type = "text/brightscript" uri = "pkg:/components/SlideShow/Browse.brs" />
+   <script type = "text/brightscript" uri = "pkg:/components/SlideShow/SlideshowHelper.brs" />
+   <script type = "text/brightscript" uri = "pkg:/components/Utils/Common.brs" />
+   <script type = "text/brightscript" uri = "pkg:/components/Utils/private-git.brs" />
+   
+   <children>
+
+	  <Label
+		 id="itemLabelMain1"
+		 horizAlign = "left"
+		 vertAlign = "top"
+		 font="font:SmallBoldSystemFont"
+		 color="#808080"
+		 text = "860 Photos"
+		 translation="[100,160]" />
+	
+	  <PosterGrid
+		 id="ImageGrid"
+		 itemSpacing="[20, 20]"
+		 rowHeights="[150]"
+		 columnWidths="[200]"
+		 numColumns="5"
+		 numRows="3"
+		 useAtlas = "false"
+		 focusBitmapBlendColor = "#e8e8e8"
+		 basePosterSize = "[200,150]"
+		 posterDisplayMode = "scaleToFit"
+		 translation="[100, 200]" />
+		 
+   </children>
+
+</component>

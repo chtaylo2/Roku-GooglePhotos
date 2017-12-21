@@ -6,6 +6,9 @@ Sub init()
 	 m.FadeForeground    = m.top.findNode("FadeForeground")
 	 m.FadeINAnimation   = m.top.findNode("FadeINAnimation")
 	 m.FadeOUTAnimation  = m.top.findNode("FadeOUTAnimation")
+	 m.PauseScreen       = m.top.findNode("PauseScreen")
+	 m.pauseImageCount   = m.top.findNode("pauseImageCount")
+	 m.pauseImageDetail  = m.top.findNode("pauseImageDetail")
 	 m.RotationTimer     = m.top.findNode("RotationTimer")
 	 m.DownloadTimer     = m.top.findNode("DownloadTimer")
 
@@ -66,7 +69,7 @@ sub loadImageList()
 		     nxt = originalList.Count()-1
          end if
 		 
-		 print "NEXT: "; nxt
+		 print "NEXT: "; originalList[nxt]
          m.imageDisplay.push(originalList[nxt])
  		 originalList.Delete(nxt)
 	 end for
@@ -179,6 +182,8 @@ Sub sendNextImage()
 	    m.BlendedImage.uri = url
 	end if
 	
+	m.pauseImageCount.text  = itostr(nextID+1)+" of "+itostr(m.imageDisplay.Count())
+    m.pauseImageDetail.text = friendlyDate(strtoi(m.imageDisplay[nextID].timestamp))
 	
 	''''' THIS IS CRASHING THE ROKU...
     'Delete cached images after display completed
@@ -208,21 +213,24 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
     if press then
 	    print "KEY: "; key
 		print "CONTROL: "; m.RotationTimer.control
-        if key = "right"
+        if key = "right" or key = "fastforward"
+            print "RIGHT"
             onRotationTigger({})
 			m.RotationTimer.control = "stop"
+			m.PauseScreen.visible = "true"
             return true
-        else if key = "left"
+        else if key = "left" or key = "rewind"
+            print "LEFT"
             return true
         else if (key = "play" or key = "OK") and m.RotationTimer.control = "start"
-		    print "PAUSE"
-		    'PAUSE
+			print "PAUSE"
             m.RotationTimer.control = "stop"
+			m.PauseScreen.visible = "true"
             return true
         else if (key = "play" or key = "OK") and m.RotationTimer.control = "stop"
 		    print "PLAY"
-		    'PLAY
             m.RotationTimer.control = "start"
+			m.PauseScreen.visible = "false"
             return true  
         end if
     end if
