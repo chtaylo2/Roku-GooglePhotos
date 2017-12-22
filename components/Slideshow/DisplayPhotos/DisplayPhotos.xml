@@ -1,13 +1,13 @@
 <?xml version = "1.0" encoding = "utf-8" ?> 
 
-<component name = "Slideshow" extends = "Group" >
+<component name = "DisplayPhotos" extends = "Group" >
 
    <interface>
 	  <field id = "content" type = "array" />
 	  <field id = "startPhoto" type = "string" />
    </interface>
   
-   <script type = "text/brightscript" uri = "pkg:/components/SlideShow/Slideshow.brs" />
+   <script type = "text/brightscript" uri = "pkg:/components/SlideShow/DisplayPhotos/DisplayPhotos.brs" />
    <script type = "text/brightscript" uri = "pkg:/components/SlideShow/SlideshowHelper.brs" />
    <script type = "text/brightscript" uri = "pkg:/components/Utils/Common.brs" />
    <script type = "text/brightscript" uri = "pkg:/components/Utils/private-git.brs" />

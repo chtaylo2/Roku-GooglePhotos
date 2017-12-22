@@ -52,7 +52,7 @@ End Sub
 
 
 sub loadImageList()
-     print "Slideshow.brs [loadImageList]"
+     print "DisplayPhotos.brs [loadImageList]"
 	
      'Copy original list since we can't change origin
      originalList = m.top.content
@@ -96,7 +96,7 @@ End Sub
 
 
 Sub onRotationTigger(event as object)
-     print "Slideshow.brs [onRotationTigger]";
+     print "DisplayPhotos.brs [onRotationTigger]";
 	
     if m.showDisplay = "NoFading_YesBlur" or m.showDisplay = "NoFading_NoBlur" then
        m.FadeForeground.visible = false
@@ -108,7 +108,7 @@ End Sub
 
 
 Sub onDownloadTigger(event as object)
-    print "Slideshow.brs [onDownloadTigger]"
+    print "DisplayPhotos.brs [onDownloadTigger]"
 	
 	tmpDownload = []
 	
@@ -137,7 +137,7 @@ End Sub
 
 
 Sub processDownloads(event as object)
-    print "Slideshow.brs [processDownloads]"
+    print "DisplayPhotos.brs [processDownloads]"
 	
 	'Take newly downloaded images and add to our localImageStore array for tracking
 	response = event.getdata()
@@ -162,7 +162,7 @@ End Sub
 
 
 Sub onFadeOutTrigger(event as object)
-    print "Slideshow.brs [onFadeOutTrigger]"
+    print "DisplayPhotos.brs [onFadeOutTrigger]"
 	
     if event.getdata() = "stopped" then
 	    'FadeOUT has completed. Trigger next image load
@@ -172,7 +172,7 @@ End Sub
 
 
 Sub sendNextImage()
-    print "Slideshow.brs [sendNextImage]"
+    print "DisplayPhotos.brs [sendNextImage]"
 		
     'Get next image to display.
     nextID = GetNextImage(m.imageDisplay, m.imageTracker)

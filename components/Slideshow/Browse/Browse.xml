@@ -9,7 +9,7 @@
 	  <field id = "itemSelected" type = "node" alias = "ImageGrid.itemSelected" onChange = "onItemSelected" />
    </interface>
   
-   <script type = "text/brightscript" uri = "pkg:/components/SlideShow/Browse.brs" />
+   <script type = "text/brightscript" uri = "pkg:/components/SlideShow/Browse/Browse.brs" />
    
    <children>
 

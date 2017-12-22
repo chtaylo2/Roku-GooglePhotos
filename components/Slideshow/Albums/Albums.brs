@@ -138,7 +138,7 @@ Sub onItemSelected()
 		
 	else if selection.id = "GP_SLIDESHOW_START" then 
 		print "START SHOW"
-		m.screenActive = createObject("roSGNode", "Slideshow")
+		m.screenActive = createObject("roSGNode", "DisplayPhotos")
 		m.screenActive.content = m.imagesMetaData
 		m.screenActive.id = selection.id
 		m.top.appendChild(m.screenActive)

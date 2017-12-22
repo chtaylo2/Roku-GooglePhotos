@@ -2,7 +2,7 @@
 
 <component name="Photo UrlHandler" extends="Task">
   
-  <script type="text/brightscript" uri="pkg:/components/SlideShow/UrlHandler.brs"/>
+  <script type="text/brightscript" uri="pkg:/components/SlideShow/UrlHandler/UrlHandler.brs"/>
 	
   <interface>
   	<field id="request" type="assocarray"/>

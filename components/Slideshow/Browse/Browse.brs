@@ -25,7 +25,7 @@ Sub onItemSelected()
     'Item selected
     print "SELECTED: "; m.ImageGrid.itemSelected
 	
-	m.screenActive = createObject("roSGNode", "Slideshow")
+	m.screenActive = createObject("roSGNode", "DisplayPhotos")
 	m.screenActive.startPhoto = m.top.imagesMetaData[m.ImageGrid.itemSelected].url
 	m.screenActive.content = m.top.imagesMetaData
     m.top.appendChild(m.screenActive)
