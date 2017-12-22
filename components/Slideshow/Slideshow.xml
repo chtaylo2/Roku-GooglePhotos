@@ -4,6 +4,7 @@
 
    <interface>
 	  <field id = "content" type = "array" />
+	  <field id = "startPhoto" type = "string" />
    </interface>
   
    <script type = "text/brightscript" uri = "pkg:/components/SlideShow/Slideshow.brs" />
@@ -87,15 +88,15 @@
 	  <Rectangle
 		 id = "PauseScreen"
 		 color = "0x000000"
-         height = "150"
+         height = "100"
          width = "1280"
-		 translation="[0,520]"
+		 translation="[0,570]"
          opacity = ".7"
 		 visible = "false" >
 		 
 		 <Label 
 			id = "pauseImageCount" 
-			height = "150" 
+			height = "100" 
 			width = "1200"
 			horizAlign = "right"
 			vertAlign = "top"
@@ -105,7 +106,7 @@
 		 
 		 <Label 
 			id = "pauseImageDetail" 
-			height = "150" 
+			height = "100" 
 			width = "1280"
 			horizAlign = "center"
 			vertAlign = "center"

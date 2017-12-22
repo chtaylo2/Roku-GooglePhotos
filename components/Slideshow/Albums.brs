@@ -140,6 +140,7 @@ Sub onItemSelected()
 		print "START SHOW"
 		m.screenActive = createObject("roSGNode", "Slideshow")
 		m.screenActive.content = m.imagesMetaData
+		m.screenActive.id = selection.id
 		m.top.appendChild(m.screenActive)
 		m.screenActive.setFocus(true)
 		
@@ -149,14 +150,16 @@ Sub onItemSelected()
 	else if selection.id = "GP_IMAGE_BROWSE" then
 		print "IMAGE BROWSE"
 		
-		m.imageList = createObject("RoSGNode","ContentNode")
+		m.imageThumbList = createObject("RoSGNode","ContentNode")
 		for i = 0 to m.imagesMetaData.Count()-1
-			addItem(m.imageList, "GP_BROWSE", m.imagesMetaData[i].thumbnail, "", "")
+			addItem(m.imageThumbList, "GP_BROWSE", m.imagesMetaData[i].thumbnail, "", "")
 		end for
 		
 		m.screenActive = createObject("roSGNode", "Browse")
 		m.screenActive.albumName = m.albumName + "  -  " + itostr(m.imagesMetaData.Count()) + " Photos"
-		m.screenActive.content = m.imageList
+		m.screenActive.imagesMetaData = m.imagesMetaData
+		m.screenActive.content = m.imageThumbList
+		m.screenActive.id = selection.id
 		m.top.appendChild(m.screenActive)
 		m.screenActive.setFocus(true)
 		m.albummarkupgrid.visible = false
@@ -346,7 +349,14 @@ End Sub
 
 Function onKeyEvent(key as String, press as Boolean) as Boolean
     if press then
-        if key = "back"        
+        if key = "back"
+            if (m.screenActive <> invalid)
+                m.top.removeChild(m.screenActive)
+				displayAlbum()
+				m.screenActive = invalid
+				return true
+            end if		
+
             if (m.albummarkupgrid.content <> invalid) and (m.albummarkupgrid.content.getChild(0).id <> "GP_ALBUM_LISTING" )
 				m.albummarkupgrid.content = m.content
 				centerMarkupBox()

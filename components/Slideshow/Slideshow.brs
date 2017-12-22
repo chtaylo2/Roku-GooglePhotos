@@ -56,7 +56,7 @@ sub loadImageList()
 	
      'Copy original list since we can't change origin
      originalList = m.top.content
-	
+	 
      for i = 0 to m.top.content.Count()-1 
          if m.showOrder = "random" then
 		     'Create image display list - RANDOM
@@ -69,22 +69,34 @@ sub loadImageList()
 		     nxt = originalList.Count()-1
          end if
 		 
-		 print "NEXT: "; originalList[nxt]
-         m.imageDisplay.push(originalList[nxt])
- 		 originalList.Delete(nxt)
+		 'Track startPhoto if valid
+		 if m.top.startPhoto = originalList[nxt].url then
+			 m.imageDisplay.unshift(originalList[nxt])
+         else
+		     m.imageDisplay.push(originalList[nxt])
+		 end if
+		 
+         originalList.Delete(nxt)
+				 
 	 end for
 	
 	 'We have an image list. Start display
 	 onRotationTigger({})
 	 onDownloadTigger({})
-	
+	 
      m.RotationTimer.control = "start"
      m.DownloadTimer.control = "start"
+	 
+     'Trigger a PAUSE if photo selected
+     if m.top.startPhoto <> "" then
+	     onKeyEvent("OK", true)
+	 end if
+	 
 End Sub
 
 
 Sub onRotationTigger(event as object)
-     print "Slideshow.brs [onRotationTigger]"
+     print "Slideshow.brs [onRotationTigger]";
 	
     if m.showDisplay = "NoFading_YesBlur" or m.showDisplay = "NoFading_NoBlur" then
        m.FadeForeground.visible = false
@@ -212,12 +224,12 @@ End Function
 Function onKeyEvent(key as String, press as Boolean) as Boolean
     if press then
 	    print "KEY: "; key
-		print "CONTROL: "; m.RotationTimer.control
         if key = "right" or key = "fastforward"
             print "RIGHT"
             onRotationTigger({})
 			m.RotationTimer.control = "stop"
-			m.PauseScreen.visible = "true"
+			m.DownloadTimer.control = "stop"
+			m.PauseScreen.visible   = "true"
             return true
         else if key = "left" or key = "rewind"
             print "LEFT"
@@ -225,13 +237,24 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
         else if (key = "play" or key = "OK") and m.RotationTimer.control = "start"
 			print "PAUSE"
             m.RotationTimer.control = "stop"
-			m.PauseScreen.visible = "true"
+			m.DownloadTimer.control = "stop"
+			m.PauseScreen.visible   = "true"
             return true
         else if (key = "play" or key = "OK") and m.RotationTimer.control = "stop"
 		    print "PLAY"
+			onRotationTigger({})
             m.RotationTimer.control = "start"
-			m.PauseScreen.visible = "false"
-            return true  
+			m.DownloadTimer.control = "start"
+			m.PauseScreen.visible   = "false"
+            return true
+        else if (key = "options") and m.PauseScreen.visible = false
+			print "OPTIONS - SHOW"
+			m.PauseScreen.visible   = "true"
+            return true
+        else if (key = "options") and m.PauseScreen.visible = true
+			print "OPTIONS - HIDE"
+			m.PauseScreen.visible   = "false"
+            return true
         end if
     end if
 

@@ -5,12 +5,11 @@
    <interface>
 	  <field id = "albumName" type = "string" />
 	  <field id = "content" type = "node" />
+	  <field id = "imagesMetaData" type = "array" />
+	  <field id = "itemSelected" type = "node" alias = "ImageGrid.itemSelected" onChange = "onItemSelected" />
    </interface>
   
    <script type = "text/brightscript" uri = "pkg:/components/SlideShow/Browse.brs" />
-   <script type = "text/brightscript" uri = "pkg:/components/SlideShow/SlideshowHelper.brs" />
-   <script type = "text/brightscript" uri = "pkg:/components/Utils/Common.brs" />
-   <script type = "text/brightscript" uri = "pkg:/components/Utils/private-git.brs" />
    
    <children>
 
@@ -20,7 +19,6 @@
 		 vertAlign = "top"
 		 font="font:SmallBoldSystemFont"
 		 color="#808080"
-		 text = "860 Photos"
 		 translation="[100,160]" />
 	
 	  <PosterGrid
