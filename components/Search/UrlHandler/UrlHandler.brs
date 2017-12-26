@@ -1,14 +1,14 @@
 
-sub init()
+Sub init()
 	print "UrlHandler.brs - [init]"
 	m.port = createObject("roMessagePort")
 	m.top.observeField("request", m.port)
 	m.top.functionName = "go"
 	m.top.control = "RUN"
-end sub
+End Sub
 
 
-sub go()
+Sub go()
 	print "UrlHandler.brs - [go]"
 	' Holds requests by id
 	m.jobsById = {}
@@ -39,7 +39,8 @@ sub go()
 		end if
   end while
   
-end sub
+End Sub
+
 
 Function addRequest(request as Object) as Boolean
 	print "UrlHandler.brs - [addRequest]"
@@ -106,7 +107,7 @@ Function addRequest(request as Object) as Boolean
 	return true
 End Function
 
-sub processResponse(msg as Object)
+Sub processResponse(msg as Object)
 	print "UrlHandler.brs - [processResponse]"
 	idKey = stri(msg.GetSourceIdentity()).trim()
 	job = m.jobsById[idKey]
@@ -128,13 +129,13 @@ sub processResponse(msg as Object)
 		' could handle various error codes, retry, etc. here
 		m.jobsById.delete(idKey)
 		job.context.context.response = result
-		if msg.GetResponseCode() = 200
+		if (msg.GetResponseCode() = 200) or (msg.GetResponseCode() = 403)
 			if result.num = 0
-				parseGenToken(job)
+				m.top.albumList = job.context.context.response
 			else if result.num = 1
-				parseAuthCheck(job)
+				m.top.albumImages = job.context.context.response
 			else if result.num = 2
-				parseUserInfo(job)
+				m.top.refreshToken = job.context.context.response
 			end if
 		else
 			print "Error: status code was: " + (msg.GetResponseCode()).toStr()
@@ -143,25 +144,11 @@ sub processResponse(msg as Object)
 		print "Error: event for unknown job "; idkey
 	end if
 	print "--------------------------------------------------------------------------"
-end sub
+End Sub
 
 
-sub parseGenToken(job as object)
+Sub provideResponse(job as object)
     print "UrlHandler.brs - [parseGenToken]"
     result = job.context.context.response
-    m.top.gen_token_response = result
-end sub
-
-
-sub parseAuthCheck(job as object)
-    print "UrlHandler.brs - [parseAuthCheck]"
-    result = job.context.context.response
-	m.top.poll_token_response = result	
-end sub
-
-
-sub parseUserInfo(job as object)
-    print "UrlHandler.brs - [parseUserInfo]"
-    result = job.context.context.response
-	m.top.userinfo_response = result	
-end sub
+    m.top.response = result
+End Sub

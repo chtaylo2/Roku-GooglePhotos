@@ -1,14 +1,14 @@
 
-sub init()
+Sub init()
 	print "UrlHandler.brs - [init]"
 	m.port = createObject("roMessagePort")
 	m.top.observeField("request", m.port)
 	m.top.functionName = "go"
 	m.top.control = "RUN"
-end sub
+End Sub
 
 
-sub go()
+Sub go()
 	print "UrlHandler.brs - [go]"
 	' Holds requests by id
 	m.jobsById = {}
@@ -39,7 +39,8 @@ sub go()
 		end if
   end while
   
-end sub
+End Sub
+
 
 Function addRequest(request as Object) as Boolean
 	print "UrlHandler.brs - [addRequest]"
@@ -106,7 +107,7 @@ Function addRequest(request as Object) as Boolean
 	return true
 End Function
 
-sub processResponse(msg as Object)
+Sub processResponse(msg as Object)
 	print "UrlHandler.brs - [processResponse]"
 	idKey = stri(msg.GetSourceIdentity()).trim()
 	job = m.jobsById[idKey]
@@ -143,11 +144,11 @@ sub processResponse(msg as Object)
 		print "Error: event for unknown job "; idkey
 	end if
 	print "--------------------------------------------------------------------------"
-end sub
+End Sub
 
 
-sub provideResponse(job as object)
+Sub provideResponse(job as object)
     print "UrlHandler.brs - [parseGenToken]"
     result = job.context.context.response
     m.top.response = result
-end sub
+End Sub

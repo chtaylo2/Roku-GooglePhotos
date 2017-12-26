@@ -2,38 +2,40 @@
 
 <component name = "Browse" extends = "Group" initialFocus = "ImageGrid" >
 
-   <interface>
-	  <field id = "albumName" type = "string" />
-	  <field id = "content" type = "node" />
-	  <field id = "imagesMetaData" type = "array" />
-	  <field id = "itemSelected" type = "node" alias = "ImageGrid.itemSelected" onChange = "onItemSelected" />
-   </interface>
+    <interface>
+        <field id = "id" type = "string" />
+        <field id = "albumName" type = "string" />
+        <field id = "content" type = "node" />
+        <field id = "metaData" type = "array" />
+        <field id = "itemSelected" type = "node" alias = "ImageGrid.itemSelected" onChange = "onItemSelected" />
+    </interface>
   
-   <script type = "text/brightscript" uri = "pkg:/components/SlideShow/Browse/Browse.brs" />
+    <script type = "text/brightscript" uri = "pkg:/components/SlideShow/Browse/Browse.brs" />
    
-   <children>
+    <children>
 
-	  <Label
-		 id="itemLabelMain1"
-		 horizAlign = "left"
-		 vertAlign = "top"
-		 font="font:SmallBoldSystemFont"
-		 color="#808080"
-		 translation="[100,160]" />
-	
-	  <PosterGrid
-		 id="ImageGrid"
-		 itemSpacing="[20, 20]"
-		 rowHeights="[150]"
-		 columnWidths="[200]"
-		 numColumns="5"
-		 numRows="3"
-		 useAtlas = "false"
-		 focusBitmapBlendColor = "#e8e8e8"
-		 basePosterSize = "[200,150]"
-		 posterDisplayMode = "scaleToFit"
-		 translation="[100, 200]" />
-		 
-   </children>
-
+        <Label
+           id          = "itemLabelMain1"
+           horizAlign  = "left"
+           vertAlign   = "top"
+           font        = "font:SmallBoldSystemFont"
+           color       = "#808080"
+           translation = "[100,160]"
+        />
+    
+        <PosterGrid
+            id                    = "ImageGrid"
+            itemSpacing           = "[20, 20]"
+            rowHeights            = "[150]"
+            columnWidths          = "[200]"
+            numColumns            = "5"
+            numRows               = "3"
+            useAtlas              = "false"
+            focusBitmapBlendColor = "#e8e8e8"
+            basePosterSize        = "[200,150]"
+            posterDisplayMode     = "scaleToFit"
+            translation           = "[100, 200]"
+        />
+         
+    </children>
 </component>

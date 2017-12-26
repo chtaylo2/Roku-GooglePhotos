@@ -2,75 +2,78 @@
 
 <component name = "Settings" extends = "Group" initialFocus = "settingsLabelList" >
 
-  <interface>
-    <field id = "itemFocused" type = "node" alias = "settingsLabelList.itemFocused" onChange = "showfocus" />
-    <field id = "itemSelected" type = "node" alias = "settingsLabelList.itemSelected" onChange = "showselected" />
-    <field id = "itemSubSelected" type = "node" alias = "settingSubList.itemSelected" onChange = "showsubselected" />
-    <field id = "itemPinEntered" type = "node" alias = "pinPad.pin" onChange = "processPinEntry" />
-  </interface>
+    <interface>
+        <field id = "itemFocused" type = "node" alias = "settingsLabelList.itemFocused" onChange = "showfocus" />
+        <field id = "itemSelected" type = "node" alias = "settingsLabelList.itemSelected" onChange = "showselected" />
+        <field id = "itemSubSelected" type = "node" alias = "settingSubList.itemSelected" onChange = "showsubselected" />
+        <field id = "itemPinEntered" type = "node" alias = "pinPad.pin" onChange = "processPinEntry" />
+    </interface>
 
-  <script type="text/brightscript" uri="pkg:/components/Settings/Settings.brs" />
-  <script type="text/brightscript" uri="pkg:/components/Utils/Common.brs" />
+    <script type = "text/brightscript" uri = "pkg:/components/Settings/Settings.brs" />
+    <script type = "text/brightscript" uri = "pkg:/components/Utils/Common.brs" />
   
-  <children>
+    <children>
     
-    <LabelList
-      id = "settingsLabelList"
-      translation = "[ 80, 180 ]"
-      itemSize = "[480,40]"
-      itemSpacing = "[0,20]"
-      color="#808080"
-      vertFocusAnimationStyle="floatingFocus">
+        <LabelList
+            id                      = "settingsLabelList"
+            translation             = "[ 80, 180 ]"
+            itemSize                = "[480,40]"
+            itemSpacing             = "[0,20]"
+            color                   = "#808080"
+            vertFocusAnimationStyle = "floatingFocus">
     
-      <Rectangle 
-        id = "infoRectangle" 
-        translation = "[ 550, 0 ]" 
-        height = "490" 
-        width = "600" 
-        color = "#606060" >
+            <Rectangle 
+                id          = "infoRectangle" 
+                translation = "[ 550, 0 ]" 
+                height      = "490" 
+                width       = "600" 
+                color       = "#606060" >
 
-        <Label 
-          id = "infoLabel" 
-          translation = "[ 15, 15 ]" 
-          height = "460" 
-          width = "580" 
-          wrap = "true"
-          color = "#F8F8F8"
-          font = "font:SmallSystemFont" />
+                <Label 
+                    id          = "infoLabel" 
+                    translation = "[ 15, 15 ]" 
+                    height      = "460" 
+                    width       = "580" 
+                    wrap        = "true"
+                    color       = "#F8F8F8"
+                    font        = "font:SmallSystemFont"
+                />
   
-        <RadioButtonList
-          id = "settingSubList"
-          visible = "false"
-          itemSize = "[435,40]"
-          translation = "[ 100, 175 ]"/>
+                <RadioButtonList
+                    id          = "settingSubList"
+                    visible     = "false"
+                    itemSize    = "[435,40]"
+                    translation = "[ 100, 175 ]"
+                />
        
-      </Rectangle>
-    </LabelList>
+            </Rectangle>
+            
+        </LabelList>
     
-    <Rectangle 
-      id = "pinRectangle" 
-      height = "360" 
-      width = "300" 
-      color = "#858585"
-      translation = "[ 500, 200 ]"
-      visible = "false" >
+        <Rectangle 
+            id          = "pinRectangle" 
+            height      = "360" 
+            width       = "300" 
+            color       = "#858585"
+            translation = "[ 500, 200 ]"
+            visible     = "false" >
 
-      <Label 
-        id = "infoLabel" 
-        translation = "[ 10, 15 ]" 
-        color = "#F8F8F8"
-        text = "Custom Delay (Seconds):"
-        font = "font:SmallBoldSystemFont" />
+            <Label 
+                id          = "infoLabel" 
+                translation = "[ 10, 15 ]" 
+                color       = "#F8F8F8"
+                text        = "Custom Delay (Seconds):"
+                font        = "font:SmallBoldSystemFont"
+            />
         
-      <PinPad 
-        id = "pinPad" 
-        pinLength = "3"
-        secureMode = "false"
-        translation = "[ 15, 52 ]" />
+            <PinPad 
+                id          = "pinPad" 
+                pinLength   = "3"
+                secureMode  = "false"
+                translation = "[ 15, 52 ]"
+            />
     
-    </Rectangle>
-
-    
+        </Rectangle>
+  
   </children>
-
 </component>

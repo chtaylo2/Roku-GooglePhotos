@@ -1,28 +1,28 @@
 
-sub init()
+Sub init()
     'Define SG nodes
     m.tipsList = m.top.findNode("tipsLabelList")
     m.tipsInfo = m.top.findNode("infoLabel")
       
     'Read in content
-    m.readContentTask = createObject("roSGNode", "ContentReader")
+    m.readContentTask = createObject("roSGNode", "Local ContentReader")
     m.readContentTask.observeField("content", "setlist")
     m.readContentTask.file = "pkg:/data/TipsAndTricks/tipsContent.xml"
     m.readContentTask.control = "RUN"
-end sub
+End Sub
 
 
-sub setlist()
+Sub setlist()
     'Populate list content
     m.tipsList.content = m.readContentTask.content
     m.tipsList.setFocus(true)
-end sub
+End Sub
 
 
-sub showfocus()
+Sub showfocus()
     'Show info for focused item
     if m.tipsList.content<>invalid then
         itemcontent = m.tipsList.content.getChild(m.tipsList.itemFocused)
         m.tipsInfo.text = itemcontent.description
     end if
-end sub
+End Sub

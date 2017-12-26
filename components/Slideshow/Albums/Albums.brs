@@ -145,7 +145,23 @@ Sub onItemSelected()
         m.screenActive.setFocus(true)
         
     else if selection.id = "GP_VIDEO_BROWSE" then
-        print "VIDEO BROWSE - NOT DONE YET"
+        print "VIDEO BROWSE"
+
+        m.videoThumbList = createObject("RoSGNode","ContentNode")
+        for i = 0 to m.videosMetaData.Count()-1
+            addItem(m.videoThumbList, "GP_BROWSE", m.videosMetaData[i].thumbnail, "", "")
+        end for
+        
+        m.screenActive = createObject("roSGNode", "Browse")
+        m.screenActive.id = selection.id
+        m.screenActive.albumName = m.albumName + "  -  " + itostr(m.videosMetaData.Count()) + " Videos"
+        m.screenActive.metaData = m.videosMetaData
+        m.screenActive.content = m.videoThumbList
+        m.screenActive.id = selection.id
+        m.top.appendChild(m.screenActive)
+        m.screenActive.setFocus(true)
+
+        hideAlbum()
         
     else if selection.id = "GP_IMAGE_BROWSE" then
         print "IMAGE BROWSE"
@@ -156,16 +172,16 @@ Sub onItemSelected()
         end for
         
         m.screenActive = createObject("roSGNode", "Browse")
+        m.screenActive.id = selection.id
         m.screenActive.albumName = m.albumName + "  -  " + itostr(m.imagesMetaData.Count()) + " Photos"
-        m.screenActive.imagesMetaData = m.imagesMetaData
+        m.screenActive.metaData = m.imagesMetaData
         m.screenActive.content = m.imageThumbList
         m.screenActive.id = selection.id
         m.top.appendChild(m.screenActive)
         m.screenActive.setFocus(true)
-        m.albummarkupgrid.visible = false
-        m.settingsIcon.visible    = false
-        m.itemLabelMain1.visible  = false
-        m.itemLabelMain2.visible  = false
+
+        hideAlbum()
+        
     end if
 End Sub
 
@@ -318,6 +334,14 @@ Sub centerMarkupBox()
     m.albummarkupgrid.translation = [ centerx+18, 240 ]
 End Sub
 
+ 
+Sub hideAlbum()
+    m.albummarkupgrid.visible = false
+    m.settingsIcon.visible    = false
+    m.itemLabelMain1.visible  = false
+    m.itemLabelMain2.visible  = false  
+End Sub
+
 
 Sub displayAlbum()
     m.albummarkupgrid.visible = true
@@ -327,7 +351,6 @@ Sub displayAlbum()
     m.albumPageList.visible = false
     
     m.albummarkupgrid.setFocus(true)
-    
 End Sub
 
 

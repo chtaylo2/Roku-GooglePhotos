@@ -1,0 +1,73 @@
+<?xml version = "1.0" encoding = "utf-8" ?>
+
+<component name = "Search" extends = "Group" initialFocus = "miniKeyboard" >
+
+    <interface>
+    </interface>
+
+    <script type = "text/brightscript" uri = "pkg:/components/Search/Search.brs" />
+    <script type = "text/brightscript" uri = "pkg:/components/Utils/Common.brs" />
+  
+    <children>
+    
+        <MiniKeyboard
+            id = "miniKeyboard"
+            translation = "[ 150, 160 ]"
+            keyColor = "#808080" >
+ 
+            <Label 
+                id          = "infoLabel" 
+                translation = "[ 480, 0 ]" 
+                height      = "460" 
+                width       = "580"
+                text        = "Recent Searches:"
+                color       = "#808080"
+                font        = "font:MediumBoldSystemFont"
+                />
+    
+            <Rectangle 
+                id          = "infoRectangle" 
+                translation = "[ 515, 40 ]" 
+                height      = "405" 
+                width       = "435" 
+                color       = "#606060" >
+
+                <Label 
+                    id          = "infoLabel" 
+                    translation = "[ 15, 15 ]" 
+                    height      = "460" 
+                    width       = "580" 
+                    wrap        = "true"
+                    color       = "#F8F8F8"
+                    font        = "font:SmallSystemFont"
+                />
+  
+                <RadioButtonList
+                    id          = "settingSubList"
+                    visible     = "false"
+                    itemSize    = "[435,40]"
+                    translation = "[ 100, 175 ]"
+                />
+                       
+            </Rectangle>
+
+            <Button
+                id = "searchBtn"
+                text = "Search"
+                iconUri = ""
+                textColor       = "#808080"
+                translation = "[ 0, 465 ]"
+            />
+            
+            <Button
+                id = "clearSearchBtn"
+                text = "Clear Search History"
+                iconUri = ""
+                textColor   = "#808080"
+                translation = "[ 530, 465 ]"
+            />
+            
+        </MiniKeyboard>
+  
+  </children>
+</component>

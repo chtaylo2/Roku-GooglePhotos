@@ -1,5 +1,5 @@
 
-sub init()
+Sub init()
     m.buttongroup   = m.top.findNode("buttonGroup")
     m.Row1          = m.top.findNode("Row1")
     m.Row2          = m.top.findNode("Row2")
@@ -12,7 +12,7 @@ sub init()
 
     m.buttongroup.buttons = [ "Get a new code", "About Channel" ]
     
-    m.UriHandler = createObject("roSGNode","UrlHandler")
+    m.UriHandler = createObject("roSGNode","Authlinking UrlHandler")
     m.UriHandler.observeField("gen_token_response","onNewToken")
     m.LoginTimer.observeField("fire","onCheckAuth")
 
@@ -26,29 +26,29 @@ sub init()
     loadReg()
     doGenerateToken()
     
-end sub
+End Sub
 
 
-sub doGenerateToken()
+Sub doGenerateToken()
     print "Registration.brs [doGenerateToken]"
 
     params = "client_id="        + m.clientId
     params = params + "&scope="  + m.oauth_scope
 
     makeRequest({}, m.oauth_prefix+"/device/code", "POST", params, 0)
-end sub
+End Sub
 
 
-sub doQueryUserInfo()
+Sub doQueryUserInfo()
     print "Registration.brs [doQueryUserInfo]"
 
     m.UriHandler.observeField("userinfo_response","onStoreUser")
     userIndex = m.accessToken.Count()-1
     makeRequest({}, "https://www.googleapis.com/oauth2/v3/userinfo?access_token="+m.accessToken[userIndex], "GET", "", 2)
-end sub
+End Sub
 
 
-sub onNewToken(event as object)
+Sub onNewToken(event as object)
     print "Registration.brs [onNewToken]"
   
     tokenData = event.getData()
@@ -81,10 +81,10 @@ sub onNewToken(event as object)
     
     m.LoginTimer.repeat = true
     m.LoginTimer.control = "start"
-end sub
+End Sub
 
 
-sub onCheckAuth(event as object)
+Sub onCheckAuth(event as object)
     print "Registration.brs [onCheckAuth]"
     status = -1   ' 0 => Finished (got tokens), < 0 => Retry needed, > 0 => fatal error
         
@@ -146,10 +146,10 @@ sub onCheckAuth(event as object)
         m.LoginTimer.repeat = true
         m.LoginTimer.control = "start"
     end if
-end sub
+End Sub
 
 
-sub onStoreUser(event as object)
+Sub onStoreUser(event as object)
     print "Registration.brs [onCheckAuth]"
     status = -1   ' 0 => Finished (got tokens), < 0 => Retry needed, > 0 => fatal error
         
@@ -217,4 +217,4 @@ sub onStoreUser(event as object)
                 
         end if   
     end if
-end sub
+End Sub

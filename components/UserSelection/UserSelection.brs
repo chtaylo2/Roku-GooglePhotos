@@ -1,5 +1,5 @@
 
-sub init()     
+Sub init()     
     m.top.setFocus(true)
     
     ' Load in the OAuth Registry entries
@@ -16,10 +16,10 @@ sub init()
     'Display content
     showmarkupgrid()
     
-end sub
+End Sub
 
 
-sub showmarkupgrid()
+Sub showmarkupgrid()
 
     usersLoaded = oauth_count()
     m.content = createObject("RoSGNode","ContentNode")
@@ -45,31 +45,31 @@ sub showmarkupgrid()
     'Watch for events
     m.markupgrid.observeField("itemFocused", "onItemFocused") 
     m.markupgrid.observeField("itemSelected", "onItemSelected")
-end sub
+End Sub
 
 
-sub addItem(store as object, hdgridposterurl as string, shortdescriptionline1 as string, shortdescriptionline2 as string)
+Sub addItem(store as object, hdgridposterurl as string, shortdescriptionline1 as string, shortdescriptionline2 as string)
     item = store.createChild("ContentNode")
     item.hdgridposterurl = hdgridposterurl
     item.shortdescriptionline1 = shortdescriptionline1
     item.shortdescriptionline2 = shortdescriptionline2
     item.x = 200
-end sub
+End Sub
 
 
-sub onItemFocused()
+Sub onItemFocused()
     'Item focused
     focusedItem = m.markupgrid.content.getChild(m.markupgrid.itemFocused)
     m.itemLabelMain1.text = focusedItem.shortdescriptionline1
     m.itemLabelMain2.text = focusedItem.shortdescriptionline2
-end sub
+End Sub
 
 
-sub onItemSelected()
+Sub onItemSelected()
     'Item selected
     print "SELECTEDUSER: "; m.markupgrid.itemSelected
     m.global.selectedUser = m.markupgrid.itemSelected
-end sub
+End Sub
 
 
 Function onKeyEvent(key as String, press as Boolean) as Boolean

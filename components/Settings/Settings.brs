@@ -14,7 +14,7 @@ Sub init()
     m.infoLabel = m.top.findNode("infoLabel")
       
     'Read in Content
-    m.readContentTask = createObject("roSGNode", "ContentReader")
+    m.readContentTask = createObject("roSGNode", "Local ContentReader")
     m.readContentTask.observeField("content", "setLists")
     m.readContentTask.file = "pkg:/data/Settings/settingsContent.xml"
     m.readContentTask.control = "RUN"

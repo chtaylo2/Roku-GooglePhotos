@@ -2,52 +2,53 @@
 
 <component name = "UserSelection" extends = "Group" initialFocus = "homeGrid" >
 
-  <script type="text/brightscript" uri="pkg:/components/UserSelection/UserSelection.brs" />
-  <script type="text/brightscript" uri="pkg:/components/Utils/Common.brs" />
+    <script type = "text/brightscript" uri = "pkg:/components/UserSelection/UserSelection.brs" />
+    <script type = "text/brightscript" uri = "pkg:/components/Utils/Common.brs" />
 
-  <children >
+    <children>
 
-    <MarkupGrid 
-      id = "homeGrid" 
-      itemComponentName = "markupgridItem" 
-      numColumns = "5" 
-      numRows = "1" 
-      itemSize = "[ 220, 250 ]" 
-      itemSpacing = "[ 20, 20 ]"
-      drawFocusFeedback = "false" />
+        <MarkupGrid 
+            id                  = "homeGrid" 
+            itemComponentName   = "markupgridItem" 
+            numColumns          = "5" 
+            numRows             = "1" 
+            itemSize            = "[ 220, 250 ]" 
+            itemSpacing         = "[ 20, 20 ]"
+            drawFocusFeedback   = "false"
+        />
 
-    <Label
-      id="itemLabelMain1"
-      height="720"
-      width="1280"
-      font="font:LargeBoldSystemFont"
-      color="#808080"
-      text = ""
-      horizAlign = "center"
-      vertAlign = "center"
-      translation="[0,175]" />
+        <Label
+            id          = "itemLabelMain1"
+            height      = "720"
+            width       = "1280"
+            font        = "font:LargeBoldSystemFont"
+            color       = "#808080"
+            horizAlign  = "center"
+            vertAlign   = "center"
+            translation = "[0,175]"
+        />
     
-    <Label
-      id="itemLabelMain2"
-      height="720"
-      width="1280"
-      font="font:MediumSystemFont"
-      color="#808080"
-      text = ""
-      horizAlign = "center"
-      vertAlign = "center"
-      translation="[0,225]" />
+        <Label
+            id          = "itemLabelMain2"
+            height      = "720"
+            width       = "1280"
+            font        = "font:MediumSystemFont"
+            color       = "#808080"
+            horizAlign  = "center"
+            vertAlign   = "center"
+            translation = "[0,225]"
+        />
     
-    <Label
-      id="itemHeader"
-      height="720"
-      width="1200"
-      font="font:MediumBoldSystemFont"
-      color="#808080"
-      horizAlign = "right"
-      vertAlign = "top"
-      translation="[0,65]" />
+        <Label
+            id          = "itemHeader"
+            height      = "720"
+            width       = "1200"
+            font        = "font:MediumBoldSystemFont"
+            color       = "#808080"
+            horizAlign  = "right"
+            vertAlign   = "top"
+            translation = "[0,65]"
+        />
 
   </children>
-
 </component>

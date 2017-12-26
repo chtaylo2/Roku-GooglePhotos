@@ -2,26 +2,27 @@
 
 <component name = "GooglePhotosMainScene" extends = "Scene" >
 
-  <script type="text/brightscript" uri="pkg:/components/GooglePhotosMainScene.brs" />
-  <script type="text/brightscript" uri="pkg:/components/Utils/Common.brs" />
+    <script type = "text/brightscript" uri = "pkg:/components/GooglePhotosMainScene.brs" />
+    <script type = "text/brightscript" uri = "pkg:/components/Utils/Common.brs" />
 
-  <children >
+    <children>
 
-    <Overhang
-      showClock="false"
-      logoBaselineOffset = "70"
-      logoUri="pkg:/images/Logo_Overhang_HD.png" />
+        <Overhang
+            showClock           = "false"
+            logoBaselineOffset  = "70"
+            logoUri             = "pkg:/images/Logo_Overhang_HD.png"
+        />
 
-    <Label
-      id="itemHeader"
-      height="720"
-      width="1200"
-      font="font:MediumBoldSystemFont"
-      color="#808080"
-      horizAlign = "right"
-      vertAlign = "top"
-      translation="[0,65]" />
+        <Label
+            id          = "itemHeader"
+            height      = "720"
+            width       = "1200"
+            font        = "font:MediumBoldSystemFont"
+            color       = "#808080"
+            horizAlign  = "right"
+            vertAlign   = "top"
+            translation = "[0,65]"
+        />
 
   </children>
-
 </component>

@@ -2,93 +2,99 @@
 
 <component name = "My Albums" extends = "Group" initialFocus = "albumGrid" >
 
-   <script type = "text/brightscript" uri = "pkg:/components/SlideShow/Albums/Albums.brs" />
-   <script type = "text/brightscript" uri = "pkg:/components/SlideShow/SlideshowHelper.brs" />
-   <script type = "text/brightscript" uri = "pkg:/components/Utils/Common.brs" />
-   <script type = "text/brightscript" uri = "pkg:/components/Utils/private-git.brs" />
+    <script type = "text/brightscript" uri = "pkg:/components/SlideShow/Albums/Albums.brs" />
+    <script type = "text/brightscript" uri = "pkg:/components/SlideShow/SlideshowHelper.brs" />
+    <script type = "text/brightscript" uri = "pkg:/components/Utils/Common.brs" />
+    <script type = "text/brightscript" uri = "pkg:/components/Utils/private-git.brs" />
 
-   <children>
+    <children>
 
-	  <MarkupGrid 
-		 id = "albumGrid"
-		 translation="[39,240]"
-		 itemComponentName = "markupgridItem" 
-		 numColumns = "5" 
-		 numRows = "1" 
-		 itemSize = "[ 220, 250 ]" 
-		 itemSpacing = "[ 20, 20 ]"
-		 drawFocusFeedback = "false" />
-	
-	  <Label
-		 id="itemLabelMain1"
-		 height="720"
-		 width="1280"
-		 font="font:LargeBoldSystemFont"
-		 color="#808080"
-		 horizAlign = "center"
-		 vertAlign = "center"
-		 translation="[0,175]" />
-	
-	  <Label
-		 id="itemLabelMain2"
-		 height="720"
-		 width="1280"
-		 font="font:MediumSystemFont"
-		 color="#808080"
-		 text = "..     Page Buttons     .."
-		 horizAlign = "center"
-		 vertAlign = "center"
-		 translation="[0,225]" />
+        <MarkupGrid 
+            id                  = "albumGrid"
+            translation         = "[39,240]"
+            itemComponentName   = "markupgridItem" 
+            numColumns          = "5" 
+            numRows             = "1" 
+            itemSize            = "[ 220, 250 ]" 
+            itemSpacing         = "[ 20, 20 ]"
+            drawFocusFeedback   = "false"
+        />
+    
+        <Label
+            id          = "itemLabelMain1"
+            height      = "720"
+            width       = "1280"
+            font        = "font:LargeBoldSystemFont"
+            color       = "#808080"
+            horizAlign  = "center"
+            vertAlign   = "center"
+            translation = "[0,175]"
+        />
+    
+        <Label
+            id          = "itemLabelMain2"
+            height      = "720"
+            width       = "1280"
+            font        = "font:MediumSystemFont"
+            color       = "#808080"
+            text        = "..     Page Buttons     .."
+            horizAlign  = "center"
+            vertAlign   = "center"
+            translation = "[0,225]"
+        />
 
-	  <Poster 
-		 id = "settingsIcon"
-		 width="60"
-		 height="60"
-		 translation="[1180, 630]"
-		 uri = "pkg:/images/gear.png"
-		 visible = "false" />
+        <Poster 
+            id          = "settingsIcon"
+            width       = "60"
+            height      = "60"
+            translation = "[1180, 630]"
+            uri         = "pkg:/images/gear.png"
+            visible     = "false"
+        />
 
-	  <LabelList
-		 id = "albumPageList"
-		 translation = "[ 200, 200 ]"
-		 itemSize = "[300,30]"
-		 itemSpacing = "[0,20]"
-		 color = "#808080" >
+        <LabelList
+            id          = "albumPageList"
+            translation = "[ 200, 200 ]"
+            itemSize    = "[300,30]"
+            itemSpacing = "[0,20]"
+            color       = "#808080" >
 
-		 <Poster 
-			id = "albumPageThumb"
-			loadheight="250"
-			loadwidth="250"
-			width="250"
-			translation = "[ 525, 20 ]"
-			loadDisplayMode = "scaleTofit" />
+            <Poster 
+                id              = "albumPageThumb"
+                loadheight      = "250"
+                loadwidth       = "250"
+                width           = "250"
+                translation     = "[ 525, 20 ]"
+                loadDisplayMode = "scaleTofit"
+            />
 
-		 <Label 
-			id = "albumPageInfo1" 
-			height = "200" 
-			width = "300" 
-			wrap = "true"
-			text = "Auto Backup"
-			horizAlign = "center"
-			vertAlign = "center"
-			color="#808080"
-			font="font:MediumBoldSystemFont"
-			translation = "[ 500, 200 ]" />
-		 
-		 <Label 
-			id = "albumPageInfo2" 
-			height = "200" 
-			width = "300" 
-			wrap = "true"
-			text = "Items: 1 thru 1000"
-			horizAlign = "center"
-			vertAlign = "center"
-			color="#808080"
-			font="font:MediumSystemFont"
-			translation = "[ 500, 250 ]" />
-	  
-	  </LabelList>
-
-   </children>
-
+            <Label 
+                id          = "albumPageInfo1" 
+                height      = "200" 
+                width       = "300" 
+                wrap        = "true"
+                text        = "Auto Backup"
+                horizAlign  = "center"
+                vertAlign   = "center"
+                color       ="#808080"
+                font        = "font:MediumBoldSystemFont"
+                translation = "[ 500, 200 ]"
+            />
+         
+            <Label 
+                id          = "albumPageInfo2" 
+                height      = "200" 
+                width       = "300" 
+                wrap        = "true"
+                text        = "Items: 1 thru 1000"
+                horizAlign  = "center"
+                vertAlign   = "center"
+                color       = "#808080"
+                font        = "font:MediumSystemFont"
+                translation = "[ 500, 250 ]"
+            />
+      
+        </LabelList>
+        
+    </children>
 </component>

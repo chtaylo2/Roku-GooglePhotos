@@ -1,13 +1,11 @@
 
-sub init()
-    'ContentReader components are used to read in local XML content.
-    'This does not handle remote content over http(s)
-    
+Sub init()
+    'ContentReader is used to read in local XML content.
     m.top.functionName = "getContent"
-end sub
+End Sub
 
 
-sub getContent()
+Sub getContent()
     content = createObject("roSGNode", "ContentNode")
     contentxml = createObject("roXMLElement")
     xmlstring = ReadAsciiFile(m.top.file)
@@ -21,4 +19,4 @@ sub getContent()
     end if
 
     m.top.content = content
-end sub
+End Sub

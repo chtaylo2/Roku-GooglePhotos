@@ -1,5 +1,5 @@
 
-sub init()     
+Sub init()
     m.top.setFocus(true)
     
     ' Load in the OAuth Registry entries
@@ -14,14 +14,14 @@ sub init()
     m.itemHeader.text   = m.userInfoName[m.global.selectedUser] + " • Main Menu"
       
     'Read in content
-    m.readMarkupGridTask = createObject("roSGNode", "ContentReader")
+    m.readMarkupGridTask = createObject("roSGNode", "Local ContentReader")
     m.readMarkupGridTask.file = "pkg:/data/homeGridContent.xml"
     m.readMarkupGridTask.observeField("content", "showmarkupgrid")
     m.readMarkupGridTask.control = "RUN"  
-end sub
+End Sub
 
 
-sub showmarkupgrid()
+Sub showmarkupgrid()
     'Populate grid content
     m.markupgrid.content = m.readMarkupGridTask.content
 
@@ -36,18 +36,18 @@ sub showmarkupgrid()
     'Watch for events
     m.markupgrid.observeField("itemFocused", "onItemFocused") 
     m.markupgrid.observeField("itemSelected", "onItemSelected")
-end sub
+End Sub
 
 
-sub onItemFocused()
+Sub onItemFocused()
     'Item focused
     focusedItem = m.markupgrid.content.getChild(m.markupgrid.itemFocused)
     m.itemLabelMain1.text = focusedItem.shortdescriptionline1
     m.itemLabelMain2.text = focusedItem.shortdescriptionline2
-end sub
+End Sub
 
 
-sub onItemSelected()
+Sub onItemSelected()
     'Item selected
     selectedItem = m.markupgrid.content.getChild(m.markupgrid.itemSelected)
     screenToDisplay = selectedItem.shortdescriptionline1
@@ -60,7 +60,7 @@ sub onItemSelected()
     m.screenActive      = createObject("roSGNode", screenToDisplay)
     m.top.appendChild(m.screenActive)
     m.screenActive.setFocus(true)
-end sub
+End Sub
 
 
 Function onKeyEvent(key as String, press as Boolean) as Boolean

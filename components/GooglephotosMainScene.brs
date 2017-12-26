@@ -1,5 +1,5 @@
 
-sub init()
+Sub init()
     'Set scene properties
     m.top.backgroundURI   = ""
     m.top.backgroundColor = "#EBEBEB"
@@ -15,7 +15,7 @@ sub init()
     
     checkRegistration()
     
-end sub
+End Sub
 
 
 Function checkRegistration()

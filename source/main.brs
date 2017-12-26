@@ -1,19 +1,18 @@
 
-sub Main()
+Sub Main()
+    'Start main screen
     showGooglePhotosScreen()
-end sub
+End Sub
 
-sub showGooglePhotosScreen()
-    m.mgr = CreateObject("roTextureManager")
-    screen = CreateObject("roSGScreen")
-    m.port = CreateObject("roMessagePort")
-    device = CreateObject("roDeviceInfo")
-    screen.setMessagePort(m.port)
-    scene = screen.CreateScene("GooglePhotosMainScene")
-  
+Sub showGooglePhotosScreen()
+    screen   = CreateObject("roSGScreen")
+    port     = CreateObject("roMessagePort")
+    device   = CreateObject("roDeviceInfo")
+    screen.setMessagePort(port)
+    
+    scene    = screen.CreateScene("GooglePhotosMainScene")
     m.global = screen.getGlobalNode()
- 
-    ds=device.GetDisplaySize()
+    ds       = device.GetDisplaySize()
     
     m.global.addFields( {screenWidth: ds.w, screenHeight: ds.h} )
     m.global.addFields( {selectedUser: 0} )
@@ -21,11 +20,11 @@ sub showGooglePhotosScreen()
     screen.show()
 
     while(true)
-        msg = wait(0, m.port)
+        msg     = wait(0, port)
         msgType = type(msg)
 
         if msgType = "roSGScreenEvent"
-          if msg.isScreenClosed() then return
+            if msg.isScreenClosed() then return
         end if
     end while
-end sub
+End Sub

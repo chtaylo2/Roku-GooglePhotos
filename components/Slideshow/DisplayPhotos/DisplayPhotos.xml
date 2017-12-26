@@ -2,129 +2,139 @@
 
 <component name = "DisplayPhotos" extends = "Group" >
 
-   <interface>
-	  <field id = "content" type = "array" />
-	  <field id = "startPhoto" type = "string" />
-   </interface>
+    <interface>
+        <field id = "content" type = "array" />
+        <field id = "startPhoto" type = "string" />
+    </interface>
   
-   <script type = "text/brightscript" uri = "pkg:/components/SlideShow/DisplayPhotos/DisplayPhotos.brs" />
-   <script type = "text/brightscript" uri = "pkg:/components/SlideShow/SlideshowHelper.brs" />
-   <script type = "text/brightscript" uri = "pkg:/components/Utils/Common.brs" />
-   <script type = "text/brightscript" uri = "pkg:/components/Utils/private-git.brs" />
+    <script type = "text/brightscript" uri = "pkg:/components/SlideShow/DisplayPhotos/DisplayPhotos.brs" />
+    <script type = "text/brightscript" uri = "pkg:/components/SlideShow/SlideshowHelper.brs" />
+    <script type = "text/brightscript" uri = "pkg:/components/Utils/Common.brs" />
+    <script type = "text/brightscript" uri = "pkg:/components/Utils/private-git.brs" />
    
-   <children>
+    <children>
 
-	  <!-- Hide the primary screen -->
-	  <Rectangle
-		 id = "FadeBackground"
-		 color = "0x000000"
-         height = "720"
-         width = "1280"
-         opacity = "1" />
+        <!-- Hide the primary screen -->
+        <Rectangle
+            id      = "FadeBackground"
+            color   = "0x000000"
+            height  = "720"
+            width   = "1280"
+            opacity = "1"
+        />
 
-	  <!-- Create the blended in background -->
-	  <Poster
-		 id = "BlendedImage"
-		 loadWidth = "10.24"
-		 loadHeight = "5.76"
-		 loadDisplayMode = "scaleToFill"
-		 height = "720"
-		 width = "1280" />
-	  
-	  <!-- Create some opacity between main image -->
-	  <Rectangle
-		 id = "ImageObscure"
-		 color = "0x000000"
-         height = "720"
-         width = "1280"
-         opacity = ".3" />
-	  
-	  <!-- Primary Image -->
-	  <Poster 
-		 id = "PrimaryImage"
-		 loadWidth = "0.0"
-		 loadHeight = "0.0"
-		 loadDisplayMode = "scaleToFit" />
-	  
-	  <!-- Fading foreground effect -->
-	  <Rectangle
-		 id = "FadeForeground"
-		 color = "0x000000"
-		 height = "720"
-		 width = "1280"
-		 opacity = "0" />		 
+        <!-- Create the blended in background -->
+        <Poster
+            id              = "BlendedImage"
+            loadWidth       = "10.24"
+            loadHeight      = "5.76"
+            loadDisplayMode = "scaleToFill"
+            height          = "720"
+            width           = "1280"
+        />
+      
+        <!-- Create some opacity between main image -->
+        <Rectangle
+            id      = "ImageObscure"
+            color   = "0x000000"
+            height  = "720"
+            width   = "1280"
+            opacity = ".3"
+        />
+      
+        <!-- Primary Image -->
+        <Poster 
+            id              = "PrimaryImage"
+            loadWidth       = "0.0"
+            loadHeight      = "0.0"
+            loadDisplayMode = "scaleToFit"
+        />
+      
+        <!-- Fading foreground effect -->
+        <Rectangle
+            id      = "FadeForeground"
+            color   = "0x000000"
+            height  = "720"
+            width   = "1280"
+            opacity = "0"
+        />        
 
-	  <!-- Fading OUT Animation -->    	    
-	  <Animation
-		 id = "FadeOUTAnimation"
-		 repeat = "false"
-		 easeFunction = "inQuad"
-		 duration = "0.2">
+        <!-- Fading OUT Animation -->         
+        <Animation
+            id              = "FadeOUTAnimation"
+            repeat          = "false"
+            easeFunction    = "inQuad"
+            duration        = "0.2" >
 
-		 <FloatFieldInterpolator
-			id = "FadeOUTInterpolator"
-			key = "[0.0,1.0]"
-			KeyValue = "[0.0,1.0]"
-			fieldToInterp = "FadeForeground.opacity" />
+            <FloatFieldInterpolator
+                id              = "FadeOUTInterpolator"
+                key             = "[0.0,1.0]"
+                KeyValue        = "[0.0,1.0]"
+                fieldToInterp   = "FadeForeground.opacity"
+            />
 
-	  </Animation>
+        </Animation>
 
-	  <!-- Fading IN Animation -->
-	  <Animation
-		 id = "FadeINAnimation"
-		 repeat = "false"
-		 easeFunction = "inQuad"
-		 duration = "0.3">
+        <!-- Fading IN Animation -->
+        <Animation
+            id              = "FadeINAnimation"
+            repeat          = "false"
+            easeFunction    = "inQuad"
+            duration        = "0.3" >
 
-		 <FloatFieldInterpolator
-			id = "FadeINInterpolator"
-			key = "[0.0,1.0]"
-			KeyValue = "[1.0,0.0]"
-			fieldToInterp = "FadeForeground.opacity" />
+            <FloatFieldInterpolator
+                id              = "FadeINInterpolator"
+                key             = "[0.0,1.0]"
+                KeyValue        = "[1.0,0.0]"
+                fieldToInterp   = "FadeForeground.opacity"
+            />
 
-	  </Animation>
+        </Animation>
 
-	  <!-- Used to display pause screen -->
-	  <Rectangle
-		 id = "PauseScreen"
-		 color = "0x000000"
-         height = "100"
-         width = "1280"
-		 translation="[0,570]"
-         opacity = ".7"
-		 visible = "false" >
-		 
-		 <Label 
-			id = "pauseImageCount" 
-			height = "100" 
-			width = "1200"
-			horizAlign = "right"
-			vertAlign = "top"
-			color="#eaeaea"
-			font="font:SmallSystemFont"
-			translation = "[ 0, 15 ]" />
-		 
-		 <Label 
-			id = "pauseImageDetail" 
-			height = "100" 
-			width = "1280"
-			horizAlign = "center"
-			vertAlign = "center"
-			color="#eaeaea"
-			font="font:MediumSystemFont"
-			translation = "[ 0, 0 ]" />
-	  
-	  </Rectangle>
+        <!-- Used to display pause screen -->
+        <Rectangle
+            id          = "PauseScreen"
+            color       = "0x000000"
+            height      = "100"
+            width       = "1280"
+            translation = "[0,570]"
+            opacity     = ".7"
+            visible     = "false" >
+         
+            <Label 
+                id          = "pauseImageCount" 
+                height      = "100" 
+                width       = "1200"
+                horizAlign  = "right"
+                vertAlign   = "top"
+                color       = "#eaeaea"
+                font        = "font:SmallSystemFont"
+                translation = "[ 0, 15 ]"
+            />
+         
+            <Label 
+               id           = "pauseImageDetail" 
+               height       = "100" 
+               width        = "1280"
+               horizAlign   = "center"
+               vertAlign    = "center"
+               color        = "#eaeaea"
+               font         = "font:MediumSystemFont"
+               translation  = "[ 0, 0 ]"
+            />
+      
+        </Rectangle>
 
-	  <!-- Required Timers -->
-	  <Timer
-		 id="RotationTimer"
-		 duration="5" />
+        <!-- Required Timers -->
+        <Timer
+            id          = "RotationTimer"
+            duration    = "5"
+        />
    
-	  <Timer
-		 id="DownloadTimer"
-		 duration="2" />
-			
+        <Timer
+            id          = "DownloadTimer"
+            duration    = "2"
+        />
+            
    </children>
-
 </component>
