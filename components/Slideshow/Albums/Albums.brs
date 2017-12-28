@@ -8,7 +8,6 @@ Sub init()
     m.albummarkupgrid = m.top.findNode("albumGrid")
     m.itemLabelMain1  = m.top.findNode("itemLabelMain1")
     m.itemLabelMain2  = m.top.findNode("itemLabelMain2")
-    m.settingsIcon    = m.top.findNode("settingsIcon")
     
     m.albumPageList   = m.top.findNode("albumPageList")
     m.albumPageThumb  = m.top.findNode("albumPageThumb")
@@ -23,15 +22,35 @@ Sub init()
     'Load registration variables
     loadReg()
     
-    'Focus album list
-    doGetAlbumList()
+    m.top.observeField("loaded","loadingComplete")
+    
+End Sub
+
+
+Sub loadingComplete()
+    m.top.unobserveField("loaded")
+
+    if m.top.imageContent<>invalid then
+        album = CreateObject("roAssociativeArray")
+        album.GetTitle=function():return "Search Results":end function
+        album.GetImageCount=function():return Int(1):end function
+        m.albumName = album.GetTitle()
+
+        rsp=ParseXML(m.top.imageContent.content)
+        m.imagesObject = googleImageListing(rsp.entry)
+        googleDisplayImageMenu(album, m.imagesObject)
+        
+    else
+        'Focus album list
+        doGetAlbumList()
+    end if
     
 End Sub
 
 
 ' URL Request to fetch album listing
 Sub doGetAlbumList()
-    print "Albums.brs [doGetAlbumList]"
+    print "Albums.brs [doGetAlbumList]"  
 
     signedHeader = oauth_sign(m.global.selectedUser)
     makeRequest(signedHeader, m.gp_prefix + "?kind=album&v=3.0&fields=entry(title,gphoto:numphotos,gphoto:user,gphoto:id,media:group(media:description,media:thumbnail))&thumbsize=220", "GET", "", 0)
@@ -41,7 +60,6 @@ End Sub
 Sub doGetAlbumImages(album As Object, index=0 as Integer)
     print "Albums.brs - [doGetAlbumImages]"
     
-    print "ALBUM: "; album
     totalPages = ceiling(album.GetImageCount() / 1000)
     
     startIndex = 1
@@ -112,6 +130,7 @@ End Sub
 
 Sub onItemFocused()
     'Item focused
+    
     focusedItem = m.albummarkupgrid.content.getChild(m.albummarkupgrid.itemFocused)
     m.itemLabelMain1.text = focusedItem.shortdescriptionline1
     m.itemLabelMain2.text = focusedItem.shortdescriptionline2
@@ -320,9 +339,11 @@ Sub googleDisplayImageMenu(album As Object, imageList As Object)
     m.itemLabelMain2.text = ""
     m.albummarkupgrid.content = m.menuSelected
     m.albummarkupgrid.jumpToItem = 0
-    m.settingsIcon.visible = true
     
     centerMarkupBox()
+    
+    m.albummarkupgrid.observeField("itemFocused", "onItemFocused") 
+    m.albummarkupgrid.observeField("itemSelected", "onItemSelected")
 End Sub
 
 
@@ -337,7 +358,6 @@ End Sub
  
 Sub hideAlbum()
     m.albummarkupgrid.visible = false
-    m.settingsIcon.visible    = false
     m.itemLabelMain1.visible  = false
     m.itemLabelMain2.visible  = false  
 End Sub
@@ -347,7 +367,6 @@ Sub displayAlbum()
     m.albummarkupgrid.visible = true
     m.itemLabelMain1.visible = true
     m.itemLabelMain2.visible = true
-    m.settingsIcon.visible = false
     m.albumPageList.visible = false
     
     m.albummarkupgrid.setFocus(true)
@@ -359,7 +378,7 @@ Sub displayAlbumPages()
     m.albummarkupgrid.visible = false
     m.itemLabelMain1.visible = false
     m.itemLabelMain2.visible = false
-    m.settingsIcon.visible = false
+
     
     m.albumPageList.setFocus(true)
     

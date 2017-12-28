@@ -1,7 +1,12 @@
 <?xml version = "1.0" encoding = "utf-8" ?> 
 
 <component name = "My Albums" extends = "Group" initialFocus = "albumGrid" >
-
+    
+	<interface>
+		<field id = "imageContent" type = "assocarray" />
+        <field id = "loaded"       type = "boolean" />
+	</interface>
+    
     <script type = "text/brightscript" uri = "pkg:/components/SlideShow/Albums/Albums.brs" />
     <script type = "text/brightscript" uri = "pkg:/components/SlideShow/SlideshowHelper.brs" />
     <script type = "text/brightscript" uri = "pkg:/components/Utils/Common.brs" />
@@ -41,15 +46,6 @@
             horizAlign  = "center"
             vertAlign   = "center"
             translation = "[0,225]"
-        />
-
-        <Poster 
-            id          = "settingsIcon"
-            width       = "60"
-            height      = "60"
-            translation = "[1180, 630]"
-            uri         = "pkg:/images/gear.png"
-            visible     = "false"
         />
 
         <LabelList

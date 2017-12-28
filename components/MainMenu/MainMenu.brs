@@ -56,8 +56,9 @@ Sub onItemSelected()
     m.itemLabelMain1.visible = false
     m.itemLabelMain2.visible = false
       
-    m.itemHeader.text   = m.userInfoName[m.global.selectedUser] + " • " + screenToDisplay
-    m.screenActive      = createObject("roSGNode", screenToDisplay)
+    m.itemHeader.text     = m.userInfoName[m.global.selectedUser] + " • " + screenToDisplay
+    m.screenActive        = createObject("roSGNode", screenToDisplay)
+    m.screenActive.loaded = true
     m.top.appendChild(m.screenActive)
     m.screenActive.setFocus(true)
 End Sub

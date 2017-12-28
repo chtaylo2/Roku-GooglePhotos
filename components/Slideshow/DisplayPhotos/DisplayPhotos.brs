@@ -246,11 +246,11 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
             m.DownloadTimer.control = "start"
             m.PauseScreen.visible   = "false"
             return true
-        else if (key = "options") and m.PauseScreen.visible = false
+        else if ((key = "up") or (key = "down")) and m.PauseScreen.visible = false
             print "OPTIONS - SHOW"
             m.PauseScreen.visible   = "true"
             return true
-        else if (key = "options") and m.PauseScreen.visible = true
+        else if ((key = "up") or (key = "down")) and m.PauseScreen.visible = true
             print "OPTIONS - HIDE"
             m.PauseScreen.visible   = "false"
             return true

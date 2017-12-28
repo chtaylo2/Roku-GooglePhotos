@@ -6,14 +6,16 @@
     </interface>
 
     <script type = "text/brightscript" uri = "pkg:/components/Search/Search.brs" />
+    <script type = "text/brightscript" uri = "pkg:/components/SlideShow/SlideshowHelper.brs" />
     <script type = "text/brightscript" uri = "pkg:/components/Utils/Common.brs" />
+    <script type = "text/brightscript" uri = "pkg:/components/Utils/private-git.brs" />
   
     <children>
     
         <MiniKeyboard
-            id = "miniKeyboard"
+            id          = "miniKeyboard"
             translation = "[ 150, 160 ]"
-            keyColor = "#808080" >
+            keyColor    = "#808080" >
  
             <Label 
                 id          = "infoLabel" 
@@ -52,17 +54,17 @@
             </Rectangle>
 
             <Button
-                id = "searchBtn"
-                text = "Search"
-                iconUri = ""
-                textColor       = "#808080"
+                id          = "searchBtn"
+                text        = "Search"
+                iconUri     = ""
+                textColor   = "#808080"
                 translation = "[ 0, 465 ]"
             />
             
             <Button
-                id = "clearSearchBtn"
-                text = "Clear Search History"
-                iconUri = ""
+                id          = "clearSearchBtn"
+                text        = "Clear Search History"
+                iconUri     = ""
                 textColor   = "#808080"
                 translation = "[ 530, 465 ]"
             />

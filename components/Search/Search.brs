@@ -1,22 +1,66 @@
 
 Sub init()
 
+    m.UriHandler = createObject("roSGNode","Search UrlHandler")
+    m.UriHandler.observeField("searchResult","handleGetSearch")
     m.miniKeyboard = m.top.findNode("miniKeyboard")
     m.searchBtn = m.top.findNode("searchBtn")
 
+    'Load common variables
+    loadCommon()
+    
     ' Load in the OAuth Registry entries
     loadReg()
+
+    
 
 End Sub
 
 
-Sub processkeyEntry()
-    print "TEXT: "; m.miniKeyboard.textEditBox.text
+' URL Request to fetch search
+Sub doGetSearch()
+    print "Search.brs [doGetSearch]"
+    keyword = m.miniKeyboard.textEditBox.text
+    
+    signedHeader = oauth_sign(m.global.selectedUser)
+    makeRequest(signedHeader, m.gp_prefix + "?kind=photo&v=3.0&q="+keyword+"&max-results=1000&thumbsize=220&imgmax="+getResolution(), "GET", "", 0)
+End Sub
 
-    'if len(m.pinPad.pin) = 3 then
-    '    m.pinRectangle.visible = false
-    '    m.settingSubList.setFocus(true)
-    'end if
+
+Sub doRefreshToken()
+    print "Albums.brs [doRefreshToken]"
+
+    params = "client_id="                  + m.clientId
+    params = params + "&client_secret="    + m.clientSecret
+    params = params + "&refresh_token="    + m.refreshToken[m.global.selectedUser]
+    params = params + "&grant_type="       + "refresh_token"
+
+    makeRequest({}, m.oauth_prefix+"/token", "POST", params, 2)
+End Sub
+
+
+Sub handleGetSearch(event as object)
+    print "Search.brs [handleGetSearch]"
+
+    response = event.getData()
+    if response.code <> 200 then
+        doRefreshToken()
+    else
+
+        rsp=ParseXML(response.content)
+        'if rsp=invalid then
+        '    ShowErrorDialog("Unable to parse Google Photos API response" + LF + LF + "Exit the channel then try again later","API Error")
+        'end if
+        
+        m.screenActive = createObject("roSGNode", "My Albums")
+        m.screenActive.imageContent = response
+        m.screenActive.loaded = true
+        m.top.appendChild(m.screenActive)
+        m.screenActive.setFocus(true)
+        
+        m.miniKeyboard.visible = false
+        
+    end if
 
 End Sub
 
@@ -29,13 +73,9 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
         if (key = "down") and (m.miniKeyboard.hasFocus() = true)
         '    m.searchBtn.setFocus(true)
             return true
-        'else if (key = "left") and (m.pinRectangle.visible = false) and (m.settingsList.hasFocus() = false)
-        '    m.settingsList.setFocus(true)
-        '    return true        
-        'else if (key = "back") and (m.settingsList.hasFocus() = false)
-        '    m.settingsList.setFocus(true)
-        '    m.pinRectangle.visible = false
-        '    return true
+        else if (key = "options")
+            doGetSearch()
+            return true        
         end if
     end if
 

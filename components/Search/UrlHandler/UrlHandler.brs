@@ -131,11 +131,7 @@ Sub processResponse(msg as Object)
 		job.context.context.response = result
 		if (msg.GetResponseCode() = 200) or (msg.GetResponseCode() = 403)
 			if result.num = 0
-				m.top.albumList = job.context.context.response
-			else if result.num = 1
-				m.top.albumImages = job.context.context.response
-			else if result.num = 2
-				m.top.refreshToken = job.context.context.response
+				m.top.searchResult = job.context.context.response
 			end if
 		else
 			print "Error: status code was: " + (msg.GetResponseCode()).toStr()
@@ -144,11 +140,4 @@ Sub processResponse(msg as Object)
 		print "Error: event for unknown job "; idkey
 	end if
 	print "--------------------------------------------------------------------------"
-End Sub
-
-
-Sub provideResponse(job as object)
-    print "UrlHandler.brs - [parseGenToken]"
-    result = job.context.context.response
-    m.top.response = result
 End Sub

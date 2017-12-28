@@ -10,7 +10,7 @@ sub doVideoShow()
     
     
     videoStream = CreateObject("roAssociativeArray")
-    videoStream.url = "https://lh3.googleusercontent.com/5I_xOonP2vwYrCQGLX2TQqXI3S-QbuWhCTvwF4bv83DGk9wZebNsukO7PF7Nv-1AdWwDmvtvCw=m22"
+    videoStream.url = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4"
     'videoStream.quality = true
     videoStream.title = "test ABC"
     videoStream.streamformat = "mp4"
