@@ -15,7 +15,7 @@
         <MiniKeyboard
             id          = "miniKeyboard"
             translation = "[ 150, 160 ]"
-            keyColor    = "#808080" >
+            keyColor    = "#8a8b8c" >
  
             <Label 
                 id          = "infoLabel" 
@@ -58,7 +58,10 @@
                 text        = "Search"
                 iconUri     = ""
                 textColor   = "#808080"
-                translation = "[ 0, 465 ]"
+                translation = "[ 115, 465 ]"
+                minWidth    = "50"
+                height      = "50"
+                showFocusFootprint = "true"
             />
             
             <Button

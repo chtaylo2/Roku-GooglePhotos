@@ -13,7 +13,7 @@
     <script type = "text/brightscript" uri = "pkg:/components/Utils/private-git.brs" />
 
     <children>
-
+				
         <MarkupGrid 
             id                  = "albumGrid"
             translation         = "[39,240]"
@@ -24,7 +24,12 @@
             itemSpacing         = "[ 20, 20 ]"
             drawFocusFeedback   = "false"
         />
-    
+
+		<LoadingIndicator
+			id 			= "loadingSpinner"
+			visible 	= "false"
+		/>
+	
         <Label
             id          = "itemLabelMain1"
             height      = "720"

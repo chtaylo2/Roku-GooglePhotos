@@ -5,6 +5,7 @@ Sub init()
     m.UriHandler.observeField("albumImages","handleGetAlbumImages")
     m.UriHandler.observeField("refreshToken","handleRefreshToken")
 
+    m.loadingSpinner  = m.top.findNode("loadingSpinner")
     m.albummarkupgrid = m.top.findNode("albumGrid")
     m.itemLabelMain1  = m.top.findNode("itemLabelMain1")
     m.itemLabelMain2  = m.top.findNode("itemLabelMain2")
@@ -14,7 +15,7 @@ Sub init()
     m.albumPageInfo1  = m.top.findNode("albumPageInfo1")
     m.albumPageInfo2  = m.top.findNode("albumPageInfo2")
 
-    m.content = createObject("RoSGNode","ContentNode")
+    m.albumListContent = createObject("RoSGNode","ContentNode")
     
     'Load common variables
     loadCommon()
@@ -23,7 +24,6 @@ Sub init()
     loadReg()
     
     m.top.observeField("loaded","loadingComplete")
-    
 End Sub
 
 
@@ -31,6 +31,8 @@ Sub loadingComplete()
     m.top.unobserveField("loaded")
 
     if m.top.imageContent<>invalid then
+        'Show search results
+    
         album = CreateObject("roAssociativeArray")
         album.GetTitle=function():return "Search Results":end function
         album.GetImageCount=function():return Int(1):end function
@@ -41,10 +43,14 @@ Sub loadingComplete()
         googleDisplayImageMenu(album, m.imagesObject)
         
     else
-        'Focus album list
+        'Get user albums
+        
+        'Display Loading Spinner
+        showLoadingSpinner(5, "GP_ALBUM_LISTING")
+        
+        'API CALL: Get album listing
         doGetAlbumList()
     end if
-    
 End Sub
 
 
@@ -143,6 +149,8 @@ Sub onItemSelected()
 
     selection = m.albummarkupgrid.content.getChild(m.albummarkupgrid.itemSelected)
     
+    print "HERE: "; selection
+    
     if selection.id = "GP_ALBUM_LISTING" then
         album = m.albumsObject[m.albummarkupgrid.itemSelected]
         m.albumName = album.GetTitle()
@@ -152,6 +160,11 @@ Sub onItemSelected()
             'if lastPopup=invalid then googlephotos_thousandpopup()
             googleAlbumPages(album)
         else
+
+            'Display Loading Spinner
+            showLoadingSpinner(3, "GP_LOADING")
+        
+            'API CALL: Get album image listing
             doGetAlbumImages(album)
         end if
         
@@ -180,7 +193,7 @@ Sub onItemSelected()
         m.top.appendChild(m.screenActive)
         m.screenActive.setFocus(true)
 
-        hideAlbum()
+        hideMarkupGrid()
         
     else if selection.id = "GP_IMAGE_BROWSE" then
         print "IMAGE BROWSE"
@@ -199,7 +212,7 @@ Sub onItemSelected()
         m.top.appendChild(m.screenActive)
         m.screenActive.setFocus(true)
 
-        hideAlbum()
+        hideMarkupGrid()
         
     end if
 End Sub
@@ -218,15 +231,19 @@ End Sub
 
 Sub googleDisplayAlbums(albumList As Object)
     for each album in albumList
-        addItem(m.content, "GP_ALBUM_LISTING", album.GetThumb(), album.GetTitle(), "")
+        addItem(m.albumListContent, "GP_ALBUM_LISTING", album.GetThumb(), album.GetTitle(), "")
     end for
     
-    m.albummarkupgrid.content = m.content
+    m.albummarkupgrid.content = m.albumListContent
     
-    centerMarkupBox()
+    centerMarkupGrid()
+    showMarkupGrid()
     
     m.albummarkupgrid.observeField("itemFocused", "onItemFocused") 
     m.albummarkupgrid.observeField("itemSelected", "onItemSelected")
+    
+    'Turn off Loading Spinner
+    m.loadingSpinner.visible = "false"
 End Sub
 
 
@@ -254,12 +271,12 @@ Sub googleAlbumPages(album As Object)
         page_end_dply   = str(page_end)
         page_end_dply   = page_end_dply.Replace(" ", "")
         
-        addIt = ""
+        tmpExtra = ""
         if i = 1 then
-            addIt = " - Newest"
+            tmpExtra = " - Newest"
         end if
         
-        addItem(m.albumPages, "GP_ALBUM_PAGES", thumb, "Media Page " + str(i) + addIt, "Items: "+page_start_dply+" thru "+page_end_dply)
+        addItem(m.albumPages, "GP_ALBUM_PAGES", thumb, "Media Page " + str(i) + tmpExtra, "Items: "+page_start_dply+" thru "+page_end_dply)
         
     end for
 
@@ -281,6 +298,10 @@ Sub onAlbumPageSelected()
     'Item selected
     print "SELECTED: "; m.albumPageList.itemSelected
     
+    'Display Loading Spinner
+    showLoadingSpinner(3, "GP_ALBUM_PAGES")    
+    
+    'API CALL: Get image based on page selected
     album = m.albumsObject[m.albummarkupgrid.itemSelected]
     doGetAlbumImages(album, m.albumPageList.itemSelected)
 End Sub
@@ -288,8 +309,6 @@ End Sub
 
 Sub googleDisplayImageMenu(album As Object, imageList As Object)
     print "Albums.brs - [googleDisplayImageMenu]"
-    
-    displayAlbum()
     
     m.menuSelected = createObject("RoSGNode","ContentNode")
     title          = album.GetTitle()
@@ -340,14 +359,21 @@ Sub googleDisplayImageMenu(album As Object, imageList As Object)
     m.albummarkupgrid.content = m.menuSelected
     m.albummarkupgrid.jumpToItem = 0
     
-    centerMarkupBox()
+    centerMarkupGrid()
+    showMarkupGrid()
     
+    'Unobserve first to make sure we're not already monitoring
+    m.albummarkupgrid.unobserveField("itemFocused") 
+    m.albummarkupgrid.unobserveField("itemSelected")
     m.albummarkupgrid.observeField("itemFocused", "onItemFocused") 
     m.albummarkupgrid.observeField("itemSelected", "onItemSelected")
+    
+    'Turn off Loading Spinner
+    m.loadingSpinner.visible = "false"
 End Sub
 
 
-Sub centerMarkupBox()
+Sub centerMarkupGrid()
     'Center the MarkUp Box
     markupRectAlbum = m.albummarkupgrid.boundingRect()
     centerx = (1280 - markupRectAlbum.width) / 2
@@ -356,14 +382,14 @@ Sub centerMarkupBox()
 End Sub
 
  
-Sub hideAlbum()
+Sub hideMarkupGrid()
     m.albummarkupgrid.visible = false
     m.itemLabelMain1.visible  = false
-    m.itemLabelMain2.visible  = false  
+    m.itemLabelMain2.visible  = false
 End Sub
 
 
-Sub displayAlbum()
+Sub showMarkupGrid()
     m.albummarkupgrid.visible = true
     m.itemLabelMain1.visible = true
     m.itemLabelMain2.visible = true
@@ -379,13 +405,25 @@ Sub displayAlbumPages()
     m.itemLabelMain1.visible = false
     m.itemLabelMain2.visible = false
 
-    
     m.albumPageList.setFocus(true)
     
     'Watch for events
     m.albumPageList.observeField("itemFocused", "onAlbumPageFocused") 
-    m.albumPageList.observeField("itemSelected", "onAlbumPageSelected")
+    m.albumPageList.observeField("itemSelected", "onAlbumPageSelected")   
+End Sub
+
+
+Sub showLoadingSpinner(gridCount as integer, id as string)
+    m.placeholder = createObject("RoSGNode","ContentNode")
+    for i = 1 to gridCount
+        addItem(m.placeholder, id, "pkg:/images/placeholder.jpg", "", "")
+    end for
     
+    m.albummarkupgrid.content = m.placeholder
+    centerMarkupGrid()
+    showMarkupGrid()
+    m.loadingSpinner.visible = "true"
+    m.loadingSpinner.setFocus(true)
 End Sub
 
 
@@ -394,14 +432,14 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
         if key = "back"
             if (m.screenActive <> invalid)
                 m.top.removeChild(m.screenActive)
-                displayAlbum()
+                showMarkupGrid()
                 m.screenActive = invalid
                 return true
             end if      
 
             if (m.albummarkupgrid.content <> invalid) and (m.albummarkupgrid.content.getChild(0).id <> "GP_ALBUM_LISTING" )
-                m.albummarkupgrid.content = m.content
-                centerMarkupBox()
+                m.albummarkupgrid.content = m.albumListContent
+                centerMarkupGrid()
                 
                 return true
             end if

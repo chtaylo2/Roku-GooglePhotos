@@ -5,15 +5,21 @@ Sub init()
     m.UriHandler.observeField("searchResult","handleGetSearch")
     m.miniKeyboard = m.top.findNode("miniKeyboard")
     m.searchBtn = m.top.findNode("searchBtn")
+    
+    m.searchBtn.observeField("buttonSelected","doGetSearch")
 
     'Load common variables
     loadCommon()
     
     ' Load in the OAuth Registry entries
     loadReg()
-
     
-
+    'Set some UI customizations
+    m.miniKeyboard.texteditbox.maxTextLength    = 20
+    m.miniKeyboard.texteditbox.hintText         = "Google Photos Search"
+    m.miniKeyboard.texteditbox.hintTextColor    = "#949596"
+    m.miniKeyboard.texteditbox.textColor        = "#313233"
+    
 End Sub
 
 
@@ -22,8 +28,10 @@ Sub doGetSearch()
     print "Search.brs [doGetSearch]"
     keyword = m.miniKeyboard.textEditBox.text
     
-    signedHeader = oauth_sign(m.global.selectedUser)
-    makeRequest(signedHeader, m.gp_prefix + "?kind=photo&v=3.0&q="+keyword+"&max-results=1000&thumbsize=220&imgmax="+getResolution(), "GET", "", 0)
+    if keyword <> ""
+        signedHeader = oauth_sign(m.global.selectedUser)
+        makeRequest(signedHeader, m.gp_prefix + "?kind=photo&v=3.0&q="+keyword+"&max-results=1000&thumbsize=220&imgmax="+getResolution(), "GET", "", 0)
+    end if
 End Sub
 
 
@@ -68,10 +76,11 @@ End Sub
 Function onKeyEvent(key as String, press as Boolean) as Boolean
     if press then
         print "KEY: "; key
-        print "FOCUS: "; m.miniKeyboard.hasFocus()
-        'm.searchBtn.setFocus(true)
-        if (key = "down") and (m.miniKeyboard.hasFocus() = true)
-        '    m.searchBtn.setFocus(true)
+        if (key = "down") and (m.miniKeyboard<>invalid) and (m.miniKeyboard.focusedChild.id = "")
+            m.searchBtn.setFocus(true)
+            return true
+        else if (key = "up") and (m.miniKeyboard<>invalid) and (m.miniKeyboard.focusedChild.id = "searchBtn")
+            m.miniKeyboard.setFocus(true)
             return true
         else if (key = "options")
             doGetSearch()
