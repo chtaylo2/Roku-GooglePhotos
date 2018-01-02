@@ -9,7 +9,7 @@ End Sub
 Sub showcontent()
     itemcontent = m.top.itemContent
     m.itemposter.width = itemcontent.x
-    m.itemposter.heith = itemcontent.x
+    m.itemposter.height = itemcontent.y
     m.itemposter.uri = itemcontent.hdgridposterurl     
 End Sub
 

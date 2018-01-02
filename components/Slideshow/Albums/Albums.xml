@@ -47,7 +47,6 @@
             width       = "1280"
             font        = "font:MediumSystemFont"
             color       = "#808080"
-            text        = "..     Page Buttons     .."
             horizAlign  = "center"
             vertAlign   = "center"
             translation = "[0,225]"

@@ -2,48 +2,43 @@
 
 <component name="LoadingIndicator" extends="Group">
 
-	<script type = "text/brightscript" >
+    <script type = "text/brightscript" >
 
-		<![CDATA[
+        <![CDATA[
 
-			Sub init()
-				m.spinner = m.top.findNode("spinner")
-				
-		        m.spinner.poster.uri="pkg:/images/loader.gif"
-				m.spinner.poster.width="75"
-				m.spinner.poster.height="75"
-				m.spinner.visible = "true"
-				m.spinner.control = "start"
-				
-                centerMarkupBox()
+            Sub init()
+                m.spinner               = m.top.findNode("spinner")
+                m.spinner.poster.uri    = "pkg:/images/loader.gif"
+                m.spinner.poster.width  = "75"
+                m.spinner.poster.height = "75"
+                m.spinner.visible       = "true"
+                m.spinner.control       = "start"
                 
-			End Sub
+                centerSpinner()
+            End Sub
 
-            Sub centerMarkupBox()
-                'Center the MarkUp Box
+            Sub centerSpinner()
+                'Center the Spinner
                 spinnerRect = m.spinner.boundingRect()
                 centerx = (1280 - spinnerRect.width) / 2
                 centery = (720 - spinnerRect.height) / 2
 
-                m.spinner.translation = [ centerx, centery ]
-        End Sub
+                m.spinner.translation = [ centerx, centery-20 ]
+            End Sub
 
-		]]>
+        ]]>
 
-	</script>
+    </script>
 
     <children>
 
- 			<BusySpinner
-				id="spinner"
-				translation="[570, 300]"
-				control="start"
-				clockwise="true"
-				spinInterval="2" />
-  </children>
-
-  <interface>
-    <field id="control" type="string" />
-  </interface>
+        <BusySpinner
+            id              = "spinner"
+            control         = "start"
+            clockwise       = "true"
+            spinInterval    = "2"
+        />
+        
+    </children>
   
 </component>

@@ -15,7 +15,7 @@
 
         <Poster 
             id                  = "itemPoster" 
-            translation         = "[ 22, 25 ]" 
+            translation         = "[ 22, 25 ]"
             width               = "200" 
             height              = "200"
             scaleRotateCenter   = "[ 100.0, 244.0 ]" >

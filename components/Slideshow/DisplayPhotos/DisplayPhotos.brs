@@ -1,107 +1,110 @@
 
 Sub init()    
-     m.PrimaryImage      = m.top.findNode("PrimaryImage")
-     m.BlendedImage      = m.top.findNode("BlendedImage")
-     m.FadeForeground    = m.top.findNode("FadeForeground")
-     m.FadeINAnimation   = m.top.findNode("FadeINAnimation")
-     m.FadeOUTAnimation  = m.top.findNode("FadeOUTAnimation")
-     m.PauseScreen       = m.top.findNode("PauseScreen")
-     m.pauseImageCount   = m.top.findNode("pauseImageCount")
-     m.pauseImageDetail  = m.top.findNode("pauseImageDetail")
-     m.RotationTimer     = m.top.findNode("RotationTimer")
-     m.DownloadTimer     = m.top.findNode("DownloadTimer")
+    m.PrimaryImage      = m.top.findNode("PrimaryImage")
+    m.BlendedImage      = m.top.findNode("BlendedImage")
+    m.FadeForeground    = m.top.findNode("FadeForeground")
+    m.FadeINAnimation   = m.top.findNode("FadeINAnimation")
+    m.FadeOUTAnimation  = m.top.findNode("FadeOUTAnimation")
+    m.PauseScreen       = m.top.findNode("PauseScreen")
+    m.pauseImageCount   = m.top.findNode("pauseImageCount")
+    m.pauseImageDetail  = m.top.findNode("pauseImageDetail")
+    m.RotationTimer     = m.top.findNode("RotationTimer")
+    m.DownloadTimer     = m.top.findNode("DownloadTimer")
 
-     m.port = CreateObject("roMessagePort")
-     device = CreateObject("roDeviceInfo")
-     ds     = device.GetDisplaySize()
+    m.port = CreateObject("roMessagePort")
+    device = CreateObject("roDeviceInfo")
+    ds     = device.GetDisplaySize()
     
-     m.PrimaryImage.loadWidth  = ds.w
-     m.PrimaryImage.loadHeight = ds.h
+    m.PrimaryImage.loadWidth  = ds.w
+    m.PrimaryImage.loadHeight = ds.h
     
-     m.imageLocalStore = {}
-     m.imageDisplay    = []
-     m.imageTracker    = -1
+    m.imageLocalStore = {}
+    m.imageDisplay    = []
+    m.imageTracker    = -1
     
-     m.PrimaryImage.observeField("loadStatus","onLoadStatusTrigger")
-     m.FadeOUTAnimation.observeField("state","onFadeOutTrigger")
-     m.RotationTimer.observeField("fire","onRotationTigger")
-     m.DownloadTimer.observeField("fire","onDownloadTigger")
-     m.top.observeField("content","loadImageList")
+    m.PrimaryImage.observeField("loadStatus","onLoadStatusTrigger")
+    m.FadeOUTAnimation.observeField("state","onFadeOutTrigger")
+    m.RotationTimer.observeField("fire","onRotationTigger")
+    m.DownloadTimer.observeField("fire","onDownloadTigger")
+    m.top.observeField("content","loadImageList")
 
-     m.showDisplay = RegRead("SlideshowDisplay", "Settings")
-     m.showOrder = RegRead("SlideshowOrder", "Settings")
+    m.showDisplay = RegRead("SlideshowDisplay", "Settings")
+    m.showOrder = RegRead("SlideshowOrder", "Settings")
 
-     showDelay = RegRead("SlideshowDelay", "Settings")
-     print "GooglePhotos Show Delay: "; showDelay
-     if showDelay<>invalid
-         m.RotationTimer.duration = strtoi(showDelay)
-         if strtoi(showDelay) > 3
-             m.DownloadTimer.duration = strtoi(showDelay)-3
-         else
-             m.DownloadTimer.duration = 2
-         end if
-     else
-         m.RotationTimer.duration = 5
-         m.DownloadTimer.duration = 2
-     end if
+    showDelay = RegRead("SlideshowDelay", "Settings")
+    print "GooglePhotos Show Delay: "; showDelay
+    if showDelay<>invalid
+        m.RotationTimer.duration = strtoi(showDelay)
+        if strtoi(showDelay) > 3
+            m.DownloadTimer.duration = strtoi(showDelay)-3
+        else
+            m.DownloadTimer.duration = 2
+        end if
+    else
+        m.RotationTimer.duration = 5
+        m.DownloadTimer.duration = 2
+    end if
     
-     m.RotationTimer.repeat = true
-     m.DownloadTimer.repeat = true
+    m.RotationTimer.repeat = true
+    m.DownloadTimer.repeat = true
 End Sub
 
 
 sub loadImageList()
-     print "DisplayPhotos.brs [loadImageList]"
+    print "DisplayPhotos.brs [loadImageList]"
     
-     'Copy original list since we can't change origin
-     originalList = m.top.content
-     
-     for i = 0 to m.top.content.Count()-1 
-         if m.showOrder = "random" then
-             'Create image display list - RANDOM
-             nxt = GetRandom(originalList)
-         else if m.showOrder = "newest"
-             'Create image display list - NEW FIRST
-             nxt = 0
-         else
-             'Create image display list - OLD FIRST
-             nxt = originalList.Count()-1
-         end if
-         
-         'Track startPhoto if valid
-         if m.top.startPhoto = originalList[nxt].url then
-             m.imageDisplay.unshift(originalList[nxt])
-         else
-             m.imageDisplay.push(originalList[nxt])
-         end if
-         
-         originalList.Delete(nxt)
+    'Copy original list since we can't change origin
+    originalList = m.top.content
+    
+    print "START: "; m.top.startIndex
+    for i = 0 to m.top.content.Count()-1
+    
+        if m.top.startIndex <> -1 then
+            'If coming from browsing, only show in Newest First order
+            nxt = 0
+        else
+            if m.showOrder = "random" then
+                'Create image display list - RANDOM
+                nxt = GetRandom(originalList)
+            else if m.showOrder = "oldest"
+                'Create image display list - OLD FIRST
+                nxt = originalList.Count()-1
+            else
+                'Create image display list - NEW FIRST
+                nxt = 0
+            end if 
+        end if
+        
+        m.imageDisplay.push(originalList[nxt])
+        originalList.Delete(nxt)
                  
-     end for
+    end for
     
-     'We have an image list. Start display
-     onRotationTigger({})
-     onDownloadTigger({})
+    'We have an image list. Start display
+    onRotationTigger({})
+    onDownloadTigger({})
      
-     m.RotationTimer.control = "start"
-     m.DownloadTimer.control = "start"
+    m.RotationTimer.control = "start"
+    m.DownloadTimer.control = "start"
      
-     'Trigger a PAUSE if photo selected
-     if m.top.startPhoto <> "" then
-         onKeyEvent("OK", true)
-     end if
+    'Trigger a PAUSE if photo selected
+    if m.top.startIndex <> -1 then
+        onKeyEvent("OK", true)
+    end if
      
 End Sub
 
 
 Sub onRotationTigger(event as object)
-     print "DisplayPhotos.brs [onRotationTigger]";
+    print "DisplayPhotos.brs [onRotationTigger]";
+    
+    print "SHOWDISPLAY: "; m.showDisplay
     
     if m.showDisplay = "NoFading_YesBlur" or m.showDisplay = "NoFading_NoBlur" then
-       m.FadeForeground.visible = false
-       sendNextImage()
+        m.FadeForeground.visible = false
+        sendNextImage()
     else
-       m.FadeOUTAnimation.control = "start"
+        m.FadeOUTAnimation.control = "start"
     end if
 End Sub
 
@@ -174,7 +177,13 @@ Sub sendNextImage()
     print "DisplayPhotos.brs [sendNextImage]"
         
     'Get next image to display.
-    nextID = GetNextImage(m.imageDisplay, m.imageTracker)
+    if m.top.startIndex <> -1 then
+        nextID = m.top.startIndex
+        m.top.startIndex = -1
+    else
+        nextID = GetNextImage(m.imageDisplay, m.imageTracker)
+    end if
+    
     m.imageTracker = nextID
     
     url = m.imageDisplay[nextID].url
@@ -189,7 +198,7 @@ Sub sendNextImage()
     m.PrimaryImage.uri = url
     
     'Controls the background blur
-    if m.showDisplay = "YesFading_YesBlur" or m.showDisplay = "NoFading_YesBlur" then
+    if m.showDisplay = invalid or m.showDisplay = "YesFading_YesBlur" or m.showDisplay = "NoFading_YesBlur" then
         m.BlendedImage.uri = url
     end if
     
@@ -227,7 +236,6 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
             print "RIGHT"
             onRotationTigger({})
             m.RotationTimer.control = "stop"
-            m.DownloadTimer.control = "stop"
             m.PauseScreen.visible   = "true"
             return true
         else if key = "left" or key = "rewind"
@@ -236,14 +244,12 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
         else if (key = "play" or key = "OK") and m.RotationTimer.control = "start"
             print "PAUSE"
             m.RotationTimer.control = "stop"
-            m.DownloadTimer.control = "stop"
             m.PauseScreen.visible   = "true"
             return true
         else if (key = "play" or key = "OK") and m.RotationTimer.control = "stop"
             print "PLAY"
             onRotationTigger({})
             m.RotationTimer.control = "start"
-            m.DownloadTimer.control = "start"
             m.PauseScreen.visible   = "false"
             return true
         else if ((key = "up") or (key = "down")) and m.PauseScreen.visible = false

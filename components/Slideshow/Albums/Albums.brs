@@ -139,7 +139,11 @@ Sub onItemFocused()
     
     focusedItem = m.albummarkupgrid.content.getChild(m.albummarkupgrid.itemFocused)
     m.itemLabelMain1.text = focusedItem.shortdescriptionline1
-    m.itemLabelMain2.text = focusedItem.shortdescriptionline2
+    if m.itemLabelMain2.text <> "" then
+        m.itemLabelMain2.text = focusedItem.shortdescriptionline2
+    else
+        m.itemLabelMain2.text = "NN     Pages     NN"
+    end if
 End Sub
 
 
@@ -226,6 +230,7 @@ Sub addItem(store as object, id as string, hdgridposterurl as string, shortdescr
     item.shortdescriptionline1 = shortdescriptionline1
     item.shortdescriptionline2 = shortdescriptionline2
     item.x = "200"
+    item.y = "160"
 End Sub
 
 
@@ -416,7 +421,7 @@ End Sub
 Sub showLoadingSpinner(gridCount as integer, id as string)
     m.placeholder = createObject("RoSGNode","ContentNode")
     for i = 1 to gridCount
-        addItem(m.placeholder, id, "pkg:/images/placeholder.jpg", "", "")
+        addItem(m.placeholder, id, "pkg:/images/placeholder.png", "", "")
     end for
     
     m.albummarkupgrid.content = m.placeholder
@@ -437,10 +442,9 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
                 return true
             end if      
 
-            if (m.albummarkupgrid.content <> invalid) and (m.albummarkupgrid.content.getChild(0).id <> "GP_ALBUM_LISTING" )
+            if (m.albummarkupgrid.content <> invalid) and (m.albummarkupgrid.content.getChild(0).id <> "GP_ALBUM_LISTING") and (m.top.imageContent = invalid)
                 m.albummarkupgrid.content = m.albumListContent
                 centerMarkupGrid()
-                
                 return true
             end if
         end if

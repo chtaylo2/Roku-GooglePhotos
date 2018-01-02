@@ -216,6 +216,9 @@ Sub showsubselected()
         m.pinRectangle.translation = [ centerx, 200 ]
           
         m.pinRectangle.visible = true
+        m.pinPad.visible = true
+        m.pinPad.pinPad.secureMode = false
+        m.pinPad.pinPad.pinLength  = "3"
         m.pinPad.pin = "0"
         m.pinPad.setFocus(true)   
     end if

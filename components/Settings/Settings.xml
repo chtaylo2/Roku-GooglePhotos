@@ -66,14 +66,15 @@
                 font        = "font:SmallBoldSystemFont"
             />
         
-            <PinPad 
-                id          = "pinPad" 
-                pinLength   = "3"
-                secureMode  = "false"
-                translation = "[ 15, 52 ]"
-            />
+
     
         </Rectangle>
+        
+        <PinDialog 
+            id          = "pinPad" 
+            title       = "Custom Delay (Seconds)"
+            visible     = "false"
+        />
   
   </children>
 </component>
