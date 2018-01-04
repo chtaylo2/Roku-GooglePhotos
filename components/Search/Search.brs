@@ -7,11 +7,9 @@ Sub init()
     m.searchBtn = m.top.findNode("searchBtn")
     m.clearSearchBtn = m.top.findNode("clearSearchBtn")
     m.searchHistoryList = m.top.findNode("searchHistoryList")
-    
     m.searchProgress = m.top.findNode("searchProgress")
     
-    
-    m.searchBtn.observeField("buttonSelected","doGetSearch")
+    m.searchBtn.observeField("buttonSelected","keywordSearch")
     m.searchHistoryList.observeField("itemSelected","historySearch")
     m.clearSearchBtn.observeField("buttonSelected","clearSearchHistory")
 
@@ -41,7 +39,9 @@ Sub populateHistory()
         parsedString = regHistory.Split("|")
 
         for each item in parsedString
-            addItem(m.history, item)
+            if item <> ""
+                addItem(m.history, item)
+            end if
         end for
     
         m.searchHistoryList.content = m.history

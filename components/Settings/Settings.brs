@@ -5,14 +5,14 @@ Sub init()
     loadReg()
 
     'Define SG nodes
-    m.pinRectangle = m.top.findNode("pinRectangle")
-    m.pinPad = m.top.findNode("pinPad")
+    m.pinPad            = m.top.findNode("pinPad")
+    m.settingsList      = m.top.findNode("settingsLabelList")
+    m.settingSubList    = m.top.findNode("settingSubList")
+    m.regEntry          = m.top.findNode("RegistryTask")
+    m.infoLabel         = m.top.findNode("infoLabel")
     
-    m.settingsList = m.top.findNode("settingsLabelList")
-    m.settingSubList = m.top.findNode("settingSubList")
-    m.regEntry = m.top.findNode("RegistryTask")
-    m.infoLabel = m.top.findNode("infoLabel")
-      
+    m.pinPad.observeField("buttonSelected","processPinEntry")
+    
     'Read in Content
     m.readContentTask = createObject("roSGNode", "Local ContentReader")
     m.readContentTask.observeField("content", "setLists")
@@ -95,19 +95,29 @@ Sub storeDelayOptions()
     regSelection = RegRead(regStore, "Settings")
     radioSelection = 0
 
+    tmp = ""
+    if regSelection = "3"
+        radioSelection = 0
+    else if regSelection = "5"
+        radioSelection = 1
+    else if regSelection = "10"
+        radioSelection = 2
+    else if regSelection = "15"
+        radioSelection = 3
+    else if regSelection = "30"
+        radioSelection = 4
+    else
+        radioSelection = 5
+        tmp = "  [" + regSelection + " Seconds]"
+    end if
+    
     m.content = createObject("RoSGNode","ContentNode")
-    if regSelection = "3" then radioSelection = 0
     addItem(m.content, "3 seconds", "3", regStore)
-    if regSelection = "5" then radioSelection = 1
     addItem(m.content, "5 seconds (Default)", "5", regStore)
-    if regSelection = "10" then radioSelection = 2
     addItem(m.content, "10 Seconds", "10", regStore)
-    if regSelection = "15" then radioSelection = 3
     addItem(m.content, "15 Seconds", "15", regStore)
-    if regSelection = "30" then radioSelection = 4
     addItem(m.content, "30 seconds", "30", regStore)
-    if regSelection = "0" then radioSelection = 5
-    addItem(m.content, "Custom Setting", "0", regStore)
+    addItem(m.content, "Custom Setting"+tmp, "0", regStore)
     
     'Store content node and current registry selection
     m.settingsDelay = m.content
@@ -150,31 +160,31 @@ Sub showfocus()
         m.infoLabel.text = itemcontent.description
         
         if m.settingsList.itemFocused = 0 then
-            m.settingSubList.visible = "true"
-            m.settingSubList.content = m.settingsRes
-            m.settingSubList.checkedItem = m.settingsRescheckedItem
-            m.settingSubList.translation = [85, itemcontent.x]
+            m.settingSubList.visible        = "true"
+            m.settingSubList.content        = m.settingsRes
+            m.settingSubList.checkedItem    = m.settingsRescheckedItem
+            m.settingSubList.translation    = [85, itemcontent.x]
         else if m.settingsList.itemFocused = 1 then
-            m.settingSubList.visible = "true"
-            m.settingSubList.content = m.settingsDisplay
-            m.settingSubList.checkedItem = m.settingsDisplaycheckedItem
-            m.settingSubList.translation = [85, itemcontent.x]
+            m.settingSubList.visible        = "true"
+            m.settingSubList.content        = m.settingsDisplay
+            m.settingSubList.checkedItem    = m.settingsDisplaycheckedItem
+            m.settingSubList.translation    = [85, itemcontent.x]
         else if m.settingsList.itemFocused = 2 then
-            m.settingSubList.visible = "true"
-            m.settingSubList.content = m.settingsDelay
-            m.settingSubList.checkedItem = m.settingsDelaycheckedItem
-            m.settingSubList.translation = [85, itemcontent.x]
+            m.settingSubList.visible        = "true"
+            m.settingSubList.content        = m.settingsDelay
+            m.settingSubList.checkedItem    = m.settingsDelaycheckedItem
+            m.settingSubList.translation    = [85, itemcontent.x]
         else if m.settingsList.itemFocused = 3 then
-            m.settingSubList.visible = "true"
-            m.settingSubList.content = m.settingsOrder
-            m.settingSubList.checkedItem = m.settingsOrdercheckedItem
-            m.settingSubList.translation = [85, itemcontent.x]
+            m.settingSubList.visible        = "true"
+            m.settingSubList.content        = m.settingsOrder
+            m.settingSubList.checkedItem    = m.settingsOrdercheckedItem
+            m.settingSubList.translation    = [85, itemcontent.x]
         else if m.settingsList.itemFocused = 4 then
-            m.settingSubList.visible = "false"
+            m.settingSubList.visible        = "false"
         else if m.settingsList.itemFocused = 5 then
-            m.settingSubList.visible = "false"
+            m.settingSubList.visible        = "false"
         else if m.settingsList.itemFocused = 6 then
-            m.settingSubList.visible = "false"
+            m.settingSubList.visible        = "false"
         end if
     end if 
 End Sub
@@ -210,20 +220,15 @@ Sub showsubselected()
     itemcontent = m.settingSubList.content.getChild(m.settingSubList.itemSelected)
     
     if itemcontent.description = "0" then
-        'Center the MarkUp Box
-        pinRect = m.pinRectangle.boundingRect()
-        centerx = (1280 - pinRect.width) / 2
-        m.pinRectangle.translation = [ centerx, 200 ]
-          
-        m.pinRectangle.visible = true
         m.pinPad.visible = true
         m.pinPad.pinPad.secureMode = false
         m.pinPad.pinPad.pinLength  = "3"
-        m.pinPad.pin = "0"
-        m.pinPad.setFocus(true)   
+        buttons =  [ "Save", "Cancel" ]
+        m.pinPad.buttons = buttons
+        m.pinPad.setFocus(true)
+    else
+        RegWrite(itemcontent.titleseason, itemcontent.description, "Settings")
     end if
-    
-    RegWrite(itemcontent.titleseason, itemcontent.description, "Settings")
     
     'Re-store the current selected item locally
     if m.settingsList.itemSelected = 0 then m.settingsRescheckedItem = m.settingSubList.itemSelected
@@ -233,26 +238,41 @@ Sub showsubselected()
 End Sub
 
 
-Sub processPinEntry()
-    if len(m.pinPad.pin) = 3 then
-        m.pinRectangle.visible = false
+Sub processPinEntry(event as object)
+    if event.getData() = 0
+        'SAVE
+        pinInt = strtoi(m.pinPad.pin)
+        print "HERE: "; pinInt
+        if pinInt > 0
+            itemcontent = m.settingSubList.content.getChild(m.settingSubList.itemSelected)
+            RegWrite(itemcontent.titleseason, itostr(pinInt), "Settings")
+        end if
+        
+        storeDelayOptions()
+        showfocus()
+        m.pinPad.visible = false
+        m.settingSubList.setFocus(true)
+    else
+        'CANCEL
+        m.pinPad.visible = false
         m.settingSubList.setFocus(true)
     end if
-
 End Sub
 
 
 Function onKeyEvent(key as String, press as Boolean) as Boolean
     if press then
-        if (key = "right") and (m.pinRectangle.visible = false)
+        print "KEY: "; key
+        print "FOCUS: "; m.pinPad.hasFocus()
+        if (key = "right") and (m.pinPad.visible = false)
             m.settingsList.itemSelected = m.settingsList.itemFocused
             return true
-        else if (key = "left") and (m.pinRectangle.visible = false) and (m.settingsList.hasFocus() = false)
+        else if (key = "left") and (m.pinPad.visible = false) and (m.settingsList.hasFocus() = false)
             m.settingsList.setFocus(true)
             return true        
         else if (key = "back") and (m.settingsList.hasFocus() = false)
             m.settingsList.setFocus(true)
-            m.pinRectangle.visible = false
+            m.pinPad.visible = false
             return true
         end if
     end if

@@ -18,9 +18,10 @@ Sub init()
     m.PrimaryImage.loadWidth  = ds.w
     m.PrimaryImage.loadHeight = ds.h
     
-    m.imageLocalStore = {}
-    m.imageDisplay    = []
-    m.imageTracker    = -1
+    m.imageLocalCacheByURL  = {}
+    m.imageLocalCacheByFS   = {}
+    m.imageDisplay          = []
+    m.imageTracker          = -1
     
     m.PrimaryImage.observeField("loadStatus","onLoadStatusTrigger")
     m.FadeOUTAnimation.observeField("state","onFadeOutTrigger")
@@ -28,11 +29,14 @@ Sub init()
     m.DownloadTimer.observeField("fire","onDownloadTigger")
     m.top.observeField("content","loadImageList")
 
-    m.showDisplay = RegRead("SlideshowDisplay", "Settings")
-    m.showOrder = RegRead("SlideshowOrder", "Settings")
-
-    showDelay = RegRead("SlideshowDelay", "Settings")
+    m.showDisplay   = RegRead("SlideshowDisplay", "Settings")
+    m.showOrder     = RegRead("SlideshowOrder", "Settings")
+    showDelay       = RegRead("SlideshowDelay", "Settings")
+    
     print "GooglePhotos Show Delay: "; showDelay
+    print "GooglePhotos Show Order: "; m.showOrder
+    print "GooglePhotos Show Display: "; m.showDisplay
+    
     if showDelay<>invalid
         m.RotationTimer.duration = strtoi(showDelay)
         if strtoi(showDelay) > 3
@@ -56,11 +60,10 @@ sub loadImageList()
     'Copy original list since we can't change origin
     originalList = m.top.content
     
-    print "START: "; m.top.startIndex
     for i = 0 to m.top.content.Count()-1
     
         if m.top.startIndex <> -1 then
-            'If coming from browsing, only show in Newest First order
+            'If coming from browsing, only show in Newest-Oldest order
             nxt = 0
         else
             if m.showOrder = "random" then
@@ -98,9 +101,8 @@ End Sub
 Sub onRotationTigger(event as object)
     print "DisplayPhotos.brs [onRotationTigger]";
     
-    print "SHOWDISPLAY: "; m.showDisplay
-    
-    if m.showDisplay = "NoFading_YesBlur" or m.showDisplay = "NoFading_NoBlur" then
+    rxFade = CreateObject("roRegex", "NoFading", "i")
+    if rxFade.IsMatch(m.showDisplay) then
         m.FadeForeground.visible = false
         sendNextImage()
     else
@@ -121,19 +123,19 @@ Sub onDownloadTigger(event as object)
         if m.imageDisplay.Count()-1 >= nextID
         nextURL = m.imageDisplay[nextID].url
         
-        if not m.imageLocalStore.DoesExist(nextURL) then
+        if not m.imageLocalCacheByURL.DoesExist(nextURL) then
             tmpDownload.push(m.imageDisplay[nextID])
-            print "DOWNLOAD NEXT: "; nextID; " URL: "; m.imageDisplay[nextID].url
         end if
         
         end if
     end for 
     
     if tmpDownload.Count() > 0 then
-        m.readContentTask = createObject("roSGNode", "ImageGrabber")
-        m.readContentTask.observeField("localarray", "processDownloads")
-        m.readContentTask.remotearray = tmpDownload
-        m.readContentTask.control = "RUN"
+        m.cacheImageTask = createObject("roSGNode", "ImageGrabber")
+        m.cacheImageTask.observeField("localarray", "processDownloads")
+        m.cacheImageTask.observeField("filesystem", "contolCache")
+        m.cacheImageTask.remotearray = tmpDownload
+        m.cacheImageTask.control = "RUN"
     end if
 End Sub
 
@@ -145,8 +147,40 @@ Sub processDownloads(event as object)
     response = event.getdata()
     
     for each key in response
-        m.imageLocalStore[key] = response[key]
+        tmpFS = response[key]
+        
+        m.imageLocalCacheByURL[key] = tmpFS
+        m.imageLocalCacheByFS[tmpFS] = key
     end for
+End Sub
+
+
+Sub contolCache(event as object)
+    'Free channel, no CASH here! -- Not funny? Ok..
+    
+    keepImages = 20
+    
+    'Control the filesystem download cache - After 'keepImages' downloads start removing
+    cacheArray = event.getdata()
+    if type(cacheArray) = "roArray" then
+        print "Local FileSystem Count: "; cacheArray.Count()
+        if (cacheArray.Count() > keepImages) then
+            for i = keepImages to cacheArray.Count()
+                oldImage = cacheArray.pop()
+                print "Delete from FileSystem: "; oldImage
+                DeleteFile("tmp:/"+oldImage)
+                
+                urlLookup = m.imageLocalCacheByFS.Lookup("tmp:/"+oldImage)
+                if urlLookup<>invalid
+                    'Cleanup cache
+                    m.imageLocalCacheByURL.Delete(urlLookup)
+                    m.imageLocalCacheByFS.Delete("tmp:/"+oldImage)
+                end if
+                
+            end for
+        end if
+    end if
+    
 End Sub
 
 
@@ -189,8 +223,8 @@ Sub sendNextImage()
     url = m.imageDisplay[nextID].url
     
     'Pull image from downloaded cache if avalable
-    if m.imageLocalStore.DoesExist(url) then
-        url = m.imageLocalStore[url]
+    if m.imageLocalCacheByURL.DoesExist(url) then
+        url = m.imageLocalCacheByURL[url]
     end if
     
     print "NEXT IMAGE: "; nextID; " - "; url
@@ -198,20 +232,13 @@ Sub sendNextImage()
     m.PrimaryImage.uri = url
     
     'Controls the background blur
-    if m.showDisplay = invalid or m.showDisplay = "YesFading_YesBlur" or m.showDisplay = "NoFading_YesBlur" then
+    rxBlur = CreateObject("roRegex", "YesBlur", "i")
+    if m.showDisplay = invalid or rxBlur.IsMatch(m.showDisplay) then
         m.BlendedImage.uri = url
     end if
     
     m.pauseImageCount.text  = itostr(nextID+1)+" of "+itostr(m.imageDisplay.Count())
     m.pauseImageDetail.text = friendlyDate(strtoi(m.imageDisplay[nextID].timestamp))
-    
-    ''''' THIS IS CRASHING THE ROKU...
-    'Delete cached images after display completed
-    'r = CreateObject("roRegex", "tmp:/", "i")
-    'if r.IsMatch(old) then
-    '    print "DELETE: "; old
-    '    DeleteFile(old)
-    'end if
 End Sub
 
 
@@ -235,7 +262,9 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
         if key = "right" or key = "fastforward"
             print "RIGHT"
             onRotationTigger({})
+            onDownloadTigger({})
             m.RotationTimer.control = "stop"
+            m.DownloadTimer.control = "stop"
             m.PauseScreen.visible   = "true"
             return true
         else if key = "left" or key = "rewind"
@@ -244,12 +273,14 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
         else if (key = "play" or key = "OK") and m.RotationTimer.control = "start"
             print "PAUSE"
             m.RotationTimer.control = "stop"
+            m.DownloadTimer.control = "stop"
             m.PauseScreen.visible   = "true"
             return true
         else if (key = "play" or key = "OK") and m.RotationTimer.control = "stop"
             print "PLAY"
             onRotationTigger({})
             m.RotationTimer.control = "start"
+            m.DownloadTimer.control = "start"
             m.PauseScreen.visible   = "false"
             return true
         else if ((key = "up") or (key = "down")) and m.PauseScreen.visible = false

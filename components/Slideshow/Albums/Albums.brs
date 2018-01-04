@@ -152,9 +152,7 @@ Sub onItemSelected()
     print "SELECTED: "; m.albummarkupgrid.itemSelected
 
     selection = m.albummarkupgrid.content.getChild(m.albummarkupgrid.itemSelected)
-    
-    print "HERE: "; selection
-    
+
     if selection.id = "GP_ALBUM_LISTING" then
         album = m.albumsObject[m.albummarkupgrid.itemSelected]
         m.albumName = album.GetTitle()
