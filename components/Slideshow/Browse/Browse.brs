@@ -13,12 +13,6 @@ Sub loadImageList()
 End Sub
 
 
-Sub addItem(store as object, hdgridposterurl as string)
-    item = store.createChild("ContentNode")
-    item.hdgridposterurl = hdgridposterurl
-End Sub
-
-
 Sub onItemSelected()
     'Item selected
     print "SELECTED: "; m.ImageGrid.itemSelected

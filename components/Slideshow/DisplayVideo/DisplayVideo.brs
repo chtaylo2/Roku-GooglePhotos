@@ -5,62 +5,30 @@ Sub init()
 End Sub
 
 
-sub doVideoShow()
+Sub doVideoShow()
     print "DisplayVideo.brs [doVideoShow]"
-    
-    
-    videoStream = CreateObject("roAssociativeArray")
-    videoStream.url = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4"
-    'videoStream.quality = true
-    videoStream.title = "test ABC"
-    videoStream.streamformat = "mp4"
-    'videoStream.contentid = "my-mp4"
-    
-    print "STREAM: "; videoStream
     
     videoContent = createObject("RoSGNode", "ContentNode")
     videoContent.ContentType = "movie"
-    videoContent.url = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4"
-    'm.top.videoUrl
-    videoContent.title = "Test Video"
+    videoContent.url = m.top.videoUrl
     videoContent.streamformat = "mp4"
-
-
-
 
     print "VIDEO PLAY: ";videoContent
     m.VideoPlayer.content = videoContent
     m.VideoPlayer.control = "play"
     
-     
+    m.VideoPlayer.observeField("state", "onVideoStateChange")
+    
 End Sub
 
 
-Function GetVideoMetaData()
+Sub onVideoStateChange()
+    print "DetailsScreen.brs - [onVideoStateChange]"
+    if (m.VideoPlayer.state = "error") or (m.VideoPlayer.state = "finished") then
+        'Close video screen!
 
-    res=[480]
-    bitrates=[1000]
-    qualities=["SD"]
-    
-        meta = createObject("RoSGNode", "ContentNode") 
-        meta.ContentType="movie"
-        meta.Title="TEST"
-        meta.ShortDescriptionLine1=meta.Title
-        meta.SDPosterUrl=""
-        meta.HDPosterUrl=""
-        meta.StreamFormat="mp4"
-        
-        stream = {}
-        stream.url = m.top.videoUrl
-        stream.bitrate = 480
-        
-        meta.stream = stream
-        
-        print "URL: "; m.top.videoUrl
-        print "CONTENT: "; meta
-
-    return meta
-End Function
+    end if
+End Sub
 
 
 Function onKeyEvent(key as String, press as Boolean) as Boolean

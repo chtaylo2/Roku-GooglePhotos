@@ -15,10 +15,10 @@
 
         <!-- Playback node -->
         <Video
-            id="VideoPlayer"
-            translation="[0, 0]"
-            width="1280"
-            height="720"
+            id          = "VideoPlayer"
+            translation = "[0, 0]"
+            width       = "1280"
+            height      = "720"
         />
             
    </children>

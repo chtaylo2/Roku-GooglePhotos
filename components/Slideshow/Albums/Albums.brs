@@ -204,6 +204,7 @@ Sub onItemSelected()
         for i = 0 to m.imagesMetaData.Count()-1
             addItem(m.imageThumbList, "GP_BROWSE", m.imagesMetaData[i].thumbnail, "", "")
         end for
+        addItem(m.imageThumbList, "GP_BROWSE", "pkg:/images/placeholder.png", "", "")
         
         m.screenActive = createObject("roSGNode", "Browse")
         m.screenActive.id = selection.id
@@ -241,6 +242,7 @@ Sub googleDisplayAlbums(albumList As Object)
     
     centerMarkupGrid()
     showMarkupGrid()
+    onItemFocused()
     
     m.albummarkupgrid.observeField("itemFocused", "onItemFocused") 
     m.albummarkupgrid.observeField("itemSelected", "onItemSelected")
@@ -419,7 +421,7 @@ End Sub
 Sub showLoadingSpinner(gridCount as integer, id as string)
     m.placeholder = createObject("RoSGNode","ContentNode")
     for i = 1 to gridCount
-        addItem(m.placeholder, id, "pkg:/images/placeholder.png", "", "")
+        addItem(m.placeholder, id, "pkg:/images/placeholder2.png", "", "")
     end for
     
     m.albummarkupgrid.content = m.placeholder
@@ -432,6 +434,8 @@ End Sub
 
 Function onKeyEvent(key as String, press as Boolean) as Boolean
     if press then
+        print "ID: "; m.albummarkupgrid.content.getChild(0).id
+        print "FOCUS: "; m.albumPageList.hasFocus()
         if key = "back"
             if (m.screenActive <> invalid)
                 m.top.removeChild(m.screenActive)
@@ -440,9 +444,10 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
                 return true
             end if      
 
-            if (m.albummarkupgrid.content <> invalid) and (m.albummarkupgrid.content.getChild(0).id <> "GP_ALBUM_LISTING") and (m.top.imageContent = invalid)
+            if (m.albummarkupgrid.content <> invalid) and ( (m.albummarkupgrid.content.getChild(0).id <> "GP_ALBUM_LISTING") or (m.albumPageList.hasFocus() = true) ) and (m.top.imageContent = invalid)
                 m.albummarkupgrid.content = m.albumListContent
                 centerMarkupGrid()
+                showMarkupGrid()
                 return true
             end if
         end if

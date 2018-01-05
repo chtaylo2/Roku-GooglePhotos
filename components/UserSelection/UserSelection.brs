@@ -54,6 +54,7 @@ Sub addItem(store as object, hdgridposterurl as string, shortdescriptionline1 as
     item.shortdescriptionline1 = shortdescriptionline1
     item.shortdescriptionline2 = shortdescriptionline2
     item.x = 200
+    item.y = 200
 End Sub
 
 
