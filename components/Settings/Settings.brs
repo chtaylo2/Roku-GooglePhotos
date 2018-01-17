@@ -6,17 +6,37 @@ Sub init()
 
     'Define SG nodes
     m.pinPad            = m.top.findNode("pinPad")
+    m.settingScopeLobal = m.top.findNode("settingScopeLobal")
     m.settingsList      = m.top.findNode("settingsLabelList")
     m.settingSubList    = m.top.findNode("settingSubList")
     m.regEntry          = m.top.findNode("RegistryTask")
     m.infoLabel         = m.top.findNode("infoLabel")
+    m.infoTempSetting   = m.top.findNode("infoTempSetting")
+    m.confirmDialog     = m.top.findNode("confirmDialog")
     
     m.pinPad.observeField("buttonSelected","processPinEntry")
-    
+    m.confirmDialog.observeField("buttonSelected","confirmUnregister")
+End Sub
+
+
+Sub loadListContent()
+
+    if m.top.contentFile = "settingsTemporaryContent"
+        'Temporary setting only apply to the running application
+        m.setScope = "temporary"
+    else
+        'Global settings are percistent across reboot
+        m.setScope = "global"
+    end if
+
+    if m.setScope = "temporary"
+        m.settingScopeLobal.text = "Temporary Settings:"
+    end if
+
     'Read in Content
     m.readContentTask = createObject("roSGNode", "Local ContentReader")
     m.readContentTask.observeField("content", "setLists")
-    m.readContentTask.file = "pkg:/data/Settings/settingsContent.xml"
+    m.readContentTask.file = "pkg:/data/Settings/" + m.top.contentFile + ".xml"
     m.readContentTask.control = "RUN"
 End Sub
 
@@ -159,6 +179,13 @@ Sub showfocus()
         itemcontent = m.settingsList.content.getChild(m.settingsList.itemFocused)
         m.infoLabel.text = itemcontent.description
         
+        'Temporary Setting
+        if (itemcontent.shortdescriptionline1<>"" and m.global.[itemcontent.shortdescriptionline1] <> "")
+            m.infoTempSetting.text = "Override Setting: " + m.global.[itemcontent.shortdescriptionline1]
+        else
+            m.infoTempSetting.text = ""
+        end if
+        
         if m.settingsList.itemFocused = 0 then
             m.settingSubList.visible        = "true"
             m.settingSubList.content        = m.settingsRes
@@ -191,26 +218,24 @@ End Sub
 
 
 Sub showselected()
+
     'Process item selected
     if m.settingsList.itemSelected = 0 OR m.settingsList.itemSelected = 1 OR m.settingsList.itemSelected = 2 OR m.settingsList.itemSelected = 3 then
         'SETTINGS
         m.settingSubList.setFocus(true)
     else if m.settingsList.itemSelected = 4 then
         'REGISTER NEW USER
-        'm.screenActive = createObject("roSGNode", "Registration")
-        'm.top.appendChild(m.screenActive)
-        'm.screenActive.setFocus(true)
+        m.screenActive = createObject("roSGNode", "Registration")
+        m.top.appendChild(m.screenActive)
+        m.screenActive.setFocus(true)
+        m.settingScopeLobal.visible = false
     else if m.settingsList.itemSelected = 5 then
         'UNREGISTER USER
-
-        loadItems()
-        for each item in m.items
-            m.[item].Delete(m.global.selectedUser)
-        end for
-        saveReg()
-        
-        m.global.selectedUser = -2
-        
+        m.confirmDialog.visible = true
+        buttons =  [ "Confirm", "Cancel" ]
+        m.confirmDialog.message = "Are you sure you want to unregister "  + m.userInfoName[m.global.selectedUser] + " from this device?"
+        m.confirmDialog.buttons = buttons
+        m.confirmDialog.setFocus(true)        
     end if
 End Sub
 
@@ -227,14 +252,42 @@ Sub showsubselected()
         m.pinPad.buttons = buttons
         m.pinPad.setFocus(true)
     else
-        RegWrite(itemcontent.titleseason, itemcontent.description, "Settings")
+        if m.setScope = "temporary"
+            'Temporary Setting
+            m.global.[itemcontent.titleseason] = itemcontent.description
+            showfocus()
+        else
+            'Global Setting
+            RegWrite(itemcontent.titleseason, itemcontent.description, "Settings")
+        end if
     end if
     
-    'Re-store the current selected item locally
-    if m.settingsList.itemSelected = 0 then m.settingsRescheckedItem = m.settingSubList.itemSelected
-    if m.settingsList.itemSelected = 1 then m.settingsDisplaycheckedItem = m.settingSubList.itemSelected
-    if m.settingsList.itemSelected = 2 then m.settingsDelaycheckedItem = m.settingSubList.itemSelected
-    if m.settingsList.itemSelected = 3 then m.settingsOrdercheckedItem = m.settingSubList.itemSelected
+    if m.setScope = "temporary"
+        'Re-store the current selected item locally
+        if m.settingsList.itemSelected = 0 then m.settingsRescheckedItem = m.settingSubList.itemSelected
+        if m.settingsList.itemSelected = 1 then m.settingsDisplaycheckedItem = m.settingSubList.itemSelected
+        if m.settingsList.itemSelected = 2 then m.settingsDelaycheckedItem = m.settingSubList.itemSelected
+        if m.settingsList.itemSelected = 3 then m.settingsOrdercheckedItem = m.settingSubList.itemSelected
+    end if
+End Sub
+
+
+Sub confirmUnregister(event as object)
+    if event.getData() = 0
+        'CONFIRM
+        loadItems()
+        for each item in m.items
+            'm.[item].Delete(m.global.selectedUser)
+            print m.[item]
+        end for
+        'saveReg()
+        print event.getData()
+        m.global.selectedUser = -2
+    else
+        'CANCEL
+        m.confirmDialog.visible = false
+        m.settingsList.setFocus(true)
+    end if
 End Sub
 
 
@@ -245,7 +298,14 @@ Sub processPinEntry(event as object)
         print "HERE: "; pinInt
         if pinInt > 0
             itemcontent = m.settingSubList.content.getChild(m.settingSubList.itemSelected)
-            RegWrite(itemcontent.titleseason, itostr(pinInt), "Settings")
+            
+            if m.setScope = "temporary"
+                'Temporary Setting
+                m.global.[itemcontent.titleseason] = itostr(pinInt)
+            else
+                'Global Setting
+                RegWrite(itemcontent.titleseason, itostr(pinInt), "Settings")
+            end if
         end if
         
         storeDelayOptions()
@@ -263,13 +323,18 @@ End Sub
 Function onKeyEvent(key as String, press as Boolean) as Boolean
     if press then
         print "KEY: "; key
-        print "FOCUS: "; m.pinPad.hasFocus()
         if (key = "right") and (m.pinPad.visible = false)
             m.settingsList.itemSelected = m.settingsList.itemFocused
             return true
         else if (key = "left") and (m.pinPad.visible = false) and (m.settingsList.hasFocus() = false)
             m.settingsList.setFocus(true)
-            return true        
+            return true
+        else if (key = "back") and (m.screenActive<>invalid)
+            m.top.removeChild(m.screenActive)
+            m.screenActive = invalid
+            m.settingScopeLobal.visible = true
+            m.settingsList.setFocus(true)
+            return true
         else if (key = "back") and (m.settingsList.hasFocus() = false)
             m.settingsList.setFocus(true)
             m.pinPad.visible = false

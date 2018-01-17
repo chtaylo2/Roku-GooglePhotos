@@ -3,35 +3,44 @@
 <component name = "Settings" extends = "Group" initialFocus = "settingsLabelList" >
 
     <interface>
+        <field id = "contentFile" type = "string" value = "settingsGlobalContent" />
         <field id = "itemFocused" type = "node" alias = "settingsLabelList.itemFocused" onChange = "showfocus" />
         <field id = "itemSelected" type = "node" alias = "settingsLabelList.itemSelected" onChange = "showselected" />
         <field id = "itemSubSelected" type = "node" alias = "settingSubList.itemSelected" onChange = "showsubselected" />
-        
+        <field id = "loaded" type = "boolean" onChange = "loadListContent" />
     </interface>
 
     <script type = "text/brightscript" uri = "pkg:/components/Settings/Settings.brs" />
     <script type = "text/brightscript" uri = "pkg:/components/Utils/Common.brs" />
   
     <children>
-    
-        <LabelList
-            id                      = "settingsLabelList"
-            translation             = "[ 80, 180 ]"
-            itemSize                = "[480,40]"
-            itemSpacing             = "[0,20]"
-            color                   = "#808080"
-            vertFocusAnimationStyle = "floatingFocus">
-    
+ 
+        <Label 
+            id          = "settingScopeLobal" 
+            translation = "[70, 150]" 
+            color       = "#808080"
+            text        = "Global Settings:"
+            font        = "font:MediumBoldSystemFont" >
+                
+            <LabelList
+                id                      = "settingsLabelList"
+                translation             = "[0, 50]"
+                itemSize                = "[480,40]"
+                itemSpacing             = "[0,20]"
+                color                   = "#808080"
+                vertFocusAnimationStyle = "floatingFocus"
+            />
+            
             <Rectangle 
                 id          = "infoRectangle" 
-                translation = "[ 550, 0 ]" 
+                translation = "[550, 25]" 
                 height      = "490" 
                 width       = "600" 
                 color       = "#606060" >
 
                 <Label 
                     id          = "infoLabel" 
-                    translation = "[ 15, 15 ]" 
+                    translation = "[15, 15]" 
                     height      = "460" 
                     width       = "580" 
                     wrap        = "true"
@@ -43,17 +52,29 @@
                     id          = "settingSubList"
                     visible     = "false"
                     itemSize    = "[435,40]"
-                    translation = "[ 100, 175 ]"
+                    translation = "[100, 175]"
                 />
-       
+
+                <Label 
+                    id          = "infoTempSetting" 
+                    translation = "[40, 430]" 
+                    color       = "#F8F8F8"
+                    font        = "font:SmallSystemFont"
+                />
+                
             </Rectangle>
-            
-        </LabelList>
+        </Label>
            
         <PinDialog 
             id          = "pinPad" 
             title       = "Custom Delay (Seconds)"
             visible     = "false"
+        />
+        
+        <Dialog
+            id      = "confirmDialog"
+            title   = "Please Confirm"
+            visible = "false"
         />
   
   </children>

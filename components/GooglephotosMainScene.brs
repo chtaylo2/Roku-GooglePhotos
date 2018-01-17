@@ -9,7 +9,6 @@ Sub init()
     m.itemHeader = m.top.findNode("itemHeader")
     
     'Observe user selected
-    m.global.selectedUser = -1
     m.global.observeField("selectedUser", "mainLoad")
     
     checkRegistration()
@@ -24,20 +23,24 @@ Function checkRegistration()
 
     'Check for linked user
     usersLoaded = oauth_count()
+
     if usersLoaded = 0 then
         m.itemHeader.text   = "Registration"
         m.screenActive      = createObject("roSGNode", "Registration")
         m.screenActive.id   = "Registration"
         m.top.appendChild(m.screenActive)
         m.screenActive.setFocus(true)
+    'else if usersLoaded = 1 then
+        'Show only registered user
+            
+        print "AM I HERE (PRE) "; m.global.selectedUser
+        'm.global.selectedUser = 0
+        'm.top.selectedUser = 0
+        'mainLoad()
+            
+        print "AM I HERE (POST) "; m.global.selectedUser
     else
-        usersLoaded = oauth_count()
-        if usersLoaded = 1 then
-            'Show only registered user
-            m.global.selectedUser = 0
-        else
-            selectionLoad()
-        end if
+        selectionLoad()
     end if
 End function
 
@@ -51,8 +54,10 @@ Function selectionLoad()
 End function
 
 
-Function mainLoad(event as object)
-    if (event.GetData() <> -1 and event.GetData() <> -2)
+Function mainLoad()
+print "mainLoad: "; m.global.selectedUser
+print "HERE: "; m.screenActive
+    if (m.global.selectedUser <> -1) and (m.global.selectedUser <> -2)
         'A user was selected, display!
         m.itemHeader.text = ""
         m.top.removeChild(m.screenActive)
@@ -60,12 +65,12 @@ Function mainLoad(event as object)
         m.screenActive.id   = "MainMenu"
         m.top.appendChild(m.screenActive)
         m.screenActive.setFocus(true)
-    else if event.GetData() = -2
+    else if m.global.selectedUser = -2
         'A user was unregistered
-        m.top.removeChild(m.screenActive)
-        m.screenActive = invalid
-
-        checkRegistration()
+       'm.top.removeChild(m.screenActive)
+        'm.screenActive = invalid
+        
+        checkRegistration()       
     end if
 End function
 

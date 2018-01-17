@@ -12,7 +12,7 @@ Sub init()
     m.itemHeader        = m.top.findNode("itemHeader")
     
     m.itemHeader.text   = m.userInfoName[m.global.selectedUser] + " • Main Menu"
-      
+    
     'Read in content
     m.readMarkupGridTask = createObject("roSGNode", "Local ContentReader")
     m.readMarkupGridTask.file = "pkg:/data/homeGridContent.xml"
@@ -55,10 +55,11 @@ Sub onItemSelected()
     m.markupgrid.visible     = false
     m.itemLabelMain1.visible = false
     m.itemLabelMain2.visible = false
-      
-    m.itemHeader.text     = m.userInfoName[m.global.selectedUser] + " • " + screenToDisplay
-    m.screenActive        = createObject("roSGNode", screenToDisplay)
-    m.screenActive.loaded = true
+
+    
+    m.itemHeader.text           = m.userInfoName[m.global.selectedUser] + " • " + screenToDisplay
+    m.screenActive              = createObject("roSGNode", screenToDisplay)
+    m.screenActive.loaded       = true
     m.top.appendChild(m.screenActive)
     m.screenActive.setFocus(true)
 End Sub

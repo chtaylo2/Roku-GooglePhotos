@@ -2,8 +2,8 @@ title=PhotoView for Google Photos
 subtitle=View your Google Photos Albums photos and videos from the PhotoView channel
 #
 major_version=4
-minor_version=240
-build_version=20180104
+minor_version=246
+build_version=20180117
 #
 mm_icon_focus_fhd=pkg:/images/mm_icon_focus_hd.png
 mm_icon_focus_hd=pkg:/images/mm_icon_focus_hd.png

@@ -13,9 +13,10 @@ Sub showGooglePhotosScreen()
     scene    = screen.CreateScene("GooglePhotosMainScene")
     m.global = screen.getGlobalNode()
     ds       = device.GetDisplaySize()
-    
+ 
+    m.global.addFields( {SlideshowRes: "", SlideshowDisplay: "", SlideshowDelay: "", SlideshowOrder: ""} )   
     m.global.addFields( {screenWidth: ds.w, screenHeight: ds.h} )
-    m.global.addFields( {selectedUser: 0} )
+    m.global.addFields( {selectedUser: -1} )
     
     screen.show()
 

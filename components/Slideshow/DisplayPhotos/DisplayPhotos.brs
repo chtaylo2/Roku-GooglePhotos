@@ -18,6 +18,7 @@ Sub init()
     m.PrimaryImage.loadWidth  = ds.w
     m.PrimaryImage.loadHeight = ds.h
     
+    m.fromBrowse            = false
     m.imageLocalCacheByURL  = {}
     m.imageLocalCacheByFS   = {}
     m.imageDisplay          = []
@@ -33,13 +34,21 @@ Sub init()
     m.showOrder     = RegRead("SlideshowOrder", "Settings")
     showDelay       = RegRead("SlideshowDelay", "Settings")
     
-    print "GooglePhotos Show Delay: "; showDelay
-    print "GooglePhotos Show Order: "; m.showOrder
+    'Check any Temporary settings
+    if m.global.SlideshowDisplay <> "" m.showDisplay = m.global.SlideshowDisplay
+    if m.global.SlideshowOrder <> "" m.showOrder = m.global.SlideshowOrder
+    if m.global.SlideshowDelay <> "" showDelay = m.global.SlideshowDelay
+    
+    print "GooglePhotos Show Delay:   "; showDelay
+    print "GooglePhotos Show Order:   "; m.showOrder
     print "GooglePhotos Show Display: "; m.showDisplay
     
     if showDelay<>invalid
         m.RotationTimer.duration = strtoi(showDelay)
-        if strtoi(showDelay) > 3
+        if strtoi(showDelay) > 50
+            'We do this to stop the ROKU screensaver if set to 1 minute
+            m.DownloadTimer.duration = 50
+        else if strtoi(showDelay) > 3
             m.DownloadTimer.duration = strtoi(showDelay)-3
         else
             m.DownloadTimer.duration = 2
@@ -100,9 +109,24 @@ End Sub
 
 Sub onRotationTigger(event as object)
     print "DisplayPhotos.brs [onRotationTigger]";
-    
+
+    if m.top.startIndex <> -1 then m.fromBrowse = true
+
     rxFade = CreateObject("roRegex", "NoFading", "i")
-    if rxFade.IsMatch(m.showDisplay) then
+    if m.showDisplay = "multi" and m.fromBrowse = false then
+    
+        'We only allow multi scroll if starting direct, can't come from Browse Images.
+        if m.screenActive = invalid then
+            m.screenActive = createObject("roSGNode", "MultiScroll")
+            m.screenActive.content = m.imageDisplay
+            m.top.appendChild(m.screenActive)
+            m.screenActive.setFocus(true)
+        end if
+
+        m.RotationTimer.control = "stop"
+        m.DownloadTimer.control = "stop"
+        
+    else if rxFade.IsMatch(m.showDisplay) then
         m.FadeForeground.visible = false
         sendNextImage()
     else
@@ -128,15 +152,20 @@ Sub onDownloadTigger(event as object)
         end if
         
         end if
-    end for 
+    end for
+    
     
     if tmpDownload.Count() > 0 then
-        m.cacheImageTask = createObject("roSGNode", "ImageGrabber")
+        m.cacheImageTask = createObject("roSGNode", "ImageCacher")
         m.cacheImageTask.observeField("localarray", "processDownloads")
         m.cacheImageTask.observeField("filesystem", "contolCache")
         m.cacheImageTask.remotearray = tmpDownload
         m.cacheImageTask.control = "RUN"
     end if
+     
+    m.keyResetTask = createObject("roSGNode", "KeyReset")
+    m.keyResetTask.control = "RUN"
+    
 End Sub
 
 

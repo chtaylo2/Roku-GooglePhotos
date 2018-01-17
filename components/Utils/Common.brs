@@ -121,7 +121,6 @@ Function eraseReg()
     loadItems()
     for each item in m.items
         RegDelete(item, m.section)
-        m[item].Clear()
     end for
 End Function
 
@@ -174,7 +173,7 @@ Function oauth_count()
     for each item in m.items
         if m.accessToken.Count() <> m.[item].Count() then
             print "accessToken / "; item; " counts do not match"
-            return invalid
+            'return invalid
         end if
     end for
     

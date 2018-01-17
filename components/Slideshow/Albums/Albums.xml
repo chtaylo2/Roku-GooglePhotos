@@ -13,7 +13,7 @@
     <script type = "text/brightscript" uri = "pkg:/components/Utils/private-git.brs" />
 
     <children>
-				
+		
         <MarkupGrid 
             id                  = "albumGrid"
             translation         = "[39,240]"
@@ -29,7 +29,26 @@
 			id 			= "loadingSpinner"
 			visible 	= "false"
 		/>
-	
+		
+        <Label
+            id          = "settingsIcon"
+            font        = "font:MediumBoldSystemFont"
+            color       = "#808080"
+            horizAlign  = "right"
+			text		= "Settings"
+            vertAlign   = "top"
+			visible 	= "false"
+            translation = "[1068,115]" >
+			
+			<Poster 
+                id              = "settingIconImage"
+                width           = "20"
+				height			= "20"
+                translation     = "[ 105, 2 ]"
+				uri = "pkg:/images/asterisk.png"
+            />
+		</Label>
+		
         <Label
             id          = "itemLabelMain1"
             height      = "720"
@@ -95,6 +114,6 @@
             />
       
         </LabelList>
-        
+	        
     </children>
 </component>

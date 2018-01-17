@@ -9,15 +9,14 @@ Sub init()
     m.LoginTimer    = m.top.findNode("LoginTimer")
     
     m.Row4.font.size = 45
-
-    m.buttongroup.buttons = [ "Get a new code", "About Channel" ]
     
     m.UriHandler = createObject("roSGNode","Authlinking UrlHandler")
     m.UriHandler.observeField("gen_token_response","onNewToken")
     m.LoginTimer.observeField("fire","onCheckAuth")
 
-    'm.Button.observeField("buttonSelected", "onButtonPress")
+    m.buttongroup.buttons = [ "Get a new code", "About Channel" ]
     m.buttongroup.setFocus(true)
+    m.buttongroup.observeField("buttonSelected","onButtonPress")
     
     'Load common variables
     loadCommon()
@@ -189,11 +188,11 @@ Sub onStoreUser(event as object)
             
                 if infoEmail <> "No email on file" then
                     for i = 0 to m.userInfoEmail.Count()-1
-                        if m.userInfoEmail[i] = infoEmail then
-                            m.accessToken.Pop()
-                            m.refreshToken.Pop()
-                            'ShowDialog1Button("Notice", "Account '"+infoEmail+"' already linked to device", "OK")
-                        end if
+                        'if m.userInfoEmail[i] = infoEmail then
+                        '    m.accessToken.Pop()
+                        '    m.refreshToken.Pop()
+                        '    'ShowDialog1Button("Notice", "Account '"+infoEmail+"' already linked to device", "OK")
+                        'end if
                     end for
                 end if
             
@@ -211,10 +210,33 @@ Sub onStoreUser(event as object)
             
             m.Row1.text = ""  
             m.Row2.text = "Successfully Linked Account!"
-            m.Row3.text = "You have successfully linked this Roku device to your Google Photos account"
+            m.Row3.text = infoName + "'s Google Photos account has been successfully linked this Roku device"
             m.Row4.text = ""
             m.Row5.text = ""
+            
+            m.buttongroup.buttons = [ "Continue" ]
+            m.buttongroup.setFocus(true)
                 
         end if   
     end if
 End Sub
+
+
+Sub onButtonPress(event as object)
+    if (event.getData() = 0) and (m.buttongroup.buttons[0] = "Get a new code")
+        'GENERATE NEW TOKEN
+        doGenerateToken()
+    else if (event.getData() = 0) and (m.buttongroup.buttons[0] = "Continue")
+        m.global.selectedUser = -2
+    end if
+End Sub
+
+
+Function onKeyEvent(key as String, press as Boolean) as Boolean
+    if press then
+        print "KEY (reg): "; key
+    end if
+
+    'If nothing above is true, we'll fall back to the previous screen.
+    return false
+End Function

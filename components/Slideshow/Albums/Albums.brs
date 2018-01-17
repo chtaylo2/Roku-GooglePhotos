@@ -9,6 +9,7 @@ Sub init()
     m.albummarkupgrid = m.top.findNode("albumGrid")
     m.itemLabelMain1  = m.top.findNode("itemLabelMain1")
     m.itemLabelMain2  = m.top.findNode("itemLabelMain2")
+    m.settingsIcon    = m.top.findNode("settingsIcon")
     
     m.albumPageList   = m.top.findNode("albumPageList")
     m.albumPageThumb  = m.top.findNode("albumPageThumb")
@@ -22,6 +23,7 @@ Sub init()
     
     'Load registration variables
     loadReg()
+    
     
     m.top.observeField("loaded","loadingComplete")
 End Sub
@@ -360,9 +362,10 @@ Sub googleDisplayImageMenu(album As Object, imageList As Object)
         addItem(m.menuSelected, "GP_IMAGE_BROWSE", listIcon, "Browse Photos", "")
     end if
     
-    m.itemLabelMain2.text = ""
-    m.albummarkupgrid.content = m.menuSelected
-    m.albummarkupgrid.jumpToItem = 0
+    m.itemLabelMain2.text           = ""
+    m.settingsIcon.visible          = true
+    m.albummarkupgrid.content       = m.menuSelected
+    m.albummarkupgrid.jumpToItem    = 0
     
     centerMarkupGrid()
     showMarkupGrid()
@@ -391,24 +394,26 @@ Sub hideMarkupGrid()
     m.albummarkupgrid.visible = false
     m.itemLabelMain1.visible  = false
     m.itemLabelMain2.visible  = false
+    m.settingsIcon.visible    = false
 End Sub
 
 
 Sub showMarkupGrid()
-    m.albummarkupgrid.visible = true
-    m.itemLabelMain1.visible = true
-    m.itemLabelMain2.visible = true
-    m.albumPageList.visible = false
+    m.albummarkupgrid.visible   = true
+    m.itemLabelMain1.visible    = true
+    m.itemLabelMain2.visible    = true
+    m.albumPageList.visible     = false
     
     m.albummarkupgrid.setFocus(true)
 End Sub
 
 
 Sub displayAlbumPages()
-    m.albumPageList.visible = true
-    m.albummarkupgrid.visible = false
-    m.itemLabelMain1.visible = false
-    m.itemLabelMain2.visible = false
+    m.albumPageList.visible     = true
+    m.albummarkupgrid.visible   = false
+    m.itemLabelMain1.visible    = false
+    m.itemLabelMain2.visible    = false
+    m.settingsIcon.visible      = false
 
     m.albumPageList.setFocus(true)
     
@@ -432,25 +437,52 @@ Sub showLoadingSpinner(gridCount as integer, id as string)
 End Sub
 
 
+Sub showTempSetting()
+    hideMarkupGrid()
+    m.screenActive              = createObject("roSGNode", "Settings")
+    m.screenActive.contentFile  = "settingsTemporaryContent"
+    m.screenActive.id           = "settings"
+    m.screenActive.loaded       = true
+    m.top.appendChild(m.screenActive)
+    m.screenActive.setFocus(true)
+End Sub
+
+
 Function onKeyEvent(key as String, press as Boolean) as Boolean
     if press then
-        print "ID: "; m.albummarkupgrid.content.getChild(0).id
-        print "FOCUS: "; m.albumPageList.hasFocus()
+        print "KEY: "; key
+        print "HERE: "; m.albummarkupgrid.content.getChild(0).id
         if key = "back"
-            if (m.screenActive <> invalid)
+            if (m.screenActive <> invalid)            
                 m.top.removeChild(m.screenActive)
                 showMarkupGrid()
                 m.screenActive = invalid
+                
+                if (m.albummarkupgrid.content.getChild(0).id = "GP_SLIDESHOW_START")
+                    m.settingsIcon.visible = true
+                end if
+                
                 return true
             end if      
 
             if (m.albummarkupgrid.content <> invalid) and ( (m.albummarkupgrid.content.getChild(0).id <> "GP_ALBUM_LISTING") or (m.albumPageList.hasFocus() = true) ) and (m.top.imageContent = invalid)
                 m.albummarkupgrid.content = m.albumListContent
+                m.settingsIcon.visible = false
                 centerMarkupGrid()
                 showMarkupGrid()
                 return true
             end if
+        else if (key = "options") and (m.screenActive = invalid) and (m.albummarkupgrid.content.getChild(0).id = "GP_SLIDESHOW_START")
+            showTempSetting()
+            return true
+        else if ((key = "options") or (key = "left")) and (m.screenActive <> invalid) and (m.screenActive.id = "settings")
+            m.top.removeChild(m.screenActive)
+            showMarkupGrid()
+            m.screenActive = invalid
+            return true
         end if
     end if
+
+    'If nothing above is true, we'll fall back to the previous screen.
     return false
 End function

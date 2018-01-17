@@ -1,6 +1,6 @@
 <?xml version = "1.0" encoding = "utf-8" ?> 
 
-<component name = "ImageGrabber" extends = "Task" >
+<component name = "ImageCacher" extends = "Task" >
  
     <script type = "text/brightscript" uri = "pkg:/components/Utils/Common.brs" />
   
@@ -53,6 +53,7 @@
 
                 m.top.filesystem = fslist.ToArray()
                 m.top.localarray = response
+                
             End Sub
 
         ]]>

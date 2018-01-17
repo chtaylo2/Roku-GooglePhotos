@@ -7,6 +7,15 @@
 
     <children>
 
+        <Rectangle
+            id      = "Background"
+            color   = "#EBEBEB"
+            height  = "720"
+            width   = "1280"
+            opacity = "1"
+            translation = "[0,175]"
+        />
+        
         <MarkupGrid 
             id                  = "homeGrid" 
             itemComponentName   = "markupgridItem" 
