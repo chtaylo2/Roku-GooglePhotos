@@ -1,0 +1,49 @@
+<?xml version = "1.0" encoding = "utf-8" ?>
+
+<component name = "FeaturesPopup" extends = "Group" >
+
+    <interface>
+        <field id = "display" type = "string" />
+        <field id = "closeReady" type = "string" />
+    </interface>
+    
+    <script type = "text/brightscript" uri = "pkg:/components/FeaturesPopup/FeaturesPopup.brs" />
+    <script type = "text/brightscript" uri = "pkg:/components/Utils/Common.brs" />
+
+    <children>
+
+        <Label
+            id                  = "itemLabelHeader"
+            font                = "font:LargeBoldSystemFont"
+            color               = "#808080"
+            horizAlign          = "left"
+            vertAlign           = "top"
+            translation         = "[100,175]" >
+
+            <Label
+                id              = "itemLabelMain"
+                width           = "1000"
+                font            = "font:MediumBoldSystemFont"
+                color           = "#808080"
+                horizAlign      = "left"
+                vertAlign       = "center"
+                wrap            = "true"
+                translation     = "[50,50]"
+            />
+            
+        </Label>
+        
+        <Button
+            id                  = "buttonContinue"
+            text                = "Continue"
+            translation         = "[950, 625]"
+        />
+
+        <Timer
+            id                  = "updateField"
+            repeat              = "false"
+            duration            = "1"
+        />
+
+  </children>
+</component>

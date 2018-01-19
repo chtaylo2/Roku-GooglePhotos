@@ -106,7 +106,7 @@ Sub init()
 End Sub
 
 
-sub loadImages()
+Sub loadImages()
     m.scroll_node_1.imageUri    = GetNextImage(m.top.content, m.imageTracker)
     m.scroll_node_5.imageUri    = GetNextImage(m.top.content, m.imageTracker)
     m.scroll_node_6.imageUri    = GetNextImage(m.top.content, m.imageTracker)
@@ -121,7 +121,7 @@ sub loadImages()
 	m.WaveTimer.control		    = "start"
     m.RefreshTimer.control      = "start"
 	
-end sub
+End Sub
 
 
 Sub onWaveTigger()
@@ -141,7 +141,8 @@ Sub onWaveTigger()
 
 End Sub
 
-sub onRefreshTigger()
+
+Sub onRefreshTigger()
 
     'FHD Support
     endPoint=-400*m.multiplier
@@ -186,7 +187,11 @@ sub onRefreshTigger()
         m.scroll_node_8.control     = "start"
     end if       
     
+    m.keyResetTask = createObject("roSGNode", "KeyReset")
+    m.keyResetTask.control = "RUN"
+    
 End Sub
+
 
 Function GetNextImage(items As Object, tracker As Integer)
     if items.Count()-1 = tracker then
@@ -198,4 +203,16 @@ Function GetNextImage(items As Object, tracker As Integer)
 		url = m.top.content[m.imageTracker].url
         return url
     end if
+End Function
+
+
+Function onKeyEvent(key as String, press as Boolean) as Boolean
+    if press then
+        if key <> "back"
+            return true
+        end if
+    end if
+
+    'If nothing above is true, we'll fall back to the previous screen.
+    return false
 End Function

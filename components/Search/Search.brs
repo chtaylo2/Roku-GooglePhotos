@@ -16,6 +16,9 @@ Sub init()
     'Load common variables
     loadCommon()
     
+    'Load privlanged variables
+    loadPrivlanged()
+
     'Load in the OAuth Registry entries
     loadReg()
     

@@ -3,8 +3,8 @@
 <component name = "Local ContentReader" extends = "Task" >
 
     <interface>
-      <field id = "file" type = "string" />
-      <field id = "content" type = "node" />
+        <field id = "file" type = "string" />
+        <field id = "content" type = "node" />
     </interface>
 
     <script type = "text/brightscript" uri = "pkg:/components/LocalContent/ContentReader.brs" />

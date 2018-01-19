@@ -100,8 +100,8 @@ Sub storeDisplayOptions()
     addItem(m.content, "No Fading w/ Blackground Blur", "NoFading_YesBlur", regStore)
     if regSelection = "NoFading_NoBlur" then radioSelection = 3
     addItem(m.content, "No Fading w/o Blackground Blur", "NoFading_NoBlur", regStore)
-    if regSelection = "multi" then radioSelection = 4
-    addItem(m.content, "Multi-Scrolling Photos", "multi", regStore)
+    if regSelection = "Multi-Scrolling" then radioSelection = 4
+    addItem(m.content, "Multi-Scrolling Photos", "Multi-Scrolling", regStore)
     
     'Store content node and current registry selection
     m.settingsDisplay = m.content
@@ -134,8 +134,8 @@ Sub storeDelayOptions()
     m.content = createObject("RoSGNode","ContentNode")
     addItem(m.content, "3 seconds", "3", regStore)
     addItem(m.content, "5 seconds (Default)", "5", regStore)
-    addItem(m.content, "10 Seconds", "10", regStore)
-    addItem(m.content, "15 Seconds", "15", regStore)
+    addItem(m.content, "10 seconds", "10", regStore)
+    addItem(m.content, "15 seconds", "15", regStore)
     addItem(m.content, "30 seconds", "30", regStore)
     addItem(m.content, "Custom Setting"+tmp, "0", regStore)
     
@@ -152,12 +152,12 @@ Sub storeOrder()
     radioSelection = 0
 
     m.content = createObject("RoSGNode","ContentNode")
-    if regSelection = "newest" then radioSelection = 0
-    addItem(m.content, "Newest to Oldest (Default)", "newest", regStore)
-    if regSelection = "oldest" then radioSelection = 1
-    addItem(m.content, "Oldest to Newest", "oldest", regStore)
-    if regSelection = "random" then radioSelection = 2
-    addItem(m.content, "Random Order", "random", regStore)
+    if regSelection = "Newest to Oldest" then radioSelection = 0
+    addItem(m.content, "Newest to Oldest (Default)", "Newest to Oldest", regStore)
+    if regSelection = "Oldest to Newest" then radioSelection = 1
+    addItem(m.content, "Oldest to Newest", "Oldest to Newest", regStore)
+    if regSelection = "Random Order" then radioSelection = 2
+    addItem(m.content, "Random Order", "Random Order", regStore)
     
     'Store content node and current registry selection
     m.settingsOrder = m.content
@@ -255,20 +255,17 @@ Sub showsubselected()
         if m.setScope = "temporary"
             'Temporary Setting
             m.global.[itemcontent.titleseason] = itemcontent.description
-            showfocus()
+            m.infoTempSetting.text = "Override Setting: " + m.global.[itemcontent.titleseason]
         else
             'Global Setting
             RegWrite(itemcontent.titleseason, itemcontent.description, "Settings")
         end if
     end if
     
-    if m.setScope = "temporary"
-        'Re-store the current selected item locally
-        if m.settingsList.itemSelected = 0 then m.settingsRescheckedItem = m.settingSubList.itemSelected
-        if m.settingsList.itemSelected = 1 then m.settingsDisplaycheckedItem = m.settingSubList.itemSelected
-        if m.settingsList.itemSelected = 2 then m.settingsDelaycheckedItem = m.settingSubList.itemSelected
-        if m.settingsList.itemSelected = 3 then m.settingsOrdercheckedItem = m.settingSubList.itemSelected
-    end if
+    if m.settingsList.itemSelected = 0 then m.settingsRescheckedItem = m.settingSubList.itemSelected
+    if m.settingsList.itemSelected = 1 then m.settingsDisplaycheckedItem = m.settingSubList.itemSelected
+    if m.settingsList.itemSelected = 2 then m.settingsDelaycheckedItem = m.settingSubList.itemSelected
+    if m.settingsList.itemSelected = 3 then m.settingsOrdercheckedItem = m.settingSubList.itemSelected
 End Sub
 
 

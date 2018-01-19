@@ -21,9 +21,11 @@ Sub init()
     'Load common variables
     loadCommon()
     
+    'Load privlanged variables
+    loadPrivlanged()
+
     'Load registration variables
     loadReg()
-    
     
     m.top.observeField("loaded","loadingComplete")
 End Sub
@@ -160,9 +162,10 @@ Sub onItemSelected()
         m.albumName = album.GetTitle()
     
         if album.GetImageCount() > 1000 then
-            'lastPopup = RegRead("ThousandPopup","Settings")
-            'if lastPopup=invalid then googlephotos_thousandpopup()
             googleAlbumPages(album)
+
+            lastPopup = RegRead("ThousandPopup","Settings")
+            if (lastPopup=invalid or lastPopup<>"true") then showThousandPopup()
         else
 
             'Display Loading Spinner
@@ -408,6 +411,15 @@ Sub showMarkupGrid()
 End Sub
 
 
+Sub hideAlbumPages()
+    m.albumPageList.visible     = false
+    
+    'Stop watching for events
+    m.albumPageList.unobserveField("itemFocused") 
+    m.albumPageList.unobserveField("itemSelected")  
+End Sub
+
+
 Sub displayAlbumPages()
     m.albumPageList.visible     = true
     m.albummarkupgrid.visible   = false
@@ -426,7 +438,7 @@ End Sub
 Sub showLoadingSpinner(gridCount as integer, id as string)
     m.placeholder = createObject("RoSGNode","ContentNode")
     for i = 1 to gridCount
-        addItem(m.placeholder, id, "pkg:/images/placeholder2.png", "", "")
+        addItem(m.placeholder, id, "pkg:/images/placeholder.png", "", "")
     end for
     
     m.albummarkupgrid.content = m.placeholder
@@ -448,10 +460,19 @@ Sub showTempSetting()
 End Sub
 
 
+Sub showThousandPopup()
+    hideAlbumPages()
+    m.screenActive          = createObject("roSGNode", "FeaturesPopup")
+    m.screenActive.id       = "FeaturesPopup"
+    m.screenActive.display  = "ThousandPopup"
+    m.top.appendChild(m.screenActive)
+    m.screenActive.setFocus(true)
+End Sub
+
+
 Function onKeyEvent(key as String, press as Boolean) as Boolean
     if press then
         print "KEY: "; key
-        print "HERE: "; m.albummarkupgrid.content.getChild(0).id
         if key = "back"
             if (m.screenActive <> invalid)            
                 m.top.removeChild(m.screenActive)
@@ -472,14 +493,22 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
                 showMarkupGrid()
                 return true
             end if
+            
         else if (key = "options") and (m.screenActive = invalid) and (m.albummarkupgrid.content.getChild(0).id = "GP_SLIDESHOW_START")
             showTempSetting()
             return true
+            
         else if ((key = "options") or (key = "left")) and (m.screenActive <> invalid) and (m.screenActive.id = "settings")
             m.top.removeChild(m.screenActive)
             showMarkupGrid()
             m.screenActive = invalid
             return true
+            
+        else if (key = "OK") and (m.screenActive <> invalid) and (m.screenActive.id = "FeaturesPopup") and (m.screenActive.closeReady = "true")
+            m.top.removeChild(m.screenActive)
+            m.screenActive = invalid
+            displayAlbumPages()
+            return true        
         end if
     end if
 

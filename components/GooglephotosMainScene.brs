@@ -5,15 +5,36 @@ Sub init()
     m.top.backgroundColor = "#EBEBEB"
     m.top.setFocus(true)
     
+    'Load common variables
+    loadCommon()
+    
     'Define SG nodes
     m.itemHeader = m.top.findNode("itemHeader")
     
     'Observe user selected
     m.global.observeField("selectedUser", "mainLoad")
     
-    checkRegistration()
+    'Show new features popup once
+    lastPopup = RegRead("FeaturePopup","Settings")
+    if (lastPopup = invalid) or (lastPopup <> m.releaseVersion) then
+        showFeaturesPopup()
+    else
+        checkRegistration()
+    end if	
+    
+    
     
 End Sub
+
+
+Function showFeaturesPopup()
+    m.itemHeader.text       = "Version " + m.releaseVersion + " • New Features"
+    m.screenActive          = createObject("roSGNode", "FeaturesPopup")
+    m.screenActive.id       = "FeaturesPopup"
+    m.screenActive.display  = "NewFeatures"
+    m.top.appendChild(m.screenActive)
+    m.screenActive.setFocus(true)
+End Function
 
 
 Function checkRegistration()
@@ -55,8 +76,6 @@ End function
 
 
 Function mainLoad()
-print "mainLoad: "; m.global.selectedUser
-print "HERE: "; m.screenActive
     if (m.global.selectedUser <> -1) and (m.global.selectedUser <> -2)
         'A user was selected, display!
         m.itemHeader.text = ""
@@ -86,6 +105,13 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
                     return true
                 end if
             else
+                return true
+            end if
+        else if key = "OK"
+            if (m.screenActive <> invalid) and (m.screenActive.id = "FeaturesPopup")
+                m.top.removeChild(m.screenActive)
+                m.screenActive = invalid
+                checkRegistration()
                 return true
             end if
         end if

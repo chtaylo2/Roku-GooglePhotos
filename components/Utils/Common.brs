@@ -7,16 +7,19 @@
 Function loadCommon()
     ' Common varables for needed for Oauth and GooglePhotos API
     
-    m.releaseVersion  = "2.0"
+    m.releaseVersion  = "2.1"
     m.gp_scope        = "https://picasaweb.google.com/data"
     m.gp_prefix       = m.gp_scope + "/feed/api/user/default"
-    
-    m.clientId        = getClientId()
-    m.clientSecret    = getClientSecret()
     
     m.oauth_prefix    = "https://accounts.google.com/o/oauth2"
     m.oauth_scope     = "https://picasaweb.google.com/data https://www.googleapis.com/auth/userinfo.email"
     
+End Function
+
+
+Function loadPrivlanged()
+    m.clientId        = getClientId()
+    m.clientSecret    = getClientSecret()
 End Function
 
 

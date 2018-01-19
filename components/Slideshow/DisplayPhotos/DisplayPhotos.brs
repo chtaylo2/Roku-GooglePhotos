@@ -75,10 +75,10 @@ sub loadImageList()
             'If coming from browsing, only show in Newest-Oldest order
             nxt = 0
         else
-            if m.showOrder = "random" then
+            if m.showOrder = "Random Order" then
                 'Create image display list - RANDOM
                 nxt = GetRandom(originalList)
-            else if m.showOrder = "oldest"
+            else if m.showOrder = "Oldest to Newest"
                 'Create image display list - OLD FIRST
                 nxt = originalList.Count()-1
             else
@@ -113,7 +113,7 @@ Sub onRotationTigger(event as object)
     if m.top.startIndex <> -1 then m.fromBrowse = true
 
     rxFade = CreateObject("roRegex", "NoFading", "i")
-    if m.showDisplay = "multi" and m.fromBrowse = false then
+    if m.showDisplay = "Multi-Scrolling" and m.fromBrowse = false then
     
         'We only allow multi scroll if starting direct, can't come from Browse Images.
         if m.screenActive = invalid then

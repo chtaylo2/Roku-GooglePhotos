@@ -32,7 +32,12 @@
                     width       = "580" 
                     wrap        = "true"
                     color       = "#F8F8F8"
-                    font        = "font:SmallSystemFont"
+                />
+                
+                <Poster 
+                    id          = "qrCode"                 
+                    translation = "[ 250, 325 ]"
+                    uri         = "pkg:/images/issues-qrcode.png"
                 />
   
             </Rectangle>
