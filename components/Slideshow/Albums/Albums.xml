@@ -64,11 +64,22 @@
             id          = "itemLabelMain2"
             height      = "720"
             width       = "1280"
-            font        = "font:MediumSystemFont"
+            font        = "font:MediumBoldSystemFont"
             color       = "#808080"
             horizAlign  = "center"
             vertAlign   = "center"
             translation = "[0,225]"
+        />
+		
+        <Label
+            id          = "itemLabelMain3"
+            height      = "720"
+            width       = "1280"
+            font        = "font:MediumSystemFont"
+            color       = "#808080"
+            horizAlign  = "center"
+            vertAlign   = "center"
+            translation = "[0,275]"
         />
 
         <LabelList

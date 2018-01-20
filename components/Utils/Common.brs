@@ -7,7 +7,7 @@
 Function loadCommon()
     ' Common varables for needed for Oauth and GooglePhotos API
     
-    m.releaseVersion  = "2.1"
+    m.releaseVersion  = "2.0"
     m.gp_scope        = "https://picasaweb.google.com/data"
     m.gp_prefix       = m.gp_scope + "/feed/api/user/default"
     

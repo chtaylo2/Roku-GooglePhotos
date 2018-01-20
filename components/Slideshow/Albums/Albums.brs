@@ -5,18 +5,21 @@ Sub init()
     m.UriHandler.observeField("albumImages","handleGetAlbumImages")
     m.UriHandler.observeField("refreshToken","handleRefreshToken")
 
-    m.loadingSpinner  = m.top.findNode("loadingSpinner")
-    m.albummarkupgrid = m.top.findNode("albumGrid")
-    m.itemLabelMain1  = m.top.findNode("itemLabelMain1")
-    m.itemLabelMain2  = m.top.findNode("itemLabelMain2")
-    m.settingsIcon    = m.top.findNode("settingsIcon")
+    m.loadingSpinner    = m.top.findNode("loadingSpinner")
+    m.albummarkupgrid   = m.top.findNode("albumGrid")
+    m.itemLabelMain1    = m.top.findNode("itemLabelMain1")
+    m.itemLabelMain2    = m.top.findNode("itemLabelMain2")
+    m.itemLabelMain3    = m.top.findNode("itemLabelMain3")
+    m.settingsIcon      = m.top.findNode("settingsIcon")
     
-    m.albumPageList   = m.top.findNode("albumPageList")
-    m.albumPageThumb  = m.top.findNode("albumPageThumb")
-    m.albumPageInfo1  = m.top.findNode("albumPageInfo1")
-    m.albumPageInfo2  = m.top.findNode("albumPageInfo2")
+    m.albumPageList     = m.top.findNode("albumPageList")
+    m.albumPageThumb    = m.top.findNode("albumPageThumb")
+    m.albumPageInfo1    = m.top.findNode("albumPageInfo1")
+    m.albumPageInfo2    = m.top.findNode("albumPageInfo2")
 
-    m.albumListContent = createObject("RoSGNode","ContentNode")
+    m.albumListContent  = createObject("RoSGNode","ContentNode")
+    
+    m.albumSelection    = 0
     
     'Load common variables
     loadCommon()
@@ -143,24 +146,22 @@ Sub onItemFocused()
     
     focusedItem = m.albummarkupgrid.content.getChild(m.albummarkupgrid.itemFocused)
     m.itemLabelMain1.text = focusedItem.shortdescriptionline1
-    if m.itemLabelMain2.text <> "" then
-        m.itemLabelMain2.text = focusedItem.shortdescriptionline2
-    else
-        m.itemLabelMain2.text = "NN     Pages     NN"
-    end if
 End Sub
 
 
 Sub onItemSelected()
     'Item selected
-    print "SELECTED: "; m.albummarkupgrid.itemSelected
 
     selection = m.albummarkupgrid.content.getChild(m.albummarkupgrid.itemSelected)
 
     if selection.id = "GP_ALBUM_LISTING" then
+        m.albumSelection = m.albummarkupgrid.itemSelected
         album = m.albumsObject[m.albummarkupgrid.itemSelected]
         m.albumName = album.GetTitle()
-    
+
+        m.itemLabelMain2.text = m.albumName
+        m.itemLabelMain3.text = ""
+
         if album.GetImageCount() > 1000 then
             googleAlbumPages(album)
 
@@ -209,7 +210,6 @@ Sub onItemSelected()
         for i = 0 to m.imagesMetaData.Count()-1
             addItem(m.imageThumbList, "GP_BROWSE", m.imagesMetaData[i].thumbnail, "", "")
         end for
-        addItem(m.imageThumbList, "GP_BROWSE", "pkg:/images/placeholder.png", "", "")
         
         m.screenActive = createObject("roSGNode", "Browse")
         m.screenActive.id = selection.id
@@ -254,6 +254,9 @@ Sub googleDisplayAlbums(albumList As Object)
     
     'Turn off Loading Spinner
     m.loadingSpinner.visible = "false"
+    
+    m.itemLabelMain3.text = "<<     Paging     >>"
+    
 End Sub
 
 
@@ -355,17 +358,18 @@ Sub googleDisplayImageMenu(album As Object, imageList As Object)
     if m.videosMetaData.Count()>0 then        
         if m.imagesMetaData.Count()>0 then 'Combined photo and photo album
             addItem(m.menuSelected, "GP_SLIDESHOW_START", m.imagesMetaData[0].thumbnail, Pluralize(m.imagesMetaData.Count(),"Photo") + " - Start Slideshow", pagesShow)
-            addItem(m.menuSelected, "GP_VIDEO_BROWSE", m.videosMetaData[0].thumbnail, Pluralize(m.videosMetaData.Count(),"Video"), pagesShow)
-            addItem(m.menuSelected, "GP_IMAGE_BROWSE", listIcon, "Browse Photos", "")
+            addItem(m.menuSelected, "GP_VIDEO_BROWSE", m.videosMetaData[0].thumbnail, Pluralize(m.videosMetaData.Count(),"Video") + " - Browse", pagesShow)
+            addItem(m.menuSelected, "GP_IMAGE_BROWSE", listIcon, Pluralize(m.imagesMetaData.Count(),"Photo") + " - Browse", "")
 '       else 'Video only album
 '            googlephotos_browse_videos(videos, title)
         end if
     else 'Photo only album          
         addItem(m.menuSelected, "GP_SLIDESHOW_START", m.imagesMetaData[0].thumbnail, Pluralize(m.imagesMetaData.Count(),"Photo") + " - Start Slideshow", pagesShow)
-        addItem(m.menuSelected, "GP_IMAGE_BROWSE", listIcon, "Browse Photos", "")
+        addItem(m.menuSelected, "GP_IMAGE_BROWSE", listIcon, Pluralize(m.imagesMetaData.Count(),"Photo") + " - Browse", "")
     end if
     
-    m.itemLabelMain2.text           = ""
+    m.itemLabelMain2.text           = title
+    m.itemLabelMain3.text           = pagesShow
     m.settingsIcon.visible          = true
     m.albummarkupgrid.content       = m.menuSelected
     m.albummarkupgrid.jumpToItem    = 0
@@ -380,7 +384,8 @@ Sub googleDisplayImageMenu(album As Object, imageList As Object)
     m.albummarkupgrid.observeField("itemSelected", "onItemSelected")
     
     'Turn off Loading Spinner
-    m.loadingSpinner.visible = "false"
+    m.loadingSpinner.visible = "false"  
+    
 End Sub
 
 
@@ -397,6 +402,7 @@ Sub hideMarkupGrid()
     m.albummarkupgrid.visible = false
     m.itemLabelMain1.visible  = false
     m.itemLabelMain2.visible  = false
+    m.itemLabelMain3.visible  = false
     m.settingsIcon.visible    = false
 End Sub
 
@@ -405,6 +411,7 @@ Sub showMarkupGrid()
     m.albummarkupgrid.visible   = true
     m.itemLabelMain1.visible    = true
     m.itemLabelMain2.visible    = true
+    m.itemLabelMain3.visible    = true
     m.albumPageList.visible     = false
     
     m.albummarkupgrid.setFocus(true)
@@ -425,6 +432,7 @@ Sub displayAlbumPages()
     m.albummarkupgrid.visible   = false
     m.itemLabelMain1.visible    = false
     m.itemLabelMain2.visible    = false
+    m.itemLabelMain3.visible    = false
     m.settingsIcon.visible      = false
 
     m.albumPageList.setFocus(true)
@@ -487,8 +495,11 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
             end if      
 
             if (m.albummarkupgrid.content <> invalid) and ( (m.albummarkupgrid.content.getChild(0).id <> "GP_ALBUM_LISTING") or (m.albumPageList.hasFocus() = true) ) and (m.top.imageContent = invalid)
-                m.albummarkupgrid.content = m.albumListContent
-                m.settingsIcon.visible = false
+                m.albummarkupgrid.content       = m.albumListContent
+                m.albummarkupgrid.jumpToItem    = m.albumSelection
+                m.settingsIcon.visible          = false
+                m.itemLabelMain2.text           = ""
+                m.itemLabelMain3.text           = "<<     Paging     >>"
                 centerMarkupGrid()
                 showMarkupGrid()
                 return true
@@ -508,7 +519,11 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
             m.top.removeChild(m.screenActive)
             m.screenActive = invalid
             displayAlbumPages()
-            return true        
+            return true
+            
+        else if key = "right"
+            'To fix bug with search results
+            return true
         end if
     end if
 

@@ -236,7 +236,7 @@ Sub onFadeOutTrigger(event as object)
 End Sub
 
 
-Sub sendNextImage()
+Sub sendNextImage(previous=invalid)
     print "DisplayPhotos.brs [sendNextImage]"
         
     'Get next image to display.
@@ -244,7 +244,11 @@ Sub sendNextImage()
         nextID = m.top.startIndex
         m.top.startIndex = -1
     else
-        nextID = GetNextImage(m.imageDisplay, m.imageTracker)
+        if previous<>invalid
+            nextID = GetPreviousImage(m.imageDisplay, m.imageTracker)
+        else
+            nextID = GetNextImage(m.imageDisplay, m.imageTracker)
+        end if
     end if
     
     m.imageTracker = nextID
@@ -258,6 +262,7 @@ Sub sendNextImage()
     
     print "NEXT IMAGE: "; nextID; " - "; url
     
+    print "COUNT: "; m.imageDisplay.Count()
     m.PrimaryImage.uri = url
     
     'Controls the background blur
@@ -268,6 +273,12 @@ Sub sendNextImage()
     
     m.pauseImageCount.text  = itostr(nextID+1)+" of "+itostr(m.imageDisplay.Count())
     m.pauseImageDetail.text = friendlyDate(strtoi(m.imageDisplay[nextID].timestamp))
+    
+    'Stop rotating if only 1 image album
+    if m.imageDisplay.Count() = 1 then
+        m.RotationTimer.control = "stop"
+        m.DownloadTimer.control = "stop"
+    end if
 End Sub
 
 
@@ -285,6 +296,15 @@ Function GetNextImage(items As Object, tracker As Integer)
 End Function
 
 
+Function GetPreviousImage(items As Object, tracker As Integer)
+    if tracker = 0 then
+        return 0
+    else
+        return tracker - 1
+    end if
+End Function
+
+
 Function onKeyEvent(key as String, press as Boolean) as Boolean
     if press then
         print "KEY: "; key
@@ -298,6 +318,10 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
             return true
         else if key = "left" or key = "rewind"
             print "LEFT"
+            sendNextImage("previous")
+            m.RotationTimer.control = "stop"
+            m.DownloadTimer.control = "stop"
+            m.PauseScreen.visible   = "true"
             return true
         else if (key = "play" or key = "OK") and m.RotationTimer.control = "start"
             print "PAUSE"

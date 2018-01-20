@@ -34,10 +34,10 @@ End Sub
 Sub setFeaturesText()
 
     m.itemLabelHeader.text = "New Channel Features"
-    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "1. This channel has been rewritten from the ground up, to support Roku's new ScreneGraph"
+    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "1. This channel has been rewritten from the ground up, to support Roku's ScreneGraph"
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "2. New options when viewing slideshows including multi-scrolling images!"
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "3. New menu layout"
-    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "4. Don't forget to check out the channels embedded screensaver"
+    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "4. Finally, don't forget to check out the channels embedded screensaver"
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + chr(10) + "Bug fixes:"
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "   - No bugs to report"
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + chr(10) + "Thank you for using the PhotoView Channel. Please remember to rate us!"
@@ -51,7 +51,7 @@ End Sub
 Sub setThousandText()
 
     m.itemLabelHeader.text = "Large Album Details"
-    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "Please be aware Google limits the amount of media we can pull back per request to 1,000 items. To account for this limitation, your album is broken into pages to allow viewing."
+    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "Google limits the amount of media we can pull back per request to 1,000 items. To account for this limitation, your album is broken into pages to allow viewing."
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + chr(10) + "Paging also allows accessing your photos much quicker as it reduces API calls. Be aware, a lower page number holds more recent media content."
 
     'Write reg entry to we don't redisplay

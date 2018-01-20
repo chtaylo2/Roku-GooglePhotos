@@ -274,11 +274,10 @@ Sub confirmUnregister(event as object)
         'CONFIRM
         loadItems()
         for each item in m.items
-            'm.[item].Delete(m.global.selectedUser)
+            m.[item].Delete(m.global.selectedUser)
             print m.[item]
         end for
-        'saveReg()
-        print event.getData()
+        saveReg()
         m.global.selectedUser = -2
     else
         'CANCEL

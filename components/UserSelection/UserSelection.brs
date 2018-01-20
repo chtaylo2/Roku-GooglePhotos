@@ -31,11 +31,6 @@ Sub showmarkupgrid()
     
     'Populate grid content
     m.markupgrid.content = m.content
-        
-    'if usersLoaded = 1 then
-    '    'Show only registered user
-    '    m.global.selectedUser = 0
-    'end if
 
     'Center the MarkUp Box
     markupRect = m.markupgrid.boundingRect()

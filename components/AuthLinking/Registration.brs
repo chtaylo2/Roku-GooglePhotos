@@ -213,7 +213,7 @@ Sub onStoreUser(event as object)
             
             m.Row1.text = ""  
             m.Row2.text = "Successfully Linked Account!"
-            m.Row3.text = infoName + "'s Google Photos account has been successfully linked this Roku device"
+            m.Row3.text = infoName + "'s Google Photos account has been successfully linked to this device"
             m.Row4.text = ""
             m.Row5.text = ""
             

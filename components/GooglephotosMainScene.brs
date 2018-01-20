@@ -51,15 +51,16 @@ Function checkRegistration()
         m.screenActive.id   = "Registration"
         m.top.appendChild(m.screenActive)
         m.screenActive.setFocus(true)
-    'else if usersLoaded = 1 then
+        
+        if m.screenKill<>invalid then
+            m.top.removeChild(m.screenKill)
+        end if
+        
+    else if usersLoaded = 1 then
         'Show only registered user
-            
-        print "AM I HERE (PRE) "; m.global.selectedUser
-        'm.global.selectedUser = 0
-        'm.top.selectedUser = 0
-        'mainLoad()
-            
-        print "AM I HERE (POST) "; m.global.selectedUser
+        m.global.selectedUser = 0
+        m.top.selectedUser = 0
+        mainLoad()
     else
         selectionLoad()
     end if
@@ -72,6 +73,10 @@ Function selectionLoad()
     m.screenActive.id   = "UserSelection"
     m.top.appendChild(m.screenActive)
     m.screenActive.setFocus(true)
+    
+    if m.screenKill<>invalid then
+        m.top.removeChild(m.screenKill)
+    end if
 End function
 
 
@@ -86,9 +91,7 @@ Function mainLoad()
         m.screenActive.setFocus(true)
     else if m.global.selectedUser = -2
         'A user was unregistered
-       'm.top.removeChild(m.screenActive)
-        'm.screenActive = invalid
-        
+        m.screenKill = m.screenActive
         checkRegistration()       
     end if
 End function
