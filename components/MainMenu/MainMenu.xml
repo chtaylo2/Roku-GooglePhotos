@@ -10,10 +10,10 @@
         <Rectangle
             id      = "Background"
             color   = "#EBEBEB"
-            height  = "720"
-            width   = "1280"
+            height  = "1080"
+            width   = "1920"
             opacity = "1"
-            translation = "[0,175]"
+            translation = "[0,270]"
         />
         
         <MarkupGrid 
@@ -21,44 +21,44 @@
             itemComponentName   = "markupgridItem" 
             numColumns          = "5" 
             numRows             = "1" 
-            itemSize            = "[ 220, 250 ]" 
-            itemSpacing         = "[ 20, 20 ]"
+            itemSize            = "[ 330, 375 ]" 
+            itemSpacing         = "[ 30, 30 ]"
             drawFocusFeedback   = "false"
         />
 
         <Label
             id          = "itemLabelMain1"
-            height      = "720"
-            width       = "1280"
+            height      = "1080"
+            width       = "1920"
             font        = "font:LargeBoldSystemFont"
             color       = "#808080"
             text        = "My Albums"
             horizAlign  = "center"
             vertAlign   = "center"
-            translation = "[0,175]"
+            translation = "[0,261]"
         />
     
         <Label
             id          = "itemLabelMain2"
-            height      = "720"
-            width       = "1280"
+            height      = "1080"
+            width       = "1920"
             font        = "font:MediumSystemFont"
             color       = "#808080"
             text        = "Browse your albums"
             horizAlign  = "center"
             vertAlign   = "center"
-            translation = "[0,225]"
+            translation = "[0,336]"
         />
     
         <Label
             id          = "itemHeader"
-            height      = "720"
-            width       = "1200"
+            height      = "1080"
+            width       = "1800"
             font        = "font:MediumBoldSystemFont"
             color       = "#808080"
             horizAlign  = "right"
             vertAlign   = "top"
-            translation = "[0,65]"
+            translation = "[0,105]"
         />
 
   </children>

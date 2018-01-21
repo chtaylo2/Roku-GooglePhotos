@@ -12,11 +12,11 @@
             id          = "Row1"
             font        = "font:MediumBoldSystemFont"
             color       = "#808080"
-            height      = "100"
-            width       = "800"
+            height      = "150"
+            width       = "1200"
             wrap        = "true"
             text        = "To link this Roku device to your Google Photos account, go to:"
-            translation = "[150,200]"
+            translation = "[225,300]"
         />
 
         <Label
@@ -24,11 +24,11 @@
             font        = "font:LargeBoldSystemFont"
             color       = "#808080"
             horizAlign  = "center"
-            height      = "100"
-            width       = "1250"
+            height      = "150"
+            width       = "1920"
             wrap        = "true"
             text        = "Loading.."
-            translation = "[0,270]"
+            translation = "[0,405]"
         />
 
         <Label
@@ -36,11 +36,11 @@
             font        = "font:MediumBoldSystemFont"
             color       = "#808080"
             horizAlign  = "center"
-            height      = "100"
-            width       = "1250"
+            height      = "150"
+            width       = "1920"
             wrap        = "true"
             text        = "and enter code:"
-            translation = "[0, 335]"
+            translation = "[0, 504]"
         />
     
         <Label
@@ -48,26 +48,26 @@
             font        = "font:LargeBoldSystemFont"
             color       = "#808080"
             horizAlign  = "center"
-            width       = "1250"
+            width       = "1920"
             text        = "Loading.."
-            translation = "[0, 400]"
+            translation = "[0, 600]"
         />
 
         <Label
             id          = "Row5"
-            font        = "font:SmallBoldSystemFont"
+            font        = "font:MediumBoldSystemFont"
             color       = "#808080"
             horizAlign  = "center"
-            height      = "100"
-            width       = "1250"
+            height      = "150"
+            width       = "1920"
             wrap        = "true"
             text        = "This screen will automatically update as soon as your activation completes"
-            translation = "[0, 500]"
+            translation = "[0, 750]"
         />
 
         <ButtonGroup
             id          = "buttonGroup"
-            translation = "[950, 550]"
+            translation = "[1425, 825]"
         />
 
         <Timer

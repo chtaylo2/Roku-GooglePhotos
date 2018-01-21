@@ -2,8 +2,8 @@ title=PhotoView for Google Photos
 subtitle=View your Google Photos Albums photos and videos from the PhotoView channel
 #
 major_version=4
-minor_version=250
-build_version=20180120
+minor_version=252
+build_version=20180121
 #
 mm_icon_focus_fhd=pkg:/images/mm_icon_focus_hd.png
 mm_icon_focus_hd=pkg:/images/mm_icon_focus_hd.png
@@ -11,7 +11,7 @@ mm_icon_side_hd=pkg:/images/mm_icon_side_hd.png
 mm_icon_focus_sd=pkg:/images/mm_icon_focus_sd.png
 mm_icon_side_sd=pkg:/images/mm_icon_side_sd.png
 #
-splash_screen_fhd=pkg:/images/Splash-HD-1280x720.png
+splash_screen_fhd=pkg:/images/Splash-FHD-1920x1080.png
 splash_screen_hd=pkg:/images/Splash-HD-1280x720.png
 splash_screen_sd=pkg:/images/Splash-SD-720x480.png
 splash_color=#ebebeb
@@ -20,4 +20,4 @@ screensaver_title=PhotoView for Google Photos
 screensaver_private=0
 #
 splash_min_time=20
-ui_resolutions=hd
+ui_resolutions=fhd

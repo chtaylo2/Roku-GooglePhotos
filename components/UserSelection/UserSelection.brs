@@ -34,8 +34,8 @@ Sub showmarkupgrid()
 
     'Center the MarkUp Box
     markupRect = m.markupgrid.boundingRect()
-    centerx = (1280 - markupRect.width) / 2
-    m.markupgrid.translation = [ centerx, 240 ]
+    centerx = (1920 - markupRect.width) / 2
+    m.markupgrid.translation = [ centerx, 360 ]
       
     'Watch for events
     m.markupgrid.observeField("itemFocused", "onItemFocused") 
@@ -48,8 +48,8 @@ Sub addItem(store as object, hdgridposterurl as string, shortdescriptionline1 as
     item.hdgridposterurl = hdgridposterurl
     item.shortdescriptionline1 = shortdescriptionline1
     item.shortdescriptionline2 = shortdescriptionline2
-    item.x = 200
-    item.y = 200
+    item.x = 300
+    item.y = 300
 End Sub
 
 

@@ -8,7 +8,7 @@ Sub init()
     m.Row5          = m.top.findNode("Row5")
     m.LoginTimer    = m.top.findNode("LoginTimer")
     
-    m.Row4.font.size = 45
+    m.Row4.font.size = 65
     
     m.UriHandler = createObject("roSGNode","Authlinking UrlHandler")
     m.UriHandler.observeField("gen_token_response","onNewToken")

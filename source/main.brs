@@ -2,22 +2,21 @@
 Sub Main()
     'Start main screen
     showGooglePhotosScreen()
+    'showGooglePhotosScreensaver()
 End Sub
+
 
 Sub showGooglePhotosScreen()
     screen   = CreateObject("roSGScreen")
     port     = CreateObject("roMessagePort")
-    device   = CreateObject("roDeviceInfo")
-    screen.setMessagePort(port)
     
     scene    = screen.CreateScene("GooglePhotosMainScene")
     m.global = screen.getGlobalNode()
-    ds       = device.GetDisplaySize()
  
-    m.global.addFields( {SlideshowRes: "", SlideshowDisplay: "", SlideshowDelay: "", SlideshowOrder: ""} )   
-    m.global.addFields( {screenWidth: ds.w, screenHeight: ds.h} )
+    m.global.addFields( {SlideshowRes: "", SlideshowDisplay: "", SlideshowDelay: "", SlideshowOrder: ""} )
     m.global.addFields( {selectedUser: -1} )
-    
+
+    screen.setMessagePort(port)    
     screen.show()
 
     while(true)

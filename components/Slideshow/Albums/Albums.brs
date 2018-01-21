@@ -66,7 +66,7 @@ Sub doGetAlbumList()
     print "Albums.brs [doGetAlbumList]"  
 
     signedHeader = oauth_sign(m.global.selectedUser)
-    makeRequest(signedHeader, m.gp_prefix + "?kind=album&v=3.0&fields=entry(title,gphoto:numphotos,gphoto:user,gphoto:id,media:group(media:description,media:thumbnail))&thumbsize=220", "GET", "", 0)
+    makeRequest(signedHeader, m.gp_prefix + "?kind=album&v=3.0&fields=entry(title,gphoto:numphotos,gphoto:user,gphoto:id,media:group(media:description,media:thumbnail))&thumbsize=300", "GET", "", 0)
 End Sub
 
 
@@ -85,7 +85,7 @@ Sub doGetAlbumImages(album As Object, index=0 as Integer)
     print "GooglePhotos Res: "; getResolution()
 
     signedHeader = oauth_sign(m.global.selectedUser)
-    makeRequest(signedHeader, m.gp_prefix + "/albumid/"+album.GetID()+"?start-index="+start+"&max-results=1000&kind=photo&v=3.0&fields=entry(title,gphoto:timestamp,gphoto:id,gphoto:streamId,gphoto:videostatus,media:group(media:description,media:content,media:thumbnail))&thumbsize=220&imgmax="+getResolution(), "GET", "", 1)
+    makeRequest(signedHeader, m.gp_prefix + "/albumid/"+album.GetID()+"?start-index="+start+"&max-results=1000&kind=photo&v=3.0&fields=entry(title,gphoto:timestamp,gphoto:id,gphoto:streamId,gphoto:videostatus,media:group(media:description,media:content,media:thumbnail))&thumbsize=330&imgmax="+getResolution(), "GET", "", 1)
 End Sub
 
 
@@ -233,8 +233,8 @@ Sub addItem(store as object, id as string, hdgridposterurl as string, shortdescr
     item.hdgridposterurl = hdgridposterurl
     item.shortdescriptionline1 = shortdescriptionline1
     item.shortdescriptionline2 = shortdescriptionline2
-    item.x = "200"
-    item.y = "160"
+    item.x = "300"
+    item.y = "240"
 End Sub
 
 
@@ -392,9 +392,9 @@ End Sub
 Sub centerMarkupGrid()
     'Center the MarkUp Box
     markupRectAlbum = m.albummarkupgrid.boundingRect()
-    centerx = (1280 - markupRectAlbum.width) / 2
+    centerx = (1920 - markupRectAlbum.width) / 2
 
-    m.albummarkupgrid.translation = [ centerx+18, 240 ]
+    m.albummarkupgrid.translation = [ centerx+27, 360 ]
 End Sub
 
  

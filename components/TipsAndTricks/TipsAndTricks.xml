@@ -12,31 +12,31 @@
     
         <LabelList
             id                      = "tipsLabelList"
-            translation             = "[ 80, 180 ]"
-            itemSize                = "[480,40]"
-            itemSpacing             = "[0,20]"
+            translation             = "[ 120, 270 ]"
+            itemSize                = "[ 720, 60 ]"
+            itemSpacing             = "[ 0, 30 ]"
             color                   = "#808080"
             vertFocusAnimationStyle = "floatingFocus">
     
             <Rectangle 
                 id          = "infoRectangle" 
-                translation = "[ 550, 0 ]" 
-                height      = "490" 
-                width       = "600" 
+                translation = "[ 825, 0 ]" 
+                height      = "735" 
+                width       = "900" 
                 color       = "#606060">
 
                 <Label 
                     id          = "infoLabel" 
-                    translation = "[ 15, 15 ]" 
-                    height      = "460" 
-                    width       = "580" 
+                    translation = "[ 24, 24 ]" 
+                    height      = "690" 
+                    width       = "870" 
                     wrap        = "true"
                     color       = "#F8F8F8"
                 />
                 
                 <Poster 
                     id          = "qrCode"                 
-                    translation = "[ 250, 325 ]"
+                    translation = "[ 375, 489 ]"
                     uri         = "pkg:/images/issues-qrcode.png"
                 />
   

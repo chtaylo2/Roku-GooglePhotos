@@ -18,17 +18,17 @@
             color               = "#808080"
             horizAlign          = "left"
             vertAlign           = "top"
-            translation         = "[100,175]" >
+            translation         = "[150,264]" >
 
             <Label
                 id              = "itemLabelMain"
-                width           = "1000"
+                width           = "1500"
                 font            = "font:MediumBoldSystemFont"
                 color           = "#808080"
                 horizAlign      = "left"
                 vertAlign       = "center"
                 wrap            = "true"
-                translation     = "[50,50]"
+                translation     = "[75,75]"
             />
             
         </Label>
@@ -36,7 +36,7 @@
         <Button
             id                  = "buttonContinue"
             text                = "Continue"
-            translation         = "[950, 625]"
+            translation         = "[1425, 939]"
         />
 
         <Timer

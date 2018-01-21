@@ -14,14 +14,14 @@
     
         <MiniKeyboard
             id          = "miniKeyboard"
-            translation = "[ 150, 160 ]"
+            translation = "[ 225, 240 ]"
             keyColor    = "#8a8b8c" >
  
             <Label 
                 id          = "infoLabel" 
-                translation = "[ 480, 0 ]" 
-                height      = "460" 
-                width       = "580"
+                translation = "[ 720, 0 ]" 
+                height      = "690" 
+                width       = "870"
                 text        = "Recent Searches:"
                 color       = "#808080"
                 font        = "font:MediumBoldSystemFont"
@@ -29,16 +29,16 @@
     
             <Rectangle 
                 id          = "infoRectangle" 
-                translation = "[ 515, 40 ]" 
-                height      = "420" 
-                width       = "435" 
+                translation = "[ 774, 60 ]" 
+                height      = "630" 
+                width       = "654" 
                 color       = "#606060" >
 
                 <Label 
                     id          = "infoLabel" 
-                    translation = "[ 15, 15 ]" 
-                    height      = "460" 
-                    width       = "580" 
+                    translation = "[ 24, 24 ]" 
+                    height      = "690" 
+                    width       = "870" 
                     wrap        = "true"
                     color       = "#F8F8F8"
                     font        = "font:SmallSystemFont"
@@ -47,8 +47,8 @@
                 <RadioButtonList
                     id          = "searchHistoryList"
                     visible     = "true"
-                    itemSize    = "[350,35]"
-                    translation = "[ 30, 20 ]"
+                    itemSize    = "[525,54]"
+                    translation = "[ 45, 30 ]"
                     vertFocusAnimationStyle = "floatingFocus"
                     checkOnSelect = "false"
                 />
@@ -59,9 +59,9 @@
                 id          = "searchBtn"
                 text        = "Search"
                 textColor   = "#808080"
-                translation = "[ 115, 465 ]"
-                minWidth    = "50"
-                height      = "50"
+                translation = "[ 174, 699 ]"
+                minWidth    = "75"
+                height      = "75"
                 showFocusFootprint = "true"
             />
             
@@ -69,8 +69,8 @@
                 id          = "clearSearchBtn"
                 text        = "Clear Search History"
                 textColor   = "#808080"
-                height      = "50"
-                translation = "[ 570, 465 ]"
+                height      = "75"
+                translation = "[ 855, 699 ]"
                 showFocusFootprint = "true"
             />
             

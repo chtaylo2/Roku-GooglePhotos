@@ -20,21 +20,21 @@
            vertAlign   = "top"
            font        = "font:SmallBoldSystemFont"
            color       = "#808080"
-           translation = "[100,160]"
+           translation = "[150,240]"
         />
     
         <PosterGrid
             id                    = "ImageGrid"
-            itemSpacing           = "[20, 20]"
-            rowHeights            = "[150]"
-            columnWidths          = "[200]"
+            itemSpacing           = "[30, 30]"
+            rowHeights            = "[225]"
+            columnWidths          = "[300]"
             numColumns            = "5"
             numRows               = "3"
             useAtlas              = "false"
             focusBitmapBlendColor = "#e8e8e8"
-            basePosterSize        = "[200,150]"
+            basePosterSize        = "[300,225]"
             posterDisplayMode     = "scaleToFit"
-            translation           = "[100, 200]"
+            translation           = "[150, 300]"
         />
          
     </children>

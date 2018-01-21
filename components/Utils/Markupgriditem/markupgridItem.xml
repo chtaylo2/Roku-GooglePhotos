@@ -15,18 +15,18 @@
 
         <Poster 
             id                  = "itemPoster" 
-            translation         = "[ 22, 25 ]"
-            width               = "200" 
-            height              = "200"
-            scaleRotateCenter   = "[ 100.0, 244.0 ]" >
+            translation         = "[ 33, 39 ]"
+            width               = "300" 
+            height              = "300"
+            scaleRotateCenter   = "[ 150, 366 ]" >
 
             <Rectangle 
                 id                  = "itemMask" 
                 color               = "#EBEBEB"
                 opacity             = "0.50" 
-                width               = "220" 
-                height              = "220" 
-                scaleRotateCenter   = "[ 205.0, 144.0 ]"
+                width               = "330" 
+                height              = "330" 
+                scaleRotateCenter   = "[ 309.0, 216.0 ]"
             />
     
         </Poster>

@@ -17,32 +17,32 @@
  
         <Label 
             id          = "settingScopeLobal" 
-            translation = "[70, 150]" 
+            translation = "[105, 225]" 
             color       = "#808080"
             text        = "Global Settings:"
             font        = "font:MediumBoldSystemFont" >
                 
             <LabelList
                 id                      = "settingsLabelList"
-                translation             = "[0, 50]"
-                itemSize                = "[480,40]"
-                itemSpacing             = "[0,20]"
+                translation             = "[0, 75]"
+                itemSize                = "[720, 60]"
+                itemSpacing             = "[0,30]"
                 color                   = "#808080"
                 vertFocusAnimationStyle = "floatingFocus"
             />
             
             <Rectangle 
                 id          = "infoRectangle" 
-                translation = "[550, 25]" 
-                height      = "490" 
-                width       = "600" 
+                translation = "[825, 39]" 
+                height      = "735" 
+                width       = "900" 
                 color       = "#606060" >
 
                 <Label 
                     id          = "infoLabel" 
-                    translation = "[15, 15]" 
-                    height      = "460" 
-                    width       = "580" 
+                    translation = "[24, 24]" 
+                    height      = "690" 
+                    width       = "870" 
                     wrap        = "true"
                     color       = "#F8F8F8"
                     font        = "font:SmallSystemFont"
@@ -51,13 +51,13 @@
                 <RadioButtonList
                     id          = "settingSubList"
                     visible     = "false"
-                    itemSize    = "[435,40]"
-                    translation = "[100, 175]"
+                    itemSize    = "[654,60]"
+                    translation = "[175, 264]"
                 />
 
                 <Label 
                     id          = "infoTempSetting" 
-                    translation = "[40, 430]" 
+                    translation = "[60, 645]" 
                     color       = "#F8F8F8"
                     font        = "font:SmallSystemFont"
                 />

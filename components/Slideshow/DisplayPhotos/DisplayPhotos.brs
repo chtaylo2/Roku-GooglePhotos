@@ -12,12 +12,7 @@ Sub init()
     m.DownloadTimer     = m.top.findNode("DownloadTimer")
 
     m.port = CreateObject("roMessagePort")
-    device = CreateObject("roDeviceInfo")
-    ds     = device.GetDisplaySize()
-    
-    m.PrimaryImage.loadWidth  = ds.w
-    m.PrimaryImage.loadHeight = ds.h
-    
+
     m.fromBrowse            = false
     m.imageLocalCacheByURL  = {}
     m.imageLocalCacheByFS   = {}
@@ -217,8 +212,8 @@ Sub onLoadStatusTrigger(event as object)
     if event.getdata() = "ready" then
         'Center the MarkUp Box
         markupRectAlbum = m.PrimaryImage.localBoundingRect()
-        centerx = (1280 - markupRectAlbum.width) / 2
-        centery = (720 - markupRectAlbum.height) / 2
+        centerx = (1920 - markupRectAlbum.width) / 2
+        centery = (1080 - markupRectAlbum.height) / 2
 
         m.PrimaryImage.translation = [ centerx, centery ]
         m.FadeINAnimation.control = "start"

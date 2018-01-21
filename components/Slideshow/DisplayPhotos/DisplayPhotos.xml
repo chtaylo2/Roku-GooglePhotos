@@ -18,35 +18,35 @@
         <Rectangle
             id      = "FadeBackground"
             color   = "0x000000"
-            height  = "720"
-            width   = "1280"
+            height  = "1080"
+            width   = "1920"
             opacity = "1"
         />
 
         <!-- Create the blended in background -->
         <Poster
             id              = "BlendedImage"
-            loadWidth       = "10.24"
-            loadHeight      = "5.76"
+            loadWidth       = "15.36"
+            loadHeight      = "8.64"
             loadDisplayMode = "scaleToFill"
-            height          = "720"
-            width           = "1280"
+            height          = "1080"
+            width           = "1920"
         />
       
         <!-- Create some opacity between main image -->
         <Rectangle
             id      = "ImageObscure"
             color   = "0x000000"
-            height  = "720"
-            width   = "1280"
+            height  = "1080"
+            width   = "1920"
             opacity = ".3"
         />
       
         <!-- Primary Image -->
         <Poster 
             id              = "PrimaryImage"
-            loadWidth       = "0.0"
-            loadHeight      = "0.0"
+            loadWidth       = "1920"
+            loadHeight      = "1080"
             loadDisplayMode = "scaleToFit"
         />
       
@@ -54,8 +54,8 @@
         <Rectangle
             id      = "FadeForeground"
             color   = "0x000000"
-            height  = "720"
-            width   = "1280"
+            height  = "1080"
+            width   = "1920"
             opacity = "0"
         />        
 
@@ -95,27 +95,27 @@
         <Rectangle
             id          = "PauseScreen"
             color       = "0x000000"
-            height      = "100"
-            width       = "1280"
-            translation = "[0,570]"
+            height      = "150"
+            width       = "1920"
+            translation = "[0,855]"
             opacity     = ".7"
             visible     = "false" >
          
             <Label 
                 id          = "pauseImageCount" 
-                height      = "100" 
-                width       = "1200"
+                height      = "150" 
+                width       = "1800"
                 horizAlign  = "right"
                 vertAlign   = "top"
                 color       = "#eaeaea"
                 font        = "font:SmallSystemFont"
-                translation = "[ 0, 15 ]"
+                translation = "[ 0, 24 ]"
             />
          
             <Label 
                id           = "pauseImageDetail" 
-               height       = "100" 
-               width        = "1280"
+               height       = "150" 
+               width        = "1920"
                horizAlign   = "center"
                vertAlign    = "center"
                color        = "#eaeaea"

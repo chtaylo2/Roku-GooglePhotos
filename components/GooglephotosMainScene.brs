@@ -4,7 +4,23 @@ Sub init()
     m.top.backgroundURI   = ""
     m.top.backgroundColor = "#EBEBEB"
     m.top.setFocus(true)
+
+    m.itemOverhang = m.top.findNode("itemOverhang")
+
+	device = CreateObject("roDeviceInfo")
+    ds = device.GetDisplaySize()
     
+    if ds.w = 720 then
+        print "SD Detected"
+        m.itemOverhang.logoUri = "pkg:/images/Logo_Overhang_SD.png"
+    else if ds.w = 1280 then
+        print "HD Detected"
+        m.itemOverhang.logoUri = "pkg:/images/Logo_Overhang_HD.png"
+    else
+        print "FHD Detected"
+        m.itemOverhang.logoUri = "pkg:/images/Logo_Overhang_FHD.png"
+    end if
+        
     'Load common variables
     loadCommon()
     
@@ -20,10 +36,7 @@ Sub init()
         showFeaturesPopup()
     else
         checkRegistration()
-    end if	
-    
-    
-    
+    end if	  
 End Sub
 
 

@@ -16,12 +16,12 @@
 		
         <MarkupGrid 
             id                  = "albumGrid"
-            translation         = "[39,240]"
+            translation         = "[60,360]"
             itemComponentName   = "markupgridItem" 
             numColumns          = "5" 
             numRows             = "1" 
-            itemSize            = "[ 220, 250 ]" 
-            itemSpacing         = "[ 20, 20 ]"
+            itemSize            = "[ 330, 375 ]" 
+            itemSpacing         = "[ 30, 30 ]"
             drawFocusFeedback   = "false"
         />
 
@@ -38,90 +38,90 @@
 			text		= "Settings"
             vertAlign   = "top"
 			visible 	= "false"
-            translation = "[1068,115]" >
+            translation = "[1602,174]" >
 			
 			<Poster 
                 id              = "settingIconImage"
-                width           = "20"
-				height			= "20"
-                translation     = "[ 105, 2 ]"
+                width           = "30"
+				height			= "30"
+                translation     = "[ 159, 3 ]"
 				uri = "pkg:/images/asterisk.png"
             />
 		</Label>
 		
         <Label
             id          = "itemLabelMain1"
-            height      = "720"
-            width       = "1280"
+            height      = "1080"
+            width       = "1920"
             font        = "font:LargeBoldSystemFont"
             color       = "#808080"
             horizAlign  = "center"
             vertAlign   = "center"
-            translation = "[0,175]"
+            translation = "[0,264]"
         />
     
         <Label
             id          = "itemLabelMain2"
-            height      = "720"
-            width       = "1280"
+            height      = "1080"
+            width       = "1920"
             font        = "font:MediumBoldSystemFont"
             color       = "#808080"
             horizAlign  = "center"
             vertAlign   = "center"
-            translation = "[0,225]"
+            translation = "[0,339]"
         />
 		
         <Label
             id          = "itemLabelMain3"
-            height      = "720"
-            width       = "1280"
+            height      = "1080"
+            width       = "1920"
             font        = "font:MediumSystemFont"
             color       = "#808080"
             horizAlign  = "center"
             vertAlign   = "center"
-            translation = "[0,275]"
+            translation = "[0,621]"
         />
 
         <LabelList
             id          = "albumPageList"
-            translation = "[ 200, 200 ]"
-            itemSize    = "[300,30]"
-            itemSpacing = "[0,20]"
+            translation = "[ 300, 300 ]"
+            itemSize    = "[450,45]"
+            itemSpacing = "[0,30]"
             color       = "#808080" >
 
             <Poster 
                 id              = "albumPageThumb"
-                loadheight      = "250"
-                loadwidth       = "250"
-                width           = "250"
-                translation     = "[ 525, 20 ]"
+                loadheight      = "375"
+                loadwidth       = "375"
+                width           = "375"
+                translation     = "[ 789, 30 ]"
                 loadDisplayMode = "scaleTofit"
             />
 
             <Label 
                 id          = "albumPageInfo1" 
-                height      = "200" 
-                width       = "300" 
+                height      = "300" 
+                width       = "450" 
                 wrap        = "true"
                 text        = "Auto Backup"
                 horizAlign  = "center"
                 vertAlign   = "center"
                 color       ="#808080"
                 font        = "font:MediumBoldSystemFont"
-                translation = "[ 500, 200 ]"
+                translation = "[ 750, 300 ]"
             />
          
             <Label 
                 id          = "albumPageInfo2" 
-                height      = "200" 
-                width       = "300" 
+                height      = "300" 
+                width       = "450" 
                 wrap        = "true"
                 text        = "Items: 1 thru 1000"
                 horizAlign  = "center"
                 vertAlign   = "center"
                 color       = "#808080"
                 font        = "font:MediumSystemFont"
-                translation = "[ 500, 250 ]"
+                translation = "[ 750, 375 ]"
             />
       
         </LabelList>

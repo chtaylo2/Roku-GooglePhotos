@@ -27,8 +27,8 @@ Sub showmarkupgrid()
 
     'Center the MarkUp Box
     markupRect = m.markupgrid.boundingRect()
-    centerx = (1280 - markupRect.width) / 2
-    m.markupgrid.translation = [ centerx + 9, 240 ]
+    centerx = (1920 - markupRect.width) / 2
+    m.markupgrid.translation = [ centerx + 15, 360 ]
     
     'Select default item
     m.markupgrid.jumpToItem = 2
@@ -52,11 +52,10 @@ Sub onItemSelected()
     selectedItem = m.markupgrid.content.getChild(m.markupgrid.itemSelected)
     screenToDisplay = selectedItem.shortdescriptionline1
       
-    m.markupgrid.visible     = false
-    m.itemLabelMain1.visible = false
-    m.itemLabelMain2.visible = false
+    m.markupgrid.visible        = false
+    m.itemLabelMain1.visible    = false
+    m.itemLabelMain2.visible    = false
 
-    
     m.itemHeader.text           = m.userInfoName[m.global.selectedUser] + " • " + screenToDisplay
     m.screenActive              = createObject("roSGNode", screenToDisplay)
     m.screenActive.loaded       = true

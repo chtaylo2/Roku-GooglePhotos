@@ -1,18 +1,8 @@
 Sub init()
-			
-	device = CreateObject("roDeviceInfo")
-    ds = device.GetDisplaySize()
-
+        
     m.WaveStep          = 0
-	m.imageTracker      = -1
-    m.multiplier        = 1
-    loadmultiplier      = 1
-    if ds.w = 1920 then
-        print "FHD detected"
-        m.multiplier    = 1.5
-        loadmultiplier  = 1.6
-    end if
-    
+    m.imageTracker      = -1
+
     m.scroll_node_1 = m.top.findNode("scroll_node_1")
     m.scroll_node_2 = m.top.findNode("scroll_node_2")
     m.scroll_node_3 = m.top.findNode("scroll_node_3")
@@ -22,87 +12,89 @@ Sub init()
     m.scroll_node_7 = m.top.findNode("scroll_node_7")
     m.scroll_node_8 = m.top.findNode("scroll_node_8")
 
-	m.WaveTimer     = m.top.findNode("waveTimer")
+    m.WaveTimer     = m.top.findNode("waveTimer")
     m.RefreshTimer  = m.top.findNode("refreshTimer")
     
     m.WaveTimer.observeField("fire","onWaveTigger")
-	m.RefreshTimer.observeField("fire","onRefreshTigger")
-	
+    m.RefreshTimer.observeField("fire","onRefreshTigger")
+    
+    endPoint=-600
+    
     'Node 1 adjustments
         tmpStart = []
-        tmpStart.Push(50*m.multiplier)
-        tmpStart.Push(730*m.multiplier)
-        m.scroll_node_1.loadWidth           = 150*loadmultiplier
-        m.scroll_node_1.loadHeight          = 150*loadmultiplier
+        tmpStart.Push(75)
+        tmpStart.Push(1095)
+        m.scroll_node_1.loadWidth           = 225
+        m.scroll_node_1.loadHeight          = 225
         m.scroll_node_1.imageTranslation    = tmpStart
-        m.scroll_node_1.ventorTranslation   = "[["+str(tmpStart[0])+","+str(tmpStart[1])+"],["+str(tmpStart[0])+","+str(-400*m.multiplier)+"]]"
+        m.scroll_node_1.ventorTranslation   = "[["+str(tmpStart[0])+","+str(tmpStart[1])+"],["+str(tmpStart[0])+","+str(endPoint)+"]]"
             
     'Node 2 adjustments
         tmpStart = []
-        tmpStart.Push(300*m.multiplier)
-        tmpStart.Push(730*m.multiplier)
-        m.scroll_node_2.loadWidth           = 250*loadmultiplier
-        m.scroll_node_2.loadHeight          = 250*loadmultiplier
+        tmpStart.Push(450)
+        tmpStart.Push(1095)
+        m.scroll_node_2.loadWidth           = 375
+        m.scroll_node_2.loadHeight          = 375
         m.scroll_node_2.imageTranslation    = tmpStart
-        m.scroll_node_2.ventorTranslation   = "[["+str(tmpStart[0])+","+str(tmpStart[1])+"],["+str(tmpStart[0])+","+str(-400*m.multiplier)+"]]"
+        m.scroll_node_2.ventorTranslation   = "[["+str(tmpStart[0])+","+str(tmpStart[1])+"],["+str(tmpStart[0])+","+str(endPoint)+"]]"
 
     'Node 3 adjustments
         tmpStart = []
-        tmpStart.Push(875*m.multiplier)
-        tmpStart.Push(730*m.multiplier)
-        m.scroll_node_3.loadWidth           = 150*loadmultiplier
-        m.scroll_node_3.loadHeight          = 150*loadmultiplier
+        tmpStart.Push(1314)
+        tmpStart.Push(1095)
+        m.scroll_node_3.loadWidth           = 225
+        m.scroll_node_3.loadHeight          = 225
         m.scroll_node_3.imageTranslation    = tmpStart
-        m.scroll_node_3.ventorTranslation   = "[["+str(tmpStart[0])+","+str(tmpStart[1])+"],["+str(tmpStart[0])+","+str(-400*m.multiplier)+"]]"
+        m.scroll_node_3.ventorTranslation   = "[["+str(tmpStart[0])+","+str(tmpStart[1])+"],["+str(tmpStart[0])+","+str(endPoint)+"]]"
                 
     'Node 4 adjustments
         tmpStart = []
-        tmpStart.Push(700*m.multiplier)
-        tmpStart.Push(730*m.multiplier)
-        m.scroll_node_4.loadWidth           = 215*loadmultiplier
-        m.scroll_node_4.loadHeight          = 215*loadmultiplier
+        tmpStart.Push(1050)
+        tmpStart.Push(1095)
+        m.scroll_node_4.loadWidth           = 324
+        m.scroll_node_4.loadHeight          = 324
         m.scroll_node_4.imageTranslation    = tmpStart
-        m.scroll_node_4.ventorTranslation   = "[["+str(tmpStart[0])+","+str(tmpStart[1])+"],["+str(tmpStart[0])+","+str(-400*m.multiplier)+"]]"
+        m.scroll_node_4.ventorTranslation   = "[["+str(tmpStart[0])+","+str(tmpStart[1])+"],["+str(tmpStart[0])+","+str(endPoint)+"]]"
 
     'Node 5 adjustments
         tmpStart = []
-        tmpStart.Push(450*m.multiplier)
-        tmpStart.Push(730*m.multiplier)
-        m.scroll_node_5.loadWidth           = 300*loadmultiplier
-        m.scroll_node_5.loadHeight          = 300*loadmultiplier
+        tmpStart.Push(675)
+        tmpStart.Push(1095)
+        m.scroll_node_5.loadWidth           = 450
+        m.scroll_node_5.loadHeight          = 450
         m.scroll_node_5.imageTranslation    = tmpStart
-        m.scroll_node_5.ventorTranslation   = "[["+str(tmpStart[0])+","+str(tmpStart[1])+"],["+str(tmpStart[0])+","+str(-400*m.multiplier)+"]]"
+        m.scroll_node_5.ventorTranslation   = "[["+str(tmpStart[0])+","+str(tmpStart[1])+"],["+str(tmpStart[0])+","+str(endPoint)+"]]"
 
     'Node 6 adjustments
         tmpStart = []
-        tmpStart.Push(1000*m.multiplier)
-        tmpStart.Push(730*m.multiplier)
-        m.scroll_node_6.loadWidth           = 250*loadmultiplier
-        m.scroll_node_6.loadHeight          = 250*loadmultiplier
+        tmpStart.Push(1500)
+        tmpStart.Push(1095)
+        m.scroll_node_6.loadWidth           = 375
+        m.scroll_node_6.loadHeight          = 375
         m.scroll_node_6.imageTranslation    = tmpStart
-        m.scroll_node_6.ventorTranslation   = "[["+str(tmpStart[0])+","+str(tmpStart[1])+"],["+str(tmpStart[0])+","+str(-400*m.multiplier)+"]]"
+        m.scroll_node_6.ventorTranslation   = "[["+str(tmpStart[0])+","+str(tmpStart[1])+"],["+str(tmpStart[0])+","+str(endPoint)+"]]"
 
     'Node 7 adjustments
         tmpStart = []
-        tmpStart.Push(600*m.multiplier)
-        tmpStart.Push(730*m.multiplier)
-        m.scroll_node_7.loadWidth           = 375*loadmultiplier
-        m.scroll_node_7.loadHeight          = 375*loadmultiplier
+        tmpStart.Push(900)
+        tmpStart.Push(1095)
+        m.scroll_node_7.loadWidth           = 564
+        m.scroll_node_7.loadHeight          = 564
         m.scroll_node_7.imageTranslation    = tmpStart
-        m.scroll_node_7.ventorTranslation   = "[["+str(tmpStart[0])+","+str(tmpStart[1])+"],["+str(tmpStart[0])+","+str(-400*m.multiplier)+"]]"
+        m.scroll_node_7.ventorTranslation   = "[["+str(tmpStart[0])+","+str(tmpStart[1])+"],["+str(tmpStart[0])+","+str(endPoint)+"]]"
 
     'Node 8 adjustments
         tmpStart = []
-        tmpStart.Push(100*m.multiplier)
-        tmpStart.Push(730*m.multiplier)
-        m.scroll_node_8.loadWidth           = 375*loadmultiplier
-        m.scroll_node_8.loadHeight          = 375*loadmultiplier
+        tmpStart.Push(150)
+        tmpStart.Push(1095)
+        m.scroll_node_8.loadWidth           = 564
+        m.scroll_node_8.loadHeight          = 564
         m.scroll_node_8.imageTranslation    = tmpStart
-        m.scroll_node_8.ventorTranslation   = "[["+str(tmpStart[0])+","+str(tmpStart[1])+"],["+str(tmpStart[0])+","+str(-400*m.multiplier)+"]]"
-				
-	
+        m.scroll_node_8.ventorTranslation   = "[["+str(tmpStart[0])+","+str(tmpStart[1])+"],["+str(tmpStart[0])+","+str(endPoint)+"]]"
+                
+    
     m.top.observeField("content","loadImages")
-				
+                
 End Sub
 
 
@@ -115,29 +107,29 @@ Sub loadImages()
     m.scroll_node_2.imageUri    = GetNextImage(m.top.content, m.imageTracker)
     m.scroll_node_3.imageUri    = GetNextImage(m.top.content, m.imageTracker)
     m.scroll_node_7.imageUri    = GetNextImage(m.top.content, m.imageTracker)
-	
-    m.scroll_node_1.control	    = "start"
-    m.scroll_node_5.control	    = "start"
-	m.WaveTimer.control		    = "start"
+    
+    m.scroll_node_1.control     = "start"
+    m.scroll_node_5.control     = "start"
+    m.WaveTimer.control         = "start"
     m.RefreshTimer.control      = "start"
-	
+    
 End Sub
 
 
 Sub onWaveTigger()
-	if m.WaveStep = 0 then
-		m.scroll_node_6.control	= "start"
-	else if m.WaveStep = 1
-		m.scroll_node_4.control	= "start"
-        m.scroll_node_8.control	= "start"'
-	else if m.WaveStep = 2
-        m.scroll_node_2.control	= "start"
-        m.scroll_node_3.control	= "start"
-        m.scroll_node_7.control	= "start"
-		m.WaveTimer.control 	= "stop"
-	end if
+    if m.WaveStep = 0 then
+        m.scroll_node_6.control = "start"
+    else if m.WaveStep = 1
+        m.scroll_node_4.control = "start"
+        m.scroll_node_8.control = "start"'
+    else if m.WaveStep = 2
+        m.scroll_node_2.control = "start"
+        m.scroll_node_3.control = "start"
+        m.scroll_node_7.control = "start"
+        m.WaveTimer.control     = "stop"
+    end if
 
-	m.WaveStep = m.WaveStep + 1
+    m.WaveStep = m.WaveStep + 1
 
 End Sub
 
@@ -145,7 +137,7 @@ End Sub
 Sub onRefreshTigger()
 
     'FHD Support
-    endPoint=-400*m.multiplier
+    endPoint=-600
     
     if (m.scroll_node_1.imageTranslation[1] = endPoint) then
         m.scroll_node_1.imageUri    = GetNextImage(m.top.content, m.imageTracker)
@@ -195,12 +187,12 @@ End Sub
 
 Function GetNextImage(items As Object, tracker As Integer)
     if items.Count()-1 = tracker then
-		m.imageTracker = 0
-		url = m.top.content[m.imageTracker].url
+        m.imageTracker = 0
+        url = m.top.content[m.imageTracker].url
         return url
     else
-		m.imageTracker = tracker + 1
-		url = m.top.content[m.imageTracker].url
+        m.imageTracker = tracker + 1
+        url = m.top.content[m.imageTracker].url
         return url
     end if
 End Function

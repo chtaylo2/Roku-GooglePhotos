@@ -5,7 +5,7 @@ Sub init()
     m.tipsInfo = m.top.findNode("infoLabel")
     m.qrCode   = m.top.findNode("qrCode")
     
-    m.tipsInfo.font.size = 19
+    m.tipsInfo.font.size = 28
       
     'Read in content
     m.readContentTask = createObject("roSGNode", "Local ContentReader")
