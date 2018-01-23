@@ -6,6 +6,9 @@ Sub init()
     m.UriHandler.observeField("albumImages","handleGetScreensaverAlbumImages")
     m.UriHandler.observeField("refreshToken","handleRefreshToken")
 
+	m.apiTimer = m.top.findNode("apiTimer")
+	m.apiTimer.observeField("fire","onApiTImerTigger")
+	
     'Load common variables
     loadCommon()
 
@@ -18,7 +21,9 @@ Sub init()
 	userCount 	 = oauth_count()
     selectedUser = RegRead("SSaverUser","Settings")
     m.userIndex  = 0
-    
+	m.apiPending = 0
+	m.photoItems = []
+	
     if selectedUser = invalid then      
         m.userIndex = 0
     else if ssUser="All (Random)" then
@@ -30,23 +35,9 @@ Sub init()
     end if
     
 	'm.userIndex = 100
-	
-    methodAvailable = ["Multi-Scrolling Photos", "Fading Photo - Large", "Fading Photo - Small"]
-    selectedMethod  = RegRead("SSaverMethod","Settings")
-    
-    if selectedMethod = invalid then        
-        m.ssMethodSel = methodAvailable[0]
-    else if selectedMethod = "Random" then
-        m.ssMethodSel = ssMethodAvailable[Rnd(methodAvailable.Count())-1]
-    else
-        m.ssMethodSel = selectedMethod            
-    end if
 
     print "USER: "; m.userIndex
-    print "METHOD: "; m.ssMethodSel
     
-	m.photoItems = []
-	
     if userCount = 0 then
         rsp="invalid"
     else
@@ -60,6 +51,9 @@ Sub init()
 			doGetScreensaverAlbumList(m.userIndex)
         end if
     end if
+	
+	m.apiTimer.control = "start"
+	
 End Sub
 
 
@@ -67,6 +61,7 @@ End Sub
 Sub doGetScreensaverAlbumList(selectedUser=0 as Integer)
     print "Screensaver.brs [doGetScreensaverAlbumList]"  
 
+	m.apiPending = m.apiPending+1
     signedHeader = oauth_sign(selectedUser)
     makeRequest(signedHeader, m.gp_prefix + "?kind=album&v=3.0&fields=entry(title,gphoto:numphotos,gphoto:user,gphoto:id,media:group(media:description,media:thumbnail))", "GET", "", 0)
 End Sub
@@ -75,6 +70,7 @@ End Sub
 Sub doGetScreensaverAlbumImages(album As Object)
     print "Screensaver.brs - [doGetScreensaverAlbumImages]"
     
+	m.apiPending = m.apiPending+1
     signedHeader = oauth_sign(0)
     makeRequest(signedHeader, m.gp_prefix + "/albumid/"+album.GetID()+"?start-index=1&max-results=1000&kind=photo&v=3.0&fields=entry(title,gphoto:timestamp,gphoto:id,gphoto:streamId,gphoto:videostatus,media:group(media:description,media:content,media:thumbnail))&thumbsize=330&imgmax="+getResolution(), "GET", "", 1)
 End Sub
@@ -85,6 +81,7 @@ Sub handleGetScreensaverAlbumList(event as object)
   
     response = event.getData()
 
+	m.apiPending = m.apiPending-1
     if response.code <> 200 then
         'doRefreshToken()
     else
@@ -127,6 +124,8 @@ Sub handleGetScreensaverAlbumImages(event as object)
   
     response = event.getData()
     
+	m.apiPending = m.apiPending-1
+	
     if response.code <> 200 then
         doRefreshToken()
     else
@@ -139,13 +138,40 @@ Sub handleGetScreensaverAlbumImages(event as object)
         imagesObject = googleImageListing(rsp.entry)
 		
 		for each image in imagesObject
-            if image.GetURL().instr(".MOV") <> -1 Or image.GetURL().instr(".mp4") <> -1 then
+			tmp = {}
+			tmp.url       = image.GetURL()
+			tmp.timestamp = image.GetTimestamp()
+			
+            if image.IsVideo() then
+				'	image.GetURL().instr(".MOV") <> -1 Or image.GetURL().instr(".mp4") <> -1 then
                 print "Ignore: "; image.GetURL()
             else
                 print "Push: "; image.GetURL()
-                m.photoItems.Push(image.GetURL())
+                m.photoItems.Push(tmp)
             end if    
         end for
-
     end if
+End Sub
+
+
+Sub onApiTImerTigger()
+
+	print "API CALLS LEFT: "; m.apiPending; " - Image Count: "; m.photoItems.Count()
+
+	if m.apiPending = 0 then
+		execScreensaver()
+		m.apiTimer.control = "stop"
+	end if
+
+End Sub
+
+
+Sub execScreensaver()
+    print "START SHOW"
+    m.screenActive = createObject("roSGNode", "DisplayPhotos")
+    m.screenActive.content = m.photoItems
+    m.screenActive.id = "DisplayScreensaver"
+    m.top.appendChild(m.screenActive)
+    m.screenActive.setFocus(true)
+
 End Sub

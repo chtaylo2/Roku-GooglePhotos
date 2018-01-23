@@ -1,6 +1,6 @@
 <Content>
 <item x="375" shortdescriptionline1="SlideshowRes" title="  &#8226;  Set Photo Download Resolution" description="Overrides global setting until application restarts.&#xA;&#xA;Defines photo size downloaded. If you have a slow internet connection, it's recommended to decrease this setting.&#xA;&#xA;You will only see options your Roku player supports." />
-<item x="210" shortdescriptionline1="SlideshowDisplay" title="  &#8226;  Set Slideshow Display Method" description="Overrides global setting until application restarts.&#xA;&#xA;Determines how your slideshow displays your photos." />
-<item x="225" shortdescriptionline1="SlideshowDelay" title="  &#8226;  Set Slideshow Delay" description="Overrides global setting until application restarts.&#xA;&#xA;Defines the number of seconds between photos during your slideshow." />
-<item x="210" shortdescriptionline1="SlideshowOrder" title="  &#8226;  Set Slideshow Order" description="Overrides global setting until application restarts.&#xA;&#xA;Defines the order of your slideshow playback." />
+<item x="210" shortdescriptionline1="SlideshowDisplay" title="  &#8226;  Set Slideshow Display Method" description="Overrides global setting until application restarts.&#xA;&#xA;Determines how the slideshow displays your photos." />
+<item x="225" shortdescriptionline1="SlideshowDelay" title="  &#8226;  Set Slideshow Delay" description="Overrides global setting until application restarts.&#xA;&#xA;Defines the number of seconds between photos during the slideshow." />
+<item x="210" shortdescriptionline1="SlideshowOrder" title="  &#8226;  Set Slideshow Order" description="Overrides global setting until application restarts.&#xA;&#xA;Defines the order of the slideshow playback." />
 </Content>

@@ -2,10 +2,6 @@
 
 <component name = "GooglePhotosScreensaver" extends = "Scene" >
 
-	<interface>
-        <field id = "loaded" type = "boolean" />
-	</interface>
-    
     <script type = "text/brightscript" uri = "pkg:/components/Screensaver/Screensaver.brs" />
     <script type = "text/brightscript" uri = "pkg:/components/SlideShow/SlideshowHelper.brs" />
     <script type = "text/brightscript" uri = "pkg:/components/Utils/Common.brs" />
@@ -13,21 +9,10 @@
     
     <children>
 
-        <Overhang
-            id                  = "itemOverhang"
-            showClock           = "false"
-            logoBaselineOffset  = "105"
-        />
-
-        <Label
-            id          = "itemHeader"
-            height      = "1080"
-            width       = "1800"
-            font        = "font:MediumBoldSystemFont"
-            color       = "#808080"
-            horizAlign  = "right"
-            vertAlign   = "top"
-            translation = "[0,105]"
+        <Timer
+            id          = "apiTimer"
+            repeat      = "true"
+            duration    = "2"
         />
 
   </children>
