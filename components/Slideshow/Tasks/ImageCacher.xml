@@ -37,7 +37,7 @@
         
                     fname =  "tmp:/" + itostr(unique) + "_" + fileObj.filename
         
-                    print "Caching Image: "; item.url
+                    'print "Caching Image: "; item.url
                     httpObj.setUrl(item.url)
                     httpObj.AsyncGetToFile( fname )
     

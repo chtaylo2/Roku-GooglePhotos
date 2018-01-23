@@ -1,15 +1,18 @@
 
 Sub init()    
-    m.PrimaryImage      = m.top.findNode("PrimaryImage")
-    m.BlendedImage      = m.top.findNode("BlendedImage")
-    m.FadeForeground    = m.top.findNode("FadeForeground")
-    m.FadeINAnimation   = m.top.findNode("FadeINAnimation")
-    m.FadeOUTAnimation  = m.top.findNode("FadeOUTAnimation")
-    m.PauseScreen       = m.top.findNode("PauseScreen")
-    m.pauseImageCount   = m.top.findNode("pauseImageCount")
-    m.pauseImageDetail  = m.top.findNode("pauseImageDetail")
-    m.RotationTimer     = m.top.findNode("RotationTimer")
-    m.DownloadTimer     = m.top.findNode("DownloadTimer")
+    m.PrimaryImage              = m.top.findNode("PrimaryImage")
+    m.SecondaryImage            = m.top.findNode("SecondaryImage")
+    m.BlendedPrimaryImage       = m.top.findNode("BlendedPrimaryImage")
+    m.BlendedSecondaryImage     = m.top.findNode("BlendedSecondaryImage")
+    m.FadeInPrimaryAnimation    = m.top.findNode("FadeInPrimaryAnimation")
+    m.FadeInSecondaryAnimation  = m.top.findNode("FadeInSecondaryAnimation")
+    m.FadeForeground            = m.top.findNode("FadeForeground")
+    m.FadeOutForeground         = m.top.findNode("FadeOutForeground")
+    m.PauseScreen               = m.top.findNode("PauseScreen")
+    m.pauseImageCount           = m.top.findNode("pauseImageCount")
+    m.pauseImageDetail          = m.top.findNode("pauseImageDetail")
+    m.RotationTimer             = m.top.findNode("RotationTimer")
+    m.DownloadTimer             = m.top.findNode("DownloadTimer")
 
     m.port = CreateObject("roMessagePort")
 
@@ -18,9 +21,10 @@ Sub init()
     m.imageLocalCacheByFS   = {}
     m.imageDisplay          = []
     m.imageTracker          = -1
+    m.imageOnScreen         = ""
     
-    m.PrimaryImage.observeField("loadStatus","onLoadStatusTrigger")
-    m.FadeOUTAnimation.observeField("state","onFadeOutTrigger")
+    m.PrimaryImage.observeField("loadStatus","onPrimaryLoadedTrigger")
+    m.SecondaryImage.observeField("loadStatus","onSecondaryLoadedTrigger")
     m.RotationTimer.observeField("fire","onRotationTigger")
     m.DownloadTimer.observeField("fire","onDownloadTigger")
     m.top.observeField("content","loadImageList")
@@ -103,11 +107,10 @@ End Sub
 
 
 Sub onRotationTigger(event as object)
-    print "DisplayPhotos.brs [onRotationTigger]";
+    'print "DisplayPhotos.brs [onRotationTigger]";
 
     if m.top.startIndex <> -1 then m.fromBrowse = true
 
-    rxFade = CreateObject("roRegex", "NoFading", "i")
     if m.showDisplay = "Multi-Scrolling" and m.fromBrowse = false then
     
         'We only allow multi scroll if starting direct, can't come from Browse Images.
@@ -120,18 +123,14 @@ Sub onRotationTigger(event as object)
 
         m.RotationTimer.control = "stop"
         m.DownloadTimer.control = "stop"
-        
-    else if rxFade.IsMatch(m.showDisplay) then
-        m.FadeForeground.visible = false
-        sendNextImage()
     else
-        m.FadeOUTAnimation.control = "start"
+        sendNextImage()
     end if
 End Sub
 
 
 Sub onDownloadTigger(event as object)
-    print "DisplayPhotos.brs [onDownloadTigger]"
+    'print "DisplayPhotos.brs [onDownloadTigger]"
     
     tmpDownload = []
     
@@ -149,7 +148,6 @@ Sub onDownloadTigger(event as object)
         end if
     end for
     
-    
     if tmpDownload.Count() > 0 then
         m.cacheImageTask = createObject("roSGNode", "ImageCacher")
         m.cacheImageTask.observeField("localarray", "processDownloads")
@@ -165,7 +163,7 @@ End Sub
 
 
 Sub processDownloads(event as object)
-    print "DisplayPhotos.brs [processDownloads]"
+    'print "DisplayPhotos.brs [processDownloads]"
     
     'Take newly downloaded images and add to our localImageStore array for tracking
     response = event.getdata()
@@ -187,11 +185,11 @@ Sub contolCache(event as object)
     'Control the filesystem download cache - After 'keepImages' downloads start removing
     cacheArray = event.getdata()
     if type(cacheArray) = "roArray" then
-        print "Local FileSystem Count: "; cacheArray.Count()
+        'print "Local FileSystem Count: "; cacheArray.Count()
         if (cacheArray.Count() > keepImages) then
             for i = keepImages to cacheArray.Count()
                 oldImage = cacheArray.pop()
-                print "Delete from FileSystem: "; oldImage
+                'print "Delete from FileSystem: "; oldImage
                 DeleteFile("tmp:/"+oldImage)
                 
                 urlLookup = m.imageLocalCacheByFS.Lookup("tmp:/"+oldImage)
@@ -200,7 +198,6 @@ Sub contolCache(event as object)
                     m.imageLocalCacheByURL.Delete(urlLookup)
                     m.imageLocalCacheByFS.Delete("tmp:/"+oldImage)
                 end if
-                
             end for
         end if
     end if
@@ -208,7 +205,7 @@ Sub contolCache(event as object)
 End Sub
 
 
-Sub onLoadStatusTrigger(event as object)
+Sub onPrimaryLoadedTrigger(event as object)
     if event.getdata() = "ready" then
         'Center the MarkUp Box
         markupRectAlbum = m.PrimaryImage.localBoundingRect()
@@ -216,22 +213,59 @@ Sub onLoadStatusTrigger(event as object)
         centery = (1080 - markupRectAlbum.height) / 2
 
         m.PrimaryImage.translation = [ centerx, centery ]
-        m.FadeINAnimation.control = "start"
+        
+        'Controls the image fading
+        rxFade = CreateObject("roRegex", "NoFading", "i")        
+        if rxFade.IsMatch(m.showDisplay) or rxFade.IsMatch(m.imageOnScreen) then
+            m.BlendedPrimaryImage.visible       = true
+            m.BlendedSecondaryImage.visible     = false
+            m.PrimaryImage.visible              = true
+            m.SecondaryImage.visible            = false
+            m.BlendedPrimaryImage.opacity       = 1
+            m.PrimaryImage.opacity              = 1
+            m.FadeForeground.opacity            = 0
+        else
+            m.BlendedPrimaryImage.visible       = true
+            m.PrimaryImage.visible              = true
+            m.FadeInPrimaryAnimation.control    = "start"
+            
+            if m.FadeForeground.opacity = 1 then
+                m.FadeOutForeground.control     = "start"
+            end if
+            
+        end if
     end if  
 End Sub
 
 
-Sub onFadeOutTrigger(event as object)
-    print "DisplayPhotos.brs [onFadeOutTrigger]"
-    
-    if event.getdata() = "stopped" then
-        'FadeOUT has completed. Trigger next image load
-        sendNextImage()     
-    end if
+Sub onSecondaryLoadedTrigger(event as object)
+    if event.getdata() = "ready" then
+        'Center the MarkUp Box
+        markupRectAlbum = m.SecondaryImage.localBoundingRect()
+        centerx = (1920 - markupRectAlbum.width) / 2
+        centery = (1080 - markupRectAlbum.height) / 2
+
+        m.SecondaryImage.translation = [ centerx, centery ]
+
+        'Controls the image fading
+        rxFade = CreateObject("roRegex", "NoFading", "i")       
+        if rxFade.IsMatch(m.showDisplay) or rxFade.IsMatch(m.imageOnScreen) then
+            m.BlendedPrimaryImage.visible       = false
+            m.BlendedSecondaryImage.visible     = true
+            m.PrimaryImage.visible              = false
+            m.SecondaryImage.visible            = true
+            m.BlendedSecondaryImage.opacity     = 1
+            m.SecondaryImage.opacity            = 1
+        else
+            m.BlendedSecondaryImage.visible     = true
+            m.SecondaryImage.visible            = true
+            m.FadeInSecondaryAnimation.control  = "start"
+        end if
+    end if  
 End Sub
 
 
-Sub sendNextImage(previous=invalid)
+Sub sendNextImage(direction=invalid)
     print "DisplayPhotos.brs [sendNextImage]"
         
     'Get next image to display.
@@ -239,7 +273,7 @@ Sub sendNextImage(previous=invalid)
         nextID = m.top.startIndex
         m.top.startIndex = -1
     else
-        if previous<>invalid
+        if direction<>invalid and direction = "previous"
             nextID = GetPreviousImage(m.imageDisplay, m.imageTracker)
         else
             nextID = GetNextImage(m.imageDisplay, m.imageTracker)
@@ -255,15 +289,36 @@ Sub sendNextImage(previous=invalid)
         url = m.imageLocalCacheByURL[url]
     end if
     
-    print "NEXT IMAGE: "; nextID; " - "; url
-    
-    print "COUNT: "; m.imageDisplay.Count()
-    m.PrimaryImage.uri = url
+    print "Next Image: "; url
     
     'Controls the background blur
     rxBlur = CreateObject("roRegex", "YesBlur", "i")
-    if m.showDisplay = invalid or rxBlur.IsMatch(m.showDisplay) then
-        m.BlendedImage.uri = url
+    
+    ' Whats going on here:
+    '   If a direction button is pressed (previous or next) we disable fading for a better user experiance.
+    '   Since the images trigger on "loadstatus" change, we first set the URI to null, then populate.
+    if direction<>invalid
+        if m.imageOnScreen = "PrimaryImage" or m.imageOnScreen = "PrimaryImage_NoFading" then
+            m.SecondaryImage.uri = ""
+            m.SecondaryImage.uri = url
+            m.imageOnScreen      = "SecondaryImage_NoFading"
+            if m.showDisplay = invalid or rxBlur.IsMatch(m.showDisplay) then m.BlendedSecondaryImage.uri = url
+        else
+            m.PrimaryImage.uri   = ""
+            m.PrimaryImage.uri   = url
+            m.imageOnScreen      = "PrimaryImage_NoFading"
+            if m.showDisplay = invalid or rxBlur.IsMatch(m.showDisplay) then m.BlendedPrimaryImage.uri = url
+        end if
+    else
+        if m.imageOnScreen = "PrimaryImage" or m.imageOnScreen = "PrimaryImage_NoFading" then
+            m.SecondaryImage.uri = url
+            m.imageOnScreen      = "SecondaryImage"
+            if m.showDisplay     = invalid or rxBlur.IsMatch(m.showDisplay) then m.BlendedSecondaryImage.uri = url
+        else
+            m.PrimaryImage.uri   = url
+            m.imageOnScreen      = "PrimaryImage"
+            if m.showDisplay = invalid or rxBlur.IsMatch(m.showDisplay) then m.BlendedPrimaryImage.uri = url
+        end if
     end if
     
     m.pauseImageCount.text  = itostr(nextID+1)+" of "+itostr(m.imageDisplay.Count())
@@ -305,7 +360,7 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
         print "KEY: "; key
         if key = "right" or key = "fastforward"
             print "RIGHT"
-            onRotationTigger({})
+            sendNextImage("next")
             onDownloadTigger({})
             m.RotationTimer.control = "stop"
             m.DownloadTimer.control = "stop"
@@ -326,7 +381,7 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
             return true
         else if (key = "play" or key = "OK") and m.RotationTimer.control = "stop"
             print "PLAY"
-            onRotationTigger({})
+            sendNextImage()
             m.RotationTimer.control = "start"
             m.DownloadTimer.control = "start"
             m.PauseScreen.visible   = "false"

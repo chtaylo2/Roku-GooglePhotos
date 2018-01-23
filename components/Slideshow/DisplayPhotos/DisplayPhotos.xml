@@ -25,7 +25,16 @@
 
         <!-- Create the blended in background -->
         <Poster
-            id              = "BlendedImage"
+            id              = "BlendedPrimaryImage"
+            loadWidth       = "15.36"
+            loadHeight      = "8.64"
+            loadDisplayMode = "scaleToFill"
+            height          = "1080"
+            width           = "1920"
+        />
+    
+        <Poster
+            id              = "BlendedSecondaryImage"
             loadWidth       = "15.36"
             loadHeight      = "8.64"
             loadDisplayMode = "scaleToFill"
@@ -33,7 +42,7 @@
             width           = "1920"
         />
       
-        <!-- Create some opacity between main image -->
+        <!-- Create some opacity between blended images -->
         <Rectangle
             id      = "ImageObscure"
             color   = "0x000000"
@@ -49,48 +58,105 @@
             loadHeight      = "1080"
             loadDisplayMode = "scaleToFit"
         />
-      
+
+        <!-- Secondary Image -->
+        <Poster 
+            id              = "SecondaryImage"
+            loadWidth       = "1920"
+            loadHeight      = "1080"
+            loadDisplayMode = "scaleToFit"
+        /> 
+
         <!-- Fading foreground effect -->
         <Rectangle
             id      = "FadeForeground"
             color   = "0x000000"
             height  = "1080"
             width   = "1920"
-            opacity = "0"
+            opacity = "1"
         />        
 
-        <!-- Fading OUT Animation -->         
         <Animation
-            id              = "FadeOUTAnimation"
+            id              = "FadeOutForeground"
             repeat          = "false"
             easeFunction    = "inQuad"
-            duration        = "0.2" >
+            duration        = "0.5" >
 
             <FloatFieldInterpolator
-                id              = "FadeOUTInterpolator"
-                key             = "[0.0,1.0]"
-                KeyValue        = "[0.0,1.0]"
-                fieldToInterp   = "FadeForeground.opacity"
-            />
-
-        </Animation>
-
-        <!-- Fading IN Animation -->
-        <Animation
-            id              = "FadeINAnimation"
-            repeat          = "false"
-            easeFunction    = "inQuad"
-            duration        = "0.3" >
-
-            <FloatFieldInterpolator
-                id              = "FadeINInterpolator"
                 key             = "[0.0,1.0]"
                 KeyValue        = "[1.0,0.0]"
                 fieldToInterp   = "FadeForeground.opacity"
             />
 
         </Animation>
+        
+        <!-- Fading In Primary Image Animation -->
+        <Animation
+            id              = "FadeInPrimaryAnimation"
+            repeat          = "false"
+            easeFunction    = "inQuad"
+            duration        = "0.5" >
+            
+            <FloatFieldInterpolator
+                key             = "[0.0,1.0]"
+                KeyValue        = "[0.0,1.0]"
+                fieldToInterp   = "PrimaryImage.opacity"
+            />
+            
+            <FloatFieldInterpolator
+                key             = "[0.0,1.0]"
+                KeyValue        = "[0.0,1.0]"
+                fieldToInterp   = "BlendedPrimaryImage.opacity"
+            />
 
+            <FloatFieldInterpolator
+                key             = "[0.0,1.0]"
+                KeyValue        = "[1.0,0.0]"
+                fieldToInterp   = "SecondaryImage.opacity"
+            />
+            
+            <FloatFieldInterpolator
+                key             = "[0.0,1.0]"
+                KeyValue        = "[1.0,0.0]"
+                fieldToInterp   = "BlendedSecondaryImage.opacity"
+            />
+
+        </Animation>
+
+        <!-- Fading In Secondary Image Animation -->         
+        <Animation
+            id              = "FadeInSecondaryAnimation"
+            repeat          = "false"
+            easeFunction    = "inQuad"
+            duration        = "0.5" >
+
+
+            <FloatFieldInterpolator
+                key             = "[0.0,1.0]"
+                KeyValue        = "[1.0,0.0]"
+                fieldToInterp   = "PrimaryImage.opacity"
+            />
+            
+            <FloatFieldInterpolator
+                key             = "[0.0,1.0]"
+                KeyValue        = "[1.0,0.0]"
+                fieldToInterp   = "BlendedPrimaryImage.opacity"
+            />
+
+            <FloatFieldInterpolator
+                key             = "[0.0,1.0]"
+                KeyValue        = "[0.0,1.0]"
+                fieldToInterp   = "SecondaryImage.opacity"
+            />
+            
+            <FloatFieldInterpolator
+                key             = "[0.0,1.0]"
+                KeyValue        = "[0.0,1.0]"
+                fieldToInterp   = "BlendedSecondaryImage.opacity"
+            />
+
+        </Animation>
+        
         <!-- Used to display pause screen -->
         <Rectangle
             id          = "PauseScreen"
