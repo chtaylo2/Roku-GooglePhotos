@@ -24,6 +24,9 @@ Sub loadListContent()
     if m.top.contentFile = "settingsTemporaryContent"
         'Temporary setting only apply to the running application
         m.setScope = "temporary"
+    else if m.top.contentFile = "settingsScreensaverContent"
+        'Screensaver setting
+        m.setScope = "screensaver"
     else
         'Global settings are percistent across reboot
         m.setScope = "global"
@@ -31,6 +34,8 @@ Sub loadListContent()
 
     if m.setScope = "temporary"
         m.settingScopeLobal.text = "Temporary Settings:"
+    else if m.setScope = "screensaver"
+        m.settingScopeLobal.text = "Screensaver Settings:"
     end if
 
     'Read in Content
@@ -56,7 +61,13 @@ End Sub
 
 Sub storeResolutionOptions()
     'Populate screen resolution list content
-    regStore = "SlideshowRes"
+    
+    if m.setScope = "screensaver"
+        regStore = "SSaverRes"
+    else
+        regStore = "SlideshowRes"
+    end if
+    
     regSelection = RegRead(regStore, "Settings")
     radioSelection = 0
 
@@ -87,9 +98,16 @@ End Sub
 
 Sub storeDisplayOptions()
     'Populate photo delay list content
-    regStore = "SlideshowDisplay"
+    
+    if m.setScope = "screensaver"
+        regStore = "SSaverMethod"
+        radioSelection = 4
+    else
+        regStore = "SlideshowDisplay"
+        radioSelection = 0
+    end if
+    
     regSelection = RegRead(regStore, "Settings")
-    radioSelection = 0
 
     m.content = createObject("RoSGNode","ContentNode")
     if regSelection = "YesFading_YesBlur" then radioSelection = 0
@@ -111,9 +129,16 @@ End Sub
 
 Sub storeDelayOptions()
     'Populate photo delay list content
-    regStore = "SlideshowDelay"
+    
+    if m.setScope = "screensaver"
+        regStore = "SSaverDelay"
+        radioSelection = 2
+    else
+        regStore = "SlideshowDelay"
+        radioSelection = 0
+    end if
+    
     regSelection = RegRead(regStore, "Settings")
-    radioSelection = 0
 
     tmp = ""
     if regSelection = "3"
@@ -147,9 +172,16 @@ End Sub
 
 Sub storeOrder()
     'Populate photo delay list content
-    regStore = "SlideshowOrder"
+
+    if m.setScope = "screensaver"
+        regStore = "SSaverOrder"
+        radioSelection = 2
+    else
+        regStore = "SlideshowOrder"
+        radioSelection = 0
+    end if
+    
     regSelection = RegRead(regStore, "Settings")
-    radioSelection = 0
 
     m.content = createObject("RoSGNode","ContentNode")
     if regSelection = "Newest to Oldest" then radioSelection = 0
@@ -256,6 +288,9 @@ Sub showsubselected()
             'Temporary Setting
             m.global.[itemcontent.titleseason] = itemcontent.description
             m.infoTempSetting.text = "Override Setting: " + m.global.[itemcontent.titleseason]
+        else if m.setScope = "screensaver"
+            'Screensaver Setting
+            RegWrite(itemcontent.titleseason, itemcontent.description, "Settings")
         else
             'Global Setting
             RegWrite(itemcontent.titleseason, itemcontent.description, "Settings")

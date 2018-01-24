@@ -10,6 +10,12 @@ Sub init()
 	device = CreateObject("roDeviceInfo")
     ds = device.GetDisplaySize()
     
+	'Load common variables
+    loadCommon()
+
+	'Load default settings
+	loadDefaults()
+	
     if ds.w = 720 then
         print "SD Detected"
         m.itemOverhang.logoUri = "pkg:/images/Logo_Overhang_SD.png"

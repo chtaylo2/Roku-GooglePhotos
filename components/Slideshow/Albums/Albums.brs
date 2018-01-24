@@ -11,6 +11,7 @@ Sub init()
     m.itemLabelMain2    = m.top.findNode("itemLabelMain2")
     m.itemLabelMain3    = m.top.findNode("itemLabelMain3")
     m.settingsIcon      = m.top.findNode("settingsIcon")
+    m.noticeDialog      = m.top.findNode("noticeDialog")
     
     m.albumPageList     = m.top.findNode("albumPageList")
     m.albumPageThumb    = m.top.findNode("albumPageThumb")
@@ -104,40 +105,67 @@ End Sub
 Sub handleGetAlbumList(event as object)
     print "Albums.brs [handleGetAlbumList]"
   
+    errorMsg = ""
     response = event.getData()
 
-    if response.code <> 200 then
+    if response.code = 403 then
         doRefreshToken()
+    else if response.code <> 200
+        errorMsg = "An Error Occured in 'handleGetAlbumList'. Code: "+(response.code).toStr()+" - " +response.error
     else
         rsp=ParseXML(response.content)
         print rsp
-        'if rsp=invalid then
-        '    ShowErrorDialog("Unable to parse Google Photos API response" + LF + LF + "Exit the channel then try again later","API Error")
-        'end if
-    
-        m.albumsObject = googleAlbumListing(rsp.entry)
-        googleDisplayAlbums(m.albumsObject)
+        if rsp=invalid then
+            errorMsg = "Unable to parse Google Photos API response. Exit the channel then try again later. Code: "+(response.code).toStr()+" - " +response.error
+        else
+            m.albumsObject = googleAlbumListing(rsp.entry)
+            googleDisplayAlbums(m.albumsObject)        
+        end if
     end if
+    
+    if errorMsg<>"" then
+        'ShowNotice
+        m.noticeDialog.visible = true
+        buttons =  [ "OK" ]
+        m.noticeDialog.message = errorMsg
+        m.noticeDialog.buttons = buttons
+        m.noticeDialog.setFocus(true)
+        m.noticeDialog.observeField("buttonSelected","noticeClose")
+    end if   
+    
 End Sub
 
 
 Sub handleGetAlbumImages(event as object)
     print "Albums.brs [handleGetAlbumImages]"
   
+    errorMsg = ""
     response = event.getData()
     
-    if response.code <> 200 then
+    if response.code = 403 then
         doRefreshToken()
+    else if response.code <> 200
+        errorMsg = "An Error Occured in 'handleGetAlbumImages'. Code: "+(response.code).toStr()+" - " +response.error
     else
         rsp=ParseXML(response.content)
-        print rsp
-        'if rsp=invalid then
-        '    ShowErrorDialog("Unable to parse Google Photos API response" + LF + LF + "Exit the channel then try again later","API Error")
-        'end if
-        
-        m.imagesObject = googleImageListing(rsp.entry)
-        googleDisplayImageMenu(m.albumsObject[m.albummarkupgrid.itemSelected], m.imagesObject)
+        if rsp=invalid then
+            errorMsg = "Unable to parse Google Photos API response. Exit the channel then try again later. Code: "+(response.code).toStr()+" - " +response.error
+        else
+            m.imagesObject = googleImageListing(rsp.entry)
+            googleDisplayImageMenu(m.albumsObject[m.albummarkupgrid.itemSelected], m.imagesObject)
+        end if
     end if
+    
+    if errorMsg<>"" then
+        'ShowNotice
+        m.noticeDialog.visible = true
+        buttons =  [ "OK" ]
+        m.noticeDialog.message = errorMsg
+        m.noticeDialog.buttons = buttons
+        m.noticeDialog.setFocus(true)
+        m.noticeDialog.observeField("buttonSelected","noticeClose")
+    end if
+    
 End Sub
 
 
@@ -470,12 +498,17 @@ End Sub
 
 Sub showThousandPopup()
     hideAlbumPages()
-    m.screenActive          = createObject("roSGNode", "FeaturesPopup")
-    m.screenActive.id       = "FeaturesPopup"
-    m.screenActive.display  = "ThousandPopup"
+    m.screenActive          = createObject("roSGNode", "InfoPopup")
+    m.screenActive.id       = "ThousandPopup"
     m.top.appendChild(m.screenActive)
     m.screenActive.setFocus(true)
 End Sub
+
+
+Sub noticeClose(event as object)
+    m.noticeDialog.visible = false
+End Sub
+
 
 
 Function onKeyEvent(key as String, press as Boolean) as Boolean
@@ -515,7 +548,7 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
             m.screenActive = invalid
             return true
             
-        else if (key = "OK") and (m.screenActive <> invalid) and (m.screenActive.id = "FeaturesPopup") and (m.screenActive.closeReady = "true")
+        else if (key = "OK") and (m.screenActive <> invalid) and (m.screenActive.id = "ThousandPopup") and (m.screenActive.closeReady = "true")
             m.top.removeChild(m.screenActive)
             m.screenActive = invalid
             displayAlbumPages()

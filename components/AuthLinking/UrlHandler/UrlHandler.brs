@@ -120,24 +120,19 @@ Sub processResponse(msg as Object)
             code:    msg.GetResponseCode(),
             headers: msg.GetResponseHeaders(),
             content: msg.GetString(),
+            error:   msg.GetFailureReason(),
             num:     jobnum
         }
-        'print "URL RESULT: ";  result
-        'print "MSG: "; msg
     
         ' could handle various error codes, retry, etc. here
         m.jobsById.delete(idKey)
         job.context.context.response = result
-        if msg.GetResponseCode() = 200
-            if result.num = 0
-                parseGenToken(job)
-            else if result.num = 1
-                parseAuthCheck(job)
-            else if result.num = 2
-                parseUserInfo(job)
-            end if
-        else
-            print "Error: status code was: " + (msg.GetResponseCode()).toStr()
+        if result.num = 0
+            parseGenToken(job)
+        else if result.num = 1
+            parseAuthCheck(job)
+        else if result.num = 2
+            parseUserInfo(job)
         end if
     else
         print "Error: event for unknown job "; idkey

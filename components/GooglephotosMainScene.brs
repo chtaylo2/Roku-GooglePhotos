@@ -36,15 +36,15 @@ Sub init()
         showFeaturesPopup()
     else
         checkRegistration()
-    end if	  
+    end if
 End Sub
 
 
 Function showFeaturesPopup()
     m.itemHeader.text       = "Version " + m.releaseVersion + " • New Features"
-    m.screenActive          = createObject("roSGNode", "FeaturesPopup")
+    m.screenActive          = createObject("roSGNode", "InfoPopup")
     m.screenActive.id       = "FeaturesPopup"
-    m.screenActive.display  = "NewFeatures"
+    'm.screenActive.display  = "FeaturesPopup"
     m.top.appendChild(m.screenActive)
     m.screenActive.setFocus(true)
 End Function

@@ -125,6 +125,11 @@
             />
       
         </LabelList>
-	        
+	    
+		<Dialog
+            id      = "noticeDialog"
+            title   = "Error"
+            visible = "false"
+        />
     </children>
 </component>

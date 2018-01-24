@@ -18,6 +18,9 @@ Sub init()
     'Load registration variables
     loadReg()
     
+	'Load default settings
+	'loadDefaults()
+	
 	userCount 	 = oauth_count()
     selectedUser = RegRead("SSaverUser","Settings")
     m.userIndex  = 0
@@ -26,7 +29,7 @@ Sub init()
 	
     if selectedUser = invalid then      
         m.userIndex = 0
-    else if ssUser="All (Random)" then
+    else if selectedUser="All (Random)" then
         m.userIndex = 100
     else
         for i = 0 to userCount-1
@@ -83,7 +86,7 @@ Sub handleGetScreensaverAlbumList(event as object)
 
 	m.apiPending = m.apiPending-1
     if response.code <> 200 then
-        'doRefreshToken()
+        '''''doRefreshToken()
     else
         rsp=ParseXML(response.content)
         print rsp
@@ -127,7 +130,7 @@ Sub handleGetScreensaverAlbumImages(event as object)
 	m.apiPending = m.apiPending-1
 	
     if response.code <> 200 then
-        doRefreshToken()
+        '''''doRefreshToken()
     else
         rsp=ParseXML(response.content)
         print rsp

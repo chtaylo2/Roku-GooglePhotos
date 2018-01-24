@@ -1,13 +1,13 @@
 <?xml version = "1.0" encoding = "utf-8" ?>
 
-<component name = "FeaturesPopup" extends = "Group" >
+<component name = "InfoPopup" extends = "Group" >
 
     <interface>
         <field id = "display" type = "string" />
         <field id = "closeReady" type = "string" />
     </interface>
     
-    <script type = "text/brightscript" uri = "pkg:/components/FeaturesPopup/FeaturesPopup.brs" />
+    <script type = "text/brightscript" uri = "pkg:/components/InfoPopup/InfoPopup.brs" />
     <script type = "text/brightscript" uri = "pkg:/components/Utils/Common.brs" />
 
     <children>

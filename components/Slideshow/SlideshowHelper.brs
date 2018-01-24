@@ -13,43 +13,58 @@
 Function handleRefreshToken(event as object)
     print "SlideshowHelper.brs [handleRefreshToken]"
 
+    status = -1
+    errorMsg = ""
     refreshData = m.UriHandler.refreshToken
         
     if refreshData <> invalid
-        json = ParseJson(refreshData.content)
-        if json = invalid
-            m.errorMsg = "Unable to parse Json response"
-            status = 1
-        else if type(json) <> "roAssociativeArray"
-            m.errorMsg = "Json response is not an associative array"
-            status = -1
-        else if json.DoesExist("error")
-            m.errorMsg = "Json error response: " + json.error
-            status = 1
+        if refreshData.code <> 200
+            errorMsg = "An Error Occured in 'handleRefreshToken'. Code: "+(refreshData.code).toStr()+" - " +refreshData.error
         else
-            
-            ' We have our tokens
-            m.accessToken[m.global.selectedUser]  = getString(json,"access_token")
-            m.tokenType                           = getString(json,"token_type")
-            m.tokenExpiresIn                      = getInteger(json,"expires_in")
-            refreshToken                          = getString(json,"refresh_token")
-            if refreshToken <> ""
-                m.refreshToken[m.global.selectedUser] = refreshToken
+            json = ParseJson(refreshData.content)
+            if json = invalid
+                errorMsg = "Unable to parse Json response: handleRefreshToken"
+                status = 1
+            else if type(json) <> "roAssociativeArray"
+                errorMsg = "Json response is not an associative array: handleRefreshToken"
+                status = -1
+            else if json.DoesExist("error")
+                errorMsg = "Json error response: [handleRefreshToken] " + json.error
+                status = 1
+            else
+                
+                status = 0
+                ' We have our tokens
+                m.accessToken[m.global.selectedUser]  = getString(json,"access_token")
+                m.tokenType                           = getString(json,"token_type")
+                m.tokenExpiresIn                      = getInteger(json,"expires_in")
+                refreshToken                          = getString(json,"refresh_token")
+                if refreshToken <> ""
+                    m.refreshToken[m.global.selectedUser] = refreshToken
+                end if
+    
+                'Query User info
+                'status = m.RequestUserInfo(m.accessToken.Count()-1, false)
+    
+                'Save cached values to registry
+                saveReg()                
             end if
-
-            'Query User info
-            'status = m.RequestUserInfo(m.accessToken.Count()-1, false)
-
-            if m.tokenType       = "" then m.errorMsg = "Missing token_type"      : status = 1
-            if m.tokenExpiresIn  = 0  then m.errorMsg = "Missing expires_in"      : status = 1
-
-            'Save cached values to registry
-            saveReg()                
-        end if   
+        end if
     end if
     
-    'Yes - shouldnt default to this. only temporary.
-    doGetAlbumList()
+    if errorMsg<>"" then
+        'ShowNotice
+        m.noticeDialog.visible = true
+        buttons =  [ "OK" ]
+        m.noticeDialog.message = errorMsg
+        m.noticeDialog.buttons = buttons
+        m.noticeDialog.setFocus(true)
+        m.noticeDialog.observeField("buttonSelected","noticeClose")
+    end if   
+    
+    if status = 0 then
+        doGetAlbumList()
+    end if
     
 End Function
 

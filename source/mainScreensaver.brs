@@ -42,6 +42,7 @@ Sub showGooglePhotosScreensaverSettings()
     scene    = screen.CreateScene("GooglePhotosScreensaverSettings")
     m.global = screen.getGlobalNode()
  
+    m.global.addFields( {SSaverUser: "", SSaverRes: "", SSaverMethod: "", SSaverDelay: "", SSaverOrder: ""} )
     m.global.addFields( {SlideshowRes: "", SlideshowDisplay: "", SlideshowDelay: "", SlideshowOrder: ""} )
     m.global.addFields( {selectedUser: -1} )
     
