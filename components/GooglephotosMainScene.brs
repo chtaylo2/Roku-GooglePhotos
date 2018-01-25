@@ -24,6 +24,9 @@ Sub init()
     'Load common variables
     loadCommon()
     
+    'Load default settings
+	loadDefaults()
+    
     'Define SG nodes
     m.itemHeader = m.top.findNode("itemHeader")
     

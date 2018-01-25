@@ -8,7 +8,21 @@
     <script type = "text/brightscript" uri = "pkg:/components/Utils/private-git.brs" />
     
     <children>
-
+        <Rectangle
+            id          = "FadeBackground"
+            color       = "0x000000"
+            height      = "1080"
+            width       = "1920"
+            opacity     = "1"
+        />
+        
+        <!-- PhotoView Advertisment -->
+        <Poster
+            id          = "PhotoViewLogo"
+            uri         = "pkg://images/screensaver_splash.png"
+            translation = "[650, 350]"
+        />
+        
         <Timer
             id          = "apiTimer"
             repeat      = "true"

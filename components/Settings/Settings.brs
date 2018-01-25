@@ -48,6 +48,7 @@ End Sub
 
 Sub setLists()
     'Setup content list for different settings
+    storeLinkedUsers()
     storeResolutionOptions()
     storeDisplayOptions()
     storeDelayOptions()
@@ -68,11 +69,11 @@ Sub storeResolutionOptions()
         regStore = "SlideshowRes"
     end if
     
-    regSelection = RegRead(regStore, "Settings")
     radioSelection = 0
+    regSelection = RegRead(regStore, "Settings")
 
-    device = createObject("roDeviceInfo")
-    is4k = (val(device.GetVideoMode()) = 2160)
+    device  = createObject("roDeviceInfo")
+    is4k    = (val(device.GetVideoMode()) = 2160)
     is1080p = (val(device.GetVideoMode()) = 1080)
 
     m.content = createObject("RoSGNode","ContentNode")
@@ -101,12 +102,11 @@ Sub storeDisplayOptions()
     
     if m.setScope = "screensaver"
         regStore = "SSaverMethod"
-        radioSelection = 4
     else
         regStore = "SlideshowDisplay"
-        radioSelection = 0
     end if
     
+    radioSelection = 0
     regSelection = RegRead(regStore, "Settings")
 
     m.content = createObject("RoSGNode","ContentNode")
@@ -132,12 +132,11 @@ Sub storeDelayOptions()
     
     if m.setScope = "screensaver"
         regStore = "SSaverDelay"
-        radioSelection = 2
     else
         regStore = "SlideshowDelay"
-        radioSelection = 0
     end if
     
+    radioSelection = 0
     regSelection = RegRead(regStore, "Settings")
 
     tmp = ""
@@ -162,7 +161,7 @@ Sub storeDelayOptions()
     addItem(m.content, "10 seconds", "10", regStore)
     addItem(m.content, "15 seconds", "15", regStore)
     addItem(m.content, "30 seconds", "30", regStore)
-    addItem(m.content, "Custom Setting"+tmp, "0", regStore)
+    addItem(m.content, "Custom Setting"+tmp, "9999", regStore)
     
     'Store content node and current registry selection
     m.settingsDelay = m.content
@@ -175,12 +174,11 @@ Sub storeOrder()
 
     if m.setScope = "screensaver"
         regStore = "SSaverOrder"
-        radioSelection = 2
     else
         regStore = "SlideshowOrder"
-        radioSelection = 0
     end if
     
+    radioSelection = 0
     regSelection = RegRead(regStore, "Settings")
 
     m.content = createObject("RoSGNode","ContentNode")
@@ -194,6 +192,36 @@ Sub storeOrder()
     'Store content node and current registry selection
     m.settingsOrder = m.content
     m.settingsOrdercheckedItem = radioSelection
+End Sub
+
+
+Sub storeLinkedUsers()
+    'Populate linked user list
+    
+    usersLoaded     = oauth_count()
+    radioSelection  = 0
+    regStore        = "SSaverUser"
+    regSelection    = RegRead(regStore, "Settings")
+    m.content       = createObject("RoSGNode","ContentNode")
+    
+    if usersLoaded = 0 then
+        addItem(m.content,  "No users linked", 0, "")
+    else
+        for i = 0 to usersLoaded-1
+            addItem(m.content,  m.userInfoName[i], m.userInfoEmail[i], regStore)
+            if regSelection = m.userInfoEmail[i] then radioSelection = i
+        end for
+        if usersLoaded > 1 then
+            addItem(m.content,  "All (Random)", "All (Random)", regStore)
+            if regSelection = "All (Random)" then
+                radioSelection = usersLoaded
+            end if
+        end if
+    end if
+    
+    'Store content node and current registry selection
+    m.settingsUsers = m.content
+    m.settingsUserscheckedItem = radioSelection
 End Sub
 
 
@@ -239,7 +267,14 @@ Sub showfocus()
             m.settingSubList.checkedItem    = m.settingsOrdercheckedItem
             m.settingSubList.translation    = [129, itemcontent.x]
         else if m.settingsList.itemFocused = 4 then
-            m.settingSubList.visible        = "false"
+            if m.setScope = "screensaver"
+                m.settingSubList.visible        = "true"
+                m.settingSubList.content        = m.settingsUsers
+                m.settingSubList.checkedItem    = m.settingsUserscheckedItem
+                m.settingSubList.translation    = [129, itemcontent.x]    
+            else
+                m.settingSubList.visible        = "false"
+            end if
         else if m.settingsList.itemFocused = 5 then
             m.settingSubList.visible        = "false"
         else if m.settingsList.itemFocused = 6 then
@@ -252,22 +287,29 @@ End Sub
 Sub showselected()
 
     'Process item selected
-    if m.settingsList.itemSelected = 0 OR m.settingsList.itemSelected = 1 OR m.settingsList.itemSelected = 2 OR m.settingsList.itemSelected = 3 then
-        'SETTINGS
-        m.settingSubList.setFocus(true)
-    else if m.settingsList.itemSelected = 4 then
-        'REGISTER NEW USER
-        m.screenActive = createObject("roSGNode", "Registration")
-        m.top.appendChild(m.screenActive)
-        m.screenActive.setFocus(true)
-        m.settingScopeLobal.visible = false
-    else if m.settingsList.itemSelected = 5 then
-        'UNREGISTER USER
-        m.confirmDialog.visible = true
-        buttons =  [ "Confirm", "Cancel" ]
-        m.confirmDialog.message = "Are you sure you want to unregister "  + m.userInfoName[m.global.selectedUser] + " from this device?"
-        m.confirmDialog.buttons = buttons
-        m.confirmDialog.setFocus(true)        
+    if m.setScope = "screensaver"
+        if m.settingsList.itemSelected = 0 OR m.settingsList.itemSelected = 1 OR m.settingsList.itemSelected = 2 OR m.settingsList.itemSelected = 3 OR m.settingsList.itemSelected = 4 then
+            'SETTINGS
+            m.settingSubList.setFocus(true)
+        end if    
+    else
+        if m.settingsList.itemSelected = 0 OR m.settingsList.itemSelected = 1 OR m.settingsList.itemSelected = 2 OR m.settingsList.itemSelected = 3 then
+            'SETTINGS
+            m.settingSubList.setFocus(true)
+        else if m.settingsList.itemSelected = 4 then
+            'REGISTER NEW USER
+            m.screenActive = createObject("roSGNode", "Registration")
+            m.top.appendChild(m.screenActive)
+            m.screenActive.setFocus(true)
+            m.settingScopeLobal.visible = false
+        else if m.settingsList.itemSelected = 5 then
+            'UNREGISTER USER
+            m.confirmDialog.visible = true
+            buttons =  [ "Confirm", "Cancel" ]
+            m.confirmDialog.message = "Are you sure you want to unregister "  + m.userInfoName[m.global.selectedUser] + " from this device?"
+            m.confirmDialog.buttons = buttons
+            m.confirmDialog.setFocus(true)        
+        end if    
     end if
 End Sub
 
@@ -275,8 +317,8 @@ End Sub
 Sub showsubselected()
     'Store item selected in registry
     itemcontent = m.settingSubList.content.getChild(m.settingSubList.itemSelected)
-    
-    if itemcontent.description = "0" then
+
+    if itemcontent.description = "9999" then
         m.pinPad.visible = true
         m.pinPad.pinPad.secureMode = false
         m.pinPad.pinPad.pinLength  = "3"
@@ -301,6 +343,7 @@ Sub showsubselected()
     if m.settingsList.itemSelected = 1 then m.settingsDisplaycheckedItem = m.settingSubList.itemSelected
     if m.settingsList.itemSelected = 2 then m.settingsDelaycheckedItem = m.settingSubList.itemSelected
     if m.settingsList.itemSelected = 3 then m.settingsOrdercheckedItem = m.settingSubList.itemSelected
+    if m.settingsList.itemSelected = 4 then m.settingsUserscheckedItem = m.settingSubList.itemSelected    
 End Sub
 
 
@@ -326,7 +369,6 @@ Sub processPinEntry(event as object)
     if event.getData() = 0
         'SAVE
         pinInt = strtoi(m.pinPad.pin)
-        print "HERE: "; pinInt
         if pinInt > 0
             itemcontent = m.settingSubList.content.getChild(m.settingSubList.itemSelected)
             

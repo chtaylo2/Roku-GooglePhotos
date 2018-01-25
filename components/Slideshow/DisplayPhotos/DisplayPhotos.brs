@@ -13,15 +13,14 @@ Sub init()
     m.pauseImageDetail          = m.top.findNode("pauseImageDetail")
     m.RotationTimer             = m.top.findNode("RotationTimer")
     m.DownloadTimer             = m.top.findNode("DownloadTimer")
+    m.Watermark                 = m.top.findNode("Watermark")
 
-    m.port = CreateObject("roMessagePort")
-
-    m.fromBrowse            = false
-    m.imageLocalCacheByURL  = {}
-    m.imageLocalCacheByFS   = {}
-    m.imageDisplay          = []
-    m.imageTracker          = -1
-    m.imageOnScreen         = ""
+    m.fromBrowse                = false
+    m.imageLocalCacheByURL      = {}
+    m.imageLocalCacheByFS       = {}
+    m.imageDisplay              = []
+    m.imageTracker              = -1
+    m.imageOnScreen             = ""
     
     m.PrimaryImage.observeField("loadStatus","onPrimaryLoadedTrigger")
     m.SecondaryImage.observeField("loadStatus","onSecondaryLoadedTrigger")
@@ -65,6 +64,22 @@ End Sub
 sub loadImageList()
     print "DisplayPhotos.brs [loadImageList]"
     
+    if m.top.id = "DisplayScreensaver" then
+        'Override settings for screensaver
+        m.showDisplay   = RegRead("SSaverMethod", "Settings")
+        m.showOrder     = RegRead("SSaverOrder", "Settings")
+        showDelay       = RegRead("SSaverDelay", "Settings")
+    
+        m.RotationTimer.duration = showDelay
+        
+        print "GooglePhotos Screensaver Delay:   "; showDelay
+        print "GooglePhotos Screensaver Order:   "; m.showOrder
+        print "GooglePhotos Screensaver Display: "; m.showDisplay
+        
+        'Show watermark on screensaver - Stop bitching, we need some advertisment!
+        m.Watermark.visible = true
+    end if    
+    
     'Copy original list since we can't change origin
     originalList = m.top.content
     
@@ -97,10 +112,15 @@ sub loadImageList()
      
     m.RotationTimer.control = "start"
     m.DownloadTimer.control = "start"
-     
+ 
     'Trigger a PAUSE if photo selected
     if m.top.startIndex <> -1 then
         onKeyEvent("OK", true)
+    end if
+    
+    if m.top.id = "DisplayScreensaver" then
+        'We don't need pre-downloading of photos for screensaver. Disable
+        m.DownloadTimer.control = "stop"
     end if
      
 End Sub
@@ -116,6 +136,7 @@ Sub onRotationTigger(event as object)
         'We only allow multi scroll if starting direct, can't come from Browse Images.
         if m.screenActive = invalid then
             m.screenActive = createObject("roSGNode", "MultiScroll")
+            m.screenActive.id = m.top.id
             m.screenActive.content = m.imageDisplay
             m.top.appendChild(m.screenActive)
             m.screenActive.setFocus(true)

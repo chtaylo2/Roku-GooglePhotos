@@ -22,8 +22,15 @@
         <ScrollingImage id = "scroll_node_6" duration = "32" />
         <ScrollingImage id = "scroll_node_7" duration = "23" />
         <ScrollingImage id = "scroll_node_8" duration = "20" />
-
-
+        
+        <!-- Screensaver watermark -->
+        <Poster
+            id          = "Watermark"
+            uri         = "pkg:/images/PhotoViewWatermark.png"
+            translation = "[1700,1010]"
+            visible     = "false"
+        />
+        
         <!-- Required Timers -->
         <Timer
             id          = "waveTimer"

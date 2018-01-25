@@ -19,7 +19,7 @@ Sub init()
     loadReg()
     
 	'Load default settings
-	'loadDefaults()
+	loadDefaults()
 	
 	userCount 	 = oauth_count()
     selectedUser = RegRead("SSaverUser","Settings")
@@ -36,15 +36,12 @@ Sub init()
             if m.userInfoEmail[i] = selectedUser then m.userIndex = i
         end for
     end if
-    
-	'm.userIndex = 100
 
     print "USER: "; m.userIndex
     
     if userCount = 0 then
         rsp="invalid"
     else
-
         'If m.userIndex is set to 100, means user wants random photos from each linked account shown.
         if m.userIndex = 100 then
             for i = 0 to userCount-1
@@ -172,8 +169,8 @@ End Sub
 Sub execScreensaver()
     print "START SHOW"
     m.screenActive = createObject("roSGNode", "DisplayPhotos")
+	m.screenActive.id = "DisplayScreensaver"
     m.screenActive.content = m.photoItems
-    m.screenActive.id = "DisplayScreensaver"
     m.top.appendChild(m.screenActive)
     m.screenActive.setFocus(true)
 

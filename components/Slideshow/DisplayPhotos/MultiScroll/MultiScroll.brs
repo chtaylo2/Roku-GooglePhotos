@@ -14,6 +14,7 @@ Sub init()
 
     m.WaveTimer     = m.top.findNode("waveTimer")
     m.RefreshTimer  = m.top.findNode("refreshTimer")
+    m.Watermark     = m.top.findNode("Watermark")
     
     m.WaveTimer.observeField("fire","onWaveTigger")
     m.RefreshTimer.observeField("fire","onRefreshTigger")
@@ -92,9 +93,7 @@ Sub init()
         m.scroll_node_8.imageTranslation    = tmpStart
         m.scroll_node_8.ventorTranslation   = "[["+str(tmpStart[0])+","+str(tmpStart[1])+"],["+str(tmpStart[0])+","+str(endPoint)+"]]"
                 
-    
     m.top.observeField("content","loadImages")
-                
 End Sub
 
 
@@ -107,6 +106,11 @@ Sub loadImages()
     m.scroll_node_2.imageUri    = GetNextImage(m.top.content, m.imageTracker)
     m.scroll_node_3.imageUri    = GetNextImage(m.top.content, m.imageTracker)
     m.scroll_node_7.imageUri    = GetNextImage(m.top.content, m.imageTracker)
+    
+    if m.top.id = "DisplayScreensaver" then
+        'Show watermark on screensaver - Stop bitching, we need some advertisment!
+        m.Watermark.visible = true
+    end if
     
     m.scroll_node_1.control     = "start"
     m.scroll_node_5.control     = "start"

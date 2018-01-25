@@ -214,22 +214,7 @@ Sub onItemSelected()
         
     else if selection.id = "GP_VIDEO_BROWSE" then
         print "VIDEO BROWSE"
-
-        m.videoThumbList = createObject("RoSGNode","ContentNode")
-        for i = 0 to m.videosMetaData.Count()-1
-            addItem(m.videoThumbList, "GP_BROWSE", m.videosMetaData[i].thumbnail, "", "")
-        end for
-        
-        m.screenActive = createObject("roSGNode", "Browse")
-        m.screenActive.id = selection.id
-        m.screenActive.albumName = m.albumName + "  -  " + itostr(m.videosMetaData.Count()) + " Videos"
-        m.screenActive.metaData = m.videosMetaData
-        m.screenActive.content = m.videoThumbList
-        m.screenActive.id = selection.id
-        m.top.appendChild(m.screenActive)
-        m.screenActive.setFocus(true)
-
-        hideMarkupGrid()
+        displayVideoBrowse()
         
     else if selection.id = "GP_IMAGE_BROWSE" then
         print "IMAGE BROWSE"
@@ -244,7 +229,6 @@ Sub onItemSelected()
         m.screenActive.albumName = m.albumName + "  -  " + itostr(m.imagesMetaData.Count()) + " Photos"
         m.screenActive.metaData = m.imagesMetaData
         m.screenActive.content = m.imageThumbList
-        m.screenActive.id = selection.id
         m.top.appendChild(m.screenActive)
         m.screenActive.setFocus(true)
 
@@ -355,6 +339,7 @@ Sub googleDisplayImageMenu(album As Object, imageList As Object)
     title          = album.GetTitle()
     totalPages     = ceiling(album.GetImageCount() / 1000)
     listIcon       = "pkg:/images/browse.png"
+    videoOnly      = false
     
     m.videosMetaData=[]
     m.imagesMetaData=[]
@@ -388,8 +373,9 @@ Sub googleDisplayImageMenu(album As Object, imageList As Object)
             addItem(m.menuSelected, "GP_SLIDESHOW_START", m.imagesMetaData[0].thumbnail, Pluralize(m.imagesMetaData.Count(),"Photo") + " - Start Slideshow", pagesShow)
             addItem(m.menuSelected, "GP_VIDEO_BROWSE", m.videosMetaData[0].thumbnail, Pluralize(m.videosMetaData.Count(),"Video") + " - Browse", pagesShow)
             addItem(m.menuSelected, "GP_IMAGE_BROWSE", listIcon, Pluralize(m.imagesMetaData.Count(),"Photo") + " - Browse", "")
-'       else 'Video only album
-'            googlephotos_browse_videos(videos, title)
+       else 'Video only album
+            addItem(m.menuSelected, "GP_VIDEO_BROWSE", m.videosMetaData[0].thumbnail, Pluralize(m.videosMetaData.Count(),"Video") + " - Browse", pagesShow)
+            videoOnly = true
         end if
     else 'Photo only album          
         addItem(m.menuSelected, "GP_SLIDESHOW_START", m.imagesMetaData[0].thumbnail, Pluralize(m.imagesMetaData.Count(),"Photo") + " - Start Slideshow", pagesShow)
@@ -404,6 +390,11 @@ Sub googleDisplayImageMenu(album As Object, imageList As Object)
     
     centerMarkupGrid()
     showMarkupGrid()
+
+    if videoOnly then
+        'Remove an unnecessary click for user
+        displayVideoBrowse()
+    end if
     
     'Unobserve first to make sure we're not already monitoring
     m.albummarkupgrid.unobserveField("itemFocused") 
@@ -452,6 +443,24 @@ Sub hideAlbumPages()
     'Stop watching for events
     m.albumPageList.unobserveField("itemFocused") 
     m.albumPageList.unobserveField("itemSelected")  
+End Sub
+
+
+Sub displayVideoBrowse()
+    m.videoThumbList = createObject("RoSGNode","ContentNode")
+    for i = 0 to m.videosMetaData.Count()-1
+        addItem(m.videoThumbList, "GP_BROWSE", m.videosMetaData[i].thumbnail, "", "")
+    end for
+            
+    m.screenActive = createObject("roSGNode", "Browse")
+    m.screenActive.id = "GP_VIDEO_BROWSE"
+    m.screenActive.albumName = m.albumName + "  -  " + itostr(m.videosMetaData.Count()) + " Videos"
+    m.screenActive.metaData = m.videosMetaData
+    m.screenActive.content = m.videoThumbList
+    m.top.appendChild(m.screenActive)
+    m.screenActive.setFocus(true)
+    
+    hideMarkupGrid()
 End Sub
 
 
@@ -545,7 +554,8 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
         else if ((key = "options") or (key = "left")) and (m.screenActive <> invalid) and (m.screenActive.id = "settings")
             m.top.removeChild(m.screenActive)
             showMarkupGrid()
-            m.screenActive = invalid
+            m.screenActive          = invalid
+            m.settingsIcon.visible  = true
             return true
             
         else if (key = "OK") and (m.screenActive <> invalid) and (m.screenActive.id = "ThousandPopup") and (m.screenActive.closeReady = "true")

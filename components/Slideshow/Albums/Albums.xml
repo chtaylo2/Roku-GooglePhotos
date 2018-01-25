@@ -30,24 +30,30 @@
 			visible 	= "false"
 		/>
 		
-        <Label
-            id          = "settingsIcon"
-            font        = "font:MediumBoldSystemFont"
-            color       = "#808080"
-            horizAlign  = "right"
-			text		= "Settings"
-            vertAlign   = "top"
-			visible 	= "false"
-            translation = "[1602,174]" >
+		<Group
+			id 			= "settingsIcon"
+			translation = "[1602,174]"
+			visible 	= "false" >
+			
+			<Label
+				id          = "settingsIconText"
+				font        = "font:MediumBoldSystemFont"
+				color       = "#808080"
+				horizAlign  = "right"
+				text		= "Settings"
+				vertAlign   = "top"
+				translation = "[ 0, 4 ]"
+			/>
 			
 			<Poster 
-                id              = "settingIconImage"
-                width           = "30"
-				height			= "30"
-                translation     = "[ 159, 3 ]"
-				uri = "pkg:/images/asterisk.png"
+                id          = "settingIconImage"
+                width       = "45"
+				height		= "45"
+                translation = "[ 159, 0 ]"
+				uri 		= "pkg:/images/asterisk.png"
             />
-		</Label>
+			
+		</Group>
 		
         <Label
             id          = "itemLabelMain1"
@@ -79,7 +85,7 @@
             color       = "#808080"
             horizAlign  = "center"
             vertAlign   = "center"
-            translation = "[0,621]"
+            translation = "[0,421]"
         />
 
         <LabelList

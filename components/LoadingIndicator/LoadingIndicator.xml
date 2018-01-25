@@ -8,9 +8,9 @@
 
             Sub init()
                 m.spinner               = m.top.findNode("spinner")
-                m.spinner.poster.uri    = "pkg:/images/loader.gif"
-                m.spinner.poster.width  = "114"
-                m.spinner.poster.height = "114"
+                m.spinner.poster.uri    = "pkg:/images/loading.png"
+                m.spinner.poster.width  = "128"
+                m.spinner.poster.height = "128"
                 m.spinner.visible       = "true"
                 m.spinner.control       = "start"
                 
@@ -23,7 +23,7 @@
                 centerx = (1920 - spinnerRect.width) / 2
                 centery = (1080 - spinnerRect.height) / 2
 
-                m.spinner.translation = [ centerx, centery-30 ]
+                m.spinner.translation = [ centerx+10, centery-20 ]
             End Sub
 
         ]]>

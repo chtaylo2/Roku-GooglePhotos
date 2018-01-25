@@ -3,7 +3,6 @@
 <component name = "InfoPopup" extends = "Group" >
 
     <interface>
-        <field id = "display" type = "string" />
         <field id = "closeReady" type = "string" />
     </interface>
     

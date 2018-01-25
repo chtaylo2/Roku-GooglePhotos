@@ -1,9 +1,9 @@
 
 Sub Main()
     'Start main screen
-    'showGooglePhotosScreen()
+    showGooglePhotosScreen()
     'showGooglePhotosScreensaver()
-    showGooglePhotosScreensaverSettings()
+    'showGooglePhotosScreensaverSettings()
 End Sub
 
 

@@ -191,6 +191,14 @@
       
         </Rectangle>
 
+        <!-- Screensaver watermark -->
+        <Poster
+            id          = "Watermark"
+            uri         = "pkg:/images/PhotoViewWatermark.png"
+            translation = "[1700,1010]"
+            visible     = "false"
+        />
+
         <!-- Required Timers -->
         <Timer
             id          = "RotationTimer"
