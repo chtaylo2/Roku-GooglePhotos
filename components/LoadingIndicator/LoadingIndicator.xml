@@ -7,8 +7,12 @@
         <![CDATA[
 
             Sub init()
+            
+                ' I actually purchased this loading spinner as I could not find a free one I liked. $2 well spent!
+                ' https://www.iconfinder.com/icons/1045655/buffering_download_load_loading_preloader_progress_wait_icon#size=128
+                
                 m.spinner               = m.top.findNode("spinner")
-                m.spinner.poster.uri    = "pkg:/images/loading.png"
+                m.spinner.poster.uri    = "pkg:/images/loadingSpinner.png"
                 m.spinner.poster.width  = "128"
                 m.spinner.poster.height = "128"
                 m.spinner.visible       = "true"

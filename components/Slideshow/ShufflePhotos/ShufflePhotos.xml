@@ -1,12 +1,12 @@
 <?xml version = "1.0" encoding = "utf-8" ?>
 
-<component name = "GooglePhotosScreensaver" extends = "Scene" >
-
-    <script type = "text/brightscript" uri = "pkg:/components/Screensaver/Screensaver.brs" />
+<component name = "Shuffle Photos" extends = "Group" >
+    
+    <script type = "text/brightscript" uri = "pkg:/components/SlideShow/ShufflePhotos/ShufflePhotos.brs" />
     <script type = "text/brightscript" uri = "pkg:/components/SlideShow/SlideshowHelper.brs" />
     <script type = "text/brightscript" uri = "pkg:/components/Utils/Common.brs" />
     <script type = "text/brightscript" uri = "pkg:/components/Utils/private-git.brs" />
-    
+
     <children>
         
         <Rectangle
@@ -22,7 +22,19 @@
             id          = "PhotoViewLogo"
             translation = "[650, 350]"
         />
+
+        <Dialog
+            id      = "noticeDialog"
+            title   = "Error"
+            visible = "false"
+        />
         
+        <Timer
+            id          = "pullPhotos"
+            repeat      = "true"
+            duration    = "15"
+        />
+
         <Timer
             id          = "apiTimer"
             repeat      = "true"

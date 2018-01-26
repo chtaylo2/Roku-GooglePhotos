@@ -8,8 +8,8 @@
         <field id = "loadWidth" type = "float" alias = "poster.loadWidth" />
         <field id = "loadHeight" type = "float" alias = "poster.loadHeight" />
         <field id = "ventorTranslation" type = "array" alias = "ventor.keyValue" />
-		<field id = "duration" type = "node" alias = "animate.duration" />
-		<field id = "control" type = "node" alias = "animate.control" />
+        <field id = "duration" type = "node" alias = "animate.duration" />
+        <field id = "control" type = "node" alias = "animate.control" />
     </interface>
   
     <children>
@@ -29,8 +29,8 @@
                 fieldToInterp   = "poster.translation"
                 key             = "[0,1]"
             />
-			
+            
         </Animation>
         
-	</children>
+    </children>
 </component>

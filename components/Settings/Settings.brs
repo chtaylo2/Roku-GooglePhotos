@@ -1,3 +1,9 @@
+'*************************************************************
+'** PhotoView for Google Photos
+'** Copyright (c) 2017-2018 Chris Taylor.  All rights reserved.
+'** Use of code within this application subject to the MIT License (MIT)
+'** https://raw.githubusercontent.com/chtaylo2/Roku-GooglePhotos/master/LICENSE
+'*************************************************************
 
 Sub init()
 
@@ -205,7 +211,7 @@ Sub storeLinkedUsers()
     m.content       = createObject("RoSGNode","ContentNode")
     
     if usersLoaded = 0 then
-        addItem(m.content,  "No users linked", 0, "")
+        addItem(m.content, "No users linked", "0", "")
     else
         for i = 0 to usersLoaded-1
             addItem(m.content,  m.userInfoName[i], m.userInfoEmail[i], regStore)

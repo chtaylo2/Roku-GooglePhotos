@@ -1,3 +1,9 @@
+'*************************************************************
+'** PhotoView for Google Photos
+'** Copyright (c) 2017-2018 Chris Taylor.  All rights reserved.
+'** Use of code within this application subject to the MIT License (MIT)
+'** https://raw.githubusercontent.com/chtaylo2/Roku-GooglePhotos/master/LICENSE
+'*************************************************************
 
 Sub init()
     m.UriHandler = createObject("roSGNode","Photo UrlHandler")
@@ -174,6 +180,7 @@ Sub onItemFocused()
     
     focusedItem = m.albummarkupgrid.content.getChild(m.albummarkupgrid.itemFocused)
     m.itemLabelMain1.text = focusedItem.shortdescriptionline1
+    m.itemLabelMain2.text = focusedItem.shortdescriptionline2
 End Sub
 
 
@@ -252,7 +259,7 @@ End Sub
 
 Sub googleDisplayAlbums(albumList As Object)
     for each album in albumList
-        addItem(m.albumListContent, "GP_ALBUM_LISTING", album.GetThumb(), album.GetTitle(), "")
+        addItem(m.albumListContent, "GP_ALBUM_LISTING", album.GetThumb(), album.GetTitle(), Pluralize(album.GetImageCount(),"Item"))
     end for
     
     m.albummarkupgrid.content = m.albumListContent

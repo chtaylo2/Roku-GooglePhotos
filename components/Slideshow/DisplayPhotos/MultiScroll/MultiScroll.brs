@@ -1,3 +1,10 @@
+'*************************************************************
+'** PhotoView for Google Photos
+'** Copyright (c) 2017-2018 Chris Taylor.  All rights reserved.
+'** Use of code within this application subject to the MIT License (MIT)
+'** https://raw.githubusercontent.com/chtaylo2/Roku-GooglePhotos/master/LICENSE
+'*************************************************************
+
 Sub init()
         
     m.WaveStep          = 0
@@ -93,7 +100,7 @@ Sub init()
         m.scroll_node_8.imageTranslation    = tmpStart
         m.scroll_node_8.ventorTranslation   = "[["+str(tmpStart[0])+","+str(tmpStart[1])+"],["+str(tmpStart[0])+","+str(endPoint)+"]]"
                 
-    m.top.observeField("content","loadImages")
+    m.top.observeField("loaded","loadImages")
 End Sub
 
 
@@ -109,6 +116,14 @@ Sub loadImages()
     
     if m.top.id = "DisplayScreensaver" then
         'Show watermark on screensaver - Stop bitching, we need some advertisment!
+        device  = createObject("roDeviceInfo")
+        ds = device.GetDisplaySize()
+
+        if ds.w = 1920 then
+            m.Watermark.uri = "pkg:/images/PhotoViewWatermark_FHD.png"
+        else
+            m.Watermark.uri = "pkg:/images/PhotoViewWatermark_HD.png"
+        end if
         m.Watermark.visible = true
     end if
     

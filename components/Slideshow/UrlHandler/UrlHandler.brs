@@ -1,3 +1,9 @@
+'*************************************************************
+'** PhotoView for Google Photos
+'** Copyright (c) 2017-2018 Chris Taylor.  All rights reserved.
+'** Use of code within this application subject to the MIT License (MIT)
+'** https://raw.githubusercontent.com/chtaylo2/Roku-GooglePhotos/master/LICENSE
+'*************************************************************
 
 Sub init()
     print "UrlHandler.brs - [init]"
@@ -121,7 +127,7 @@ Sub processResponse(msg as Object)
             code:    msg.GetResponseCode(),
             headers: msg.GetResponseHeaders(),
             content: msg.GetString(),
-			error:   msg.GetFailureReason(),
+            error:   msg.GetFailureReason(),
             num:     jobnum
         }
         'print "URL RESULT: ";  result

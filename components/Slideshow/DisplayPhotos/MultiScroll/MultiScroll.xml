@@ -4,6 +4,7 @@
 
     <interface>
         <field id = "content" type = "array" />
+        <field id = "loaded"  type = "boolean" />
         <field id = "loadingvisible" type = "node" alias = "Loading.visible" />
         <field id = "loadingtext" type = "node" alias = "Loading.text" />
     </interface>
@@ -26,7 +27,6 @@
         <!-- Screensaver watermark -->
         <Poster
             id          = "Watermark"
-            uri         = "pkg:/images/PhotoViewWatermark.png"
             translation = "[1700,1010]"
             visible     = "false"
         />

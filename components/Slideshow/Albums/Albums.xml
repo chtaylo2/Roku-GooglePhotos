@@ -2,10 +2,10 @@
 
 <component name = "My Albums" extends = "Group" initialFocus = "albumGrid" >
     
-	<interface>
-		<field id = "imageContent" type = "assocarray" />
+    <interface>
+        <field id = "imageContent" type = "assocarray" />
         <field id = "loaded"       type = "boolean" />
-	</interface>
+    </interface>
     
     <script type = "text/brightscript" uri = "pkg:/components/SlideShow/Albums/Albums.brs" />
     <script type = "text/brightscript" uri = "pkg:/components/SlideShow/SlideshowHelper.brs" />
@@ -13,7 +13,7 @@
     <script type = "text/brightscript" uri = "pkg:/components/Utils/private-git.brs" />
 
     <children>
-		
+        
         <MarkupGrid 
             id                  = "albumGrid"
             translation         = "[60,360]"
@@ -25,36 +25,36 @@
             drawFocusFeedback   = "false"
         />
 
-		<LoadingIndicator
-			id 			= "loadingSpinner"
-			visible 	= "false"
-		/>
-		
-		<Group
-			id 			= "settingsIcon"
-			translation = "[1602,174]"
-			visible 	= "false" >
-			
-			<Label
-				id          = "settingsIconText"
-				font        = "font:MediumBoldSystemFont"
-				color       = "#808080"
-				horizAlign  = "right"
-				text		= "Settings"
-				vertAlign   = "top"
-				translation = "[ 0, 4 ]"
-			/>
-			
-			<Poster 
+        <LoadingIndicator
+            id          = "loadingSpinner"
+            visible     = "false"
+        />
+        
+        <Group
+            id          = "settingsIcon"
+            translation = "[1602,174]"
+            visible     = "false" >
+            
+            <Label
+                id          = "settingsIconText"
+                font        = "font:MediumBoldSystemFont"
+                color       = "#808080"
+                horizAlign  = "right"
+                text        = "Settings"
+                vertAlign   = "top"
+                translation = "[ 0, 4 ]"
+            />
+            
+            <Poster 
                 id          = "settingIconImage"
                 width       = "45"
-				height		= "45"
+                height      = "45"
                 translation = "[ 159, 0 ]"
-				uri 		= "pkg:/images/asterisk.png"
+                uri         = "pkg:/images/asterisk.png"
             />
-			
-		</Group>
-		
+            
+        </Group>
+        
         <Label
             id          = "itemLabelMain1"
             height      = "1080"
@@ -76,7 +76,7 @@
             vertAlign   = "center"
             translation = "[0,339]"
         />
-		
+        
         <Label
             id          = "itemLabelMain3"
             height      = "1080"
@@ -131,11 +131,12 @@
             />
       
         </LabelList>
-	    
-		<Dialog
+        
+        <Dialog
             id      = "noticeDialog"
             title   = "Error"
             visible = "false"
         />
+        
     </children>
 </component>

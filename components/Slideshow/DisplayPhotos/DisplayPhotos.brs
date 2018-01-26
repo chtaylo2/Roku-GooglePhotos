@@ -1,3 +1,9 @@
+'*************************************************************
+'** PhotoView for Google Photos
+'** Copyright (c) 2017-2018 Chris Taylor.  All rights reserved.
+'** Use of code within this application subject to the MIT License (MIT)
+'** https://raw.githubusercontent.com/chtaylo2/Roku-GooglePhotos/master/LICENSE
+'*************************************************************
 
 Sub init()    
     m.PrimaryImage              = m.top.findNode("PrimaryImage")
@@ -61,7 +67,7 @@ Sub init()
 End Sub
 
 
-sub loadImageList()
+Sub loadImageList()
     print "DisplayPhotos.brs [loadImageList]"
     
     if m.top.id = "DisplayScreensaver" then
@@ -77,6 +83,14 @@ sub loadImageList()
         print "GooglePhotos Screensaver Display: "; m.showDisplay
         
         'Show watermark on screensaver - Stop bitching, we need some advertisment!
+        device  = createObject("roDeviceInfo")
+        ds = device.GetDisplaySize()
+
+        if ds.w = 1920 then
+            m.Watermark.uri = "pkg:/images/PhotoViewWatermark_FHD.png"
+        else
+            m.Watermark.uri = "pkg:/images/PhotoViewWatermark_HD.png"
+        end if
         m.Watermark.visible = true
     end if    
     
@@ -106,21 +120,26 @@ sub loadImageList()
                  
     end for
     
-    'We have an image list. Start display
-    onRotationTigger({})
-    onDownloadTigger({})
-     
-    m.RotationTimer.control = "start"
-    m.DownloadTimer.control = "start"
- 
-    'Trigger a PAUSE if photo selected
-    if m.top.startIndex <> -1 then
-        onKeyEvent("OK", true)
-    end if
+    if m.screenActive<>invalid then
+        m.screenActive.content = m.imageDisplay
+    else
     
-    if m.top.id = "DisplayScreensaver" then
-        'We don't need pre-downloading of photos for screensaver. Disable
-        m.DownloadTimer.control = "stop"
+        'We have an image list. Start display
+        onRotationTigger({})
+        onDownloadTigger({})
+         
+        m.RotationTimer.control = "start"
+        m.DownloadTimer.control = "start"
+     
+        'Trigger a PAUSE if photo selected
+        if m.top.startIndex <> -1 then
+            onKeyEvent("OK", true)
+        end if
+        
+        if m.top.id = "DisplayScreensaver" then
+            'We don't need pre-downloading of photos for screensaver. Disable
+            m.DownloadTimer.control = "stop"
+        end if
     end if
      
 End Sub
@@ -138,6 +157,7 @@ Sub onRotationTigger(event as object)
             m.screenActive = createObject("roSGNode", "MultiScroll")
             m.screenActive.id = m.top.id
             m.screenActive.content = m.imageDisplay
+            m.screenActive.loaded = "true"
             m.top.appendChild(m.screenActive)
             m.screenActive.setFocus(true)
         end if
@@ -353,11 +373,6 @@ Sub sendNextImage(direction=invalid)
 End Sub
 
 
-Function GetRandom(items As Object)
-    return Rnd(items.Count())-1
-End Function
-
-
 Function GetNextImage(items As Object, tracker As Integer)
     if items.Count()-1 = tracker then
         return 0
@@ -369,7 +384,7 @@ End Function
 
 Function GetPreviousImage(items As Object, tracker As Integer)
     if tracker = 0 then
-        return 0
+        return items.Count()-1
     else
         return tracker - 1
     end if

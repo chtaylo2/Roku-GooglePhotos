@@ -1,3 +1,9 @@
+'*************************************************************
+'** PhotoView for Google Photos
+'** Copyright (c) 2017-2018 Chris Taylor.  All rights reserved.
+'** Use of code within this application subject to the MIT License (MIT)
+'** https://raw.githubusercontent.com/chtaylo2/Roku-GooglePhotos/master/LICENSE
+'*************************************************************
 
 Sub init()
     'Set scene properties
@@ -7,7 +13,7 @@ Sub init()
 
     m.itemOverhang = m.top.findNode("itemOverhang")
 
-	device = CreateObject("roDeviceInfo")
+    device = CreateObject("roDeviceInfo")
     ds = device.GetDisplaySize()
     
     if ds.w = 720 then
@@ -25,7 +31,7 @@ Sub init()
     loadCommon()
     
     'Load default settings
-	loadDefaults()
+    loadDefaults()
     
     'Define SG nodes
     m.itemHeader = m.top.findNode("itemHeader")

@@ -2,13 +2,13 @@
 
 <component name = "Photo UrlHandler" extends = "Task">
   
-	<interface>
-		<field id = "request" type = "assocarray"/>
-		<field id = "albumList" type = "assocarray" alwaysNotify = "true"/>
-		<field id = "albumImages" type = "assocarray" alwaysNotify = "true"/>
-		<field id = "refreshToken" type = "assocarray" alwaysNotify = "true"/>
-	</interface>
+    <interface>
+        <field id = "request" 		type = "assocarray" />
+        <field id = "albumList" 	type = "assocarray" alwaysNotify = "true"/>
+        <field id = "albumImages" 	type = "assocarray" alwaysNotify = "true"/>
+        <field id = "refreshToken" 	type = "assocarray" alwaysNotify = "true"/>
+    </interface>
   
-	<script type = "text/brightscript" uri = "pkg:/components/SlideShow/UrlHandler/UrlHandler.brs"/>
+    <script type = "text/brightscript" uri = "pkg:/components/SlideShow/UrlHandler/UrlHandler.brs"/>
 
 </component>

@@ -11,6 +11,7 @@
     </interface>
   
     <script type = "text/brightscript" uri = "pkg:/components/SlideShow/Browse/Browse.brs" />
+    <script type = "text/brightscript" uri = "pkg:/components/Utils/Common.brs" />
    
     <children>
 
@@ -35,7 +36,17 @@
             basePosterSize        = "[300,225]"
             posterDisplayMode     = "scaleToFit"
             translation           = "[150, 300]"
+            wrapDividerBitmapUri = "pkg:/images/wrapBitmap.png"
         />
-         
+        
+        <!-- Playback node -->
+        <Video
+            id          = "VideoPlayer"
+            translation = "[0, 0]"
+            width       = "1920"
+            height      = "1080"
+            visible     = "false"
+        />        
+
     </children>
 </component>
