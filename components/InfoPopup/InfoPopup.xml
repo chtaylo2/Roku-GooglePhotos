@@ -41,7 +41,7 @@
         <Timer
             id                  = "updateField"
             repeat              = "false"
-            duration            = "1"
+            duration            = "0.5"
         />
 
   </children>

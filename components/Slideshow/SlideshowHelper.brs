@@ -16,13 +16,30 @@
 '**
 '*********************************************************
 
+Sub doRefreshToken(post_data=[] as Object, selectedUser=-1 as Integer)
+    print "SlideshowHelper.brs [doRefreshToken]"
+
+    params = "client_id="                  + m.clientId
+    params = params + "&client_secret="    + m.clientSecret
+    params = params + "&grant_type="       + "refresh_token"
+    
+    if selectedUser<>-1 then
+        params = params + "&refresh_token="    + m.refreshToken[selectedUser]
+    else
+        params = params + "&refresh_token="    + m.refreshToken[m.global.selectedUser]
+    end if
+    
+    makeRequest({}, m.oauth_prefix+"/token", "POST", params, 2, post_data)
+End Sub
+
+
 Function handleRefreshToken(event as object)
     print "SlideshowHelper.brs [handleRefreshToken]"
 
     status = -1
     errorMsg = ""
     refreshData = m.UriHandler.refreshToken
-        
+    
     if refreshData <> invalid
         if refreshData.code <> 200
             errorMsg = "An Error Occured in 'handleRefreshToken'. Code: "+(refreshData.code).toStr()+" - " +refreshData.error
@@ -38,22 +55,29 @@ Function handleRefreshToken(event as object)
                 errorMsg = "Json error response: [handleRefreshToken] " + json.error
                 status = 1
             else
-                
                 status = 0
                 ' We have our tokens
-                m.accessToken[m.global.selectedUser]  = getString(json,"access_token")
-                m.tokenType                           = getString(json,"token_type")
-                m.tokenExpiresIn                      = getInteger(json,"expires_in")
-                refreshToken                          = getString(json,"refresh_token")
+                
+                if refreshData.post_data[1]<>invalid then
+                    'Don't use global set user. Screensaver uses this.
+                    m.accessToken[refreshData.post_data[1]]  = getString(json,"access_token")
+                else
+                    m.accessToken[m.global.selectedUser]  = getString(json,"access_token")
+                end if
+                    
+                m.tokenType          = getString(json,"token_type")
+                m.tokenExpiresIn     = getInteger(json,"expires_in")
+                refreshToken         = getString(json,"refresh_token")
+                
                 if refreshToken <> ""
-                    m.refreshToken[m.global.selectedUser] = refreshToken
+                        m.refreshToken[m.global.selectedUser] = refreshToken
                 end if
     
                 'Query User info
                 'status = m.RequestUserInfo(m.accessToken.Count()-1, false)
     
                 'Save cached values to registry
-                saveReg()                
+                saveReg()
             end if
         end if
     end if
@@ -69,7 +93,17 @@ Function handleRefreshToken(event as object)
     end if   
     
     if status = 0 then
-        doGetAlbumList()
+        if refreshData.post_data[0] = "doGetScreensaverAlbumList" then
+            doGetScreensaverAlbumList(refreshData.post_data[1])
+        else if refreshData.post_data[0] = "doGetScreensaverAlbumImages" then
+            doGetScreensaverAlbumImages(refreshData.post_data[1], refreshData.post_data[2])
+        else if refreshData.post_data[0] = "doGetAlbumImages" then
+            doGetAlbumImages(refreshData.post_data[1], refreshData.post_data[2])
+        else if refreshData.post_data[0] = "doGetSearch" then
+            doGetSearch(refreshData.post_data[1])
+        else
+            doGetAlbumList()
+        end if
     end if
     
 End Function

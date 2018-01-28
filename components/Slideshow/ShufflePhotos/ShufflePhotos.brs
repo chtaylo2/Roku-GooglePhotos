@@ -52,30 +52,22 @@ End Sub
 Sub doGetAlbumList()
     print "ShufflePhotos.brs [doGetAlbumList]"  
 
+    tmpData = [ "doGetAlbumList" ]
+    
     m.apiPending = m.apiPending+1
     signedHeader = oauth_sign(m.global.selectedUser)
-    makeRequest(signedHeader, m.gp_prefix + "?kind=album&v=3.0&fields=entry(title,gphoto:numphotos,gphoto:user,gphoto:id,media:group(media:description,media:thumbnail))&thumbsize=300", "GET", "", 0)
+    makeRequest(signedHeader, m.gp_prefix + "?kind=album&v=3.0&fields=entry(title,gphoto:numphotos,gphoto:user,gphoto:id,media:group(media:description,media:thumbnail))&thumbsize=300", "GET", "", 0, tmpData)
 End Sub
 
 
 Sub doGetAlbumImages(album As Object)
     print "ShufflePhotos.brs - [doGetAlbumImages]"
 
+    tmpData = [ "doGetAlbumImages", album ]
+    
     m.apiPending = m.apiPending+1
     signedHeader = oauth_sign(m.global.selectedUser)
-    makeRequest(signedHeader, m.gp_prefix + "/albumid/"+album.GetID()+"?start-index=1&max-results=1000&kind=photo&v=3.0&fields=entry(title,gphoto:timestamp,gphoto:id,gphoto:streamId,gphoto:videostatus,media:group(media:description,media:content,media:thumbnail))&thumbsize=330&imgmax="+getResolution(), "GET", "", 1)
-End Sub
-
-
-Sub doRefreshToken()
-    print "Albums.brs [doRefreshToken]"
-
-    params = "client_id="                  + m.clientId
-    params = params + "&client_secret="    + m.clientSecret
-    params = params + "&refresh_token="    + m.refreshToken[m.global.selectedUser]
-    params = params + "&grant_type="       + "refresh_token"
-
-    makeRequest({}, m.oauth_prefix+"/token", "POST", params, 2)
+    makeRequest(signedHeader, m.gp_prefix + "/albumid/"+album.GetID()+"?start-index=1&max-results=1000&kind=photo&v=3.0&fields=entry(title,gphoto:timestamp,gphoto:id,gphoto:streamId,gphoto:videostatus,media:group(media:description,media:content,media:thumbnail))&thumbsize=330&imgmax="+getResolution(), "GET", "", 1, tmpData)
 End Sub
 
 
@@ -86,9 +78,10 @@ Sub handleGetAlbumList(event as object)
     response = event.getData()
 
     m.apiPending = m.apiPending-1
-    
-    if response.code = 403 then
-        doRefreshToken()
+
+    if (response.code = 401) or (response.code = 403) then
+        'Expired Token
+        doRefreshToken(response.post_data)
     else if response.code <> 200
         errorMsg = "An Error Occured in 'handleGetAlbumList'. Code: "+(response.code).toStr()+" - " +response.error
     else
@@ -127,6 +120,8 @@ Sub handleGetAlbumList(event as object)
         m.noticeDialog.buttons = buttons
         m.noticeDialog.setFocus(true)
         m.noticeDialog.observeField("buttonSelected","noticeClose")
+        m.apiTimer.control = "stop"
+        m.pullPhotos.control = "stop"
     end if  
     
 End Sub
@@ -134,14 +129,15 @@ End Sub
 
 Sub handleGetAlbumImages(event as object)
     print "ShufflePhotos.brs [handleGetAlbumImages]"
-  
+
     errorMsg = ""
     response = event.getData()
     
     m.apiPending = m.apiPending-1
     
-    if response.code = 403 then
-        doRefreshToken()
+    if (response.code = 401) or (response.code = 403) then
+        'Expired Token
+        doRefreshToken(response.post_data)
     else if response.code <> 200
         errorMsg = "An Error Occured in 'handleGetAlbumImages'. Code: "+(response.code).toStr()+" - " +response.error
     else
@@ -187,6 +183,8 @@ Sub handleGetAlbumImages(event as object)
         m.noticeDialog.buttons = buttons
         m.noticeDialog.setFocus(true)
         m.noticeDialog.observeField("buttonSelected","noticeClose")
+        m.apiTimer.control = "stop"
+        m.pullPhotos.control = "stop"
     end if
     
 End Sub
@@ -195,7 +193,7 @@ End Sub
 Sub onApiTimerTrigger()
     print "API CALLS LEFT: "; m.apiPending; " - Image Count: "; m.photoItems.Count()
     if m.apiPending = 0 then
-        execScreensaver()
+        execSlideshow()
         m.apiTimer.control = "stop"
     end if
 End Sub
@@ -215,7 +213,7 @@ Sub onPullPhotoTrigger()
 End Sub
 
 
-Sub execScreensaver()
+Sub execSlideshow()
     'Randomize the photos, regardless of settings. It's Shuffled photos!
     tmp = []
     for i = 0 to m.photoItems.Count()-1
@@ -231,6 +229,11 @@ Sub execScreensaver()
     m.screenActive.setFocus(true)
     
     m.pullPhotos.control = "start"
+End Sub
+
+
+Sub noticeClose(event as object)
+    m.noticeDialog.visible = false
 End Sub
 
 

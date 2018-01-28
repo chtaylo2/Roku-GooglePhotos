@@ -81,6 +81,12 @@
             title   = "Please wait"
             visible = "false"
         />
+        
+        <Dialog
+            id      = "noticeDialog"
+            title   = "Error"
+            visible = "false"
+        />
     
   </children>
 </component>

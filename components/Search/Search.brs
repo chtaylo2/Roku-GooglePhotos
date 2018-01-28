@@ -9,11 +9,13 @@ Sub init()
 
     m.UriHandler = createObject("roSGNode","Search UrlHandler")
     m.UriHandler.observeField("searchResult","handleGetSearch")
-    m.miniKeyboard = m.top.findNode("miniKeyboard")
-    m.searchBtn = m.top.findNode("searchBtn")
-    m.clearSearchBtn = m.top.findNode("clearSearchBtn")
+    
+    m.miniKeyboard      = m.top.findNode("miniKeyboard")
+    m.searchBtn         = m.top.findNode("searchBtn")
+    m.clearSearchBtn    = m.top.findNode("clearSearchBtn")
     m.searchHistoryList = m.top.findNode("searchHistoryList")
-    m.searchProgress = m.top.findNode("searchProgress")
+    m.searchProgress    = m.top.findNode("searchProgress")
+    m.noticeDialog      = m.top.findNode("noticeDialog")
     
     m.searchBtn.observeField("buttonSelected","keywordSearch")
     m.searchHistoryList.observeField("itemSelected","historySearch")
@@ -84,47 +86,52 @@ Sub doGetSearch(keyword as string)
         m.searchProgress.message = "Searching albums for '" + keyword + "'"
         m.searchProgress.visible = true
     
+        tmpData = [ "doGetSearch", keyword ]
+        
         signedHeader = oauth_sign(m.global.selectedUser)
-        makeRequest(signedHeader, m.gp_prefix + "?kind=photo&v=3.0&q="+keyword+"&max-results=1000&thumbsize=220&imgmax="+getResolution(), "GET", "", 0)
+        makeRequest(signedHeader, m.gp_prefix + "?kind=photo&v=3.0&q="+keyword+"&max-results=1000&thumbsize=220&imgmax="+getResolution(), "GET", "", 0, tmpData)
     end if
-End Sub
-
-
-Sub doRefreshToken()
-    print "Albums.brs [doRefreshToken]"
-
-    params = "client_id="                  + m.clientId
-    params = params + "&client_secret="    + m.clientSecret
-    params = params + "&refresh_token="    + m.refreshToken[m.global.selectedUser]
-    params = params + "&grant_type="       + "refresh_token"
-
-    makeRequest({}, m.oauth_prefix+"/token", "POST", params, 2)
 End Sub
 
 
 Sub handleGetSearch(event as object)
     print "Search.brs [handleGetSearch]"
 
+    errorMsg = ""
     response = event.getData()
-    if response.code <> 200 then
-        doRefreshToken()
+    
+    if (response.code = 401) or (response.code = 403) then
+        'Expired Token
+        doRefreshToken(response.post_data)
+    else if response.code <> 200
+        errorMsg = "An Error Occured in 'handleGetSearch'. Code: "+(response.code).toStr()+" - " +response.error
     else
-
         rsp=ParseXML(response.content)
-        'if rsp=invalid then
-        '    ShowErrorDialog("Unable to parse Google Photos API response" + LF + LF + "Exit the channel then try again later","API Error")
-        'end if
-        
-        m.screenActive = createObject("roSGNode", "My Albums")
-        m.screenActive.imageContent = response
-        m.screenActive.loaded = true
-        m.top.appendChild(m.screenActive)
-        m.screenActive.setFocus(true)
-        
-        m.searchProgress.visible = false
-        m.miniKeyboard.visible = false
+        print rsp
+        if rsp=invalid then
+            errorMsg = "Unable to parse Google Photos API response. Exit the channel then try again later. Code: "+(response.code).toStr()+" - " +response.error
+        else       
+            m.screenActive = createObject("roSGNode", "My Albums")
+            m.screenActive.imageContent = response
+            m.screenActive.loaded = true
+            m.top.appendChild(m.screenActive)
+            m.screenActive.setFocus(true)
+            
+            m.searchProgress.visible = false
+            m.miniKeyboard.visible = false
+        end if
         
     end if
+
+    if errorMsg<>"" then
+        'ShowNotice
+        m.noticeDialog.visible = true
+        buttons =  [ "OK" ]
+        m.noticeDialog.message = errorMsg
+        m.noticeDialog.buttons = buttons
+        m.noticeDialog.setFocus(true)
+        m.noticeDialog.observeField("buttonSelected","noticeClose")
+    end if   
 
 End Sub
 
@@ -169,6 +176,13 @@ Sub clearSearchHistory()
     RegWrite(regStore, "", "Search")
     m.searchHistoryList.content = ""
     m.clearSearchBtn.unobserveField("buttonSelected")
+    m.miniKeyboard.setFocus(true)
+End Sub
+
+
+Sub noticeClose(event as object)
+    m.noticeDialog.visible   = false
+    m.searchProgress.visible = false
     m.miniKeyboard.setFocus(true)
 End Sub
 

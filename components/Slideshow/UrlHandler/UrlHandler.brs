@@ -121,14 +121,16 @@ Sub processResponse(msg as Object)
         context = job.context
         parameters = context.context.parameters
         jobnum = job.context.context.num
+        post_data = job.context.context.post_data
         uri = parameters.uri
         print "Response for transfer '"; idkey; "' for URI '"; uri; "'"
         result = {
-            code:    msg.GetResponseCode(),
-            headers: msg.GetResponseHeaders(),
-            content: msg.GetString(),
-            error:   msg.GetFailureReason(),
-            num:     jobnum
+            code:        msg.GetResponseCode(),
+            headers:     msg.GetResponseHeaders(),
+            content:     msg.GetString(),
+            error:       msg.GetFailureReason(),
+            post_data:   post_data
+            num:         jobnum
         }
         'print "URL RESULT: ";  result
         'print "MSG: "; msg

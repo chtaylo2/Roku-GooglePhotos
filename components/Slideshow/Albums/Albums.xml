@@ -32,24 +32,24 @@
         
         <Group
             id          = "settingsIcon"
-            translation = "[1602,174]"
+            translation = "[1620,174]"
             visible     = "false" >
             
             <Label
                 id          = "settingsIconText"
-                font        = "font:MediumBoldSystemFont"
+                font        = "font:SmallBoldSystemFont"
                 color       = "#808080"
                 horizAlign  = "right"
                 text        = "Settings"
                 vertAlign   = "top"
-                translation = "[ 0, 4 ]"
+                translation = "[ 0, 2 ]"
             />
             
             <Poster 
                 id          = "settingIconImage"
-                width       = "45"
-                height      = "45"
-                translation = "[ 159, 0 ]"
+                width       = "35"
+                height      = "35"
+                translation = "[ 140, 0 ]"
                 uri         = "pkg:/images/asterisk.png"
             />
             
@@ -81,7 +81,7 @@
             id          = "itemLabelMain3"
             height      = "1080"
             width       = "1920"
-            font        = "font:MediumSystemFont"
+            font        = "font:SmallSystemFont"
             color       = "#808080"
             horizAlign  = "center"
             vertAlign   = "center"
@@ -89,11 +89,12 @@
         />
 
         <LabelList
-            id          = "albumPageList"
-            translation = "[ 300, 300 ]"
-            itemSize    = "[450,45]"
-            itemSpacing = "[0,30]"
-            color       = "#808080" >
+            id                   = "albumPageList"
+            translation          = "[ 300, 300 ]"
+            itemSize             = "[450,45]"
+            itemSpacing          = "[0,30]"
+            wrapDividerBitmapUri = "pkg:/images/wrapBitmap.png"
+            color                = "#808080" >
 
             <Poster 
                 id              = "albumPageThumb"

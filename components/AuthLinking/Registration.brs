@@ -47,7 +47,7 @@ Sub doGenerateToken()
     params = "client_id="        + m.clientId
     params = params + "&scope="  + m.oauth_scope
 
-    makeRequest({}, m.oauth_prefix+"/device/code", "POST", params, 0)
+    makeRequest({}, m.oauth_prefix+"/device/code", "POST", params, 0, [])
 End Sub
 
 
@@ -56,7 +56,7 @@ Sub doQueryUserInfo()
 
     m.UriHandler.observeField("userinfo_response","onStoreUser")
     userIndex = m.accessToken.Count()-1
-    makeRequest({}, "https://www.googleapis.com/oauth2/v3/userinfo?access_token="+m.accessToken[userIndex], "GET", "", 2)
+    makeRequest({}, "https://www.googleapis.com/oauth2/v3/userinfo?access_token="+m.accessToken[userIndex], "GET", "", 2, [])
 End Sub
 
 
@@ -176,7 +176,7 @@ Sub onCheckAuth(event as object)
         params = params + "&code="            + m.deviceCode
         params = params + "&grant_type="      + "http://oauth.net/grant_type/device/1.0"
     
-        makeRequest({}, m.oauth_prefix+"/token", "POST", params, 1)
+        makeRequest({}, m.oauth_prefix+"/token", "POST", params, 1, [])
 
         m.LoginTimer.repeat = true
         m.LoginTimer.control = "start"

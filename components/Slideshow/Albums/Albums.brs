@@ -72,8 +72,10 @@ End Sub
 Sub doGetAlbumList()
     print "Albums.brs [doGetAlbumList]"  
 
+    tmpData = [ "doGetAlbumList" ]
+
     signedHeader = oauth_sign(m.global.selectedUser)
-    makeRequest(signedHeader, m.gp_prefix + "?kind=album&v=3.0&fields=entry(title,gphoto:numphotos,gphoto:user,gphoto:id,media:group(media:description,media:thumbnail))&thumbsize=300", "GET", "", 0)
+    makeRequest(signedHeader, m.gp_prefix + "?kind=album&v=3.0&fields=entry(title,gphoto:numphotos,gphoto:user,gphoto:id,media:group(media:description,media:thumbnail))&thumbsize=300", "GET", "", 0, tmpData)
 End Sub
 
 
@@ -91,20 +93,10 @@ Sub doGetAlbumImages(album As Object, index=0 as Integer)
     print "GooglePhotos StartIndex: "; start
     print "GooglePhotos Res: "; getResolution()
 
+    tmpData = [ "doGetAlbumImages", album, start ]
+
     signedHeader = oauth_sign(m.global.selectedUser)
-    makeRequest(signedHeader, m.gp_prefix + "/albumid/"+album.GetID()+"?start-index="+start+"&max-results=1000&kind=photo&v=3.0&fields=entry(title,gphoto:timestamp,gphoto:id,gphoto:streamId,gphoto:videostatus,media:group(media:description,media:content,media:thumbnail))&thumbsize=330&imgmax="+getResolution(), "GET", "", 1)
-End Sub
-
-
-Sub doRefreshToken()
-    print "Albums.brs [doRefreshToken]"
-
-    params = "client_id="                  + m.clientId
-    params = params + "&client_secret="    + m.clientSecret
-    params = params + "&refresh_token="    + m.refreshToken[m.global.selectedUser]
-    params = params + "&grant_type="       + "refresh_token"
-
-    makeRequest({}, m.oauth_prefix+"/token", "POST", params, 2)
+    makeRequest(signedHeader, m.gp_prefix + "/albumid/"+album.GetID()+"?start-index="+start+"&max-results=1000&kind=photo&v=3.0&fields=entry(title,gphoto:timestamp,gphoto:id,gphoto:streamId,gphoto:videostatus,media:group(media:description,media:content,media:thumbnail))&thumbsize=330&imgmax="+getResolution(), "GET", "", 1, tmpData)
 End Sub
 
 
@@ -114,8 +106,9 @@ Sub handleGetAlbumList(event as object)
     errorMsg = ""
     response = event.getData()
 
-    if response.code = 403 then
-        doRefreshToken()
+    if (response.code = 401) or (response.code = 403) then
+        'Expired Token
+        doRefreshToken(response.post_data)
     else if response.code <> 200
         errorMsg = "An Error Occured in 'handleGetAlbumList'. Code: "+(response.code).toStr()+" - " +response.error
     else
@@ -148,8 +141,9 @@ Sub handleGetAlbumImages(event as object)
     errorMsg = ""
     response = event.getData()
     
-    if response.code = 403 then
-        doRefreshToken()
+    if (response.code = 401) or (response.code = 403) then
+        'Expired Token
+        doRefreshToken(response.post_data)
     else if response.code <> 200
         errorMsg = "An Error Occured in 'handleGetAlbumImages'. Code: "+(response.code).toStr()+" - " +response.error
     else
@@ -179,6 +173,7 @@ Sub onItemFocused()
     'Item focused
     
     focusedItem = m.albummarkupgrid.content.getChild(m.albummarkupgrid.itemFocused)
+
     m.itemLabelMain1.text = focusedItem.shortdescriptionline1
     m.itemLabelMain2.text = focusedItem.shortdescriptionline2
 End Sub
@@ -308,8 +303,12 @@ Sub googleAlbumPages(album As Object)
             tmpExtra = " - Newest"
         end if
         
-        addItem(m.albumPages, "GP_ALBUM_PAGES", thumb, "Media Page " + str(i) + tmpExtra, "Items: "+page_start_dply+" thru "+page_end_dply)
-        
+
+        if i < 12 then
+            addItem(m.albumPages, "GP_ALBUM_PAGES", thumb, "Media Page " + str(i) + tmpExtra, "Items: "+page_start_dply+" thru "+page_end_dply)
+        else if i = 12 then
+            addItem(m.albumPages, "GP_ALBUM_PAGES", thumb, "Media Pages +12", "Items: "+page_start_dply+"+")
+        end if    
     end for
 
     m.albumPageList.content = m.albumPages
@@ -330,12 +329,16 @@ Sub onAlbumPageSelected()
     'Item selected
     print "SELECTED: "; m.albumPageList.itemSelected
     
-    'Display Loading Spinner
-    showLoadingSpinner(3, "GP_ALBUM_PAGES")    
+    if (m.albumPageList.itemSelected = 11) then
+        showOverLoadPopup()
+    else
+        'Display Loading Spinner
+        showLoadingSpinner(3, "GP_ALBUM_PAGES")    
     
-    'API CALL: Get image based on page selected
-    album = m.albumsObject[m.albummarkupgrid.itemSelected]
-    doGetAlbumImages(album, m.albumPageList.itemSelected)
+        'API CALL: Get image based on page selected
+        album = m.albumsObject[m.albummarkupgrid.itemSelected]
+        doGetAlbumImages(album, m.albumPageList.itemSelected)
+    end if
 End Sub
 
 
@@ -377,19 +380,18 @@ Sub googleDisplayImageMenu(album As Object, imageList As Object)
 
     if m.videosMetaData.Count()>0 then        
         if m.imagesMetaData.Count()>0 then 'Combined photo and photo album
-            addItem(m.menuSelected, "GP_SLIDESHOW_START", m.imagesMetaData[0].thumbnail, Pluralize(m.imagesMetaData.Count(),"Photo") + " - Start Slideshow", pagesShow)
-            addItem(m.menuSelected, "GP_VIDEO_BROWSE", m.videosMetaData[0].thumbnail, Pluralize(m.videosMetaData.Count(),"Video") + " - Browse", pagesShow)
-            addItem(m.menuSelected, "GP_IMAGE_BROWSE", listIcon, Pluralize(m.imagesMetaData.Count(),"Photo") + " - Browse", "")
+            addItem(m.menuSelected, "GP_SLIDESHOW_START", m.imagesMetaData[0].thumbnail, Pluralize(m.imagesMetaData.Count(),"Photo") + " - Start Slideshow", title)
+            addItem(m.menuSelected, "GP_VIDEO_BROWSE", m.videosMetaData[0].thumbnail, Pluralize(m.videosMetaData.Count(),"Video") + " - Browse", title)
+            addItem(m.menuSelected, "GP_IMAGE_BROWSE", listIcon, Pluralize(m.imagesMetaData.Count(),"Photo") + " - Browse", title)
        else 'Video only album
-            addItem(m.menuSelected, "GP_VIDEO_BROWSE", m.videosMetaData[0].thumbnail, Pluralize(m.videosMetaData.Count(),"Video") + " - Browse", pagesShow)
+            addItem(m.menuSelected, "GP_VIDEO_BROWSE", m.videosMetaData[0].thumbnail, Pluralize(m.videosMetaData.Count(),"Video") + " - Browse", title)
             videoOnly = true
         end if
     else 'Photo only album          
-        addItem(m.menuSelected, "GP_SLIDESHOW_START", m.imagesMetaData[0].thumbnail, Pluralize(m.imagesMetaData.Count(),"Photo") + " - Start Slideshow", pagesShow)
-        addItem(m.menuSelected, "GP_IMAGE_BROWSE", listIcon, Pluralize(m.imagesMetaData.Count(),"Photo") + " - Browse", "")
+        addItem(m.menuSelected, "GP_SLIDESHOW_START", m.imagesMetaData[0].thumbnail, Pluralize(m.imagesMetaData.Count(),"Photo") + " - Start Slideshow", title)
+        addItem(m.menuSelected, "GP_IMAGE_BROWSE", listIcon, Pluralize(m.imagesMetaData.Count(),"Photo") + " - Browse", title)
     end if
     
-    m.itemLabelMain2.text           = title
     m.itemLabelMain3.text           = pagesShow
     m.settingsIcon.visible          = true
     m.albummarkupgrid.content       = m.menuSelected
@@ -481,7 +483,9 @@ Sub displayAlbumPages()
 
     m.albumPageList.setFocus(true)
     
-    'Watch for events
+    'Watch for events - Unobserve first to make sure we're not already monitoring
+    m.albumPageList.unobserveField("itemFocused") 
+    m.albumPageList.unobserveField("itemSelected")
     m.albumPageList.observeField("itemFocused", "onAlbumPageFocused") 
     m.albumPageList.observeField("itemSelected", "onAlbumPageSelected")   
 End Sub
@@ -516,6 +520,15 @@ Sub showThousandPopup()
     hideAlbumPages()
     m.screenActive          = createObject("roSGNode", "InfoPopup")
     m.screenActive.id       = "ThousandPopup"
+    m.top.appendChild(m.screenActive)
+    m.screenActive.setFocus(true)
+End Sub
+
+
+Sub showOverLoadPopup()
+    hideAlbumPages()
+    m.screenActive          = createObject("roSGNode", "InfoPopup")
+    m.screenActive.id       = "OverLoadPopup"
     m.top.appendChild(m.screenActive)
     m.screenActive.setFocus(true)
 End Sub
@@ -565,7 +578,7 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
             m.settingsIcon.visible  = true
             return true
             
-        else if (key = "OK") and (m.screenActive <> invalid) and (m.screenActive.id = "ThousandPopup") and (m.screenActive.closeReady = "true")
+        else if (key = "OK") and (m.screenActive <> invalid) and (m.screenActive.id = "ThousandPopup" or m.screenActive.id = "OverLoadPopup") and (m.screenActive.closeReady = "true")
             m.top.removeChild(m.screenActive)
             m.screenActive = invalid
             displayAlbumPages()

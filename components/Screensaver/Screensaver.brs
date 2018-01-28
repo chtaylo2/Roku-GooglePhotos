@@ -36,7 +36,7 @@ Sub init()
     
     'Load default settings
     loadDefaults()
-    
+
     userCount    = oauth_count()
     selectedUser = RegRead("SSaverUser","Settings")
     m.userIndex  = 0
@@ -75,12 +75,13 @@ Sub init()
                 doGetScreensaverAlbumList(i)
             end for
         else
+            'Check Token Validity
             doGetScreensaverAlbumList(m.userIndex)
         end if
     end if
     
     m.apiTimer.control = "start"
-    
+
 End Sub
 
 
@@ -88,18 +89,23 @@ End Sub
 Sub doGetScreensaverAlbumList(selectedUser=0 as Integer)
     print "Screensaver.brs [doGetScreensaverAlbumList]"  
 
+    tmpData = [ "doGetScreensaverAlbumList", selectedUser ]
+
     m.apiPending = m.apiPending+1
     signedHeader = oauth_sign(selectedUser)
-    makeRequest(signedHeader, m.gp_prefix + "?kind=album&v=3.0&fields=entry(title,gphoto:numphotos,gphoto:user,gphoto:id,media:group(media:description,media:thumbnail))", "GET", "", 0)
+    makeRequest(signedHeader, m.gp_prefix + "?kind=album&v=3.0&fields=entry(title,gphoto:numphotos,gphoto:user,gphoto:id,media:group(media:description,media:thumbnail))", "GET", "", 0, tmpData)
 End Sub
 
 
-Sub doGetScreensaverAlbumImages(album As Object)
+' URL Request to fetch Image listing
+Sub doGetScreensaverAlbumImages(album As Object, selectedUser=0 as Integer)
     print "Screensaver.brs - [doGetScreensaverAlbumImages]"
     
+    tmpData = [ "doGetScreensaverAlbumImages", album, selectedUser ]
+    
     m.apiPending = m.apiPending+1
-    signedHeader = oauth_sign(0)
-    makeRequest(signedHeader, m.gp_prefix + "/albumid/"+album.GetID()+"?start-index=1&max-results=1000&kind=photo&v=3.0&fields=entry(title,gphoto:timestamp,gphoto:id,gphoto:streamId,gphoto:videostatus,media:group(media:description,media:content,media:thumbnail))&thumbsize=330&imgmax="+getResolution(), "GET", "", 1)
+    signedHeader = oauth_sign(selectedUser)
+    makeRequest(signedHeader, m.gp_prefix + "/albumid/"+album.GetID()+"?start-index=1&max-results=1000&kind=photo&v=3.0&fields=entry(title,gphoto:timestamp,gphoto:id,gphoto:streamId,gphoto:videostatus,media:group(media:description,media:content,media:thumbnail))&thumbsize=330&imgmax="+getResolution(), "GET", "", 1, tmpData)
 End Sub
 
 
@@ -109,9 +115,10 @@ Sub handleGetScreensaverAlbumList(event as object)
     response = event.getData()
 
     m.apiPending = m.apiPending-1
-    if response.code <> 200 then
-        '''''doRefreshToken()
-    else
+    if (response.code = 401) or (response.code = 403) then
+        'Expired Token
+        doRefreshToken(response.post_data, response.post_data[1])
+    else if response.code = 200
         rsp=ParseXML(response.content)
         print rsp
         'if rsp=invalid then
@@ -133,7 +140,7 @@ Sub handleGetScreensaverAlbumList(event as object)
                     
                 album_cache_count = album_cache_count+1
 
-                doGetScreensaverAlbumImages(albumsObject[album_idx])
+                doGetScreensaverAlbumImages(albumsObject[album_idx], response.post_data[1])
                 albumsObject.delete(album_idx)
 
                 if album_cache_count>=5
@@ -141,7 +148,8 @@ Sub handleGetScreensaverAlbumList(event as object)
                 end if    
             end for
         end if
-
+    else
+        '' ERROR SHOW SOME MESSAGE
     end if
 End Sub
 
@@ -152,10 +160,11 @@ Sub handleGetScreensaverAlbumImages(event as object)
     response = event.getData()
     
     m.apiPending = m.apiPending-1
-    
-    if response.code <> 200 then
-        '''''doRefreshToken()
-    else
+
+    if (response.code = 401) or (response.code = 403) then
+        'Expired Token
+        doRefreshToken(response.post_data, response.post_data[2])
+    else if response.code = 200
         rsp=ParseXML(response.content)
         print rsp
         'if rsp=invalid then
@@ -170,12 +179,14 @@ Sub handleGetScreensaverAlbumImages(event as object)
             tmp.timestamp = image.GetTimestamp()
             
             if image.IsVideo() then
-                print "Ignore: "; image.GetURL()
+                'print "Ignore: "; image.GetURL()
             else
-                print "Push: "; image.GetURL()
+                'print "Push: "; image.GetURL()
                 m.photoItems.Push(tmp)
             end if    
         end for
+    else
+        '' ERROR SHOW SOME MESSAGE
     end if
 End Sub
 

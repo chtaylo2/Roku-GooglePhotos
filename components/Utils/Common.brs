@@ -232,7 +232,7 @@ Function oauth_sign(userIndex As Integer) as Object
 End Function
 
 
-Sub makeRequest(headers as Object, url as String, method as String, post_params as String, num as Integer)
+Sub makeRequest(headers as Object, url as String, method as String, post_params as String, num as Integer, post_data as Object)
     print "Common.brs [makeRequest]"
 
     context = createObject("roSGNode", "Node")
@@ -246,6 +246,7 @@ Sub makeRequest(headers as Object, url as String, method as String, post_params 
     context.addFields({
         parameters: params,
         num: num,
+        post_data: post_data,
         response: {}
     })
 
