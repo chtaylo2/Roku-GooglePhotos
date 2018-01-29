@@ -143,6 +143,10 @@ Function googleAlbumCreateRecord(xml As Object) As Object
     album.GetImageCount=function():return Val(m.xml.GetNamedElements("gphoto:numphotos")[0].GetText()):end function
     album.GetThumb=get_thumb
     
+    if album.GetTitle() = "Auto Backup" then
+        album.GetTitle=function():return "Google Photos Timeline":end function
+    end if
+    
     return album
 End Function
 

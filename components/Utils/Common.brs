@@ -201,7 +201,8 @@ Function oauth_count()
     for each item in m.items
         if m.accessToken.Count() <> m.[item].Count() then
             print "accessToken / "; item; " counts do not match"
-            'return invalid
+            'This sucks, items don't match. We need to kill all registrations
+            eraseReg()
         end if
     end for
     

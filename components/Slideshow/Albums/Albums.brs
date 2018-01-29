@@ -253,23 +253,33 @@ End Sub
 
 
 Sub googleDisplayAlbums(albumList As Object)
-    for each album in albumList
-        addItem(m.albumListContent, "GP_ALBUM_LISTING", album.GetThumb(), album.GetTitle(), Pluralize(album.GetImageCount(),"Item"))
-    end for
-    
-    m.albummarkupgrid.content = m.albumListContent
-    
-    centerMarkupGrid()
-    showMarkupGrid()
-    onItemFocused()
-    
-    m.albummarkupgrid.observeField("itemFocused", "onItemFocused") 
-    m.albummarkupgrid.observeField("itemSelected", "onItemSelected")
-    
-    'Turn off Loading Spinner
-    m.loadingSpinner.visible = "false"
-    
-    m.itemLabelMain3.text = "<<     Paging     >>"
+
+    if albumList.Count() = 0 then
+        m.itemLabelMain1.text = "There are no albums to display"
+        m.itemLabelMain2.text = "See 'Tips and Tricks' on how to load new albums"
+
+        'Turn off Loading Spinner
+        m.loadingSpinner.visible = "false"
+        
+    else
+        for each album in albumList
+            addItem(m.albumListContent, "GP_ALBUM_LISTING", album.GetThumb(), album.GetTitle(), Pluralize(album.GetImageCount(),"Item"))
+        end for
+        
+        m.albummarkupgrid.content = m.albumListContent
+        
+        centerMarkupGrid()
+        showMarkupGrid()
+        onItemFocused()
+        
+        m.albummarkupgrid.observeField("itemFocused", "onItemFocused") 
+        m.albummarkupgrid.observeField("itemSelected", "onItemSelected")
+        
+        'Turn off Loading Spinner
+        m.loadingSpinner.visible = "false"
+        
+        m.itemLabelMain3.text = "<<     Paging     >>"
+    end if
     
 End Sub
 
@@ -295,6 +305,7 @@ Sub googleAlbumPages(album As Object)
         
         page_start_dply = str(page_start)
         page_start_dply = page_start_dply.Replace(" ", "")
+        
         page_end_dply   = str(page_end)
         page_end_dply   = page_end_dply.Replace(" ", "")
         
@@ -307,11 +318,12 @@ Sub googleAlbumPages(album As Object)
         if i < 12 then
             addItem(m.albumPages, "GP_ALBUM_PAGES", thumb, "Media Page " + str(i) + tmpExtra, "Items: "+page_start_dply+" thru "+page_end_dply)
         else if i = 12 then
-            addItem(m.albumPages, "GP_ALBUM_PAGES", thumb, "Media Pages +12", "Items: "+page_start_dply+"+")
+            addItem(m.albumPages, "GP_ALBUM_PAGES", thumb, "Media Pages 12+", "Items: "+page_start_dply+"+")
         end if    
     end for
 
     m.albumPageList.content = m.albumPages
+    m.albumPageInfo1.text     = title
     m.albumPageThumb.uri    = thumb
     displayAlbumPages()
     
@@ -373,6 +385,7 @@ Sub googleDisplayImageMenu(album As Object, imageList As Object)
         index = m.albumPageList.itemSelected
         currentPage = str(index + 1)
         currentPage = currentPage.Replace(" ", "")
+        if totalPages > 11 then totalPages = 11
         totalPages  = str(totalPages)
         totalPages  = totalPages.Replace(" ", "")
         pagesShow   = "Page "+currentPage+" of "+totalPages
@@ -584,7 +597,7 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
             displayAlbumPages()
             return true
             
-        else if key = "right"
+        else if key = "right" or key = "up" or key = "down"
             'To fix bug with search results
             return true
         end if
