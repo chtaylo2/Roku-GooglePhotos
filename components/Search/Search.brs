@@ -7,8 +7,9 @@
 
 Sub init()
 
-    m.UriHandler = createObject("roSGNode","Search UrlHandler")
+    m.UriHandler = createObject("roSGNode","Photo UrlHandler")
     m.UriHandler.observeField("searchResult","handleGetSearch")
+    m.UriHandler.observeField("refreshToken","handleRefreshToken")
     
     m.miniKeyboard      = m.top.findNode("miniKeyboard")
     m.searchBtn         = m.top.findNode("searchBtn")
@@ -89,7 +90,7 @@ Sub doGetSearch(keyword as string)
         tmpData = [ "doGetSearch", keyword ]
         
         signedHeader = oauth_sign(m.global.selectedUser)
-        makeRequest(signedHeader, m.gp_prefix + "?kind=photo&v=3.0&q="+keyword+"&max-results=1000&thumbsize=220&imgmax="+getResolution(), "GET", "", 0, tmpData)
+        makeRequest(signedHeader, m.gp_prefix + "?kind=photo&v=3.0&q="+keyword+"&max-results=1000&thumbsize=220&imgmax="+getResolution(), "GET", "", 3, tmpData)
     end if
 End Sub
 
@@ -107,26 +108,42 @@ Sub handleGetSearch(event as object)
         errorMsg = "An Error Occured in 'handleGetSearch'. Code: "+(response.code).toStr()+" - " +response.error
     else
         rsp=ParseXML(response.content)
+        
         print rsp
         if rsp=invalid then
             errorMsg = "Unable to parse Google Photos API response. Exit the channel then try again later. Code: "+(response.code).toStr()+" - " +response.error
-        else       
-            m.screenActive = createObject("roSGNode", "My Albums")
-            m.screenActive.imageContent = response
-            m.screenActive.loaded = true
-            m.top.appendChild(m.screenActive)
-            m.screenActive.setFocus(true)
+        else
+        
+            results=rsp.GetNamedElements("openSearch:totalResults")[0].GetText()
             
             m.searchProgress.visible = false
-            m.miniKeyboard.visible = false
+            
+            if strtoi(results) > 0 then
+                m.screenActive = createObject("roSGNode", "My Albums")
+                m.screenActive.imageContent = response
+                m.screenActive.loaded = true
+                m.top.appendChild(m.screenActive)
+                m.screenActive.setFocus(true)
+                
+                m.miniKeyboard.visible = false
+            else
+                m.noticeDialog.visible = true
+                buttons =  [ "OK" ]
+                m.noticeDialog.title   = "Notice"
+                m.noticeDialog.message = "No media matched your search"
+                m.noticeDialog.buttons = buttons
+                m.noticeDialog.setFocus(true)
+                m.noticeDialog.observeField("buttonSelected","noticeClose")                
+            end if
         end if
         
     end if
 
     if errorMsg<>"" then
-        'ShowNotice
+        'ShowError
         m.noticeDialog.visible = true
         buttons =  [ "OK" ]
+        m.noticeDialog.title   = "Error"
         m.noticeDialog.message = errorMsg
         m.noticeDialog.buttons = buttons
         m.noticeDialog.setFocus(true)

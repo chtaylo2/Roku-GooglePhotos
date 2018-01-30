@@ -58,7 +58,7 @@ Function handleRefreshToken(event as object)
                 status = 0
                 ' We have our tokens
                 
-                if refreshData.post_data[1]<>invalid then
+                if refreshData.post_data[0]<>invalid and (refreshData.post_data[0] = "doGetScreensaverAlbumList" or refreshData.post_data[0] = "doGetScreensaverAlbumImages") then
                     'Don't use global set user. Screensaver uses this.
                     m.accessToken[refreshData.post_data[1]]  = getString(json,"access_token")
                 else

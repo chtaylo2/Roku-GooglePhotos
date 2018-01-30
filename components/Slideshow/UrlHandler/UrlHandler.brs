@@ -144,6 +144,8 @@ Sub processResponse(msg as Object)
             m.top.albumImages = job.context.context.response
         else if result.num = 2
             m.top.refreshToken = job.context.context.response
+        else if result.num = 3
+            m.top.searchResult = job.context.context.response
         end if
     else
         print "Error: event for unknown job "; idkey

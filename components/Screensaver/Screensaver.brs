@@ -203,6 +203,14 @@ End Sub
 
 
 Sub execScreensaver()
+
+    if m.photoItems.Count() = 0 then
+        generic1            = {}
+        generic1.timestamp  = "284040000"
+        generic1.url        = "pkg:/images/screensaver_splash.png"
+        m.photoItems.Push(generic1)
+    end if
+
     print "START SHOW"
     m.screenActive = createObject("roSGNode", "DisplayPhotos")
     m.screenActive.id = "DisplayScreensaver"

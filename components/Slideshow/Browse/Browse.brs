@@ -10,6 +10,9 @@ Sub init()
     m.itemLabelMain1 = m.top.findNode("itemLabelMain1")
     m.VideoPlayer    = m.top.findNode("VideoPlayer")
     
+    m.regStore = "positions"
+    m.regSection = "VideoStatus"
+    
     m.top.observeField("content","loadImageList")
 End Sub
 
@@ -23,15 +26,13 @@ End Sub
 
 Sub onItemSelected()
     'Item selected
-    print "SELECTED: "; m.ImageGrid.itemSelected
-    print "ID: "; m.top.id
-    
-    print "HERE: ";m.top.metaData[m.ImageGrid.itemSelected]
+    'print "SELECTED: "; m.ImageGrid.itemSelected
+    'print "ID: "; m.top.id
     
     if m.top.id = "GP_IMAGE_BROWSE" then
-        m.screenActive = createObject("roSGNode", "DisplayPhotos")
-        m.screenActive.startIndex = m.ImageGrid.itemSelected
-        m.screenActive.content = m.top.metaData
+        m.screenActive              = createObject("roSGNode", "DisplayPhotos")
+        m.screenActive.startIndex   = m.ImageGrid.itemSelected
+        m.screenActive.content      = m.top.metaData
         m.top.appendChild(m.screenActive)
         m.screenActive.setFocus(true)
         
@@ -41,24 +42,28 @@ Sub onItemSelected()
 End Sub
 
 
-Sub doVideoShow(videoObj as object)
+Sub doVideoShow(videoStore as object)
     print "Browse.brs [doVideoShow]"
     
-    mypath = CreateObject("roPath", videoObj.thumbnail)
-    fileObj = myPath.Split()
-    print "NAME: "; fileObj.filename
+    thumbnailPath = CreateObject("roPath", videoStore.thumbnail)
+    thumbnailObj  = thumbnailPath.Split()
     
+    videoFile     = videoStore.url
+    videoPath     = CreateObject("roPath", videoFile)
+    videoObj      = videoPath.Split()
     
+    regStorage = RegRead(m.regStore, m.regSection)
+
     videoContent              = createObject("RoSGNode", "ContentNode")
     videoContent.ContentType  = "movie"
-    videoContent.url          = videoObj.url
+    videoContent.url          = videoStore.url
     videoContent.streamformat = "mp4"
-    videoContent.TitleSeason  = fileobj.filename
-    videoContent.Title        = friendlyDate(StrToI(videoObj.timestamp))
+    videoContent.TitleSeason  = thumbnailObj.filename
+    videoContent.Title        = friendlyDate(StrToI(videoStore.timestamp))
 
-    print "VIDEO PLAY: ";videoContent
     m.VideoPlayer.visible = true
     m.VideoPlayer.content = videoContent
+    m.VideoPlayer.seek    = setVideoPosition(videoObj.filename)
     m.VideoPlayer.control = "play"
     m.VideoPlayer.setFocus(true)
     
@@ -70,8 +75,63 @@ Sub onVideoStateChange()
     print "Browse.brs - [onVideoStateChange]"
     if (m.VideoPlayer.state = "error") or (m.VideoPlayer.state = "finished") then
         'Close video screen!
+        writeVideoPosition(0)
         m.VideoPlayer.visible = false
         m.ImageGrid.setFocus(true)
+        m.VideoPlayer.unobserveField("state")
+    end if
+End Sub
+
+
+Function setVideoPosition(filename as string) as integer
+
+    regStorage = RegRead(m.regStore, m.regSection)
+    
+    if (filename <> "") and (regStorage <> invalid) and (regStorage <> "") then
+        parsedString = regStorage.Split("|")
+        for each item in parsedString
+            keypair = item.Split(":")
+            if keypair[0] = filename
+                return StrToI(keypair[1])
+            end if
+        end for
+    end if
+    
+    return 0
+    
+End Function
+
+
+Sub writeVideoPosition(position as integer)
+
+    regStorage = RegRead(m.regStore, m.regSection)
+    
+    if (m.VideoPlayer.state <> "error") and (m.VideoPlayer.streamInfo.streamUrl <> invalid) and (m.VideoPlayer.streamInfo.streamUrl <> "") then
+    
+        videoFile = m.VideoPlayer.streamInfo.streamUrl
+        videoPath = CreateObject("roPath", videoFile)
+        videoObj  = videoPath.Split()
+        
+        if (videoObj.filename <> "") then
+            if (regStorage <> invalid) and (regStorage <> "") then
+            
+                'Only save last 20 video positions
+                parsedString = regStorage.Split("|")
+                i = 1
+                saveList = ""
+                for each item in parsedString
+                    keypair = item.Split(":")
+                    if keypair[0] <> videoObj.filename
+                        saveList = saveList + "|" + item
+                    end if
+                    i = i + 1
+                    if i = 20 EXIT FOR
+                end for
+                RegWrite(m.regStore, videoObj.filename + ":" + itostr(position) + saveList, m.regSection)
+            else
+                RegWrite(m.regStore, videoObj.filename + ":" + itostr(position), m.regSection)
+            end if
+        end if
     end if
 End Sub
 
@@ -88,6 +148,8 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
                 m.VideoPlayer.control = "stop"
                 m.VideoPlayer.visible = false
                 m.ImageGrid.setFocus(true)
+                m.VideoPlayer.unobserveField("state")   
+                writeVideoPosition(m.VideoPlayer.position)
                 return true
             end if
         end if 

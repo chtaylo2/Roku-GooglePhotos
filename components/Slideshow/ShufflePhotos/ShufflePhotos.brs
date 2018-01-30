@@ -220,15 +220,25 @@ Sub execSlideshow()
         nxt = GetRandom(m.photoItems)
         tmp.push(m.photoItems[nxt])
     end for
-
-    print "START SHOW"
-    m.screenActive = createObject("roSGNode", "DisplayPhotos")
-    m.screenActive.id = "DisplayPhotos"
-    m.screenActive.content = tmp
-    m.top.appendChild(m.screenActive)
-    m.screenActive.setFocus(true)
     
-    m.pullPhotos.control = "start"
+    if tmp.Count() > 0 then 
+        print "START SHOW"
+        m.screenActive = createObject("roSGNode", "DisplayPhotos")
+        m.screenActive.id = "DisplayPhotos"
+        m.screenActive.content = tmp
+        m.top.appendChild(m.screenActive)
+        m.screenActive.setFocus(true)
+        
+        m.pullPhotos.control = "start"
+    else
+        m.noticeDialog.visible  = true
+        m.noticeDialog.title    = "Notice"
+        m.noticeDialog.message  = "There are no photos to display, please add photos and try again"
+        m.noticeDialog.buttons  = ""
+        m.apiTimer.control      = "stop"
+        m.pullPhotos.control    = "stop"
+        m.PhotoViewLogo.setFocus(true)
+    end if
 End Sub
 
 
@@ -238,5 +248,8 @@ End Sub
 
 
 Function onKeyEvent(key as String, press as Boolean) as Boolean
+    if press then
+        print "KEY: "; key
+    end if
     return false
 End function

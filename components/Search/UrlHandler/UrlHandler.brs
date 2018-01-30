@@ -132,7 +132,7 @@ Sub processResponse(msg as Object)
             post_data:  post_data
 			num:     	jobnum
 		}
-		'print "URL RESULT: ";  result
+		print "URL RESULT: ";  result
 		'print "MSG: "; msg
 	
 		' could handle various error codes, retry, etc. here

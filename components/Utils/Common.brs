@@ -13,7 +13,7 @@
 Function loadCommon()
     ' Common varables for needed for Oauth and GooglePhotos API
     
-    m.releaseVersion  = "2.3"
+    m.releaseVersion  = "2.0"
     m.gp_scope        = "https://picasaweb.google.com/data"
     m.gp_prefix       = m.gp_scope + "/feed/api/user/default"
     
@@ -41,21 +41,51 @@ End Function
 
 
 Function loadDefaults()
+
+    device  = createObject("roDeviceInfo")
+    is4k    = (val(device.GetVideoMode()) = 2160)
+    is1080p = (val(device.GetVideoMode()) = 1080)
+
     tmp = RegRead("SSaverUser", "Settings")
     if tmp=invalid RegWrite("SSaverUser", "0", "Settings")
-    tmp = RegRead("SSaverMethod", "Settings")
-    if tmp=invalid RegWrite("SSaverMethod", "Multi-Scrolling", "Settings")
     tmp = RegRead("SSaverDelay", "Settings")
     if tmp=invalid RegWrite("SSaverDelay", itostr(12), "Settings")
     tmp = RegRead("SSaverOrder", "Settings")
     if tmp=invalid RegWrite("SSaverOrder", "Random Order", "Settings")
+    tmp = RegRead("SSaverMethod", "Settings")
+    if tmp=invalid RegWrite("SSaverMethod", "Multi-Scrolling", "Settings")
+        'Backward compatibility from v1.x
+        if tmp="Fading Photo - Small" RegWrite("SSaverMethod", "YesFading_YesBlur", "Settings")
+        if tmp="Fading Photo - Large" RegWrite("SSaverMethod", "YesFading_YesBlur", "Settings")
     
     tmp = RegRead("SlideshowDisplay", "Settings")
-    if tmp=invalid RegWrite("SlideshowDisplay", "YesFading_YesBlur", "Settings")
+    if tmp=invalid then
+        RegWrite("SlideshowDisplay", "YesFading_YesBlur", "Settings")
+        'Backward compatibility from v1.x - Change default from 3 to 5
+        RegWrite("SlideshowDelay", itostr(5), "Settings")
+    end if
     tmp = RegRead("SlideshowDelay", "Settings")
     if tmp=invalid RegWrite("SlideshowDelay", itostr(5), "Settings")
     tmp = RegRead("SlideshowOrder", "Settings")
     if tmp=invalid RegWrite("SlideshowOrder", "Newest to Oldest", "Settings")
+    
+    if is4k then
+        tmp = RegRead("SSaverRes", "Settings")
+        if tmp=invalid RegWrite("SSaverRes", "FHD", "Settings")
+        tmp = RegRead("SlideshowRes", "Settings")
+        if tmp=invalid RegWrite("SlideshowRes", "FHD", "Settings")
+    else if is1080p
+        tmp = RegRead("SSaverRes", "Settings")
+        if tmp=invalid RegWrite("SSaverRes", "HD", "Settings")
+        tmp = RegRead("SlideshowRes", "Settings")
+        if tmp=invalid RegWrite("SlideshowRes", "HD", "Settings")
+    else
+        tmp = RegRead("SSaverRes", "Settings")
+        if tmp=invalid RegWrite("SSaverRes", "SD", "Settings")
+        tmp = RegRead("SlideshowRes", "Settings")
+        if tmp=invalid RegWrite("SlideshowRes", "SD", "Settings")
+    end if   
+    
 End Function
 
 

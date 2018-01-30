@@ -256,7 +256,7 @@ Sub googleDisplayAlbums(albumList As Object)
 
     if albumList.Count() = 0 then
         m.itemLabelMain1.text = "There are no albums to display"
-        m.itemLabelMain2.text = "See 'Tips and Tricks' on how to load new albums"
+        m.itemLabelMain2.text = "See 'Tips and Tricks' on how to create new albums"
 
         'Turn off Loading Spinner
         m.loadingSpinner.visible = "false"
@@ -548,7 +548,9 @@ End Sub
 
 
 Sub noticeClose(event as object)
-    m.noticeDialog.visible = false
+    m.noticeDialog.visible   = false
+    m.loadingSpinner.visible = false
+    m.albummarkupgrid.setFocus(true)
 End Sub
 
 
