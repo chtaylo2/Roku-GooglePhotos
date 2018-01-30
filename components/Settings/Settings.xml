@@ -1,0 +1,81 @@
+<?xml version = "1.0" encoding = "utf-8" ?>
+
+<component name = "Settings" extends = "Group" initialFocus = "settingsLabelList" >
+
+    <interface>
+        <field id = "contentFile" type = "string" value = "settingsGlobalContent" />
+        <field id = "itemFocused" type = "node" alias = "settingsLabelList.itemFocused" onChange = "showfocus" />
+        <field id = "itemSelected" type = "node" alias = "settingsLabelList.itemSelected" onChange = "showselected" />
+        <field id = "itemSubSelected" type = "node" alias = "settingSubList.itemSelected" onChange = "showsubselected" />
+        <field id = "loaded" type = "boolean" onChange = "loadListContent" />
+    </interface>
+
+    <script type = "text/brightscript" uri = "pkg:/components/Settings/Settings.brs" />
+    <script type = "text/brightscript" uri = "pkg:/components/Utils/Common.brs" />
+  
+    <children>
+ 
+        <Label 
+            id          = "settingScopeLobal" 
+            translation = "[105, 225]" 
+            color       = "#808080"
+            text        = "Global Settings:"
+            font        = "font:MediumBoldSystemFont" >
+                
+            <LabelList
+                id                      = "settingsLabelList"
+                translation             = "[0, 75]"
+                itemSize                = "[720, 60]"
+                itemSpacing             = "[0,30]"
+                color                   = "#808080"
+                vertFocusAnimationStyle = "floatingFocus"
+            />
+            
+            <Rectangle 
+                id          = "infoRectangle" 
+                translation = "[825, 39]" 
+                height      = "735" 
+                width       = "900" 
+                color       = "#606060" >
+
+                <Label 
+                    id          = "infoLabel" 
+                    translation = "[24, 24]" 
+                    height      = "690" 
+                    width       = "870" 
+                    wrap        = "true"
+                    color       = "#F8F8F8"
+                    font        = "font:SmallSystemFont"
+                />
+  
+                <RadioButtonList
+                    id          = "settingSubList"
+                    visible     = "false"
+                    itemSize    = "[654,60]"
+                    translation = "[175, 264]"
+                />
+
+                <Label 
+                    id          = "infoTempSetting" 
+                    translation = "[60, 645]" 
+                    color       = "#F8F8F8"
+                    font        = "font:SmallSystemFont"
+                />
+                
+            </Rectangle>
+        </Label>
+           
+        <PinDialog 
+            id          = "pinPad" 
+            title       = "Custom Delay (Seconds)"
+            visible     = "false"
+        />
+        
+        <Dialog
+            id      = "confirmDialog"
+            title   = "Please Confirm"
+            visible = "false"
+        />
+  
+  </children>
+</component>

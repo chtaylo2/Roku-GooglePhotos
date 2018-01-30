@@ -1,0 +1,65 @@
+<?xml version = "1.0" encoding = "utf-8" ?>
+
+<component name = "MainMenu" extends = "Group" initialFocus = "homeGrid" >
+  
+    <script type = "text/brightscript" uri = "pkg:/components/MainMenu/MainMenu.brs" />
+    <script type = "text/brightscript" uri = "pkg:/components/Utils/Common.brs" />
+
+    <children>
+
+        <Rectangle
+            id      = "Background"
+            color   = "#EBEBEB"
+            height  = "1080"
+            width   = "1920"
+            opacity = "1"
+            translation = "[0,270]"
+        />
+        
+        <MarkupGrid 
+            id                  = "homeGrid" 
+            itemComponentName   = "markupgridItem" 
+            numColumns          = "5" 
+            numRows             = "1" 
+            itemSize            = "[ 330, 375 ]" 
+            itemSpacing         = "[ 30, 30 ]"
+            drawFocusFeedback   = "false"
+        />
+
+        <Label
+            id          = "itemLabelMain1"
+            height      = "1080"
+            width       = "1920"
+            font        = "font:LargeBoldSystemFont"
+            color       = "#808080"
+            text        = "My Albums"
+            horizAlign  = "center"
+            vertAlign   = "center"
+            translation = "[0,261]"
+        />
+    
+        <Label
+            id          = "itemLabelMain2"
+            height      = "1080"
+            width       = "1920"
+            font        = "font:MediumSystemFont"
+            color       = "#808080"
+            text        = "Browse your albums"
+            horizAlign  = "center"
+            vertAlign   = "center"
+            translation = "[0,336]"
+        />
+    
+        <Label
+            id          = "itemHeader"
+            height      = "1080"
+            width       = "1800"
+            font        = "font:MediumBoldSystemFont"
+            color       = "#808080"
+            horizAlign  = "right"
+            vertAlign   = "top"
+            translation = "[0,105]"
+        />
+
+  </children>
+</component>

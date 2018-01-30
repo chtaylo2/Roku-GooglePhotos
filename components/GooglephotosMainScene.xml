@@ -1,0 +1,28 @@
+<?xml version = "1.0" encoding = "utf-8" ?>
+
+<component name = "GooglePhotosMainScene" extends = "Scene" >
+
+    <script type = "text/brightscript" uri = "pkg:/components/GooglePhotosMainScene.brs" />
+    <script type = "text/brightscript" uri = "pkg:/components/Utils/Common.brs" />
+    
+    <children>
+
+        <Overhang
+            id                  = "itemOverhang"
+            showClock           = "false"
+            logoBaselineOffset  = "105"
+        />
+
+        <Label
+            id          = "itemHeader"
+            height      = "1080"
+            width       = "1800"
+            font        = "font:MediumBoldSystemFont"
+            color       = "#808080"
+            horizAlign  = "right"
+            vertAlign   = "top"
+            translation = "[0,105]"
+        />
+
+  </children>
+</component>

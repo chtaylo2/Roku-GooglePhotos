@@ -1,0 +1,35 @@
+<?xml version = "1.0" encoding = "utf-8" ?>
+
+<component name = "markupgridItem" extends = "Group" >
+ 
+    <interface> 
+        <field id = "itemContent" type = "node" onChange = "showcontent" />
+        <field id = "focusPercent" type = "float" onChange = "showfocus" />
+        <field id = "itemFocused" type = "node" />
+        <field id = "itemSelected" type = "node" />
+    </interface>
+ 
+    <script type = "text/brightscript" uri = "pkg:/components/Utils/Markupgriditem/markupgridItem.brs" />
+
+    <children>
+
+        <Poster 
+            id                  = "itemPoster" 
+            translation         = "[ 33, 39 ]"
+            width               = "300" 
+            height              = "300"
+            scaleRotateCenter   = "[ 150, 366 ]" >
+
+            <Rectangle 
+                id                  = "itemMask" 
+                color               = "#EBEBEB"
+                opacity             = "0.50" 
+                width               = "330" 
+                height              = "330" 
+                scaleRotateCenter   = "[ 309.0, 216.0 ]"
+            />
+    
+        </Poster>
+    
+  </children>
+</component>

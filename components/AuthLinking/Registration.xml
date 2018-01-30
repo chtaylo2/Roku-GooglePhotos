@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<component name = "Registration" extends = "Group">
+  
+    <script type="text/brightscript" uri="pkg:/components/AuthLinking/Registration.brs"/>
+    <script type="text/brightscript" uri="pkg:/components/Utils/Common.brs" />
+    <script type="text/brightscript" uri="pkg:/components/Utils/private-git.brs" />
+  
+    <children>
+
+        <Group
+            id = "showRegistration">
+            
+            <Label
+                id          = "Row1"
+                font        = "font:MediumBoldSystemFont"
+                color       = "#808080"
+                height      = "150"
+                width       = "1200"
+                wrap        = "true"
+                text        = "To link this Roku device to your Google Photos account, go to:"
+                translation = "[225,300]"
+            />
+    
+            <Label
+                id          = "Row2"
+                font        = "font:LargeBoldSystemFont"
+                color       = "#808080"
+                horizAlign  = "center"
+                height      = "150"
+                width       = "1920"
+                wrap        = "true"
+                text        = "Loading.."
+                translation = "[0,405]"
+            />
+    
+            <Label
+                id          = "Row3"
+                font        = "font:MediumBoldSystemFont"
+                color       = "#808080"
+                horizAlign  = "center"
+                height      = "150"
+                width       = "1920"
+                wrap        = "true"
+                text        = "and enter code:"
+                translation = "[0, 504]"
+            />
+        
+            <Label
+                id          = "Row4"
+                font        = "font:LargeBoldSystemFont"
+                color       = "#808080"
+                horizAlign  = "center"
+                width       = "1920"
+                text        = "Loading.."
+                translation = "[0, 600]"
+            />
+    
+            <Label
+                id          = "Row5"
+                font        = "font:MediumBoldSystemFont"
+                color       = "#808080"
+                horizAlign  = "center"
+                height      = "150"
+                width       = "1920"
+                wrap        = "true"
+                text        = "This screen will automatically update as soon as your activation completes"
+                translation = "[0, 750]"
+            />
+    
+            <ButtonGroup
+                id          = "buttonGroup"
+                translation = "[1425, 825]"
+                textColor   = "#808080"
+            />
+        
+        </Group>
+
+        <Dialog
+            id      = "noticeDialog"
+            title   = "Error"
+            visible = "false"
+        />
+        
+        <Timer
+            id          = "LoginTimer"
+            repeat      = "true"
+            duration    = "5"
+        />
+        
+        <Timer
+            id          = "stopScanning"
+            repeat      = "false"
+            duration    = "900"
+        />
+    
+  </children>
+</component>

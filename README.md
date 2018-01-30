@@ -1,6 +1,15 @@
-# Roku-GooglePhotos
-Roku Google Photos Channel - derived from Chris Hoffman's Picasa Channel (https://github.com/chrishoffman/roku-picasa)
+# Roku-GooglePhotos (aka Roku-PhotoView)
+Roku Google Photos Channel is currently going through a major rewrite to intigrate ScreenGraph features required by Roku.
+See: https://github.com/chtaylo2/Roku-GooglePhotos/issues/44
 
-To use this channel make sure you set up the OAuth2 credentials as described in source\private.brs
+This is an active development, to checked in code to this branch is likely to not work!
 
-This version of the channel (v3) was developed by Chris Taylor which adds a number of functionality improvements.
+Thanks,
+Chris Taylor
+
+
+## Developing Code
+Want to help integrate a new feature? Outside development is welcomed as long as the new code adds to user experience. Any new development work should be tracked in an "Issue" and assigned to yourself. Once ready to commit code, merge into the 'development' branch for testing. After all tests have passed, it would be merged into the 'master' branch and released during next release cycle.
+
+## Questions or commits
+Please open an 'Issue' in the above section. Don't ask about advertising, because the answer is NO! 

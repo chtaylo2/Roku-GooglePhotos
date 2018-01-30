@@ -1,0 +1,92 @@
+<?xml version = "1.0" encoding = "utf-8" ?>
+
+<component name = "Search" extends = "Group" initialFocus = "miniKeyboard" >
+
+    <interface>
+    </interface>
+
+    <script type = "text/brightscript" uri = "pkg:/components/Search/Search.brs" />
+    <script type = "text/brightscript" uri = "pkg:/components/SlideShow/SlideshowHelper.brs" />
+    <script type = "text/brightscript" uri = "pkg:/components/Utils/Common.brs" />
+    <script type = "text/brightscript" uri = "pkg:/components/Utils/private-git.brs" />
+  
+    <children>
+    
+        <MiniKeyboard
+            id          = "miniKeyboard"
+            translation = "[ 225, 240 ]"
+            keyColor    = "#8a8b8c" >
+ 
+            <Label 
+                id          = "infoLabel" 
+                translation = "[ 720, 0 ]" 
+                height      = "690" 
+                width       = "870"
+                text        = "Recent Searches:"
+                color       = "#808080"
+                font        = "font:MediumBoldSystemFont"
+                />
+    
+            <Rectangle 
+                id          = "infoRectangle" 
+                translation = "[ 774, 60 ]" 
+                height      = "630" 
+                width       = "654" 
+                color       = "#606060" >
+
+                <Label 
+                    id          = "infoLabel" 
+                    translation = "[ 24, 24 ]" 
+                    height      = "690" 
+                    width       = "870" 
+                    wrap        = "true"
+                    color       = "#F8F8F8"
+                    font        = "font:SmallSystemFont"
+                />
+  
+                <RadioButtonList
+                    id          = "searchHistoryList"
+                    visible     = "true"
+                    itemSize    = "[525,54]"
+                    translation = "[ 45, 30 ]"
+                    vertFocusAnimationStyle = "floatingFocus"
+                    checkOnSelect = "false"
+                />
+                       
+            </Rectangle>
+
+            <Button
+                id          = "searchBtn"
+                text        = "Search"
+                textColor   = "#808080"
+                translation = "[ 174, 699 ]"
+                minWidth    = "75"
+                height      = "75"
+                showFocusFootprint = "true"
+            />
+            
+            <Button
+                id          = "clearSearchBtn"
+                text        = "Clear Search History"
+                textColor   = "#808080"
+                height      = "75"
+                translation = "[ 855, 699 ]"
+                showFocusFootprint = "true"
+            />
+            
+        </MiniKeyboard>
+  
+        <ProgressDialog
+            id      = "searchProgress"
+            title   = "Please wait"
+            visible = "false"
+        />
+        
+        <Dialog
+            id      = "noticeDialog"
+            title   = "Error"
+            visible = "false"
+        />
+    
+  </children>
+</component>

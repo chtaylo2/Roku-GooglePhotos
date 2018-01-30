@@ -1,0 +1,142 @@
+<?xml version = "1.0" encoding = "utf-8" ?> 
+
+<component name = "My Albums" extends = "Group" initialFocus = "albumGrid" >
+    
+    <interface>
+        <field id = "imageContent" type = "assocarray" />
+        <field id = "loaded"       type = "boolean" />
+    </interface>
+    
+    <script type = "text/brightscript" uri = "pkg:/components/SlideShow/Albums/Albums.brs" />
+    <script type = "text/brightscript" uri = "pkg:/components/SlideShow/SlideshowHelper.brs" />
+    <script type = "text/brightscript" uri = "pkg:/components/Utils/Common.brs" />
+    <script type = "text/brightscript" uri = "pkg:/components/Utils/private-git.brs" />
+
+    <children>
+        
+        <MarkupGrid 
+            id                  = "albumGrid"
+            translation         = "[60,360]"
+            itemComponentName   = "markupgridItem" 
+            numColumns          = "5" 
+            numRows             = "1" 
+            itemSize            = "[ 330, 375 ]" 
+            itemSpacing         = "[ 30, 30 ]"
+            drawFocusFeedback   = "false"
+        />
+
+        <LoadingIndicator
+            id          = "loadingSpinner"
+            visible     = "false"
+        />
+        
+        <Group
+            id          = "settingsIcon"
+            translation = "[1620,174]"
+            visible     = "false" >
+            
+            <Label
+                id          = "settingsIconText"
+                font        = "font:SmallBoldSystemFont"
+                color       = "#808080"
+                horizAlign  = "right"
+                text        = "Settings"
+                vertAlign   = "top"
+                translation = "[ 0, 2 ]"
+            />
+            
+            <Poster 
+                id          = "settingIconImage"
+                width       = "35"
+                height      = "35"
+                translation = "[ 140, 0 ]"
+                uri         = "pkg:/images/asterisk.png"
+            />
+            
+        </Group>
+        
+        <Label
+            id          = "itemLabelMain1"
+            height      = "1080"
+            width       = "1920"
+            font        = "font:LargeBoldSystemFont"
+            color       = "#808080"
+            horizAlign  = "center"
+            vertAlign   = "center"
+            translation = "[0,264]"
+        />
+    
+        <Label
+            id          = "itemLabelMain2"
+            height      = "1080"
+            width       = "1920"
+            font        = "font:MediumBoldSystemFont"
+            color       = "#808080"
+            horizAlign  = "center"
+            vertAlign   = "center"
+            translation = "[0,339]"
+        />
+        
+        <Label
+            id          = "itemLabelMain3"
+            height      = "1080"
+            width       = "1920"
+            font        = "font:SmallSystemFont"
+            color       = "#808080"
+            horizAlign  = "center"
+            vertAlign   = "center"
+            translation = "[0,421]"
+        />
+
+        <LabelList
+            id                   = "albumPageList"
+            translation          = "[ 300, 300 ]"
+            itemSize             = "[450,45]"
+            itemSpacing          = "[0,30]"
+            wrapDividerBitmapUri = "pkg:/images/wrapBitmap.png"
+            color                = "#808080" >
+
+            <Poster 
+                id              = "albumPageThumb"
+                loadheight      = "375"
+                loadwidth       = "375"
+                width           = "375"
+                translation     = "[ 789, 30 ]"
+                loadDisplayMode = "scaleTofit"
+            />
+
+            <Label 
+                id          = "albumPageInfo1" 
+                height      = "300" 
+                width       = "450" 
+                wrap        = "true"
+                horizAlign  = "center"
+                vertAlign   = "center"
+                color       ="#808080"
+                font        = "font:MediumBoldSystemFont"
+                translation = "[ 750, 300 ]"
+            />
+         
+            <Label 
+                id          = "albumPageInfo2" 
+                height      = "300" 
+                width       = "450" 
+                wrap        = "true"
+                text        = "Items: 1 thru 1000"
+                horizAlign  = "center"
+                vertAlign   = "center"
+                color       = "#808080"
+                font        = "font:MediumSystemFont"
+                translation = "[ 750, 375 ]"
+            />
+      
+        </LabelList>
+        
+        <Dialog
+            id      = "noticeDialog"
+            title   = "Error"
+            visible = "false"
+        />
+        
+    </children>
+</component>
