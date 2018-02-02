@@ -45,7 +45,7 @@ Sub setFeaturesText()
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "1. This channel has been rewritten from the ground up, to support Roku's ScreneGraph features."
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "2. New options when viewing slideshows including multi-scrolling images, fading photos and background blurs."
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "3. New menu layout plus many other new features."
-    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "4. Finally, don't forget to check out the channels embedded screensaver."
+    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "4. New screensaver options, including album selection!"
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + chr(10) + "Bug fixes:"
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "   - No bugs to report"
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + chr(10) + "Thank you for using the PhotoView Channel. Please remember to rate us!"

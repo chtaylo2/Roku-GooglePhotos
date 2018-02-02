@@ -28,7 +28,7 @@ Sub doRefreshToken(post_data=[] as Object, selectedUser=-1 as Integer)
     else
         params = params + "&refresh_token="    + m.refreshToken[m.global.selectedUser]
     end if
-    
+
     makeRequest({}, m.oauth_prefix+"/token", "POST", params, 2, post_data)
 End Sub
 
@@ -58,7 +58,7 @@ Function handleRefreshToken(event as object)
                 status = 0
                 ' We have our tokens
                 
-                if refreshData.post_data[0]<>invalid and (refreshData.post_data[0] = "doGetScreensaverAlbumList" or refreshData.post_data[0] = "doGetScreensaverAlbumImages") then
+                if refreshData.post_data[0]<>invalid and (refreshData.post_data[0] = "doGetScreensaverAlbumList" or refreshData.post_data[0] = "doGetScreensaverAlbumImages" or refreshData.post_data[0] = "doGetAlbumSelection") then
                     'Don't use global set user. Screensaver uses this.
                     m.accessToken[refreshData.post_data[1]]  = getString(json,"access_token")
                 else
@@ -101,6 +101,8 @@ Function handleRefreshToken(event as object)
             doGetAlbumImages(refreshData.post_data[1], refreshData.post_data[2])
         else if refreshData.post_data[0] = "doGetSearch" then
             doGetSearch(refreshData.post_data[1])
+        else if refreshData.post_data[0] = "doGetAlbumSelection" then
+            doGetAlbumSelection()
         else
             doGetAlbumList()
         end if

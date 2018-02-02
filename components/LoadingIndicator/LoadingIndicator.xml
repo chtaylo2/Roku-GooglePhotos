@@ -2,6 +2,10 @@
 
 <component name="LoadingIndicator" extends="Group">
 
+    <interface>
+        <field id="centered" type="bool" value="false" onChange="centerSpinner" />
+    </interface>
+
     <script type = "text/brightscript" >
 
         <![CDATA[
@@ -17,11 +21,10 @@
                 m.spinner.poster.height = "128"
                 m.spinner.visible       = "true"
                 m.spinner.control       = "start"
-                
-                centerSpinner()
             End Sub
 
             Sub centerSpinner()
+                print "CENTERING"
                 'Center the Spinner
                 spinnerRect = m.spinner.boundingRect()
                 centerx = (1920 - spinnerRect.width) / 2

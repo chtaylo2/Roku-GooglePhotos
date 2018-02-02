@@ -8,8 +8,6 @@
 Sub Main()
     'Start main screen
     showGooglePhotosScreen()
-    'showGooglePhotosScreensaver()
-    'showGooglePhotosScreensaverSettings()
 End Sub
 
 

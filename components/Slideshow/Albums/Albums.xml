@@ -27,6 +27,7 @@
 
         <LoadingIndicator
             id          = "loadingSpinner"
+            centered    = "true"
             visible     = "false"
         />
         

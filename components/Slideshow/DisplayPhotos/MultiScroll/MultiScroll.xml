@@ -43,6 +43,12 @@
             repeat      = "true"
             duration    = "1"
         />
+
+        <Timer
+            id          = "moveWatermark"
+            repeat      = "true"
+            duration    = "1200"
+        />
         
     </children>
 </component>

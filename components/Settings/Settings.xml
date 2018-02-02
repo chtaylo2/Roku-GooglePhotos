@@ -7,16 +7,19 @@
         <field id = "itemFocused" type = "node" alias = "settingsLabelList.itemFocused" onChange = "showfocus" />
         <field id = "itemSelected" type = "node" alias = "settingsLabelList.itemSelected" onChange = "showselected" />
         <field id = "itemSubSelected" type = "node" alias = "settingSubList.itemSelected" onChange = "showsubselected" />
+        <field id = "itemAlbumSelected" type = "node" alias = "albumSelection.itemSelected" onChange = "showalbumselected" />
         <field id = "loaded" type = "boolean" onChange = "loadListContent" />
     </interface>
 
     <script type = "text/brightscript" uri = "pkg:/components/Settings/Settings.brs" />
     <script type = "text/brightscript" uri = "pkg:/components/Utils/Common.brs" />
+    <script type = "text/brightscript" uri = "pkg:/components/SlideShow/SlideshowHelper.brs" />
+    <script type = "text/brightscript" uri = "pkg:/components/Utils/private-git.brs" />
   
     <children>
  
         <Label 
-            id          = "settingScopeLobal" 
+            id          = "settingScopeLabel" 
             translation = "[105, 225]" 
             color       = "#808080"
             text        = "Global Settings:"
@@ -52,7 +55,30 @@
                     id          = "settingSubList"
                     visible     = "false"
                     itemSize    = "[654,60]"
-                    translation = "[175, 264]"
+                    translation = "[160, 264]"
+                />
+
+                <Label
+                    id          = "albumDirections"
+                    translation = "[550, 670]" 
+                    color       = "#F8F8F8"
+                    text        = "Album Selection   >"
+                    font        = "font:SmallSystemFont"
+                    visible     = "false"
+                />
+                    
+                <CheckList
+                    id          = "albumSelection"
+                    translation = "[125, 315]"
+                    itemSize    = "[654,60]"
+                    numRows     = "5"
+                    visible     = "false"
+                />
+
+                <LoadingIndicator
+                    id          = "loadingSpinner"
+                    translation = "[380,350]"
+                    visible     = "false"
                 />
 
                 <Label 
@@ -74,6 +100,12 @@
         <Dialog
             id      = "confirmDialog"
             title   = "Please Confirm"
+            visible = "false"
+        />
+        
+        <Dialog
+            id      = "noticeDialog"
+            title   = "Error"
             visible = "false"
         />
   
