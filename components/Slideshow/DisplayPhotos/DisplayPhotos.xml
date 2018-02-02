@@ -209,6 +209,12 @@
             id          = "DownloadTimer"
             duration    = "2"
         />
+        
+        <Timer
+            id          = "moveWatermark"
+            repeat      = "true"
+            duration    = "1200"
+        />
             
    </children>
 </component>

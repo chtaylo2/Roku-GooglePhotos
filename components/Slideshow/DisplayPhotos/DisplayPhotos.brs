@@ -20,6 +20,7 @@ Sub init()
     m.RotationTimer             = m.top.findNode("RotationTimer")
     m.DownloadTimer             = m.top.findNode("DownloadTimer")
     m.Watermark                 = m.top.findNode("Watermark")
+    m.MoveTimer                 = m.top.findNode("moveWatermark")
 
     m.fromBrowse                = false
     m.imageLocalCacheByURL      = {}
@@ -92,6 +93,10 @@ Sub loadImageList()
             m.Watermark.uri = "pkg:/images/PhotoViewWatermark_HD.png"
         end if
         m.Watermark.visible = true
+        
+        m.MoveTimer.observeField("fire","onMoveTrigger")
+        m.MoveTimer.control = "start"       
+        
     end if    
     
     'Copy original list since we can't change origin
@@ -162,6 +167,8 @@ Sub onRotationTigger(event as object)
             m.screenActive.setFocus(true)
         end if
 
+        m.Watermark.visible     = false
+        m.MoveTimer.control     = "stop" 
         m.RotationTimer.control = "stop"
         m.DownloadTimer.control = "stop"
     else
@@ -389,6 +396,16 @@ Function GetPreviousImage(items As Object, tracker As Integer)
         return tracker - 1
     end if
 End Function
+
+
+Sub onMoveTrigger()
+    'To prevent screen burn-in
+    if m.Watermark.translation[1] = 1010 then
+         m.Watermark.translation = "[1700,10]"
+    else
+        m.Watermark.translation = "[1700,1010]"
+    end if
+End Sub
 
 
 Function onKeyEvent(key as String, press as Boolean) as Boolean

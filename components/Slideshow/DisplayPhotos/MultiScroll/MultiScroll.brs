@@ -22,6 +22,7 @@ Sub init()
     m.WaveTimer     = m.top.findNode("waveTimer")
     m.RefreshTimer  = m.top.findNode("refreshTimer")
     m.Watermark     = m.top.findNode("Watermark")
+    m.MoveTimer     = m.top.findNode("moveWatermark")
     
     m.WaveTimer.observeField("fire","onWaveTigger")
     m.RefreshTimer.observeField("fire","onRefreshTigger")
@@ -125,6 +126,10 @@ Sub loadImages()
             m.Watermark.uri = "pkg:/images/PhotoViewWatermark_HD.png"
         end if
         m.Watermark.visible = true
+        
+        m.MoveTimer.observeField("fire","onMoveTrigger")
+        m.MoveTimer.control = "start"
+        
     end if
     
     m.scroll_node_1.control     = "start"
@@ -132,6 +137,16 @@ Sub loadImages()
     m.WaveTimer.control         = "start"
     m.RefreshTimer.control      = "start"
     
+End Sub
+
+
+Sub onMoveTrigger()
+    'To prevent screen burn-in
+    if m.Watermark.translation[1] = 1010 then
+         m.Watermark.translation = "[1700,10]"
+    else
+        m.Watermark.translation = "[1700,1010]"
+    end if
 End Sub
 
 

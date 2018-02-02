@@ -112,7 +112,9 @@ End Sub
 Sub handleGetScreensaverAlbumList(event as object)
     print "Screensaver.brs [handleGetAlbumList]"
   
-    response = event.getData()
+    regStore  = "SSaverAlbums"
+    regAlbums = RegRead(regStore, "Settings")
+    response  = event.getData()
 
     m.apiPending = m.apiPending-1
     if (response.code = 401) or (response.code = 403) then
@@ -121,35 +123,43 @@ Sub handleGetScreensaverAlbumList(event as object)
     else if response.code = 200
         rsp=ParseXML(response.content)
         print rsp
-        'if rsp=invalid then
-        '    ShowErrorDialog("Unable to parse Google Photos API response" + LF + LF + "Exit the channel then try again later","API Error")
-        'end if
+        if rsp<>invalid then
     
-        album_cache_count   = 0
-        albumsObject        = googleAlbumListing(rsp.entry)
+            album_cache_count   = 0
+            albumsObject        = googleAlbumListing(rsp.entry)
+            
+            if albumsObject.Count()>0 then
+                for each album in albumsObject
+                    'User has selected albums for screensaver
+                    if (regAlbums <> invalid) and (regAlbums <> "")
+                        parsedString = regAlbums.Split("|")
+                        for each item in parsedString
+                            albumUser = item.Split(":")
+                            if albumUser[0] = album.GetID() then
+                                doGetScreensaverAlbumImages(album, response.post_data[1])
+                            end if
+                        end for
+                    else
+                        if album_cache_count = 0 and album.GetImageCount()>0 then
+                            ' We will always pull node 0 as this is Auto Backup, likely contains most photos
+                            album_idx = 0
+                        else
+                            ' Randomly pull 5 additional albums and cache photos
+                            album_idx = Rnd(albumsObject.Count())-1
+                        end if
+                            
+                        album_cache_count = album_cache_count+1
         
-        if albumsObject.Count()>0 then
-            for each album in albumsObject
-                if album_cache_count = 0 and album.GetImageCount()>0 then
-                    ' We will always pull node 0 as this is Auto Backup, likely contains most photos
-                    album_idx = 0
-                else
-                    ' Randomly pull 5 additional albums and cache photos
-                    album_idx = Rnd(albumsObject.Count())-1
-                end if
-                    
-                album_cache_count = album_cache_count+1
-
-                doGetScreensaverAlbumImages(albumsObject[album_idx], response.post_data[1])
-                albumsObject.delete(album_idx)
-
-                if album_cache_count>=5
-                    exit for
-                end if    
-            end for
+                        doGetScreensaverAlbumImages(albumsObject[album_idx], response.post_data[1])
+                        albumsObject.delete(album_idx)
+        
+                        if album_cache_count>=5
+                            exit for
+                        end if
+                    end if
+                end for
+            end if
         end if
-    else
-        '' ERROR SHOW SOME MESSAGE
     end if
 End Sub
 
@@ -157,8 +167,7 @@ End Sub
 Sub handleGetScreensaverAlbumImages(event as object)
     print "Screensaver.brs [handleGetScreensaverAlbumImages]"
   
-    response = event.getData()
-    
+    response     = event.getData()
     m.apiPending = m.apiPending-1
 
     if (response.code = 401) or (response.code = 403) then
@@ -167,26 +176,22 @@ Sub handleGetScreensaverAlbumImages(event as object)
     else if response.code = 200
         rsp=ParseXML(response.content)
         print rsp
-        'if rsp=invalid then
-        '    ShowErrorDialog("Unable to parse Google Photos API response" + LF + LF + "Exit the channel then try again later","API Error")
-        'end if
-        
-        imagesObject = googleImageListing(rsp.entry)
-        
-        for each image in imagesObject
-            tmp = {}
-            tmp.url       = image.GetURL()
-            tmp.timestamp = image.GetTimestamp()
+        if rsp<>invalid then        
+            imagesObject = googleImageListing(rsp.entry)
             
-            if image.IsVideo() then
-                'print "Ignore: "; image.GetURL()
-            else
-                'print "Push: "; image.GetURL()
-                m.photoItems.Push(tmp)
-            end if    
-        end for
-    else
-        '' ERROR SHOW SOME MESSAGE
+            for each image in imagesObject
+                tmp = {}
+                tmp.url       = image.GetURL()
+                tmp.timestamp = image.GetTimestamp()
+                
+                if image.IsVideo() then
+                    'print "Ignore: "; image.GetURL()
+                else
+                    'print "Push: "; image.GetURL()
+                    m.photoItems.Push(tmp)
+                end if    
+            end for
+        end if
     end if
 End Sub
 
