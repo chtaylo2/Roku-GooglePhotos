@@ -1,14 +1,16 @@
 title=PhotoView for Google Photos
 #
 major_version=4
-minor_version=355
-build_version=20180202
+minor_version=356
+build_version=20180203
 #
 mm_icon_focus_fhd=pkg:/images/mm_icon_focus_hd.png
 mm_icon_focus_hd=pkg:/images/mm_icon_focus_hd.png
+mm_icon_focus_sd=pkg:/images/mm_icon_focus_sd.png
 #
 splash_screen_fhd=pkg:/images/Splash-FHD-1920x1080.png
 splash_screen_hd=pkg:/images/Splash-HD-1280x720.png
+splash_screen_sd=pkg:/images/Splash-SD-720x480.png
 splash_color=#ebebeb
 #
 screensaver_title=PhotoView for Google Photos

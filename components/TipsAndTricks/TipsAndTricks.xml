@@ -35,7 +35,9 @@
                 />
                 
                 <Poster 
-                    id          = "qrCode"                 
+                    id          = "qrCode"
+                    height      = "150" 
+                    width       = "150" 
                     translation = "[ 375, 489 ]"
                     uri         = "pkg:/images/issues-qrcode.png"
                 />

@@ -32,6 +32,7 @@ Sub init()
     m.albumDirections   = m.top.findNode("albumDirections")
     m.loadingSpinner    = m.top.findNode("loadingSpinner")
     m.noticeDialog      = m.top.findNode("noticeDialog")
+    m.aboutVersion      = m.top.findNode("aboutVersion")
     
     m.pinPad.observeField("buttonSelected","processPinEntry")
     m.confirmDialog.observeField("buttonSelected","confirmUnregister")
@@ -42,13 +43,15 @@ Sub loadListContent()
 
     if m.top.contentFile = "settingsTemporaryContent"
         'Temporary setting only apply to the running application
-        m.setScope = "temporary"
+        m.setScope           = "temporary"
     else if m.top.contentFile = "settingsScreensaverContent"
         'Screensaver setting
-        m.setScope = "screensaver"
+        m.setScope           = "screensaver"
     else
         'Global settings are percistent across reboot
-        m.setScope = "global"
+        appInfo              = CreateObject("roAppInfo")
+        m.setScope           = "global"
+        m.aboutVersion.text  = "Release v" + m.releaseVersion + " - Build " + appInfo.GetVersion()
     end if
 
     if m.setScope = "temporary"
@@ -353,6 +356,7 @@ Sub showfocus()
         end if
         
         m.albumDirections.visible = "false"
+        m.aboutVersion.visible    = "false"
         
         if m.settingsList.itemFocused = 0 then
             m.settingSubList.visible        = "true"
@@ -388,6 +392,7 @@ Sub showfocus()
             m.settingSubList.visible        = "false"
         else if m.settingsList.itemFocused = 6 then
             m.settingSubList.visible        = "false"
+            m.aboutVersion.visible          = "true"
         end if
     end if 
 End Sub
@@ -556,7 +561,7 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
             return true
         else if (key = "back") and (m.screenActive<>invalid)
             m.top.removeChild(m.screenActive)
-            m.screenActive = invalid
+            m.screenActive              = invalid
             m.settingScopeLabel.visible = true
             m.settingsList.setFocus(true)
             return true
