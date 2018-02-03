@@ -1,0 +1,54 @@
+<?xml version = "1.0" encoding = "UTF-8"?>
+
+<component name = "MultiScroll" extends = "Group" >
+
+    <interface>
+        <field id = "content" type = "array" />
+        <field id = "loaded"  type = "boolean" />
+        <field id = "loadingvisible" type = "node" alias = "Loading.visible" />
+        <field id = "loadingtext" type = "node" alias = "Loading.text" />
+    </interface>
+
+    <script type = "text/brightscript" uri = "pkg:/components/SlideShow/DisplayPhotos/MultiScroll/MultiScroll.brs" />
+
+    <children>
+        
+        <Label id="Loading" translation="[0,0]" font="font:MediumBoldSystemFont" text="" horizAlign = "center" vertAlign = "center" visible="false" />
+        
+        <ScrollingImage id = "scroll_node_1" duration = "30" />
+        <ScrollingImage id = "scroll_node_2" duration = "26" />
+        <ScrollingImage id = "scroll_node_3" duration = "32" />
+        <ScrollingImage id = "scroll_node_4" duration = "27" />
+        <ScrollingImage id = "scroll_node_5" duration = "27" />
+        <ScrollingImage id = "scroll_node_6" duration = "32" />
+        <ScrollingImage id = "scroll_node_7" duration = "23" />
+        <ScrollingImage id = "scroll_node_8" duration = "20" />
+        
+        <!-- Screensaver watermark -->
+        <Poster
+            id          = "Watermark"
+            translation = "[1700,1010]"
+            visible     = "false"
+        />
+        
+        <!-- Required Timers -->
+        <Timer
+            id          = "waveTimer"
+            repeat      = "true"
+            duration    = "5"
+        />
+        
+        <Timer
+            id          = "refreshTimer"
+            repeat      = "true"
+            duration    = "1"
+        />
+
+        <Timer
+            id          = "moveWatermark"
+            repeat      = "true"
+            duration    = "1200"
+        />
+        
+    </children>
+</component>

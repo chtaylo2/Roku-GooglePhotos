@@ -1,0 +1,50 @@
+<?xml version = "1.0" encoding = "utf-8" ?>
+
+<component name = "Tips and Tricks" extends = "Group" initialFocus = "tipsLabelList" >
+
+    <interface>
+        <field id = "itemFocused" type = "node" alias = "tipsLabelList.itemFocused" onChange = "showfocus" />
+    </interface>
+  
+    <script type="text/brightscript" uri="pkg:/components/TipsAndTricks/TipsAndTricks.brs" />
+  
+    <children>
+    
+        <LabelList
+            id                      = "tipsLabelList"
+            translation             = "[ 120, 270 ]"
+            itemSize                = "[ 720, 60 ]"
+            itemSpacing             = "[ 0, 30 ]"
+            color                   = "#808080"
+            vertFocusAnimationStyle = "floatingFocus">
+    
+            <Rectangle 
+                id          = "infoRectangle" 
+                translation = "[ 825, 0 ]" 
+                height      = "735" 
+                width       = "900" 
+                color       = "#606060">
+
+                <Label 
+                    id          = "infoLabel" 
+                    translation = "[ 24, 24 ]" 
+                    height      = "690" 
+                    width       = "870" 
+                    wrap        = "true"
+                    color       = "#F8F8F8"
+                />
+                
+                <Poster 
+                    id          = "qrCode"
+                    height      = "150" 
+                    width       = "150" 
+                    translation = "[ 375, 489 ]"
+                    uri         = "pkg:/images/issues-qrcode.png"
+                />
+  
+            </Rectangle>
+      
+        </LabelList>
+    
+  </children>
+</component>

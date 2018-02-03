@@ -15,7 +15,7 @@
 #    address of your Roku box. (e.g. export ROKU_DEV_TARGET=192.168.1.1.
 #    Set in your this variable in your shell startup (e.g. .bashrc)
 ##########################################################################  
-APPNAME = Roku-GooglePhotos
+APPNAME = Roku-GooglePhotos-v2.0
 APPDEPS = count_functions increment_version
 ZIP_EXCLUDE = -x .git\* -x app.mk -x \*.swp -x \*.DS_Store
 include ./app.mk

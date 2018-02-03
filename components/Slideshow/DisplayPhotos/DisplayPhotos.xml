@@ -1,0 +1,220 @@
+<?xml version = "1.0" encoding = "utf-8" ?> 
+
+<component name = "DisplayPhotos" extends = "Group" >
+
+    <interface>
+        <field id = "content" type = "array" />
+        <field id = "startIndex" type = "integer" value="-1" />
+    </interface>
+  
+    <script type = "text/brightscript" uri = "pkg:/components/SlideShow/DisplayPhotos/DisplayPhotos.brs" />
+    <script type = "text/brightscript" uri = "pkg:/components/SlideShow/SlideshowHelper.brs" />
+    <script type = "text/brightscript" uri = "pkg:/components/Utils/Common.brs" />
+    <script type = "text/brightscript" uri = "pkg:/components/Utils/private-git.brs" />
+   
+    <children>
+
+        <!-- Hide the primary screen -->
+        <Rectangle
+            id      = "FadeBackground"
+            color   = "0x000000"
+            height  = "1080"
+            width   = "1920"
+            opacity = "1"
+        />
+
+        <!-- Create the blended in background -->
+        <Poster
+            id              = "BlendedPrimaryImage"
+            loadWidth       = "15.36"
+            loadHeight      = "8.64"
+            loadDisplayMode = "scaleToFill"
+            height          = "1080"
+            width           = "1920"
+        />
+    
+        <Poster
+            id              = "BlendedSecondaryImage"
+            loadWidth       = "15.36"
+            loadHeight      = "8.64"
+            loadDisplayMode = "scaleToFill"
+            height          = "1080"
+            width           = "1920"
+        />
+      
+        <!-- Create some opacity between blended images -->
+        <Rectangle
+            id      = "ImageObscure"
+            color   = "0x000000"
+            height  = "1080"
+            width   = "1920"
+            opacity = ".3"
+        />
+      
+        <!-- Primary Image -->
+        <Poster 
+            id              = "PrimaryImage"
+            loadWidth       = "1920"
+            loadHeight      = "1080"
+            loadDisplayMode = "scaleToFit"
+        />
+
+        <!-- Secondary Image -->
+        <Poster 
+            id              = "SecondaryImage"
+            loadWidth       = "1920"
+            loadHeight      = "1080"
+            loadDisplayMode = "scaleToFit"
+        /> 
+
+        <!-- Fading foreground effect -->
+        <Rectangle
+            id      = "FadeForeground"
+            color   = "0x000000"
+            height  = "1080"
+            width   = "1920"
+            opacity = "1"
+        />        
+
+        <Animation
+            id              = "FadeOutForeground"
+            repeat          = "false"
+            easeFunction    = "inQuad"
+            duration        = "0.5" >
+
+            <FloatFieldInterpolator
+                key             = "[0.0,1.0]"
+                KeyValue        = "[1.0,0.0]"
+                fieldToInterp   = "FadeForeground.opacity"
+            />
+
+        </Animation>
+        
+        <!-- Fading In Primary Image Animation -->
+        <Animation
+            id              = "FadeInPrimaryAnimation"
+            repeat          = "false"
+            easeFunction    = "inQuad"
+            duration        = "0.5" >
+            
+            <FloatFieldInterpolator
+                key             = "[0.0,1.0]"
+                KeyValue        = "[0.0,1.0]"
+                fieldToInterp   = "PrimaryImage.opacity"
+            />
+            
+            <FloatFieldInterpolator
+                key             = "[0.0,1.0]"
+                KeyValue        = "[0.0,1.0]"
+                fieldToInterp   = "BlendedPrimaryImage.opacity"
+            />
+
+            <FloatFieldInterpolator
+                key             = "[0.0,1.0]"
+                KeyValue        = "[1.0,0.0]"
+                fieldToInterp   = "SecondaryImage.opacity"
+            />
+            
+            <FloatFieldInterpolator
+                key             = "[0.0,1.0]"
+                KeyValue        = "[1.0,0.0]"
+                fieldToInterp   = "BlendedSecondaryImage.opacity"
+            />
+
+        </Animation>
+
+        <!-- Fading In Secondary Image Animation -->         
+        <Animation
+            id              = "FadeInSecondaryAnimation"
+            repeat          = "false"
+            easeFunction    = "inQuad"
+            duration        = "0.5" >
+
+
+            <FloatFieldInterpolator
+                key             = "[0.0,1.0]"
+                KeyValue        = "[1.0,0.0]"
+                fieldToInterp   = "PrimaryImage.opacity"
+            />
+            
+            <FloatFieldInterpolator
+                key             = "[0.0,1.0]"
+                KeyValue        = "[1.0,0.0]"
+                fieldToInterp   = "BlendedPrimaryImage.opacity"
+            />
+
+            <FloatFieldInterpolator
+                key             = "[0.0,1.0]"
+                KeyValue        = "[0.0,1.0]"
+                fieldToInterp   = "SecondaryImage.opacity"
+            />
+            
+            <FloatFieldInterpolator
+                key             = "[0.0,1.0]"
+                KeyValue        = "[0.0,1.0]"
+                fieldToInterp   = "BlendedSecondaryImage.opacity"
+            />
+
+        </Animation>
+        
+        <!-- Used to display pause screen -->
+        <Rectangle
+            id          = "PauseScreen"
+            color       = "0x000000"
+            height      = "150"
+            width       = "1920"
+            translation = "[0,855]"
+            opacity     = ".7"
+            visible     = "false" >
+         
+            <Label 
+                id          = "pauseImageCount" 
+                height      = "150" 
+                width       = "1800"
+                horizAlign  = "right"
+                vertAlign   = "top"
+                color       = "#eaeaea"
+                font        = "font:SmallSystemFont"
+                translation = "[ 0, 24 ]"
+            />
+         
+            <Label 
+               id           = "pauseImageDetail" 
+               height       = "150" 
+               width        = "1920"
+               horizAlign   = "center"
+               vertAlign    = "center"
+               color        = "#eaeaea"
+               font         = "font:MediumSystemFont"
+               translation  = "[ 0, 0 ]"
+            />
+      
+        </Rectangle>
+
+        <!-- Screensaver watermark -->
+        <Poster
+            id          = "Watermark"
+            uri         = "pkg:/images/PhotoViewWatermark.png"
+            translation = "[1700,1010]"
+            visible     = "false"
+        />
+
+        <!-- Required Timers -->
+        <Timer
+            id          = "RotationTimer"
+            duration    = "5"
+        />
+   
+        <Timer
+            id          = "DownloadTimer"
+            duration    = "2"
+        />
+        
+        <Timer
+            id          = "moveWatermark"
+            repeat      = "true"
+            duration    = "1200"
+        />
+            
+   </children>
+</component>

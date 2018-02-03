@@ -1,0 +1,17 @@
+<?xml version = "1.0" encoding = "utf-8" ?>
+
+<component name = "GooglePhotosScreensaverSettings" extends = "Scene" >
+
+    <script type = "text/brightscript" uri = "pkg:/components/Screensaver/ScreensaverSettings.brs" />
+    <script type = "text/brightscript" uri = "pkg:/components/Utils/Common.brs" />
+    
+    <children>
+
+        <Overhang
+            id                  = "itemOverhang"
+            showClock           = "false"
+            logoBaselineOffset  = "105"
+        />
+        
+  </children>
+</component>

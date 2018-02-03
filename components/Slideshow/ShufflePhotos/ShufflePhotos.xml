@@ -1,0 +1,45 @@
+<?xml version = "1.0" encoding = "utf-8" ?>
+
+<component name = "Shuffle Photos" extends = "Group" >
+    
+    <script type = "text/brightscript" uri = "pkg:/components/SlideShow/ShufflePhotos/ShufflePhotos.brs" />
+    <script type = "text/brightscript" uri = "pkg:/components/SlideShow/SlideshowHelper.brs" />
+    <script type = "text/brightscript" uri = "pkg:/components/Utils/Common.brs" />
+    <script type = "text/brightscript" uri = "pkg:/components/Utils/private-git.brs" />
+
+    <children>
+        
+        <Rectangle
+            id          = "FadeBackground"
+            color       = "0x000000"
+            height      = "1080"
+            width       = "1920"
+            opacity     = "1"
+        />
+        
+        <!-- PhotoView Advertisment -->
+        <Poster
+            id          = "PhotoViewLogo"
+            translation = "[650, 350]"
+        />
+
+        <Dialog
+            id      = "noticeDialog"
+            title   = "Error"
+            visible = "false"
+        />
+        
+        <Timer
+            id          = "pullPhotos"
+            repeat      = "true"
+            duration    = "15"
+        />
+
+        <Timer
+            id          = "apiTimer"
+            repeat      = "true"
+            duration    = "2"
+        />
+
+  </children>
+</component>

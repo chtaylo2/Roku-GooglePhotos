@@ -1,0 +1,24 @@
+<?xml version = "1.0" encoding = "utf-8" ?> 
+
+<component name = "KeyReset" extends = "Task" >
+
+    <script type = "text/brightscript" >
+
+        <![CDATA[
+
+            Sub init()
+                m.top.functionName = "resetKeyPress"
+            End Sub
+
+    
+            Sub resetKeyPress()
+                'Very simple function. Update keypress to stop screensaver from loading during slideshow
+                app = CreateObject("roAppManager")
+                app.UpdateLastKeyPressTime()
+            End Sub
+
+        ]]>
+
+    </script>
+
+</component>

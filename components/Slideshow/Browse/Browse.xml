@@ -1,0 +1,52 @@
+<?xml version = "1.0" encoding = "utf-8" ?> 
+
+<component name = "Browse" extends = "Group" initialFocus = "ImageGrid" >
+
+    <interface>
+        <field id = "id" type = "string" />
+        <field id = "albumName" type = "string" />
+        <field id = "content" type = "node" />
+        <field id = "metaData" type = "array" />
+        <field id = "itemSelected" type = "node" alias = "ImageGrid.itemSelected" onChange = "onItemSelected" />
+    </interface>
+  
+    <script type = "text/brightscript" uri = "pkg:/components/SlideShow/Browse/Browse.brs" />
+    <script type = "text/brightscript" uri = "pkg:/components/Utils/Common.brs" />
+   
+    <children>
+
+        <Label
+           id          = "itemLabelMain1"
+           horizAlign  = "left"
+           vertAlign   = "top"
+           font        = "font:SmallBoldSystemFont"
+           color       = "#808080"
+           translation = "[150,240]"
+        />
+    
+        <PosterGrid
+            id                    = "ImageGrid"
+            itemSpacing           = "[30, 30]"
+            rowHeights            = "[225]"
+            columnWidths          = "[300]"
+            numColumns            = "5"
+            numRows               = "3"
+            useAtlas              = "false"
+            focusBitmapBlendColor = "#e8e8e8"
+            basePosterSize        = "[300,225]"
+            posterDisplayMode     = "scaleToFit"
+            translation           = "[150, 300]"
+            wrapDividerBitmapUri = "pkg:/images/wrapBitmap.png"
+        />
+        
+        <!-- Playback node -->
+        <Video
+            id          = "VideoPlayer"
+            translation = "[0, 0]"
+            width       = "1920"
+            height      = "1080"
+            visible     = "false"
+        />        
+
+    </children>
+</component>

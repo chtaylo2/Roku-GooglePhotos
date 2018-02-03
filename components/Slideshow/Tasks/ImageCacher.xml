@@ -1,0 +1,63 @@
+<?xml version = "1.0" encoding = "utf-8" ?> 
+
+<component name = "ImageCacher" extends = "Task" >
+ 
+    <script type = "text/brightscript" uri = "pkg:/components/Utils/Common.brs" />
+  
+    <interface>
+        <field id = "remotearray" type = "array" />
+        <field id = "localarray" type = "assocarray" />
+        <field id = "filesystem" type = "array" />
+    </interface> 
+
+    <script type = "text/brightscript" >
+
+        <![CDATA[
+
+            Sub init()
+                m.top.functionName = "grabcontent"
+            End Sub
+
+    
+            Sub grabcontent()
+                response = {}
+      
+                port = CreateObject("roMessagePort")
+                httpObj = createObject("roUrlTransfer")
+                httpObj.SetCertificatesFile("common:/certs/ca-bundle.crt")
+                httpObj.InitClientCertificates()
+                httpObj.SetPort(port)
+      
+                for i = 0 to m.top.remotearray.Count()-1
+                    item = m.top.remotearray[i]
+    
+                    unique = Rnd(10000)
+                    mypath = CreateObject("roPath", item.url)
+                    fileObj = myPath.Split()
+        
+                    fname =  "tmp:/" + itostr(unique) + "_" + fileObj.filename
+        
+                    'print "Caching Image: "; item.url
+                    httpObj.setUrl(item.url)
+                    httpObj.AsyncGetToFile( fname )
+    
+                    msg = wait(0, port)
+        
+                    response[item.url] = fname
+                end for
+      
+                fs = CreateObject("roFileSystem")
+                fslist = fs.GetDirectoryListing("tmp:/")
+      
+                'print "FILESYSTEM STATUS: "; fslist
+
+                m.top.filesystem = fslist.ToArray()
+                m.top.localarray = response
+                
+            End Sub
+
+        ]]>
+
+    </script>
+
+</component>

@@ -1,0 +1,121 @@
+<?xml version = "1.0" encoding = "utf-8" ?>
+
+<component name = "Settings" extends = "Group" initialFocus = "settingsLabelList" >
+
+    <interface>
+        <field id = "contentFile" type = "string" value = "settingsGlobalContent" />
+        <field id = "itemFocused" type = "node" alias = "settingsLabelList.itemFocused" onChange = "showfocus" />
+        <field id = "itemSelected" type = "node" alias = "settingsLabelList.itemSelected" onChange = "showselected" />
+        <field id = "itemSubSelected" type = "node" alias = "settingSubList.itemSelected" onChange = "showsubselected" />
+        <field id = "itemAlbumSelected" type = "node" alias = "albumSelection.itemSelected" onChange = "showalbumselected" />
+        <field id = "loaded" type = "boolean" onChange = "loadListContent" />
+    </interface>
+
+    <script type = "text/brightscript" uri = "pkg:/components/Settings/Settings.brs" />
+    <script type = "text/brightscript" uri = "pkg:/components/Utils/Common.brs" />
+    <script type = "text/brightscript" uri = "pkg:/components/SlideShow/SlideshowHelper.brs" />
+    <script type = "text/brightscript" uri = "pkg:/components/Utils/private-git.brs" />
+  
+    <children>
+ 
+        <Label 
+            id          = "settingScopeLabel" 
+            translation = "[105, 225]" 
+            color       = "#808080"
+            text        = "Global Settings:"
+            font        = "font:MediumBoldSystemFont" >
+                
+            <LabelList
+                id                      = "settingsLabelList"
+                translation             = "[0, 75]"
+                itemSize                = "[720, 60]"
+                itemSpacing             = "[0,30]"
+                color                   = "#808080"
+                vertFocusAnimationStyle = "floatingFocus"
+            />
+            
+            <Rectangle 
+                id          = "infoRectangle" 
+                translation = "[825, 39]" 
+                height      = "735" 
+                width       = "900" 
+                color       = "#606060" >
+
+                <Label 
+                    id          = "infoLabel" 
+                    translation = "[24, 24]" 
+                    height      = "690" 
+                    width       = "870" 
+                    wrap        = "true"
+                    color       = "#F8F8F8"
+                    font        = "font:SmallSystemFont"
+                />
+  
+                <RadioButtonList
+                    id          = "settingSubList"
+                    visible     = "false"
+                    itemSize    = "[654,60]"
+                    translation = "[160, 264]"
+                />
+
+                <Label
+                    id          = "albumDirections"
+                    translation = "[550, 670]" 
+                    color       = "#F8F8F8"
+                    text        = "Album Selection   >"
+                    font        = "font:SmallSystemFont"
+                    visible     = "false"
+                />
+                    
+                <CheckList
+                    id          = "albumSelection"
+                    translation = "[125, 315]"
+                    itemSize    = "[654,60]"
+                    numRows     = "5"
+                    visible     = "false"
+                />
+
+                <LoadingIndicator
+                    id          = "loadingSpinner"
+                    translation = "[380,350]"
+                    visible     = "false"
+                />
+
+                <Label 
+                    id          = "infoTempSetting" 
+                    translation = "[60, 645]" 
+                    color       = "#F8F8F8"
+                    font        = "font:SmallSystemFont"
+                />
+                
+            </Rectangle>
+        </Label>
+
+        <Label
+            id          = "aboutVersion"
+            translation = "[1400, 1020]" 
+            color       = "#808080"
+            font        = "font:SmallestBoldSystemFont"
+            visible     = "false"
+        />
+                
+        <PinDialog 
+            id          = "pinPad" 
+            title       = "Custom Delay (Seconds)"
+            visible     = "false"
+        />
+        
+        <Dialog
+            id      = "confirmDialog"
+            title   = "Please Confirm"
+            visible = "false"
+        />
+        
+        <Dialog
+            id      = "noticeDialog"
+            title   = "Error"
+            visible = "false"
+        />
+  
+  </children>
+</component>
