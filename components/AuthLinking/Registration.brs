@@ -321,7 +321,7 @@ End Sub
 Function onKeyEvent(key as String, press as Boolean) as Boolean
     if press then
         print "KEY (reg): "; key
-        if key = "OK"
+        if key = "OK" or key = "back"
             if (m.screenActive <> invalid) and (m.screenActive.id = "AboutChannel")
                 m.top.removeChild(m.screenActive)
                 m.screenActive = invalid
