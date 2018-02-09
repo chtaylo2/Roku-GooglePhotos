@@ -11,7 +11,7 @@ Sub init()
     m.top.backgroundColor = "#EBEBEB"
     m.top.setFocus(true)
 
-    m.itemOverhang = m.top.findNode("itemOverhang")
+    m.itemOverhang  = m.top.findNode("itemOverhang")
 
     device = CreateObject("roDeviceInfo")
     ds = device.GetDisplaySize()
@@ -122,13 +122,13 @@ End function
 Function onKeyEvent(key as String, press as Boolean) as Boolean
     if press then
         if key = "back"
-            if m.screenActive.id <> "Registration"
-                if (m.screenActive <> invalid)
-                    m.top.removeChild(m.screenActive)
-                    m.screenActive = invalid
-                    selectionLoad()
-                    return true
-                end if
+            if (m.screenActive <> invalid) and (m.screenActive.id = "UserSelection" or m.screenActive.id = "Registration")
+                return false
+            else if (m.screenActive <> invalid) and (m.screenActive.id <> "Registration")
+                m.top.removeChild(m.screenActive)
+                m.screenActive = invalid
+                selectionLoad()
+                return true
             else
                 return true
             end if
