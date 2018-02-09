@@ -74,6 +74,20 @@ Sub onItemSelected()
 End Sub
 
 
+Sub confirmUnregister(event as object)
+    if event.getData() = 0
+        'CONFIRM
+        print "CONFIRMED!"
+        print "TEST: "; m.screenActive
+        print m.top
+    else
+        'CANCEL
+        m.confirmDialog.visible = false
+        m.markupgrid.setFocus(true)
+    end if
+End Sub
+
+
 Function onKeyEvent(key as String, press as Boolean) as Boolean
     if press then
         if key = "back"        
@@ -81,16 +95,13 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
                 m.top.removeChild(m.screenActive)
                 m.screenActive = invalid
 
-                m.itemLabelMain3.text = "Chris Taylor • Main Menu"
-                m.markupgrid.visible = true
+                m.itemLabelMain3.text    = ""
+                m.markupgrid.visible     = true
                 m.itemLabelMain1.visible = true
                 m.itemLabelMain2.visible = true
                 m.markupgrid.setFocus(true)
                 
-                return true
-            else
-                'Once on MainMenu Screen, Stop Back Key 
-                return true
+                return false
             end if
         end if
     end if
