@@ -151,7 +151,13 @@ Sub handleGetAlbumImages(event as object)
         if rsp=invalid then
             errorMsg = "Unable to parse Google Photos API response. Exit the channel then try again later. Code: "+(response.code).toStr()+" - " +response.error
         else
-            m.imagesObject = googleImageListing(rsp.entry)
+            showall = 1
+            if ( m.albumsObject[m.albummarkupgrid.itemSelected].GetTitle() = "Google Photos Timeline" ) then
+                ' Remove any archived items from default store
+                showall = 0
+            end if
+
+            m.imagesObject = googleImageListing(rsp.entry, showall)
             googleDisplayImageMenu(m.albumsObject[m.albummarkupgrid.itemSelected], m.imagesObject)
         end if
     end if
