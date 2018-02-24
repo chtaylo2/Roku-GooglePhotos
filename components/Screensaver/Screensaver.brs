@@ -7,7 +7,7 @@
 
 Sub init()
 
-    m.UriHandler = createObject("roSGNode","Photo UrlHandler")
+    m.UriHandler = createObject("roSGNode","Content UrlHandler")
     m.UriHandler.observeField("albumList","handleGetScreensaverAlbumList")
     m.UriHandler.observeField("albumImages","handleGetScreensaverAlbumImages")
     m.UriHandler.observeField("refreshToken","handleRefreshToken")
