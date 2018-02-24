@@ -130,7 +130,7 @@ Sub onCheckAuth(event as object)
                     m.LoginTimer.duration = m.LoginTimer.duration + 2        ' Increase polling interval
                     status = -1    ' Retry
                 else
-                    m.errorMsg = "Json error response: [onCheckAuth] " + json.error
+                    errorMsg = "Json error response: [onCheckAuth] " + json.error
                     status = 1
                 end if
             else
@@ -232,7 +232,7 @@ Sub onStoreUser(event as object)
                             if m.userInfoEmail[i] = infoEmail and infoEmail<>"No email on file" then
                                 m.accessToken.Pop()
                                 m.refreshToken.Pop()
-                                m.errorMsg = "Account '"  + infoEmail + " is already linked to device"
+                                errorMsg = "Account '"  + infoEmail + " is already linked to device"
                                 status = 1
                             end if
                         end for
