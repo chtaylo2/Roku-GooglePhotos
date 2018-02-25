@@ -8,10 +8,13 @@
 Sub init()
     m.ImageGrid      = m.top.findNode("ImageGrid")
     m.itemLabelMain1 = m.top.findNode("itemLabelMain1")
+    m.itemLabelMain2 = m.top.findNode("itemLabelMain2")
     m.VideoPlayer    = m.top.findNode("VideoPlayer")
     
     m.regStore = "positions"
     m.regSection = "VideoStatus"
+    
+    m.itemLabelMain2.font.size = 25
     
     m.top.observeField("content","loadImageList")
 End Sub
@@ -24,10 +27,23 @@ Sub loadImageList()
 End Sub
 
 
+Sub onItemFocused()
+    'Item selected
+    'print "FOCUSED: "; m.ImageGrid.itemFocused
+    
+    if (m.top.metaData[m.ImageGrid.itemFocused].timestamp <> invalid) then
+        mypath = CreateObject("roPath", m.top.metaData[m.ImageGrid.itemFocused].thumbnail)
+        fileObj = myPath.Split()   
+    
+        timestamp = friendlyDate(strtoi(m.top.metaData[m.ImageGrid.itemFocused].timestamp))
+        m.itemLabelMain2.text = fileObj.filename.DecodeUri() + " - " + timestamp
+    end if
+End Sub
+
+
 Sub onItemSelected()
     'Item selected
     'print "SELECTED: "; m.ImageGrid.itemSelected
-    'print "ID: "; m.top.id
     
     if m.top.id = "GP_IMAGE_BROWSE" then
         m.screenActive              = createObject("roSGNode", "DisplayPhotos")
