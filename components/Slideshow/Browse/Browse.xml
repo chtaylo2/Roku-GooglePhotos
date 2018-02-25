@@ -8,6 +8,7 @@
         <field id = "content" type = "node" />
         <field id = "metaData" type = "array" />
         <field id = "itemSelected" type = "node" alias = "ImageGrid.itemSelected" onChange = "onItemSelected" />
+        <field id = "itemFocused" type = "node" alias = "ImageGrid.itemFocused" onChange = "onItemFocused" />
     </interface>
   
     <script type = "text/brightscript" uri = "pkg:/components/SlideShow/Browse/Browse.brs" />
@@ -22,6 +23,15 @@
            font        = "font:SmallBoldSystemFont"
            color       = "#808080"
            translation = "[150,240]"
+        />
+        
+        <Label
+           id          = "itemLabelMain2"
+           horizAlign  = "right"
+           vertAlign   = "top"
+           color       = "#808080"
+           translation = "[150,247]"
+           width       = "1650"
         />
     
         <PosterGrid
