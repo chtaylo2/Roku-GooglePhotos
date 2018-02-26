@@ -122,7 +122,7 @@ End function
 Function onKeyEvent(key as String, press as Boolean) as Boolean
     if press then
         if key = "back"
-            if (m.screenActive <> invalid) and (m.screenActive.id = "UserSelection" or m.screenActive.id = "Registration")
+            if (m.screenActive <> invalid) and (m.screenActive.id = "UserSelection" or m.screenActive.id = "Registration" or m.screenActive.id = "FeaturesPopup")
                 return false
             else if (m.screenActive <> invalid) and (m.screenActive.id <> "Registration")
                 m.top.removeChild(m.screenActive)
