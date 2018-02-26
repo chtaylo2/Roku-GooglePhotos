@@ -31,10 +31,10 @@ Sub init()
     
     'Node 1 adjustments
         tmpStart = []
-        tmpStart.Push(75)
+        tmpStart.Push(50)
         tmpStart.Push(1095)
-        m.scroll_node_1.loadWidth           = 225
-        m.scroll_node_1.loadHeight          = 225
+        m.scroll_node_1.loadWidth           = 291
+        m.scroll_node_1.loadHeight          = 291
         m.scroll_node_1.imageTranslation    = tmpStart
         m.scroll_node_1.ventorTranslation   = "[["+str(tmpStart[0])+","+str(tmpStart[1])+"],["+str(tmpStart[0])+","+str(endPoint)+"]]"
             
@@ -51,8 +51,8 @@ Sub init()
         tmpStart = []
         tmpStart.Push(1314)
         tmpStart.Push(1095)
-        m.scroll_node_3.loadWidth           = 225
-        m.scroll_node_3.loadHeight          = 225
+        m.scroll_node_3.loadWidth           = 291
+        m.scroll_node_3.loadHeight          = 291
         m.scroll_node_3.imageTranslation    = tmpStart
         m.scroll_node_3.ventorTranslation   = "[["+str(tmpStart[0])+","+str(tmpStart[1])+"],["+str(tmpStart[0])+","+str(endPoint)+"]]"
                 
