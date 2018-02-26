@@ -5,16 +5,12 @@
     <interface>
         <field id = "content" type = "array" />
         <field id = "loaded"  type = "boolean" />
-        <field id = "loadingvisible" type = "node" alias = "Loading.visible" />
-        <field id = "loadingtext" type = "node" alias = "Loading.text" />
     </interface>
 
     <script type = "text/brightscript" uri = "pkg:/components/SlideShow/DisplayPhotos/MultiScroll/MultiScroll.brs" />
 
     <children>
-        
-        <Label id="Loading" translation="[0,0]" font="font:MediumBoldSystemFont" text="" horizAlign = "center" vertAlign = "center" visible="false" />
-        
+
         <ScrollingImage id = "scroll_node_1" duration = "30" />
         <ScrollingImage id = "scroll_node_2" duration = "26" />
         <ScrollingImage id = "scroll_node_3" duration = "32" />
