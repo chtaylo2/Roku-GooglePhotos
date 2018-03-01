@@ -113,6 +113,7 @@ Function addRequest(request as Object) as Boolean
     return true
 End Function
 
+
 Sub processResponse(msg as Object)
     print "UrlHandler.brs - [processResponse]"
     idKey = stri(msg.GetSourceIdentity()).trim()
@@ -139,23 +140,22 @@ Sub processResponse(msg as Object)
         m.jobsById.delete(idKey)
         job.context.context.response = result
         if result.num = 0
-            m.top.albumList = job.context.context.response
+            m.top.albumList           = job.context.context.response
         else if result.num = 1
-            m.top.albumImages = job.context.context.response
+            m.top.albumImages         = job.context.context.response
         else if result.num = 2
-            m.top.refreshToken = job.context.context.response
+            m.top.refreshToken        = job.context.context.response
         else if result.num = 3
-            m.top.searchResult = job.context.context.response
+            m.top.searchResult        = job.context.context.response
+        else if result.num = 4
+            m.top.gen_token_response  = job.context.context.response
+        else if result.num = 5
+            m.top.poll_token_response = job.context.context.response
+        else if result.num = 6
+            m.top.userinfo_response   = job.context.context.response
         end if
     else
         print "Error: event for unknown job "; idkey
     end if
     print "--------------------------------------------------------------------------"
-End Sub
-
-
-Sub provideResponse(job as object)
-    print "UrlHandler.brs - [parseGenToken]"
-    result = job.context.context.response
-    m.top.response = result
 End Sub

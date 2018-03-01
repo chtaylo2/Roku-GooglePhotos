@@ -2,9 +2,6 @@
 
 <component name = "Search" extends = "Group" initialFocus = "miniKeyboard" >
 
-    <interface>
-    </interface>
-
     <script type = "text/brightscript" uri = "pkg:/components/Search/Search.brs" />
     <script type = "text/brightscript" uri = "pkg:/components/SlideShow/SlideshowHelper.brs" />
     <script type = "text/brightscript" uri = "pkg:/components/Utils/Common.brs" />

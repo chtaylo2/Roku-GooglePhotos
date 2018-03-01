@@ -19,7 +19,7 @@ Sub init()
     
     m.Row4.font.size = 65
     
-    m.UriHandler = createObject("roSGNode","Authlinking UrlHandler")
+    m.UriHandler = createObject("roSGNode","Content UrlHandler")
     m.UriHandler.observeField("gen_token_response","onNewToken")
     m.LoginTimer.observeField("fire","onCheckAuth")
     m.stopScanning.observeField("fire","onStopScanningTrigger")
@@ -47,7 +47,7 @@ Sub doGenerateToken()
     params = "client_id="        + m.clientId
     params = params + "&scope="  + m.oauth_scope
 
-    makeRequest({}, m.oauth_prefix+"/device/code", "POST", params, 0, [])
+    makeRequest({}, m.oauth_prefix+"/device/code", "POST", params, 4, [])
 End Sub
 
 
@@ -56,7 +56,7 @@ Sub doQueryUserInfo()
 
     m.UriHandler.observeField("userinfo_response","onStoreUser")
     userIndex = m.accessToken.Count()-1
-    makeRequest({}, "https://www.googleapis.com/oauth2/v3/userinfo?access_token="+m.accessToken[userIndex], "GET", "", 2, [])
+    makeRequest({}, "https://www.googleapis.com/oauth2/v3/userinfo?access_token="+m.accessToken[userIndex], "GET", "", 6, [])
 End Sub
 
 
@@ -130,7 +130,7 @@ Sub onCheckAuth(event as object)
                     m.LoginTimer.duration = m.LoginTimer.duration + 2        ' Increase polling interval
                     status = -1    ' Retry
                 else
-                    m.errorMsg = "Json error response: [onCheckAuth] " + json.error
+                    errorMsg = "Json error response: [onCheckAuth] " + json.error
                     status = 1
                 end if
             else
@@ -176,7 +176,7 @@ Sub onCheckAuth(event as object)
         params = params + "&code="            + m.deviceCode
         params = params + "&grant_type="      + "http://oauth.net/grant_type/device/1.0"
     
-        makeRequest({}, m.oauth_prefix+"/token", "POST", params, 1, [])
+        makeRequest({}, m.oauth_prefix+"/token", "POST", params, 5, [])
 
         m.LoginTimer.repeat = true
         m.LoginTimer.control = "start"
@@ -232,7 +232,7 @@ Sub onStoreUser(event as object)
                             if m.userInfoEmail[i] = infoEmail and infoEmail<>"No email on file" then
                                 m.accessToken.Pop()
                                 m.refreshToken.Pop()
-                                m.errorMsg = "Account '"  + infoEmail + " is already linked to device"
+                                errorMsg = "Account '"  + infoEmail + " is already linked to device"
                                 status = 1
                             end if
                         end for

@@ -160,7 +160,7 @@ End Function
 ' **
 ' ********************************************************************
 
-Function googleImageListing(xmllist As Object, showall=0 as Integer) As Object
+Function googleImageListing(xmllist As Object, showall=1 as Integer) As Object
     images=CreateObject("roList")
     for each record in xmllist
         image=googleImageCreateRecord(record)

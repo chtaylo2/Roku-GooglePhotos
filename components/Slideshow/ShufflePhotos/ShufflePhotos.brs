@@ -7,7 +7,7 @@
 
 Sub init()
 
-    m.UriHandler = createObject("roSGNode","Photo UrlHandler")
+    m.UriHandler = createObject("roSGNode","Content UrlHandler")
     m.UriHandler.observeField("albumList","handleGetAlbumList")
     m.UriHandler.observeField("albumImages","handleGetAlbumImages")
     m.UriHandler.observeField("refreshToken","handleRefreshToken")
@@ -155,9 +155,9 @@ Sub handleGetAlbumImages(event as object)
                 tmp.timestamp = image.GetTimestamp()
                 
                 if image.IsVideo() then
-                    print "Ignore: "; image.GetURL()
+                    'print "Ignore: "; image.GetURL()
                 else
-                    print "Push: "; image.GetURL()
+                    'print "Push: "; image.GetURL()
                     m.photoItems.Push(tmp)
                 end if    
             end for

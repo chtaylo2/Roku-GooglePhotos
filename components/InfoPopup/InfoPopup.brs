@@ -47,8 +47,9 @@ Sub setFeaturesText()
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "3. New menu layout plus many other new features."
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "4. New screensaver options, including album selection!"
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + chr(10) + "Bug fixes:"
-    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "   - No bugs to report"
-    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + chr(10) + "Thank you for using the PhotoView Channel. Please remember to rate us!"
+    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "   - Filenames have been added to image browse screen."
+    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "   - Archived items not shown in albums or search. Other minor bugs"
+    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + chr(10) + "Thank you for using the PhotoView Channel."
 
     'Write reg entry to we don't redisplay
     RegWrite("FeaturePopup", m.releaseVersion, "Settings")
