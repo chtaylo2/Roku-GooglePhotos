@@ -17,6 +17,7 @@ Sub init()
     m.PauseScreen               = m.top.findNode("PauseScreen")
     m.pauseImageCount           = m.top.findNode("pauseImageCount")
     m.pauseImageDetail          = m.top.findNode("pauseImageDetail")
+    m.pauseImageDetail2         = m.top.findNode("pauseImageDetail2")
     m.RotationTimer             = m.top.findNode("RotationTimer")
     m.DownloadTimer             = m.top.findNode("DownloadTimer")
     m.Watermark                 = m.top.findNode("Watermark")
@@ -28,6 +29,8 @@ Sub init()
     m.imageDisplay              = []
     m.imageTracker              = -1
     m.imageOnScreen             = ""
+    
+    m.pauseImageDetail2.font.size = 25
     
     m.PrimaryImage.observeField("loadStatus","onPrimaryLoadedTrigger")
     m.SecondaryImage.observeField("loadStatus","onSecondaryLoadedTrigger")
@@ -369,8 +372,12 @@ Sub sendNextImage(direction=invalid)
         end if
     end if
     
-    m.pauseImageCount.text  = itostr(nextID+1)+" of "+itostr(m.imageDisplay.Count())
-    m.pauseImageDetail.text = friendlyDate(strtoi(m.imageDisplay[nextID].timestamp))
+    mypath = CreateObject("roPath", m.imageDisplay[nextID].url)
+    fileObj = myPath.Split()
+    
+    m.pauseImageCount.text   = itostr(nextID+1)+" of "+itostr(m.imageDisplay.Count())
+    m.pauseImageDetail.text  = friendlyDate(strtoi(m.imageDisplay[nextID].timestamp))
+    m.pauseImageDetail2.text = fileObj.filename.DecodeUri()
     
     'Stop rotating if only 1 image album
     if m.imageDisplay.Count() = 1 then
