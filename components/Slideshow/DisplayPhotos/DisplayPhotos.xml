@@ -180,14 +180,25 @@
          
             <Label 
                id           = "pauseImageDetail" 
-               height       = "150" 
+               height       = "100" 
                width        = "1920"
                horizAlign   = "center"
                vertAlign    = "center"
                color        = "#eaeaea"
                font         = "font:MediumSystemFont"
-               translation  = "[ 0, 0 ]"
-            />
+               translation  = "[ 0, 0 ]" >
+            
+                <Label 
+                   id           = "pauseImageDetail2" 
+                   height       = "100" 
+                   width        = "1920"
+                   horizAlign   = "center"
+                   vertAlign    = "center"
+                   color        = "#eaeaea"
+                   translation  = "[ 0, 55 ]"
+                />
+                
+            </Label>
       
         </Rectangle>
 
