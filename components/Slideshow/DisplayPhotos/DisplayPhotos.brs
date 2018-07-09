@@ -422,16 +422,20 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
             print "RIGHT"
             sendNextImage("next")
             onDownloadTigger({})
-            m.RotationTimer.control = "stop"
-            m.DownloadTimer.control = "stop"
-            m.PauseScreen.visible   = "true"
+            if m.RotationTimer.control = "start"
+                m.RotationTimer.control = "stop"
+                m.DownloadTimer.control = "stop"
+                m.PauseScreen.visible   = "true"
+            end if
             return true
         else if key = "left" or key = "rewind"
             print "LEFT"
             sendNextImage("previous")
-            m.RotationTimer.control = "stop"
-            m.DownloadTimer.control = "stop"
-            m.PauseScreen.visible   = "true"
+            if m.RotationTimer.control = "start"
+                m.RotationTimer.control = "stop"
+                m.DownloadTimer.control = "stop"
+                m.PauseScreen.visible   = "true"
+            end if
             return true
         else if (key = "play" or key = "OK") and m.RotationTimer.control = "start"
             print "PAUSE"
