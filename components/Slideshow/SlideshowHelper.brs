@@ -180,6 +180,7 @@ Function googleImageCreateRecord(xml As Object) As Object
     image.xml=xml
     image.GetTitle=function():return m.xml.GetNamedElements("title")[0].GetText():end function
     image.GetID=function():return m.xml.GetNamedElements("gphoto:id")[0].GetText():end function
+    image.GetDescription=function():return m.xml.GetNamedElements("media:group")[0].GetNamedElements("media:description")[0].GetText():end function
     image.GetURL=get_image_url
     image.GetThumb=get_thumb
     image.GetTimestamp=function():return Left(m.xml.GetNamedElements("gphoto:timestamp")[0].GetText(), 10):end function

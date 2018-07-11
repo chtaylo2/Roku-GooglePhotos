@@ -174,27 +174,26 @@
                 horizAlign  = "right"
                 vertAlign   = "top"
                 color       = "#eaeaea"
-                font        = "font:SmallSystemFont"
-                translation = "[ 0, 24 ]"
+                translation = "[ 0, 18 ]"
             />
          
             <Label 
                id           = "pauseImageDetail" 
-               height       = "100" 
-               width        = "1920"
+               height       = "90" 
+               width        = "1880"
                horizAlign   = "center"
                vertAlign    = "center"
                color        = "#eaeaea"
-               font         = "font:MediumSystemFont"
-               translation  = "[ 0, 0 ]" >
+               translation  = "[ 50, 0 ]" >
             
                 <Label 
                    id           = "pauseImageDetail2" 
                    height       = "100" 
-                   width        = "1920"
+                   width        = "1880"
                    horizAlign   = "center"
                    vertAlign    = "center"
                    color        = "#eaeaea"
+                   wrap         = "true"
                    translation  = "[ 0, 55 ]"
                 />
                 
