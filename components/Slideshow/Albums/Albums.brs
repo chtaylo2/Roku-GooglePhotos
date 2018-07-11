@@ -372,10 +372,11 @@ Sub googleDisplayImageMenu(album As Object, imageList As Object)
     m.videosMetaData=[]
     m.imagesMetaData=[]
     for each media in imageList
-        tmp           = {}
-        tmp.url       = media.GetURL()
-        tmp.thumbnail = media.GetThumb()
-        tmp.timestamp = media.GetTimestamp()
+        tmp             = {}
+        tmp.url         = media.GetURL()
+        tmp.thumbnail   = media.GetThumb()
+        tmp.timestamp   = media.GetTimestamp()
+        tmp.description = media.GetDescription()
         
         if media.IsVideo() then
             m.videosMetaData.Push(tmp)

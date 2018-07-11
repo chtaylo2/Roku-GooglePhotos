@@ -30,6 +30,8 @@ Sub init()
     m.imageTracker              = -1
     m.imageOnScreen             = ""
     
+    m.pauseImageCount.font.size   = 29
+    m.pauseImageDetail.font.size  = 29
     m.pauseImageDetail2.font.size = 25
     
     m.PrimaryImage.observeField("loadStatus","onPrimaryLoadedTrigger")
@@ -377,7 +379,12 @@ Sub sendNextImage(direction=invalid)
     
     m.pauseImageCount.text   = itostr(nextID+1)+" of "+itostr(m.imageDisplay.Count())
     m.pauseImageDetail.text  = friendlyDate(strtoi(m.imageDisplay[nextID].timestamp))
-    m.pauseImageDetail2.text = fileObj.filename.DecodeUri()
+    
+    if m.imageDisplay[nextID].description <> "" then
+        m.pauseImageDetail2.text = m.imageDisplay[nextID].description + " - " + fileObj.filename.DecodeUri()
+    else
+        m.pauseImageDetail2.text = fileObj.filename.DecodeUri()
+    end if
     
     'Stop rotating if only 1 image album
     if m.imageDisplay.Count() = 1 then
