@@ -33,7 +33,32 @@
            translation = "[150,247]"
            width       = "1650"
         />
-    
+
+        <Group
+            id          = "settingsIcon"
+            translation = "[1620,174]"
+            visible     = "true" >
+            
+            <Label
+                id          = "settingsIconText"
+                font        = "font:SmallBoldSystemFont"
+                color       = "#808080"
+                horizAlign  = "right"
+                text        = "Settings"
+                vertAlign   = "top"
+                translation = "[ 0, 2 ]"
+            />
+            
+            <Poster 
+                id          = "settingIconImage"
+                width       = "35"
+                height      = "35"
+                translation = "[ 140, 0 ]"
+                uri         = "pkg:/images/asterisk.png"
+            />
+            
+        </Group>
+        
         <PosterGrid
             id                    = "ImageGrid"
             itemSpacing           = "[30, 30]"

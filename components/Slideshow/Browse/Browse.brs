@@ -9,13 +9,17 @@ Sub init()
     m.ImageGrid      = m.top.findNode("ImageGrid")
     m.itemLabelMain1 = m.top.findNode("itemLabelMain1")
     m.itemLabelMain2 = m.top.findNode("itemLabelMain2")
+    m.settingsIcon   = m.top.findNode("settingsIcon")
     m.VideoPlayer    = m.top.findNode("VideoPlayer")
     
     m.regStore = "positions"
     m.regSection = "VideoStatus"
     
     m.itemLabelMain2.font.size = 25
+    m.videoPlayingindex = 0
     
+    m.showVideoPlayback = RegRead("VideoContinuePlay", "Settings")
+        
     m.top.observeField("content","loadImageList")
 End Sub
 
@@ -52,7 +56,12 @@ Sub onItemSelected()
         m.top.appendChild(m.screenActive)
         m.screenActive.setFocus(true)
         
-    else if m.top.id = "GP_VIDEO_BROWSE" then        
+    else if m.top.id = "GP_VIDEO_BROWSE" then
+    
+        'Check any Temporary settings
+        if m.global.VideoContinuePlay <> "" m.showVideoPlayback = m.global.VideoContinuePlay
+    
+        m.videoPlayingindex = m.ImageGrid.itemSelected
         doVideoShow(m.top.metaData[m.ImageGrid.itemSelected])
     end if
 End Sub
@@ -90,11 +99,19 @@ End Sub
 Sub onVideoStateChange()
     print "Browse.brs - [onVideoStateChange]"
     if (m.VideoPlayer.state = "error") or (m.VideoPlayer.state = "finished") then
-        'Close video screen!
         writeVideoPosition(0)
-        m.VideoPlayer.visible = false
-        m.ImageGrid.setFocus(true)
         m.VideoPlayer.unobserveField("state")
+        
+        m.videoPlayingindex = m.videoPlayingindex+1
+        if (m.top.metaData[m.videoPlayingindex]=invalid) m.videoPlayingindex = 0
+        if (m.top.metaData[m.videoPlayingindex]<>invalid) and (m.showVideoPlayback = "Continuous Video Playback")
+            'Continue playing the next video inline
+            doVideoShow(m.top.metaData[m.videoPlayingindex])
+        else
+            'Close video screen
+            m.VideoPlayer.visible = false
+            m.ImageGrid.setFocus(true)
+        end if
     end if
 End Sub
 
@@ -152,12 +169,40 @@ Sub writeVideoPosition(position as integer)
 End Sub
 
 
+Sub hideMarkupGrid()
+    m.ImageGrid.visible       = false
+    m.itemLabelMain1.visible  = false
+    m.itemLabelMain2.visible  = false
+    m.settingsIcon.visible    = false
+End Sub
+
+
+Sub showMarkupGrid()
+    m.ImageGrid.visible       = true
+    m.itemLabelMain1.visible  = true
+    m.itemLabelMain2.visible  = true
+    m.settingsIcon.visible    = true
+End Sub
+
+
+Sub showTempSetting()
+    hideMarkupGrid()
+    m.screenActive              = createObject("roSGNode", "Settings")
+    m.screenActive.contentFile  = "settingsTemporaryContent"
+    m.screenActive.id           = "settings"
+    m.screenActive.loaded       = true
+    m.top.appendChild(m.screenActive)
+    m.screenActive.setFocus(true)
+End Sub
+
+
 Function onKeyEvent(key as String, press as Boolean) as Boolean
     if press then
         if key = "back"
             if (m.screenActive <> invalid)
                 m.top.removeChild(m.screenActive)
                 m.screenActive = invalid
+                showMarkupGrid()
                 m.ImageGrid.setFocus(true)
                 return true
             else if (m.VideoPlayer.visible = true)
@@ -168,6 +213,9 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
                 writeVideoPosition(m.VideoPlayer.position)
                 return true
             end if
+        else if (key = "options") and (m.screenActive = invalid)
+            showTempSetting()
+            return true
         end if 
     end if
 

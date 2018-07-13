@@ -162,6 +162,7 @@ Sub setLists()
     storeDisplayOptions()
     storeDelayOptions()
     storeOrder()
+    storeVideoOptions()
 
     'Populate primary list content
     m.settingsList.content = m.readContentTask.content
@@ -304,6 +305,30 @@ Sub storeOrder()
 End Sub
 
 
+Sub storeVideoOptions()
+    'Populate Video playback options
+
+    if m.setScope = "screensaver"
+        regStore = "SSaverVideo"
+    else
+        regStore = "VideoContinuePlay"
+    end if
+    
+    radioSelection = 0
+    regSelection = RegRead(regStore, "Settings")
+
+    m.content = createObject("RoSGNode","ContentNode")
+    if regSelection = "Single Video Playback" then radioSelection = 0
+    addItem(m.content, "Single Video Playback (Default)", "Single Video Playback", regStore)
+    if regSelection = "Continuous Video Playback" then radioSelection = 1
+    addItem(m.content, "Continuous Video Playback", "Continuous Video Playback", regStore)
+    
+    'Store content node and current registry selection
+    m.settingsVideo = m.content
+    m.settingsVideocheckedItem = radioSelection
+End Sub
+
+
 Sub storeLinkedUsers()
     'Populate linked user list
     
@@ -379,6 +404,15 @@ Sub showfocus()
             m.settingSubList.checkedItem    = m.settingsOrdercheckedItem
             m.settingSubList.translation    = [129, itemcontent.x]
         else if m.settingsList.itemFocused = 4 then
+            if m.setScope <> "screensaver"
+                m.settingSubList.visible        = "true"
+                m.settingSubList.content        = m.settingsVideo
+                m.settingSubList.checkedItem    = m.settingsVideocheckedItem
+                m.settingSubList.translation    = [129, itemcontent.x]
+            else
+                m.settingSubList.visible        = "false"
+            end if
+        else if m.settingsList.itemFocused = 5 then
             if m.setScope = "screensaver"
                 m.albumDirections.visible       = "true"
                 m.settingSubList.visible        = "true"
@@ -388,9 +422,9 @@ Sub showfocus()
             else
                 m.settingSubList.visible        = "false"
             end if
-        else if m.settingsList.itemFocused = 5 then
-            m.settingSubList.visible        = "false"
         else if m.settingsList.itemFocused = 6 then
+            m.settingSubList.visible        = "false"
+        else if m.settingsList.itemFocused = 7 then
             m.settingSubList.visible        = "false"
             m.aboutVersion.visible          = "true"
         end if
@@ -407,16 +441,16 @@ Sub showselected()
             m.settingSubList.setFocus(true)
         end if    
     else
-        if m.settingsList.itemSelected = 0 OR m.settingsList.itemSelected = 1 OR m.settingsList.itemSelected = 2 OR m.settingsList.itemSelected = 3 then
+        if m.settingsList.itemSelected = 0 OR m.settingsList.itemSelected = 1 OR m.settingsList.itemSelected = 2 OR m.settingsList.itemSelected = 3 OR m.settingsList.itemSelected = 4 then
             'SETTINGS
             m.settingSubList.setFocus(true)
-        else if m.settingsList.itemSelected = 4 then
+        else if m.settingsList.itemSelected = 5 then
             'REGISTER NEW USER
             m.screenActive = createObject("roSGNode", "Registration")
             m.top.appendChild(m.screenActive)
             m.screenActive.setFocus(true)
             m.settingScopeLabel.visible = false
-        else if m.settingsList.itemSelected = 5 then
+        else if m.settingsList.itemSelected = 6 then
             'UNREGISTER USER
             m.confirmDialog.visible = true
             buttons                 =  [ "Confirm", "Cancel" ]
@@ -462,7 +496,8 @@ Sub showsubselected()
     if m.settingsList.itemSelected = 1 then m.settingsDisplaycheckedItem = m.settingSubList.itemSelected
     if m.settingsList.itemSelected = 2 then m.settingsDelaycheckedItem   = m.settingSubList.itemSelected
     if m.settingsList.itemSelected = 3 then m.settingsOrdercheckedItem   = m.settingSubList.itemSelected
-    if m.settingsList.itemSelected = 4 then m.settingsUserscheckedItem   = m.settingSubList.itemSelected    
+    if m.settingsList.itemSelected = 4 then m.settingsVideocheckedItem   = m.settingSubList.itemSelected    
+    if m.settingsList.itemSelected = 5 then m.settingsUserscheckedItem   = m.settingSubList.itemSelected    
 End Sub
 
 

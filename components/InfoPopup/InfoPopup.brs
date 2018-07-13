@@ -42,7 +42,7 @@ End Sub
 Sub setFeaturesText()
 
     m.itemLabelHeader.text = "New Channel Features"
-    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "1. This channel has been rewritten from the ground up, to support Roku's ScreneGraph features."
+    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "1. Videos will continue "
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "2. New options when viewing slideshows including multi-scrolling images, fading photos and background blurs."
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "3. New menu layout plus many other new features."
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "4. New screensaver options, including album selection!"

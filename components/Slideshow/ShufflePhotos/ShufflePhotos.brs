@@ -151,8 +151,9 @@ Sub handleGetAlbumImages(event as object)
             
             for each image in imagesObject
                 tmp = {}
-                tmp.url       = image.GetURL()
-                tmp.timestamp = image.GetTimestamp()
+                tmp.url         = image.GetURL()
+                tmp.timestamp   = image.GetTimestamp()
+                tmp.description = image.GetDescription()
                 
                 if image.IsVideo() then
                     'print "Ignore: "; image.GetURL()

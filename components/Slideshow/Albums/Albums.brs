@@ -570,11 +570,7 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
                 m.top.removeChild(m.screenActive)
                 showMarkupGrid()
                 m.screenActive = invalid
-                
-                if (m.albummarkupgrid.content.getChild(0).id = "GP_SLIDESHOW_START")
-                    m.settingsIcon.visible = true
-                end if
-                
+                m.settingsIcon.visible = true
                 return true
             end if      
 
@@ -589,7 +585,7 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
                 return true
             end if
             
-        else if (key = "options") and (m.screenActive = invalid) and (m.albummarkupgrid.content.getChild(0).id = "GP_SLIDESHOW_START")
+        else if (key = "options") and (m.screenActive = invalid) and (m.albummarkupgrid.content.getChild(0).id = "GP_SLIDESHOW_START" or m.albummarkupgrid.content.getChild(0).id = "GP_VIDEO_BROWSE")
             showTempSetting()
             return true
             

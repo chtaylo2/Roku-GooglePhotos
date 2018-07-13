@@ -18,7 +18,7 @@ Sub showGooglePhotosScreen()
     scene    = screen.CreateScene("GooglePhotosMainScene")
     m.global = screen.getGlobalNode()
  
-    m.global.addFields( {SlideshowRes: "", SlideshowDisplay: "", SlideshowDelay: "", SlideshowOrder: ""} )
+    m.global.addFields( {SlideshowRes: "", SlideshowDisplay: "", SlideshowDelay: "", SlideshowOrder: "", VideoContinuePlay: ""} )
     m.global.addFields( {selectedUser: -1} )
 
     screen.setMessagePort(port)    
