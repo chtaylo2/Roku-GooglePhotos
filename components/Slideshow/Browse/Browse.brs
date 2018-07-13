@@ -182,6 +182,8 @@ Sub showMarkupGrid()
     m.itemLabelMain1.visible  = true
     m.itemLabelMain2.visible  = true
     m.settingsIcon.visible    = true
+    
+    m.ImageGrid.setFocus(true)
 End Sub
 
 
@@ -203,7 +205,6 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
                 m.top.removeChild(m.screenActive)
                 m.screenActive = invalid
                 showMarkupGrid()
-                m.ImageGrid.setFocus(true)
                 return true
             else if (m.VideoPlayer.visible = true)
                 m.VideoPlayer.control = "stop"
@@ -215,6 +216,12 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
             end if
         else if (key = "options") and (m.screenActive = invalid)
             showTempSetting()
+            return true
+        else if ((key = "options") or (key = "left")) and (m.screenActive <> invalid) and (m.screenActive.id = "settings")
+            m.top.removeChild(m.screenActive)
+            showMarkupGrid()
+            m.screenActive          = invalid
+            m.settingsIcon.visible  = true
             return true
         end if 
     end if

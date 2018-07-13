@@ -42,13 +42,12 @@ End Sub
 Sub setFeaturesText()
 
     m.itemLabelHeader.text = "New Channel Features"
-    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "1. Videos will continue "
-    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "2. New options when viewing slideshows including multi-scrolling images, fading photos and background blurs."
-    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "3. New menu layout plus many other new features."
-    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "4. New screensaver options, including album selection!"
+    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "1. Continuous Video playback! Allows continuous looping of videos without having to manually hit play. Enable in settings."
+    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "2. Photo captions are now viewable during slideshow playback. See Tips and Tricks."
+    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "3. TIP: Screensaver can show specific albums. See 'Linked Users' in screensaver options."
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + chr(10) + "Bug fixes:"
-    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "   - Filenames have been added to image browse screen."
-    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "   - Archived items not shown in albums or search. Other minor bugs"
+    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "   - Space in search caused an error"
+    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "   - Other minor bugs"
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + chr(10) + "Thank you for using the PhotoView Channel."
 
     'Write reg entry to we don't redisplay

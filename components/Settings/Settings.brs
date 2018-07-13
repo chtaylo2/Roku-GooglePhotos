@@ -436,7 +436,7 @@ Sub showselected()
 
     'Process item selected
     if m.setScope = "screensaver"
-        if m.settingsList.itemSelected = 0 OR m.settingsList.itemSelected = 1 OR m.settingsList.itemSelected = 2 OR m.settingsList.itemSelected = 3 OR m.settingsList.itemSelected = 4 then
+        if m.settingsList.itemSelected = 0 OR m.settingsList.itemSelected = 1 OR m.settingsList.itemSelected = 2 OR m.settingsList.itemSelected = 3 OR m.settingsList.itemSelected = 5 then
             'SETTINGS
             m.settingSubList.setFocus(true)
         end if    
@@ -576,7 +576,7 @@ End Sub
 Function onKeyEvent(key as String, press as Boolean) as Boolean
     if press then
         print "KEY: "; key
-        if (key = "options" or key = "right") and (m.settingSubList.hasFocus() = true) and (m.settingsList.itemFocused = 4)
+        if (key = "options" or key = "right") and (m.settingSubList.hasFocus() = true) and (m.settingsList.itemFocused = 5)
             'Select Linked User
             doGetAlbumSelection()
             m.settingSubList.itemSelected = m.settingSubList.itemFocused
