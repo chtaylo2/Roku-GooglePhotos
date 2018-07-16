@@ -291,8 +291,6 @@ Sub storeOrder()
     radioSelection = 0
     regSelection = RegRead(regStore, "Settings")
 
-print "TEST: "; regSelection
-
     m.content = createObject("RoSGNode","ContentNode")
     if regSelection = "Album Order" then radioSelection = 0
     addItem(m.content, "Album Order (Default)", "Album Order", regStore)
