@@ -110,17 +110,17 @@ Sub loadImageList()
     for i = 0 to m.top.content.Count()-1
     
         if m.top.startIndex <> -1 then
-            'If coming from browsing, only show in Newest-Oldest order
+            'If coming from browsing, only show in Album Order
             nxt = 0
         else
             if m.showOrder = "Random Order" then
                 'Create image display list - RANDOM
                 nxt = GetRandom(originalList)
-            else if m.showOrder = "Oldest to Newest"
-                'Create image display list - OLD FIRST
+            else if m.showOrder = "Reverse Album Order"
+                'Create image display list - REVERSE ALBUM ORDER
                 nxt = originalList.Count()-1
             else
-                'Create image display list - NEW FIRST
+                'Create image display list - ALBUM ORDER
                 nxt = 0
             end if 
         end if

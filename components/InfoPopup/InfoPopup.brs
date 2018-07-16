@@ -53,6 +53,19 @@ Sub setFeaturesText()
     'Write reg entry to we don't redisplay
     RegWrite("FeaturePopup", m.releaseVersion, "Settings")
     
+    'BEGIN
+    '' REMAP SLIDESHOW ORDER FOR VERSION 2.1 to 2.2 move.
+    '' FOR BACKWARDS COMPATIBILITY - CAN REMOVE IN NEXT VERSION
+    showOrder = RegRead("SlideshowOrder", "Settings")
+    if showOrder = "Newest to Oldest" RegWrite("SlideshowOrder", "Album Order", "Settings")
+    if showOrder = "Oldest to Newest" RegWrite("SlideshowOrder", "Reverse Album Order", "Settings")
+    saverOrder = RegRead("SSaverOrder", "Settings")
+    if saverOrder = "Newest to Oldest" RegWrite("SSaverOrder", "Album Order", "Settings")
+    if saverOrder = "Oldest to Newest" RegWrite("SSaverOrder", "Reverse Album Order", "Settings")
+    'END
+    
+    
+    
 End Sub
 
 

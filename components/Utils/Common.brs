@@ -13,7 +13,7 @@
 Function loadCommon()
     ' Common varables for needed for Oauth and GooglePhotos API
     
-    m.releaseVersion  = "2.2"
+    m.releaseVersion  = "2.2.1"
     m.gp_scope        = "https://picasaweb.google.com/data"
     m.gp_prefix       = m.gp_scope + "/feed/api/user/default"
     
@@ -67,7 +67,7 @@ Function loadDefaults()
     tmp = RegRead("SlideshowDelay", "Settings")
     if tmp=invalid RegWrite("SlideshowDelay", itostr(5), "Settings")
     tmp = RegRead("SlideshowOrder", "Settings")
-    if tmp=invalid RegWrite("SlideshowOrder", "Newest to Oldest", "Settings")
+    if tmp=invalid RegWrite("SlideshowOrder", "Album Order", "Settings")
     
     if is4k then
         tmp = RegRead("SSaverRes", "Settings")

@@ -291,11 +291,13 @@ Sub storeOrder()
     radioSelection = 0
     regSelection = RegRead(regStore, "Settings")
 
+print "TEST: "; regSelection
+
     m.content = createObject("RoSGNode","ContentNode")
-    if regSelection = "Newest to Oldest" then radioSelection = 0
-    addItem(m.content, "Newest to Oldest (Default)", "Newest to Oldest", regStore)
-    if regSelection = "Oldest to Newest" then radioSelection = 1
-    addItem(m.content, "Oldest to Newest", "Oldest to Newest", regStore)
+    if regSelection = "Album Order" then radioSelection = 0
+    addItem(m.content, "Album Order (Default)", "Album Order", regStore)
+    if regSelection = "Reverse Album Order" then radioSelection = 1
+    addItem(m.content, "Reverse Album Order", "Reverse Album Order", regStore)
     if regSelection = "Random Order" then radioSelection = 2
     addItem(m.content, "Random Order", "Random Order", regStore)
     

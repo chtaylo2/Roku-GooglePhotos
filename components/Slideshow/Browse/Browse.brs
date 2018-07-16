@@ -120,12 +120,12 @@ Sub onVideoStateChange()
             if m.showOrder = "Random Order" then
                 'Create image display list - RANDOM
                 m.videoPlayingindex = GetRandom(m.top.metaData)               
-            else if m.showOrder = "Oldest to Newest"
-                'Create image display list - OLD FIRST
+            else if m.showOrder = "Reverse Album Order"
+                'Create image display list - REVERSE ALBUM ORDER
                 m.videoPlayingindex = m.videoPlayingindex-1
                 if (m.top.metaData[m.videoPlayingindex]=invalid) m.videoPlayingindex = m.top.metaData.Count()-1
             else
-                'Create image display list - NEW FIRST
+                'Create image display list - ALBUM ORDER
                 m.videoPlayingindex = m.videoPlayingindex+1
                 if (m.top.metaData[m.videoPlayingindex]=invalid) m.videoPlayingindex = 0
             end if 
