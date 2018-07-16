@@ -28,6 +28,12 @@ Sub loadImageList()
     print "Browse.brs [loadImageList]"
     m.ImageGrid.content = m.top.content
     m.itemLabelMain1.text = m.top.albumName
+    
+    if m.top.id = "GP_VIDEO_BROWSE" then
+        'Copy original list since we can't change origin
+        m.originalList = m.top.content
+    end if
+    
 End Sub
 
 
@@ -58,7 +64,10 @@ Sub onItemSelected()
         
     else if m.top.id = "GP_VIDEO_BROWSE" then
     
+        m.showOrder = RegRead("SlideshowOrder", "Settings")
+        
         'Check any Temporary settings
+        if m.global.SlideshowOrder <> "" m.showOrder = m.global.SlideshowOrder
         if m.global.VideoContinuePlay <> "" m.showVideoPlayback = m.global.VideoContinuePlay
     
         m.videoPlayingindex = m.ImageGrid.itemSelected
@@ -83,15 +92,19 @@ Sub doVideoShow(videoStore as object)
     videoContent.ContentType  = "movie"
     videoContent.url          = videoStore.url
     videoContent.streamformat = "mp4"
-    videoContent.TitleSeason  = thumbnailObj.filename
     videoContent.Title        = friendlyDate(StrToI(videoStore.timestamp))
-
+    if videoStore.description <> "" then
+        videoContent.TitleSeason = videoStore.description  + " - " + thumbnailObj.filename
+    else
+        videoContent.TitleSeason = thumbnailObj.filename
+    end if
+    
     m.VideoPlayer.visible = true
     m.VideoPlayer.content = videoContent
     m.VideoPlayer.seek    = setVideoPosition(videoObj.filename)
     m.VideoPlayer.control = "play"
     m.VideoPlayer.setFocus(true)
-    
+
     m.VideoPlayer.observeField("state", "onVideoStateChange")
 End Sub
 
@@ -99,14 +112,28 @@ End Sub
 Sub onVideoStateChange()
     print "Browse.brs - [onVideoStateChange]"
     if (m.VideoPlayer.state = "error") or (m.VideoPlayer.state = "finished") then
+    
         writeVideoPosition(0)
         m.VideoPlayer.unobserveField("state")
-        
-        m.videoPlayingindex = m.videoPlayingindex+1
-        if (m.top.metaData[m.videoPlayingindex]=invalid) m.videoPlayingindex = 0
-        if (m.top.metaData[m.videoPlayingindex]<>invalid) and (m.showVideoPlayback = "Continuous Video Playback")
-            'Continue playing the next video inline
-            doVideoShow(m.top.metaData[m.videoPlayingindex])
+       
+        if m.showVideoPlayback = "Continuous Video Playback" then
+            if m.showOrder = "Random Order" then
+                'Create image display list - RANDOM
+                m.videoPlayingindex = GetRandom(m.top.metaData)               
+            else if m.showOrder = "Oldest to Newest"
+                'Create image display list - OLD FIRST
+                m.videoPlayingindex = m.videoPlayingindex-1
+                if (m.top.metaData[m.videoPlayingindex]=invalid) m.videoPlayingindex = m.top.metaData.Count()-1
+            else
+                'Create image display list - NEW FIRST
+                m.videoPlayingindex = m.videoPlayingindex+1
+                if (m.top.metaData[m.videoPlayingindex]=invalid) m.videoPlayingindex = 0
+            end if 
+                
+            if m.top.metaData[m.videoPlayingindex]<>invalid
+                'Continue playing the next video inline
+                doVideoShow(m.top.metaData[m.videoPlayingindex])
+            end if
         else
             'Close video screen
             m.VideoPlayer.visible = false
