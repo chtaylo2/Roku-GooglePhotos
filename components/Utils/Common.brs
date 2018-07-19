@@ -301,7 +301,7 @@ Function getResolution()
             resolution = "720"
         end if
     else
-        if ssres="FHD" then
+        if ssres="FHD" or ssres="UHD" then
             resolution = "1600"
         else if ssres="HD"
             resolution = "1280"

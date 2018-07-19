@@ -199,6 +199,9 @@ Sub storeResolutionOptions()
     if is4k then
         if regSelection = "FHD" then radioSelection = 2
         addItem(m.content, "Full High Definition (FHD)", "FHD", regStore)
+
+        if regSelection = "UHD" then radioSelection = 3
+        addItem(m.content, "Ultra High Definition [Beta]", "UHD", regStore)               
     end if
 
     'Store content node and current registry selection

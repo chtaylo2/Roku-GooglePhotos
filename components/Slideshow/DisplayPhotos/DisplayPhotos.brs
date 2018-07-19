@@ -40,15 +40,18 @@ Sub init()
     m.DownloadTimer.observeField("fire","onDownloadTigger")
     m.top.observeField("content","loadImageList")
 
+    m.showRes       = RegRead("SlideshowRes", "Settings")
     m.showDisplay   = RegRead("SlideshowDisplay", "Settings")
     m.showOrder     = RegRead("SlideshowOrder", "Settings")
     showDelay       = RegRead("SlideshowDelay", "Settings")
     
     'Check any Temporary settings
+    if m.global.SlideshowRes <> "" m.showRes = m.global.SlideshowRes
     if m.global.SlideshowDisplay <> "" m.showDisplay = m.global.SlideshowDisplay
     if m.global.SlideshowOrder <> "" m.showOrder = m.global.SlideshowOrder
     if m.global.SlideshowDelay <> "" showDelay = m.global.SlideshowDelay
     
+    print "GooglePhotos Show Res:     "; m.showRes
     print "GooglePhotos Show Delay:   "; showDelay
     print "GooglePhotos Show Order:   "; m.showOrder
     print "GooglePhotos Show Display: "; m.showDisplay
@@ -78,12 +81,14 @@ Sub loadImageList()
     
     if m.top.id = "DisplayScreensaver" then
         'Override settings for screensaver
+        m.showRes       = RegRead("SSaverRes", "Settings")
         m.showDisplay   = RegRead("SSaverMethod", "Settings")
         m.showOrder     = RegRead("SSaverOrder", "Settings")
         showDelay       = RegRead("SSaverDelay", "Settings")
     
         m.RotationTimer.duration = showDelay
         
+        print "GooglePhotos Screensaver Res:     "; m.showRes
         print "GooglePhotos Screensaver Delay:   "; showDelay
         print "GooglePhotos Screensaver Order:   "; m.showOrder
         print "GooglePhotos Screensaver Display: "; m.showDisplay
@@ -123,6 +128,10 @@ Sub loadImageList()
                 'Create image display list - ALBUM ORDER
                 nxt = 0
             end if 
+        end if
+        
+        if m.showRes = "UHD" then
+            originalList[nxt].url = originalList[nxt].url.Replace("/s1600/", "/s2160/")
         end if
         
         m.imageDisplay.push(originalList[nxt])
