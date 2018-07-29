@@ -24,7 +24,7 @@ Sub showGooglePhotosScreensaver()
     scene    = screen.CreateScene("GooglePhotosScreensaver")
     m.global = screen.getGlobalNode()
  
-    m.global.addFields( {SlideshowRes: "", SlideshowDisplay: "", SlideshowDelay: "", SlideshowOrder: ""} )
+    m.global.addFields( {SlideshowRes: "", SlideshowDisplay: "", SlideshowDelay: "", SlideshowOrder: "", VideoContinuePlay: ""} )
     m.global.addFields( {selectedUser: -1} )
     
     screen.setMessagePort(port)    
@@ -48,8 +48,8 @@ Sub showGooglePhotosScreensaverSettings()
     scene    = screen.CreateScene("GooglePhotosScreensaverSettings")
     m.global = screen.getGlobalNode()
  
-    m.global.addFields( {SSaverUser: "", SSaverRes: "", SSaverMethod: "", SSaverDelay: "", SSaverOrder: ""} )
-    m.global.addFields( {SlideshowRes: "", SlideshowDisplay: "", SlideshowDelay: "", SlideshowOrder: ""} )
+    m.global.addFields( {SSaverUser: "", SSaverRes: "", SSaverMethod: "", SSaverDelay: "", SSaverOrder: "", SSaverVideo: ""} )
+    m.global.addFields( {SlideshowRes: "", SlideshowDisplay: "", SlideshowDelay: "", SlideshowOrder: "", VideoContinuePlay: ""} )
     m.global.addFields( {selectedUser: -1} )
     
     screen.setMessagePort(port)    

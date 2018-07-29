@@ -9,13 +9,17 @@ Sub init()
     m.ImageGrid      = m.top.findNode("ImageGrid")
     m.itemLabelMain1 = m.top.findNode("itemLabelMain1")
     m.itemLabelMain2 = m.top.findNode("itemLabelMain2")
+    m.settingsIcon   = m.top.findNode("settingsIcon")
     m.VideoPlayer    = m.top.findNode("VideoPlayer")
     
     m.regStore = "positions"
     m.regSection = "VideoStatus"
     
     m.itemLabelMain2.font.size = 25
+    m.videoPlayingindex = 0
     
+    m.showVideoPlayback = RegRead("VideoContinuePlay", "Settings")
+        
     m.top.observeField("content","loadImageList")
 End Sub
 
@@ -24,6 +28,12 @@ Sub loadImageList()
     print "Browse.brs [loadImageList]"
     m.ImageGrid.content = m.top.content
     m.itemLabelMain1.text = m.top.albumName
+    
+    if m.top.id = "GP_VIDEO_BROWSE" then
+        'Copy original list since we can't change origin
+        m.originalList = m.top.content
+    end if
+    
 End Sub
 
 
@@ -52,7 +62,15 @@ Sub onItemSelected()
         m.top.appendChild(m.screenActive)
         m.screenActive.setFocus(true)
         
-    else if m.top.id = "GP_VIDEO_BROWSE" then        
+    else if m.top.id = "GP_VIDEO_BROWSE" then
+    
+        m.showOrder = RegRead("SlideshowOrder", "Settings")
+        
+        'Check any Temporary settings
+        if m.global.SlideshowOrder <> "" m.showOrder = m.global.SlideshowOrder
+        if m.global.VideoContinuePlay <> "" m.showVideoPlayback = m.global.VideoContinuePlay
+    
+        m.videoPlayingindex = m.ImageGrid.itemSelected
         doVideoShow(m.top.metaData[m.ImageGrid.itemSelected])
     end if
 End Sub
@@ -74,15 +92,19 @@ Sub doVideoShow(videoStore as object)
     videoContent.ContentType  = "movie"
     videoContent.url          = videoStore.url
     videoContent.streamformat = "mp4"
-    videoContent.TitleSeason  = thumbnailObj.filename
     videoContent.Title        = friendlyDate(StrToI(videoStore.timestamp))
-
+    if videoStore.description <> "" then
+        videoContent.TitleSeason = videoStore.description  + " - " + thumbnailObj.filename
+    else
+        videoContent.TitleSeason = thumbnailObj.filename
+    end if
+    
     m.VideoPlayer.visible = true
     m.VideoPlayer.content = videoContent
     m.VideoPlayer.seek    = setVideoPosition(videoObj.filename)
     m.VideoPlayer.control = "play"
     m.VideoPlayer.setFocus(true)
-    
+
     m.VideoPlayer.observeField("state", "onVideoStateChange")
 End Sub
 
@@ -90,11 +112,33 @@ End Sub
 Sub onVideoStateChange()
     print "Browse.brs - [onVideoStateChange]"
     if (m.VideoPlayer.state = "error") or (m.VideoPlayer.state = "finished") then
-        'Close video screen!
+    
         writeVideoPosition(0)
-        m.VideoPlayer.visible = false
-        m.ImageGrid.setFocus(true)
         m.VideoPlayer.unobserveField("state")
+       
+        if m.showVideoPlayback = "Continuous Video Playback" then
+            if m.showOrder = "Random Order" then
+                'Create image display list - RANDOM
+                m.videoPlayingindex = GetRandom(m.top.metaData)               
+            else if m.showOrder = "Reverse Album Order"
+                'Create image display list - REVERSE ALBUM ORDER
+                m.videoPlayingindex = m.videoPlayingindex-1
+                if (m.top.metaData[m.videoPlayingindex]=invalid) m.videoPlayingindex = m.top.metaData.Count()-1
+            else
+                'Create image display list - ALBUM ORDER
+                m.videoPlayingindex = m.videoPlayingindex+1
+                if (m.top.metaData[m.videoPlayingindex]=invalid) m.videoPlayingindex = 0
+            end if 
+                
+            if m.top.metaData[m.videoPlayingindex]<>invalid
+                'Continue playing the next video inline
+                doVideoShow(m.top.metaData[m.videoPlayingindex])
+            end if
+        else
+            'Close video screen
+            m.VideoPlayer.visible = false
+            m.ImageGrid.setFocus(true)
+        end if
     end if
 End Sub
 
@@ -152,13 +196,42 @@ Sub writeVideoPosition(position as integer)
 End Sub
 
 
+Sub hideMarkupGrid()
+    m.ImageGrid.visible       = false
+    m.itemLabelMain1.visible  = false
+    m.itemLabelMain2.visible  = false
+    m.settingsIcon.visible    = false
+End Sub
+
+
+Sub showMarkupGrid()
+    m.ImageGrid.visible       = true
+    m.itemLabelMain1.visible  = true
+    m.itemLabelMain2.visible  = true
+    m.settingsIcon.visible    = true
+    
+    m.ImageGrid.setFocus(true)
+End Sub
+
+
+Sub showTempSetting()
+    hideMarkupGrid()
+    m.screenActive              = createObject("roSGNode", "Settings")
+    m.screenActive.contentFile  = "settingsTemporaryContent"
+    m.screenActive.id           = "settings"
+    m.screenActive.loaded       = true
+    m.top.appendChild(m.screenActive)
+    m.screenActive.setFocus(true)
+End Sub
+
+
 Function onKeyEvent(key as String, press as Boolean) as Boolean
     if press then
         if key = "back"
             if (m.screenActive <> invalid)
                 m.top.removeChild(m.screenActive)
                 m.screenActive = invalid
-                m.ImageGrid.setFocus(true)
+                showMarkupGrid()
                 return true
             else if (m.VideoPlayer.visible = true)
                 m.VideoPlayer.control = "stop"
@@ -168,6 +241,15 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
                 writeVideoPosition(m.VideoPlayer.position)
                 return true
             end if
+        else if (key = "options") and (m.screenActive = invalid)
+            showTempSetting()
+            return true
+        else if ((key = "options") or (key = "left")) and (m.screenActive <> invalid) and (m.screenActive.id = "settings")
+            m.top.removeChild(m.screenActive)
+            showMarkupGrid()
+            m.screenActive          = invalid
+            m.settingsIcon.visible  = true
+            return true
         end if 
     end if
 

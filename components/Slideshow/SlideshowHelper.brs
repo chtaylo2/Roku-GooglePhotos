@@ -142,6 +142,7 @@ Function googleAlbumCreateRecord(xml As Object) As Object
     album.GetUsername=function():return m.xml.GetNamedElements("gphoto:user")[0].GetText():end function
     album.GetTitle=function():return m.xml.title[0].GetText():end function
     album.GetID=function():return m.xml.GetNamedElements("gphoto:id")[0].GetText():end function
+    album.GetDescription=function():return m.xml.GetNamedElements("media:group")[0].GetNamedElements("media:description")[0].GetText():end function
     album.GetImageCount=function():return Val(m.xml.GetNamedElements("gphoto:numphotos")[0].GetText()):end function
     album.GetThumb=get_thumb
     
@@ -180,6 +181,7 @@ Function googleImageCreateRecord(xml As Object) As Object
     image.xml=xml
     image.GetTitle=function():return m.xml.GetNamedElements("title")[0].GetText():end function
     image.GetID=function():return m.xml.GetNamedElements("gphoto:id")[0].GetText():end function
+    image.GetDescription=function():return m.xml.GetNamedElements("media:group")[0].GetNamedElements("media:description")[0].GetText():end function
     image.GetURL=get_image_url
     image.GetThumb=get_thumb
     image.GetTimestamp=function():return Left(m.xml.GetNamedElements("gphoto:timestamp")[0].GetText(), 10):end function

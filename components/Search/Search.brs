@@ -83,12 +83,14 @@ End Sub
 ' URL Request to fetch search
 Sub doGetSearch(keyword as string)
     print "Search.brs [doGetSearch]"
+    
     if keyword <> ""
         m.searchProgress.message = "Searching albums for '" + keyword + "'"
         m.searchProgress.visible = true
     
         tmpData = [ "doGetSearch", keyword ]
         
+        keyword = keyword.Replace(" ", "+")
         signedHeader = oauth_sign(m.global.selectedUser)
         makeRequest(signedHeader, m.gp_prefix + "?kind=photo&v=3.0&q="+keyword+"&max-results=1000&thumbsize=220&imgmax="+getResolution(), "GET", "", 3, tmpData)
     end if

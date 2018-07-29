@@ -30,6 +30,8 @@ Sub init()
     m.imageTracker              = -1
     m.imageOnScreen             = ""
     
+    m.pauseImageCount.font.size   = 29
+    m.pauseImageDetail.font.size  = 29
     m.pauseImageDetail2.font.size = 25
     
     m.PrimaryImage.observeField("loadStatus","onPrimaryLoadedTrigger")
@@ -38,15 +40,18 @@ Sub init()
     m.DownloadTimer.observeField("fire","onDownloadTigger")
     m.top.observeField("content","loadImageList")
 
+    m.showRes       = RegRead("SlideshowRes", "Settings")
     m.showDisplay   = RegRead("SlideshowDisplay", "Settings")
     m.showOrder     = RegRead("SlideshowOrder", "Settings")
     showDelay       = RegRead("SlideshowDelay", "Settings")
     
     'Check any Temporary settings
+    if m.global.SlideshowRes <> "" m.showRes = m.global.SlideshowRes
     if m.global.SlideshowDisplay <> "" m.showDisplay = m.global.SlideshowDisplay
     if m.global.SlideshowOrder <> "" m.showOrder = m.global.SlideshowOrder
     if m.global.SlideshowDelay <> "" showDelay = m.global.SlideshowDelay
     
+    print "GooglePhotos Show Res:     "; m.showRes
     print "GooglePhotos Show Delay:   "; showDelay
     print "GooglePhotos Show Order:   "; m.showOrder
     print "GooglePhotos Show Display: "; m.showDisplay
@@ -76,12 +81,14 @@ Sub loadImageList()
     
     if m.top.id = "DisplayScreensaver" then
         'Override settings for screensaver
+        m.showRes       = RegRead("SSaverRes", "Settings")
         m.showDisplay   = RegRead("SSaverMethod", "Settings")
         m.showOrder     = RegRead("SSaverOrder", "Settings")
         showDelay       = RegRead("SSaverDelay", "Settings")
     
         m.RotationTimer.duration = showDelay
         
+        print "GooglePhotos Screensaver Res:     "; m.showRes
         print "GooglePhotos Screensaver Delay:   "; showDelay
         print "GooglePhotos Screensaver Order:   "; m.showOrder
         print "GooglePhotos Screensaver Display: "; m.showDisplay
@@ -108,19 +115,23 @@ Sub loadImageList()
     for i = 0 to m.top.content.Count()-1
     
         if m.top.startIndex <> -1 then
-            'If coming from browsing, only show in Newest-Oldest order
+            'If coming from browsing, only show in Album Order
             nxt = 0
         else
             if m.showOrder = "Random Order" then
                 'Create image display list - RANDOM
                 nxt = GetRandom(originalList)
-            else if m.showOrder = "Oldest to Newest"
-                'Create image display list - OLD FIRST
+            else if m.showOrder = "Reverse Album Order"
+                'Create image display list - REVERSE ALBUM ORDER
                 nxt = originalList.Count()-1
             else
-                'Create image display list - NEW FIRST
+                'Create image display list - ALBUM ORDER
                 nxt = 0
             end if 
+        end if
+        
+        if m.showRes = "UHD" then
+            originalList[nxt].url = originalList[nxt].url.Replace("/s1600/", "/s2160/")
         end if
         
         m.imageDisplay.push(originalList[nxt])
@@ -377,7 +388,12 @@ Sub sendNextImage(direction=invalid)
     
     m.pauseImageCount.text   = itostr(nextID+1)+" of "+itostr(m.imageDisplay.Count())
     m.pauseImageDetail.text  = friendlyDate(strtoi(m.imageDisplay[nextID].timestamp))
-    m.pauseImageDetail2.text = fileObj.filename.DecodeUri()
+    
+    if m.imageDisplay[nextID].description <> "" then
+        m.pauseImageDetail2.text = m.imageDisplay[nextID].description + " - " + fileObj.filename.DecodeUri()
+    else
+        m.pauseImageDetail2.text = fileObj.filename.DecodeUri()
+    end if
     
     'Stop rotating if only 1 image album
     if m.imageDisplay.Count() = 1 then
@@ -422,16 +438,20 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
             print "RIGHT"
             sendNextImage("next")
             onDownloadTigger({})
-            m.RotationTimer.control = "stop"
-            m.DownloadTimer.control = "stop"
-            m.PauseScreen.visible   = "true"
+            if m.RotationTimer.control = "start"
+                m.RotationTimer.control = "stop"
+                m.DownloadTimer.control = "stop"
+                m.PauseScreen.visible   = "true"
+            end if
             return true
         else if key = "left" or key = "rewind"
             print "LEFT"
             sendNextImage("previous")
-            m.RotationTimer.control = "stop"
-            m.DownloadTimer.control = "stop"
-            m.PauseScreen.visible   = "true"
+            if m.RotationTimer.control = "start"
+                m.RotationTimer.control = "stop"
+                m.DownloadTimer.control = "stop"
+                m.PauseScreen.visible   = "true"
+            end if
             return true
         else if (key = "play" or key = "OK") and m.RotationTimer.control = "start"
             print "PAUSE"
