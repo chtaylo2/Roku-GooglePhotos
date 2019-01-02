@@ -105,7 +105,7 @@ Sub loadImageList()
         m.Watermark.visible = true
         
         m.MoveTimer.observeField("fire","onMoveTrigger")
-        m.MoveTimer.control = "start"       
+        m.MoveTimer.control = "start"
         
     end if    
     
@@ -159,6 +159,14 @@ Sub loadImageList()
             'We don't need pre-downloading of photos for screensaver. Disable
             m.DownloadTimer.control = "stop"
         end if
+
+        'Auto-enable PauseScreen to display photo date on Rediscovery section
+        rxHistory = CreateObject("roRegex", "Rediscover", "i")        
+        if rxHistory.IsMatch(m.top.predecessor) then
+            print "ENABLE PAUSE"
+            m.PauseScreen.visible   = "true"
+        end if
+        
     end if
      
 End Sub

@@ -1,0 +1,53 @@
+<?xml version = "1.0" encoding = "utf-8" ?> 
+
+<component name = "Dynamic Albums" extends = "Group" initialFocus = "dynamicAlbumList" >
+    
+    <interface>
+        <field id = "tracking" type = "string" />
+        <field id = "loaded"   type = "boolean" onChange = "loadListContent" />
+    </interface>
+    
+    <script type = "text/brightscript" uri = "pkg:/components/SlideShow/DynamicAlbums/DynamicAlbums.brs" />
+    <script type = "text/brightscript" uri = "pkg:/components/SlideShow/SlideshowHelper.brs" />
+    <script type = "text/brightscript" uri = "pkg:/components/Utils/Common.brs" />
+    <script type = "text/brightscript" uri = "pkg:/components/Utils/private-git.brs" />
+
+    <children>
+       
+        <Rectangle
+            id          = "FadeBackground"
+            color       = "0x000000"
+            height      = "1080"
+            width       = "1920"
+            opacity     = "1"
+        />
+        
+        <Overhang
+            id                  = "itemOverhang"
+            showClock           = "false"
+            logoBaselineOffset  = "105"
+        />
+        
+        <RadioButtonList
+            id            = "dynamicAlbumList"
+            visible       = "true"
+            itemSize      = "[700,60]"
+            translation   = "[650, 450]"
+            checkOnSelect = "false"
+            vertFocusAnimationStyle = "floatingFocus"
+        />
+   
+        <ProgressDialog
+            id      = "searchProgress"
+            title   = "Please wait"
+            visible = "false"
+        />
+           
+        <Dialog
+            id      = "noticeDialog"
+            title   = "Error"
+            visible = "false"
+        />
+        
+    </children>
+</component>

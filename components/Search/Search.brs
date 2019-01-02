@@ -123,6 +123,7 @@ Sub handleGetSearch(event as object)
             if strtoi(results) > 0 then
                 m.screenActive = createObject("roSGNode", "My Albums")
                 m.screenActive.imageContent = response
+                m.screenActive.predecessor = "Search Results"
                 m.screenActive.loaded = true
                 m.top.appendChild(m.screenActive)
                 m.screenActive.setFocus(true)

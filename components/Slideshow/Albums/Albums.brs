@@ -44,13 +44,16 @@ End Sub
 Sub loadingComplete()
     m.top.unobserveField("loaded")
 
+
+print "HERE: "; m.top.predecessor
+
     if m.top.imageContent<>invalid then
         'Show search results
     
         album = CreateObject("roAssociativeArray")
-        album.GetTitle=function():return "Search Results":end function
+        album.GetTitle=function():return "Unused":end function
         album.GetImageCount=function():return Int(1):end function
-        m.albumName = album.GetTitle()
+        m.albumName = m.top.predecessor
 
         rsp=ParseXML(m.top.imageContent.content)
         m.imagesObject = googleImageListing(rsp.entry)
@@ -215,6 +218,7 @@ Sub onItemSelected()
     else if selection.id = "GP_SLIDESHOW_START" then 
         print "START SHOW"
         m.screenActive = createObject("roSGNode", "DisplayPhotos")
+        m.screenActive.predecessor = m.top.predecessor
         m.screenActive.content = m.imagesMetaData
         m.screenActive.id = selection.id
         m.top.appendChild(m.screenActive)
@@ -236,6 +240,7 @@ Sub onItemSelected()
         m.screenActive.id = selection.id
         m.screenActive.albumName = m.albumName + "  -  " + itostr(m.imagesMetaData.Count()) + " Photos"
         m.screenActive.metaData = m.imagesMetaData
+        m.screenActive.predecessor = m.top.predecessor
         m.screenActive.content = m.imageThumbList
         m.top.appendChild(m.screenActive)
         m.screenActive.setFocus(true)
@@ -364,10 +369,15 @@ Sub googleDisplayImageMenu(album As Object, imageList As Object)
     print "Albums.brs - [googleDisplayImageMenu]"
     
     m.menuSelected = createObject("RoSGNode","ContentNode")
-    title          = album.GetTitle()
     totalPages     = ceiling(album.GetImageCount() / 1000)
     listIcon       = "pkg:/images/browse.png"
     videoOnly      = false
+    
+    if m.top.predecessor<>"" then
+        title      = m.top.predecessor
+    else
+        title      = album.GetTitle()
+    end if
     
     m.videosMetaData=[]
     m.imagesMetaData=[]

@@ -3,6 +3,7 @@
 <component name = "My Albums" extends = "Group" initialFocus = "albumGrid" >
     
     <interface>
+        <field id = "predecessor"  type = "string" />
         <field id = "imageContent" type = "assocarray" />
         <field id = "loaded"       type = "boolean" />
     </interface>
