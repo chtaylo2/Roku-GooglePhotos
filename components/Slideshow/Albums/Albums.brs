@@ -44,9 +44,6 @@ End Sub
 Sub loadingComplete()
     m.top.unobserveField("loaded")
 
-
-print "HERE: "; m.top.predecessor
-
     if m.top.imageContent<>invalid then
         'Show search results
     

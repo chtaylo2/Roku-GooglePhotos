@@ -201,35 +201,6 @@ Sub noticeClose(event as object)
 End Sub
 
 
-
-
-function getPastWeek() as string
-    d1 = createobject("rodatetime")
-    d1.ToLocalTime()
-
-    d1seconds = d1.asseconds() - (60 * 60 * 24 * 7)
-    d1.FromSeconds(d1seconds)
-   
-    current      = d1.AsDateString("no-weekday")
-    currentYear  = d1.GetYear().ToStr()
-    currentMonth = current.Split(" ")[0].ToStr()
-    currentDay   = d1.GetDayOfMonth().ToStr()
-    
-    
-   print "NOW: "; current
-   print "YEAR: "; currentYear
-   
-   
-   
-   print "FROM: "; d2.AsDateString("no-weekday")
-   
-   
-end function
-
-
-
-
-
 Function onKeyEvent(key as String, press as Boolean) as Boolean
     if press then
         print "KEY: "; key
