@@ -456,3 +456,12 @@ Function strReplaceSpecial(basestr As String) As String
     
     return newstr
 End Function
+
+'******************************************************
+'Replace a leading 0 if only 1 digit is found
+'******************************************************
+Function zeroCheck(day as string) as string
+   if len(day)=1 then day="0"+day
+   
+   return day   
+End Function

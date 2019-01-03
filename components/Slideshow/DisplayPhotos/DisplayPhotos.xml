@@ -3,8 +3,9 @@
 <component name = "DisplayPhotos" extends = "Group" >
 
     <interface>
-        <field id = "content" type = "array" />
-        <field id = "startIndex" type = "integer" value="-1" />
+        <field id = "predecessor" type = "string" />
+        <field id = "content"     type = "array" />
+        <field id = "startIndex"  type = "integer" value="-1" />
     </interface>
   
     <script type = "text/brightscript" uri = "pkg:/components/SlideShow/DisplayPhotos/DisplayPhotos.brs" />

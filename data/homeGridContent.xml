@@ -1,6 +1,6 @@
 <Content>
 <item x="300" y="300" hdgridposterurl="pkg:/images/search.png" shortdescriptionline1="Search" shortdescriptionline2="Search your albums" />
-<item x="300" y="300" hdgridposterurl="pkg:/images/random_icon.png" shortdescriptionline1="Shuffle Photos" shortdescriptionline2="Display a random slideshow of your photos" />
+<item x="300" y="300" hdgridposterurl="pkg:/images/random_icon.png" shortdescriptionline1="Dynamic Albums" shortdescriptionline2="Display albums created for you on the fly" />
 <item x="330" y="330" hdgridposterurl="pkg:/images/icon_photo_big.png" shortdescriptionline1="My Albums" shortdescriptionline2="Browse your albums" />
 <item x="300" y="300" hdgridposterurl="pkg:/images/tipsandtricks.png" shortdescriptionline1="Tips and Tricks" shortdescriptionline2="Get the most out of Google Photos!" />
 <item x="300" y="300" hdgridposterurl="pkg:/images/gear.png" shortdescriptionline1="Settings" shortdescriptionline2="Edit channel settings" />

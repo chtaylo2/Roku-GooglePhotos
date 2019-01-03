@@ -58,6 +58,7 @@ Sub onItemSelected()
     if m.top.id = "GP_IMAGE_BROWSE" then
         m.screenActive              = createObject("roSGNode", "DisplayPhotos")
         m.screenActive.startIndex   = m.ImageGrid.itemSelected
+        m.screenActive.predecessor  = m.top.predecessor
         m.screenActive.content      = m.top.metaData
         m.top.appendChild(m.screenActive)
         m.screenActive.setFocus(true)
