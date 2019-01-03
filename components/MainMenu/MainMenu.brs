@@ -16,6 +16,7 @@ Sub init()
     m.itemLabelMain1    = m.top.findNode("itemLabelMain1")
     m.itemLabelMain2    = m.top.findNode("itemLabelMain2")
     m.itemHeader        = m.top.findNode("itemHeader")
+    m.supportReset      = "Normal"
     
     m.itemHeader.text   = m.userInfoName[m.global.selectedUser] + " • Main Menu"
     
@@ -72,6 +73,11 @@ End Sub
 
 Function onKeyEvent(key as String, press as Boolean) as Boolean
     if press then
+        print "KEY: "; key
+        
+        'This will monitor events looking for the registery delete sequence
+        m.supportReset = supportResetMonitor(key, m.supportReset)
+        
         if key = "back"        
             if (m.screenActive <> invalid)
                 m.top.removeChild(m.screenActive)

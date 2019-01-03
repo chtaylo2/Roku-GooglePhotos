@@ -465,3 +465,58 @@ Function zeroCheck(day as string) as string
    
    return day   
 End Function
+
+
+'******************************************************
+'This will monitor events looking for the registery delete sequence
+'Sequence Required:  UP, UP, UP, UP, UP, Options, Options, Play, Play, Play
+'******************************************************
+Function supportResetMonitor(key as string, sequence as string) as string
+
+    strStep = "Normal"
+    
+    if ( key = "up" and sequence = "Normal" ) then
+         strStep = "1"
+    else if ( key = "up" and sequence = "1" ) then
+         strStep = "2"
+    else if ( key = "up" and sequence = "2" ) then
+         strStep = "3"
+    else if ( key = "up" and sequence = "3" ) then
+         strStep = "4"
+    else if ( key = "up" and sequence = "4" ) then
+         strStep = "5"
+    else if ( key = "options" and sequence = "5" ) then
+         strStep = "6"
+    else if ( key = "options" and sequence = "6" ) then
+         strStep= "7"
+    else if ( key = "play" and sequence = "7" ) then
+         strStep = "8"
+    else if ( key = "play" and sequence = "8" ) then
+         strStep = "9"
+    else if ( key = "play" and sequence = "9" ) then
+         'Sequence triggered. Issue registry wipe (This channel only of course!)
+         DeleteRegistry()
+    end if
+         
+    return strStep
+End Function
+
+
+'******************************************************
+'Delete all registery entries for this channel
+'******************************************************
+Function DeleteRegistry()
+    print "Deleting Registry"
+    Registry = CreateObject("roRegistry")
+    i = 0
+    for each section in Registry.GetSectionList()
+        sec = CreateObject("roRegistrySection", section)
+        for each key in sec.GetKeyList()
+            i = i+1
+            print "Deleting: " section + ":" key
+            RegDelete(key, section)
+        end for
+    end for
+    print i.toStr() " Registry Keys Deleted"
+    m.global.selectedUser = -2
+End Function
