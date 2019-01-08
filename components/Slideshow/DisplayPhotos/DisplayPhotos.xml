@@ -246,7 +246,7 @@
         <Timer
             id          = "moveWatermark"
             repeat      = "true"
-            duration    = "10"
+            duration    = "1200"
         />
             
    </children>
