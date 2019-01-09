@@ -135,7 +135,7 @@ Sub doGetScreensaverSearch(album As Object, selectedUser=0 as Integer)
     pastDay      = zeroCheck(datepast.GetDayOfMonth().ToStr())
     
     if album = "Day" then
-        keyword = "%22OFF"+currentMonth+" "+currentDay+"%22 "+"-"+currentYear
+        keyword = "%22"+currentMonth+" "+currentDay+"%22 "+"-"+currentYear
     else if album = "Week" then
         keyword = "%22"+pastMonth+" "+pastDay+" - "+currentMonth+" "+currentDay+"%22 "+"-"+pastYear+" -"+currentYear
     else if album = "Month" then

@@ -404,9 +404,6 @@ Sub sendNextImage(direction=invalid)
     m.pauseImageCount.text   = itostr(nextID+1)+" of "+itostr(m.imageDisplay.Count())
     m.pauseImageDetail.text  = friendlyDate(strtoi(m.imageDisplay[nextID].timestamp))
 
-
-    print "TEST: "; m.imageDisplay[nextID].timestamp
-    print "HERE: "; m.imageDisplay[nextID]
     'RediscoverScreen text change if needed      
     if m.rxHistory.IsMatch(m.top.predecessor) then
         m.RediscoverDetail.text  = m.top.predecessor.Replace("Rediscover this", "This")+" - "+ friendlyDateShort(strtoi(m.imageDisplay[nextID].timestamp))
