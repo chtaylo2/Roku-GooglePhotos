@@ -135,7 +135,7 @@ Sub doGetScreensaverSearch(album As Object, selectedUser=0 as Integer)
     pastDay      = zeroCheck(datepast.GetDayOfMonth().ToStr())
     
     if album = "Day" then
-        keyword = "%22"+currentMonth+" "+currentDay+"%22 "+"-"+currentYear
+        keyword = "%22OFF"+currentMonth+" "+currentDay+"%22 "+"-"+currentYear
     else if album = "Week" then
         keyword = "%22"+pastMonth+" "+pastDay+" - "+currentMonth+" "+currentDay+"%22 "+"-"+pastYear+" -"+currentYear
     else if album = "Month" then
@@ -274,6 +274,11 @@ Sub execScreensaver()
         generic1.timestamp  = "284040000"
         generic1.url        = "pkg:/images/screensaver_splash.png"
         m.photoItems.Push(generic1)
+        generic1            = {}
+        generic1.timestamp  = "284040000"
+        generic1.url        = "pkg:/images/black_pixel.png"
+        m.photoItems.Push(generic1)
+        m.predecessor       = "No images found. Try another album"
     end if
 
     print "START SHOW"

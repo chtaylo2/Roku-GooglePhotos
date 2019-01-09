@@ -143,8 +143,12 @@ Sub loadImageList()
     end for
 
     'Enable RediscoverScreen to display photo date on Rediscovery section
-    m.rxHistory = CreateObject("roRegex", "History", "i") 
+    m.rxHistory = CreateObject("roRegex", "History", "i")
+    rxNoFound = CreateObject("roRegex", "No images found", "i")
     if m.rxHistory.IsMatch(m.top.predecessor) then
+        m.RediscoverScreen.visible = "true"
+    else if rxNoFound.IsMatch(m.top.predecessor) then
+        m.RediscoverDetail.text    = m.top.predecessor
         m.RediscoverScreen.visible = "true"
     end if
     
@@ -185,6 +189,7 @@ Sub onRotationTigger(event as object)
         if m.screenActive = invalid then
             m.screenActive = createObject("roSGNode", "MultiScroll")
             m.screenActive.id = m.top.id
+            m.screenActive.predecessor = m.top.predecessor
             m.screenActive.content = m.imageDisplay
             m.screenActive.loaded = "true"
             m.top.appendChild(m.screenActive)
@@ -398,13 +403,16 @@ Sub sendNextImage(direction=invalid)
     
     m.pauseImageCount.text   = itostr(nextID+1)+" of "+itostr(m.imageDisplay.Count())
     m.pauseImageDetail.text  = friendlyDate(strtoi(m.imageDisplay[nextID].timestamp))
-    
+
+
+    print "TEST: "; m.imageDisplay[nextID].timestamp
+    print "HERE: "; m.imageDisplay[nextID]
     'RediscoverScreen text change if needed      
     if m.rxHistory.IsMatch(m.top.predecessor) then
-        m.RediscoverDetail.text    = m.top.predecessor.Replace("Rediscover this", "This")+" - "+ friendlyDateShort(strtoi(m.imageDisplay[nextID].timestamp))
+        m.RediscoverDetail.text  = m.top.predecessor.Replace("Rediscover this", "This")+" - "+ friendlyDateShort(strtoi(m.imageDisplay[nextID].timestamp))
     end if
     
-    if m.imageDisplay[nextID].description <> "" then
+    if m.imageDisplay[nextID].description <> invalid and m.imageDisplay[nextID].description <> "" then
         m.pauseImageDetail2.text = m.imageDisplay[nextID].description + " - " + fileObj.filename.DecodeUri()
     else
         m.pauseImageDetail2.text = fileObj.filename.DecodeUri()

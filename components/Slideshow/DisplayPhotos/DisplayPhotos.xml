@@ -210,7 +210,7 @@
             width       = "600"
             translation = "[0,1020]"
             opacity     = ".7"
-            visible     = "false" >
+            visible     = "true" >
          
             <Label 
                id           = "RediscoverDetail" 
