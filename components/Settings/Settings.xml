@@ -93,7 +93,7 @@
 
         <Label
             id          = "aboutVersion"
-            translation = "[1400, 1020]" 
+            translation = "[1380, 1020]" 
             color       = "#808080"
             font        = "font:SmallestBoldSystemFont"
             visible     = "false"
