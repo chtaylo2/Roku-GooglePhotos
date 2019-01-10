@@ -3,9 +3,9 @@
 <component name = "DisplayPhotos" extends = "Group" >
 
     <interface>
-        <field id = "predecessor" type = "string" />
-        <field id = "content"     type = "array" />
-        <field id = "startIndex"  type = "integer" value="-1" />
+        <field id = "predecessor"    type = "string" />
+        <field id = "content"        type = "array" />
+        <field id = "startIndex"     type = "integer" value="-1" />
     </interface>
   
     <script type = "text/brightscript" uri = "pkg:/components/SlideShow/DisplayPhotos/DisplayPhotos.brs" />
@@ -202,6 +202,28 @@
       
         </Rectangle>
 
+        <!-- Used to display screensaver screen -->
+        <Rectangle
+            id          = "RediscoverScreen"
+            color       = "0x000000"
+            height      = "35"
+            width       = "600"
+            translation = "[0,1020]"
+            opacity     = ".7"
+            visible     = "false" >
+         
+            <Label 
+               id           = "RediscoverDetail" 
+               height       = "35" 
+               width        = "555"
+               horizAlign   = "left"
+               vertAlign    = "center"
+               color        = "#eaeaea"
+               translation  = "[ 55, 0 ]" >            
+            </Label>
+      
+        </Rectangle>
+        
         <!-- Screensaver watermark -->
         <Poster
             id          = "Watermark"

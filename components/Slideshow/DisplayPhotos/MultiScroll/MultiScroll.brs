@@ -10,23 +10,26 @@ Sub init()
     m.WaveStep          = 0
     m.imageTracker      = -1
 
-    m.scroll_node_1 = m.top.findNode("scroll_node_1")
-    m.scroll_node_2 = m.top.findNode("scroll_node_2")
-    m.scroll_node_3 = m.top.findNode("scroll_node_3")
-    m.scroll_node_4 = m.top.findNode("scroll_node_4")
-    m.scroll_node_5 = m.top.findNode("scroll_node_5")
-    m.scroll_node_6 = m.top.findNode("scroll_node_6")
-    m.scroll_node_7 = m.top.findNode("scroll_node_7")
-    m.scroll_node_8 = m.top.findNode("scroll_node_8")
+    m.scroll_node_1     = m.top.findNode("scroll_node_1")
+    m.scroll_node_2     = m.top.findNode("scroll_node_2")
+    m.scroll_node_3     = m.top.findNode("scroll_node_3")
+    m.scroll_node_4     = m.top.findNode("scroll_node_4")
+    m.scroll_node_5     = m.top.findNode("scroll_node_5")
+    m.scroll_node_6     = m.top.findNode("scroll_node_6")
+    m.scroll_node_7     = m.top.findNode("scroll_node_7")
+    m.scroll_node_8     = m.top.findNode("scroll_node_8")
 
-    m.WaveTimer     = m.top.findNode("waveTimer")
-    m.RefreshTimer  = m.top.findNode("refreshTimer")
-    m.Watermark     = m.top.findNode("Watermark")
-    m.MoveTimer     = m.top.findNode("moveWatermark")
+    m.WaveTimer         = m.top.findNode("waveTimer")
+    m.RefreshTimer      = m.top.findNode("refreshTimer")
+    m.Watermark         = m.top.findNode("Watermark")
+    m.MoveTimer         = m.top.findNode("moveWatermark")
+    m.RediscoverScreen  = m.top.findNode("RediscoverScreen")
+    m.RediscoverDetail  = m.top.findNode("RediscoverDetail")
     
     m.WaveTimer.observeField("fire","onWaveTigger")
     m.RefreshTimer.observeField("fire","onRefreshTigger")
     
+    m.RediscoverDetail.font.size  = 25
     endPoint=-600
     
     'Node 1 adjustments
@@ -137,15 +140,24 @@ Sub loadImages()
     m.WaveTimer.control         = "start"
     m.RefreshTimer.control      = "start"
     
+    'Enable RediscoverScreen to display photo date on Rediscovery section
+    m.rxHistory = CreateObject("roRegex", "History", "i") 
+    if m.rxHistory.IsMatch(m.top.predecessor) then
+        m.RediscoverScreen.visible = "true"
+        m.RediscoverDetail.text    = m.top.predecessor.Replace("Rediscover this", "This")
+    end if
+    
 End Sub
 
 
 Sub onMoveTrigger()
     'To prevent screen burn-in
     if m.Watermark.translation[1] = 1010 then
-         m.Watermark.translation = "[1700,10]"
+         m.Watermark.translation        = "[1700,10]"
+         m.RediscoverScreen.translation = "[0,10]"
     else
-        m.Watermark.translation = "[1700,1010]"
+        m.Watermark.translation        = "[1700,1010]"
+        m.RediscoverScreen.translation = "[0,1010]"
     end if
 End Sub
 

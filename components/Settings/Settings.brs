@@ -115,11 +115,30 @@ Sub handleGetAlbumSelection(event as object)
         if rsp=invalid then
             errorMsg = "Unable to parse Google Photos API response. Exit the channel then try again later. Code: "+(response.code).toStr()+" - " +response.error
         else
-            m.albumsObject = googleAlbumListing(rsp.entry)
+
+            'Display Time in History selections
+            albumHistory = "Day|Week|Month".Split("|")
+            for each album in albumHistory
+                addItem(m.albumContent, "• "+album+" in History - Auto Refresh", album, "")
+                saved = 0
+                if (regAlbums <> invalid) and (regAlbums <> "")
+                    parsedString = regAlbums.Split("|")
+                    for each item in parsedString
+                        albumUser = item.Split(":")
+                        if albumUser[0] = album then
+                            'Check selected album
+                            saved = 1
+                        end if
+                    end for
+                end if
+                if saved = 1 checkedObj.Push(true)
+                if saved = 0 checkedObj.Push(false)                
+            end for
             
+            'Display user album selections
+            m.albumsObject = googleAlbumListing(rsp.entry)
             for each album in m.albumsObject
                 addItem(m.albumContent, album.GetTitle(), album.GetID(), "")
-                
                 saved = 0
                 if (regAlbums <> invalid) and (regAlbums <> "")
                     parsedString = regAlbums.Split("|")

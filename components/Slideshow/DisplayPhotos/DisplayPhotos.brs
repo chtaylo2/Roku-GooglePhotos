@@ -22,6 +22,8 @@ Sub init()
     m.DownloadTimer             = m.top.findNode("DownloadTimer")
     m.Watermark                 = m.top.findNode("Watermark")
     m.MoveTimer                 = m.top.findNode("moveWatermark")
+    m.RediscoverScreen          = m.top.findNode("RediscoverScreen")
+    m.RediscoverDetail          = m.top.findNode("RediscoverDetail")
 
     m.fromBrowse                = false
     m.imageLocalCacheByURL      = {}
@@ -33,6 +35,7 @@ Sub init()
     m.pauseImageCount.font.size   = 29
     m.pauseImageDetail.font.size  = 29
     m.pauseImageDetail2.font.size = 25
+    m.RediscoverDetail.font.size  = 25
     
     m.PrimaryImage.observeField("loadStatus","onPrimaryLoadedTrigger")
     m.SecondaryImage.observeField("loadStatus","onSecondaryLoadedTrigger")
@@ -138,6 +141,16 @@ Sub loadImageList()
         originalList.Delete(nxt)
                  
     end for
+
+    'Enable RediscoverScreen to display photo date on Rediscovery section
+    m.rxHistory = CreateObject("roRegex", "History", "i")
+    rxNoFound = CreateObject("roRegex", "No images found", "i")
+    if m.rxHistory.IsMatch(m.top.predecessor) then
+        m.RediscoverScreen.visible = "true"
+    else if rxNoFound.IsMatch(m.top.predecessor) then
+        m.RediscoverDetail.text    = m.top.predecessor
+        m.RediscoverScreen.visible = "true"
+    end if
     
     if m.screenActive<>invalid then
         m.screenActive.content = m.imageDisplay
@@ -159,13 +172,6 @@ Sub loadImageList()
             'We don't need pre-downloading of photos for screensaver. Disable
             m.DownloadTimer.control = "stop"
         end if
-
-        'Auto-enable PauseScreen to display photo date on Rediscovery section
-        rxHistory = CreateObject("roRegex", "Rediscover", "i")        
-        if rxHistory.IsMatch(m.top.predecessor) then
-            print "ENABLE PAUSE"
-            m.PauseScreen.visible   = "true"
-        end if
         
     end if
      
@@ -183,6 +189,7 @@ Sub onRotationTigger(event as object)
         if m.screenActive = invalid then
             m.screenActive = createObject("roSGNode", "MultiScroll")
             m.screenActive.id = m.top.id
+            m.screenActive.predecessor = m.top.predecessor
             m.screenActive.content = m.imageDisplay
             m.screenActive.loaded = "true"
             m.top.appendChild(m.screenActive)
@@ -396,8 +403,13 @@ Sub sendNextImage(direction=invalid)
     
     m.pauseImageCount.text   = itostr(nextID+1)+" of "+itostr(m.imageDisplay.Count())
     m.pauseImageDetail.text  = friendlyDate(strtoi(m.imageDisplay[nextID].timestamp))
+
+    'RediscoverScreen text change if needed      
+    if m.rxHistory.IsMatch(m.top.predecessor) then
+        m.RediscoverDetail.text  = m.top.predecessor.Replace("Rediscover this", "This")+" - "+ friendlyDateShort(strtoi(m.imageDisplay[nextID].timestamp))
+    end if
     
-    if m.imageDisplay[nextID].description <> "" then
+    if m.imageDisplay[nextID].description <> invalid and m.imageDisplay[nextID].description <> "" then
         m.pauseImageDetail2.text = m.imageDisplay[nextID].description + " - " + fileObj.filename.DecodeUri()
     else
         m.pauseImageDetail2.text = fileObj.filename.DecodeUri()
@@ -432,9 +444,11 @@ End Function
 Sub onMoveTrigger()
     'To prevent screen burn-in
     if m.Watermark.translation[1] = 1010 then
-         m.Watermark.translation = "[1700,10]"
+         m.Watermark.translation        = "[1700,10]"
+         m.RediscoverScreen.translation = "[0,10]"
     else
-        m.Watermark.translation = "[1700,1010]"
+        m.Watermark.translation        = "[1700,1010]"
+        m.RediscoverScreen.translation = "[0,1010]"
     end if
 End Sub
 

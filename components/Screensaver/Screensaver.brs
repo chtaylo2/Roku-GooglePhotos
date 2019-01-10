@@ -11,6 +11,7 @@ Sub init()
     m.UriHandler.observeField("albumList","handleGetScreensaverAlbumList")
     m.UriHandler.observeField("albumImages","handleGetScreensaverAlbumImages")
     m.UriHandler.observeField("refreshToken","handleRefreshToken")
+    m.UriHandler.observeField("searchResult","handleGetScreensaverAlbumImages")
 
     m.PhotoViewLogo = m.top.findNode("PhotoViewLogo")
     m.apiTimer      = m.top.findNode("apiTimer")
@@ -109,6 +110,47 @@ Sub doGetScreensaverAlbumImages(album As Object, selectedUser=0 as Integer)
 End Sub
 
 
+' URL Request to fetch search
+Sub doGetScreensaverSearch(album As Object, selectedUser=0 as Integer)
+    print "Screensaver.brs [doGetScreensaverSearch]"
+    
+    'Get Dates
+    date         = CreateObject("roDateTime")
+    datepast     = createobject("rodatetime")
+    date.ToLocalTime()
+    datepast.ToLocalTime()
+ 
+    'Calculate 7 days prior
+    d1seconds    = datepast.asseconds() - (60 * 60 * 24 * 7)
+    datepast.FromSeconds(d1seconds)
+    
+    current      = date.AsDateString("no-weekday")
+    currentYear  = date.GetYear().ToStr()
+    currentMonth = current.Split(" ")[0].ToStr()
+    currentDay   = zeroCheck(date.GetDayOfMonth().ToStr())
+    
+    past         = datepast.AsDateString("no-weekday")
+    pastYear     = datepast.GetYear().ToStr()
+    pastMonth    = past.Split(" ")[0].ToStr()
+    pastDay      = zeroCheck(datepast.GetDayOfMonth().ToStr())
+    
+    if album = "Day" then
+        keyword = "%22"+currentMonth+" "+currentDay+"%22 "+"-"+currentYear
+    else if album = "Week" then
+        keyword = "%22"+pastMonth+" "+pastDay+" - "+currentMonth+" "+currentDay+"%22 "+"-"+pastYear+" -"+currentYear
+    else if album = "Month" then
+        keyword = "%22"+currentMonth+"%22 "+"-"+currentYear
+    end if
+
+    tmpData = [ "doGetScreensaverSearch", keyword ]
+    keyword = keyword.Replace(" ", "+")
+    
+    m.apiPending = m.apiPending+1
+    signedHeader = oauth_sign(selectedUser)
+    makeRequest(signedHeader, m.gp_prefix + "?kind=photo&v=3.0&q="+keyword+"&max-results=1000&thumbsize=220&imgmax="+getResolution(), "GET", "", 3, tmpData)
+End Sub
+
+
 Sub handleGetScreensaverAlbumList(event as object)
     print "Screensaver.brs [handleGetAlbumList]"
   
@@ -127,6 +169,21 @@ Sub handleGetScreensaverAlbumList(event as object)
     
             album_cache_count   = 0
             albumsObject        = googleAlbumListing(rsp.entry)
+ 
+            'Look for Time in History
+            albumHistory = "Day|Week|Month".Split("|")
+            for each album in albumHistory
+                if (regAlbums <> invalid) and (regAlbums <> "")
+                    parsedString = regAlbums.Split("|")
+                    for each item in parsedString
+                        albumUser = item.Split(":")
+                        if albumUser[0] = album then
+                             m.predecessor = "This "+album+" in History"
+                             doGetScreensaverSearch(album, response.post_data[1])
+                        end if
+                    end for
+                end if
+             end for   
             
             if albumsObject.Count()>0 then
                 for each album in albumsObject
@@ -136,6 +193,7 @@ Sub handleGetScreensaverAlbumList(event as object)
                         for each item in parsedString
                             albumUser = item.Split(":")
                             if albumUser[0] = album.GetID() then
+                                m.predecessor = "null"
                                 doGetScreensaverAlbumImages(album, response.post_data[1])
                             end if
                         end for
@@ -149,7 +207,8 @@ Sub handleGetScreensaverAlbumList(event as object)
                         end if
                             
                         album_cache_count = album_cache_count+1
-        
+
+                        m.predecessor = "null"
                         doGetScreensaverAlbumImages(albumsObject[album_idx], response.post_data[1])
                         albumsObject.delete(album_idx)
         
@@ -215,11 +274,17 @@ Sub execScreensaver()
         generic1.timestamp  = "284040000"
         generic1.url        = "pkg:/images/screensaver_splash.png"
         m.photoItems.Push(generic1)
+        generic1            = {}
+        generic1.timestamp  = "284040000"
+        generic1.url        = "pkg:/images/black_pixel.png"
+        m.photoItems.Push(generic1)
+        m.predecessor       = "No images found. Try another album"
     end if
 
     print "START SHOW"
     m.screenActive = createObject("roSGNode", "DisplayPhotos")
     m.screenActive.id = "DisplayScreensaver"
+    m.screenActive.predecessor = m.predecessor
     m.screenActive.content = m.photoItems
     m.top.appendChild(m.screenActive)
     m.screenActive.setFocus(true)
