@@ -132,7 +132,7 @@ Sub handleGetSearch(event as object)
         'Expired Token
         doRefreshToken(response.post_data)
     else if response.code <> 200
-        errorMsg = "An Error Occured in 'handleGetSearch'. Code: "+(response.code).toStr()+" - " +response.error
+        errorMsg = "An Error Occurred in 'handleGetSearch'. Code: "+(response.code).toStr()+" - " +response.error
     else
         rsp=ParseXML(response.content)
         

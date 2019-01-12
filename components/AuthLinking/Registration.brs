@@ -67,7 +67,7 @@ Sub onNewToken(event as object)
     tokenData = event.getData()
 
     if tokenData.code <> 200
-        errorMsg = "An Error Occured in 'onNewToken'. Code: "+(tokenData.code).toStr()+" - " +tokenData.error
+        errorMsg = "An Error Occurred in 'onNewToken'. Code: "+(tokenData.code).toStr()+" - " +tokenData.error
     else
         json = ParseJson(tokenData.content)
         if json = invalid
@@ -114,7 +114,7 @@ Sub onCheckAuth(event as object)
     
     if pollData <> invalid
         if pollData.code <> 200
-            errorMsg = "An Error Occured in 'onCheckAuth'. Code: "+(pollData.code).toStr()+" - " +pollData.error
+            errorMsg = "An Error Occurred in 'onCheckAuth'. Code: "+(pollData.code).toStr()+" - " +pollData.error
         else
             json = ParseJson(pollData.content)
             if json = invalid
@@ -195,7 +195,7 @@ Sub onStoreUser(event as object)
     if userData <> invalid
     
         if userData.code <> 200
-            errorMsg = "An Error Occured in 'onStoreUser'. Code: "+(userData.code).toStr()+" - " +userData.error
+            errorMsg = "An Error Occurred in 'onStoreUser'. Code: "+(userData.code).toStr()+" - " +userData.error
         else
             json = ParseJson(userData.content)
             if json = invalid

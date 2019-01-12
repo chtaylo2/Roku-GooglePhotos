@@ -83,7 +83,7 @@ Sub handleGetAlbumList(event as object)
         'Expired Token
         doRefreshToken(response.post_data)
     else if response.code <> 200
-        errorMsg = "An Error Occured in 'handleGetAlbumList'. Code: "+(response.code).toStr()+" - " +response.error
+        errorMsg = "An Error Occurred in 'handleGetAlbumList'. Code: "+(response.code).toStr()+" - " +response.error
     else
         rsp=ParseXML(response.content)
         print rsp
@@ -139,7 +139,7 @@ Sub handleGetAlbumImages(event as object)
         'Expired Token
         doRefreshToken(response.post_data)
     else if response.code <> 200
-        errorMsg = "An Error Occured in 'handleGetAlbumImages'. Code: "+(response.code).toStr()+" - " +response.error
+        errorMsg = "An Error Occurred in 'handleGetAlbumImages'. Code: "+(response.code).toStr()+" - " +response.error
     else
         rsp=ParseXML(response.content)
         print rsp
