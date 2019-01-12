@@ -53,7 +53,6 @@ Function showFeaturesPopup()
     m.itemHeader.text       = "Version " + m.releaseVersion + " • New Features"
     m.screenActive          = createObject("roSGNode", "InfoPopup")
     m.screenActive.id       = "FeaturesPopup"
-    'm.screenActive.display  = "FeaturesPopup"
     m.top.appendChild(m.screenActive)
     m.screenActive.setFocus(true)
 End Function
@@ -89,6 +88,19 @@ Function checkRegistration()
 End function
 
 
+Function reRegistrar()
+    'REGISTER NEW USER
+    m.itemHeader.text   = "Registration"
+    m.screenActive = createObject("roSGNode", "Registration")
+    m.top.appendChild(m.screenActive)
+    m.screenActive.setFocus(true)  
+
+    if m.screenKill<>invalid then
+        m.top.removeChild(m.screenKill)
+    end if
+End function
+
+
 Function selectionLoad()
     m.itemHeader.text   = "Select User"
     m.screenActive      = createObject("roSGNode", "UserSelection")
@@ -103,7 +115,7 @@ End function
 
 
 Function mainLoad()
-    if (m.global.selectedUser <> -1) and (m.global.selectedUser <> -2)
+    if (m.global.selectedUser <> -1) and (m.global.selectedUser <> -2) and (m.global.selectedUser <> -3)
         'A user was selected, display!
         m.itemHeader.text = ""
         m.top.removeChild(m.screenActive)
@@ -114,7 +126,11 @@ Function mainLoad()
     else if m.global.selectedUser = -2
         'A user was unregistered
         m.screenKill = m.screenActive
-        checkRegistration()       
+        checkRegistration()
+    else if m.global.selectedUser = -3
+        'A users refresh token expired
+        m.screenKill = m.screenActive
+        reRegistrar()
     end if
 End function
 

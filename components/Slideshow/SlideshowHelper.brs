@@ -41,8 +41,14 @@ Function handleRefreshToken(event as object)
     refreshData = m.UriHandler.refreshToken
     
     if refreshData <> invalid
-        if refreshData.code <> 200
-            errorMsg = "An Error Occured in 'handleRefreshToken'. Code: "+(refreshData.code).toStr()+" - " +refreshData.error
+        if (refreshData.code <> 200) and (refreshData.code <> 400)
+            errorMsg = "An Error Occurred in 'handleRefreshToken'. Code: "+(refreshData.code).toStr()+" - " +refreshData.error
+        else if refreshData.code = 400
+            'CODE: 400 - Google will not allow us to use refresh token. Likely expired.
+            m.screenActive          = createObject("roSGNode", "ExpiredPopup")
+            m.screenActive.id       = "ExpiredPopup"
+            m.top.appendChild(m.screenActive)
+            m.screenActive.setFocus(true)
         else
             json = ParseJson(refreshData.content)
             if json = invalid

@@ -108,7 +108,7 @@ Sub handleGetAlbumSelection(event as object)
         'Expired Token
         doRefreshToken(response.post_data, response.post_data[1])
     else if response.code <> 200
-        errorMsg = "An Error Occured in 'handleGetAlbumSelection'. Code: "+(response.code).toStr()+" - " +response.error
+        errorMsg = "An Error Occurred in 'handleGetAlbumSelection'. Code: "+(response.code).toStr()+" - " +response.error
     else
         rsp=ParseXML(response.content)
         print rsp
