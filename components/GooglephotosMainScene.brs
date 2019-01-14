@@ -115,7 +115,11 @@ End function
 
 
 Function mainLoad()
-    if (m.global.selectedUser <> -1) and (m.global.selectedUser <> -2) and (m.global.selectedUser <> -3)
+
+    usersLoaded = oauth_count()
+    print "USERS LOADED: "; usersLoaded
+
+    if (m.global.selectedUser <> usersLoaded) and (m.global.selectedUser <> -1) and (m.global.selectedUser <> -2) and (m.global.selectedUser <> -3) and (m.global.selectedUser <> -4)
         'A user was selected, display!
         m.itemHeader.text = ""
         m.top.removeChild(m.screenActive)
@@ -123,6 +127,12 @@ Function mainLoad()
         m.screenActive.id   = "MainMenu"
         m.top.appendChild(m.screenActive)
         m.screenActive.setFocus(true)
+    else if m.global.selectedUser = usersLoaded
+        'So user can reselect
+        m.global.selectedUser = -4
+        'Add new user account
+        m.screenKill = m.screenActive
+        reRegistrar()
     else if m.global.selectedUser = -2
         'A user was unregistered
         m.screenKill = m.screenActive
