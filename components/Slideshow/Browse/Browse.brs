@@ -46,7 +46,7 @@ Sub onItemFocused()
         fileObj = myPath.Split()   
     
         timestamp = friendlyDate(strtoi(m.top.metaData[m.ImageGrid.itemFocused].timestamp))
-        m.itemLabelMain2.text = fileObj.filename.DecodeUri() + " - " + timestamp
+        m.itemLabelMain2.text = m.top.metaData[m.ImageGrid.itemFocused].filename + " - " + timestamp
     end if
 End Sub
 

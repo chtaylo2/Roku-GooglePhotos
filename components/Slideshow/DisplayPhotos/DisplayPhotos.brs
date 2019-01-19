@@ -398,6 +398,7 @@ Sub sendNextImage(direction=invalid)
         end if
     end if
     
+    print "DEBUG2: "; m.imageDisplay[nextID]
     mypath = CreateObject("roPath", m.imageDisplay[nextID].url)
     fileObj = myPath.Split()
     
@@ -410,9 +411,9 @@ Sub sendNextImage(direction=invalid)
     end if
     
     if m.imageDisplay[nextID].description <> invalid and m.imageDisplay[nextID].description <> "" then
-        m.pauseImageDetail2.text = m.imageDisplay[nextID].description + " - " + fileObj.filename.DecodeUri()
+        m.pauseImageDetail2.text = m.imageDisplay[nextID].description + " - " + m.imageDisplay[nextID].filename
     else
-        m.pauseImageDetail2.text = fileObj.filename.DecodeUri()
+        m.pauseImageDetail2.text = m.imageDisplay[nextID].filename
     end if
     
     'Stop rotating if only 1 image album

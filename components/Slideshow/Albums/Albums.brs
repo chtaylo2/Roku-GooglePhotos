@@ -75,28 +75,38 @@ Sub doGetAlbumList()
     tmpData = [ "doGetAlbumList" ]
 
     signedHeader = oauth_sign(m.global.selectedUser)
-    makeRequest(signedHeader, m.gp_prefix + "?kind=album&v=3.0&fields=entry(title,gphoto:numphotos,gphoto:user,gphoto:id,media:group(media:description,media:thumbnail))&thumbsize=300", "GET", "", 0, tmpData)
+    makeRequest(signedHeader, m.gp_prefix + "/albums", "GET", "", 0, tmpData)
 End Sub
 
 
-Sub doGetAlbumImages(album As Object, index=0 as Integer)
+Sub doGetAlbumImages(album As Object, pageNext="" As String)
     print "Albums.brs - [doGetAlbumImages]"
     
-    totalPages = ceiling(album.GetImageCount() / 1000)
+    'totalPages = ceiling(album.GetImageCount() / 1000)
     
     startIndex = 1
-    if index > 0 then startIndex=(index*1000)+1
+    'if index > 0 then startIndex=(index*1000)+1
 
     start = str(startIndex)
     start = start.Replace(" ", "")
 
-    print "GooglePhotos StartIndex: "; start
+    print "GooglePhotos pageNext: "; pageNext
     print "GooglePhotos Res: "; getResolution()
 
     tmpData = [ "doGetAlbumImages", album, start ]
 
+    params = "pageSize=100"
+    params = params + "&albumId=" + album.GetID()
+    if pageNext<>"" then
+        params = params + "&pageToken=" + pageNext
+    else
+        'First query, reset MetaData
+        m.videosMetaData    = []
+        m.imagesMetaData    = []
+    end if
+    
     signedHeader = oauth_sign(m.global.selectedUser)
-    makeRequest(signedHeader, m.gp_prefix + "/albumid/"+album.GetID()+"?start-index="+start+"&max-results=1000&kind=photo&v=3.0&fields=entry(title,gphoto:timestamp,gphoto:id,gphoto:streamId,gphoto:videostatus,media:group(media:description,media:content,media:thumbnail))&thumbsize=330&imgmax="+getResolution(), "GET", "", 1, tmpData)
+    makeRequest(signedHeader, m.gp_prefix + "/mediaItems:search/", "POST", params, 1, tmpData)
 End Sub
 
 
@@ -112,12 +122,17 @@ Sub handleGetAlbumList(event as object)
     else if response.code <> 200
         errorMsg = "An Error Occurred in 'handleGetAlbumList'. Code: "+(response.code).toStr()+" - " +response.error
     else
-        rsp=ParseXML(response.content)
-        print rsp
-        if rsp=invalid then
+        rsp=ParseJson(response.content)
+        'print rsp
+        
+        if rsp = invalid
             errorMsg = "Unable to parse Google Photos API response. Exit the channel then try again later. Code: "+(response.code).toStr()+" - " +response.error
+        else if type(rsp) <> "roAssociativeArray"
+            errorMsg = "Json response is not an associative array: handleGetAlbumList"
+        else if rsp.DoesExist("error")
+            errorMsg = "Json error response: [handleGetAlbumList] " + json.error
         else
-            m.albumsObject = googleAlbumListing(rsp.entry)
+            m.albumsObject = googleAlbumListing(rsp)
             googleDisplayAlbums(m.albumsObject)        
         end if
     end if
@@ -147,9 +162,16 @@ Sub handleGetAlbumImages(event as object)
     else if response.code <> 200
         errorMsg = "An Error Occurred in 'handleGetAlbumImages'. Code: "+(response.code).toStr()+" - " +response.error
     else
-        rsp=ParseXML(response.content)
-        if rsp=invalid then
+        rsp=ParseJson(response.content)
+        
+        'print rsp
+ 
+        if rsp = invalid
             errorMsg = "Unable to parse Google Photos API response. Exit the channel then try again later. Code: "+(response.code).toStr()+" - " +response.error
+        else if type(rsp) <> "roAssociativeArray"
+            errorMsg = "Json response is not an associative array: handleGetAlbumImages"
+        else if rsp.DoesExist("error")
+            errorMsg = "Json error response: [handleGetAlbumImages] " + json.error
         else
             showall = 1
             if ( m.albumsObject[m.albummarkupgrid.itemSelected].GetTitle() = "Google Photos Timeline" ) then
@@ -157,8 +179,33 @@ Sub handleGetAlbumImages(event as object)
                 showall = 0
             end if
 
-            m.imagesObject = googleImageListing(rsp.entry, showall)
-            googleDisplayImageMenu(m.albumsObject[m.albummarkupgrid.itemSelected], m.imagesObject)
+            imageList = googleImageListing(rsp, showall)
+
+            for each media in imageList
+                tmp             = {}
+                tmp.url         = media.GetURL()
+                tmp.thumbnail   = media.GetThumb()
+                tmp.timestamp   = media.GetTimestamp()
+                tmp.description = media.GetDescription()
+                tmp.filename    = media.GetFilename()
+        
+                if media.IsVideo() then
+                   m.videosMetaData.Push(tmp)
+                   'print "VIDEO: "; tmp.url
+                else
+                   m.imagesMetaData.Push(tmp)
+                   'print "IMAGE: "; tmp.url
+                end if
+            end for
+
+            print "PAGE: "; rsp["nextPageToken"]
+            if rsp["nextPageToken"]<>invalid then
+                album = m.albumsObject[m.albummarkupgrid.itemSelected]
+                pageNext = rsp["nextPageToken"]
+                doGetAlbumImages(album, pageNext)
+            end if
+            
+            googleDisplayImageMenu(m.albumsObject[m.albummarkupgrid.itemSelected])
         end if
     end if
     
@@ -295,7 +342,7 @@ End Sub
 Sub googleAlbumPages(album As Object)
     
     m.albumPages = createObject("RoSGNode","ContentNode")
-    totalPages   = album.GetImageCount() / 1000
+    totalPages   = album.GetImageCount() / 100
     currentCount = album.GetImageCount()
     page_start   = 0
     page_end     = 0
@@ -304,9 +351,9 @@ Sub googleAlbumPages(album As Object)
     
     for i = 1 to ceiling(totalPages)
         page_start = 1 + page_end
-        if currentCount > 1000 then
-            page_end=page_end + 1000
-            currentCount = currentCount - 1000
+        if currentCount > 100 then
+            page_end=page_end + 100
+            currentCount = currentCount - 100
         else
             page_end=page_end + currentCount
         end if
@@ -362,7 +409,7 @@ Sub onAlbumPageSelected()
 End Sub
 
 
-Sub googleDisplayImageMenu(album As Object, imageList As Object)
+Sub googleDisplayImageMenu(album As Object, imageList="" As Object)
     print "Albums.brs - [googleDisplayImageMenu]"
     
     m.menuSelected = createObject("RoSGNode","ContentNode")
@@ -376,23 +423,24 @@ Sub googleDisplayImageMenu(album As Object, imageList As Object)
         title      = album.GetTitle()
     end if
     
-    m.videosMetaData=[]
-    m.imagesMetaData=[]
-    for each media in imageList
-        tmp             = {}
-        tmp.url         = media.GetURL()
-        tmp.thumbnail   = media.GetThumb()
-        tmp.timestamp   = media.GetTimestamp()
-        tmp.description = media.GetDescription()
-        
-        if media.IsVideo() then
-            m.videosMetaData.Push(tmp)
-            'print "VIDEO: "; tmp.url
-        else
-            m.imagesMetaData.Push(tmp)
-            'print "IMAGE: "; tmp.url
-        end if
-    end for
+    'm.videosMetaData=[]
+    'm.imagesMetaData=[]
+    'for each media in imageList
+    '    tmp             = {}
+    '    tmp.url         = media.GetURL()
+    '    tmp.thumbnail   = media.GetThumb()
+    '    tmp.timestamp   = media.GetTimestamp()
+    '    tmp.description = media.GetDescription()
+    '    tmp.filename    = media.GetFilename()
+    '    
+    '    if media.IsVideo() then
+    '        m.videosMetaData.Push(tmp)
+    '        'print "VIDEO: "; tmp.url
+    '    else
+    '        m.imagesMetaData.Push(tmp)
+    '        'print "IMAGE: "; tmp.url
+    '    end if
+    'end for
     
     pagesShow  = ""
     if totalPages > 1 then
