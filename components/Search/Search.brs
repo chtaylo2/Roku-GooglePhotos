@@ -92,7 +92,7 @@ Sub doGetSearch(keyword as string)
         
         keyword = keyword.Replace(" ", "+")
         signedHeader = oauth_sign(m.global.selectedUser)
-        makeRequest(signedHeader, m.gp_prefix + "?kind=photo&v=3.0&q="+keyword+"&max-results=1000&thumbsize=220&imgmax="+getResolution(), "GET", "", 3, tmpData)
+        makeRequest(signedHeader, m.gp_prefix + "?deprecation-extension=true&kind=photo&v=3.0&q="+keyword+"&max-results=1000&thumbsize=220&imgmax="+getResolution(), "GET", "", 3, tmpData)
     end if
 End Sub
 

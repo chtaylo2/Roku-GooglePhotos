@@ -93,7 +93,7 @@ Sub doGetScreensaverAlbumList(selectedUser=0 as Integer)
 
     m.apiPending = m.apiPending+1
     signedHeader = oauth_sign(selectedUser)
-    makeRequest(signedHeader, m.gp_prefix + "?kind=album&v=3.0&fields=entry(title,gphoto:numphotos,gphoto:user,gphoto:id,media:group(media:description,media:thumbnail))", "GET", "", 0, tmpData)
+    makeRequest(signedHeader, m.gp_prefix + "?deprecation-extension=true&kind=album&v=3.0&fields=entry(title,gphoto:numphotos,gphoto:user,gphoto:id,media:group(media:description,media:thumbnail))", "GET", "", 0, tmpData)
 End Sub
 
 
@@ -105,7 +105,7 @@ Sub doGetScreensaverAlbumImages(album As Object, selectedUser=0 as Integer)
     
     m.apiPending = m.apiPending+1
     signedHeader = oauth_sign(selectedUser)
-    makeRequest(signedHeader, m.gp_prefix + "/albumid/"+album.GetID()+"?start-index=1&max-results=1000&kind=photo&v=3.0&fields=entry(title,gphoto:timestamp,gphoto:id,gphoto:streamId,gphoto:videostatus,media:group(media:description,media:content,media:thumbnail))&thumbsize=330&imgmax="+getResolution(), "GET", "", 1, tmpData)
+    makeRequest(signedHeader, m.gp_prefix + "/albumid/"+album.GetID()+"?deprecation-extension=true&start-index=1&max-results=1000&kind=photo&v=3.0&fields=entry(title,gphoto:timestamp,gphoto:id,gphoto:streamId,gphoto:videostatus,media:group(media:description,media:content,media:thumbnail))&thumbsize=330&imgmax="+getResolution(), "GET", "", 1, tmpData)
 End Sub
 
 
