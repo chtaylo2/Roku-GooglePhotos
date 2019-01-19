@@ -87,7 +87,7 @@ Sub doGetAlbumSelection()
         m.loadingSpinner.visible = true
         m.infoLabel.text = m.infoLabel.text + chr(10) + chr(10) + "Current user selected: " + m.userInfoName[selectedUser]
         signedHeader = oauth_sign(selectedUser)
-        makeRequest(signedHeader, m.gp_prefix + "?kind=album&v=3.0&fields=entry(title,gphoto:numphotos,gphoto:user,gphoto:id,media:group(media:description,media:thumbnail))&thumbsize=300", "GET", "", 0, tmpData)
+        makeRequest(signedHeader, m.gp_prefix + "?deprecation-extension=true&kind=album&v=3.0&fields=entry(title,gphoto:numphotos,gphoto:user,gphoto:id,media:group(media:description,media:thumbnail))&thumbsize=300", "GET", "", 0, tmpData)
     else
         m.infoLabel.text = m.infoLabel.text + chr(10) + chr(10) + "Unable to select albums for 'All (Random)'. A future version might allow this."
     end if
