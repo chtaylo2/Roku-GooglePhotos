@@ -18,6 +18,7 @@ Function loadCommon()
     m.gp_prefix       = m.gp_scope + "/v1"
     
     m.oauth_prefix    = "https://www.googleapis.com/oauth2/v4"
+    'm.oauth_prefix    = "https://accounts.google.com/o/oauth2"
     m.oauth_scope     = "https://picasaweb.google.com/data https://www.googleapis.com/auth/userinfo.email"
     
 End Function

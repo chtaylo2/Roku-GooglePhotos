@@ -9,6 +9,7 @@ Sub init()
     m.UriHandler = createObject("roSGNode","Content UrlHandler")
     m.UriHandler.observeField("albumList","handleGetAlbumList")
     m.UriHandler.observeField("albumImages","handleGetAlbumImages")
+    m.UriHandler.observeField("libraryImages","handleGetLibraryImages")
     m.UriHandler.observeField("refreshToken","handleRefreshToken")
 
     m.loadingSpinner    = m.top.findNode("loadingSpinner")
@@ -47,14 +48,16 @@ Sub loadingComplete()
     if m.top.imageContent<>invalid then
         'Show search results
     
-        album = CreateObject("roAssociativeArray")
-        album.GetTitle=function():return "Unused":end function
-        album.GetImageCount=function():return Int(1):end function
-        m.albumName = m.top.predecessor
+        'TODO: WILL WE SUPPORT SEARCH?
+        
+        'album = CreateObject("roAssociativeArray")
+        'album.GetTitle=function():return "Unused":end function
+        'album.GetImageCount=function():return Int(1):end function
+        'm.albumName = m.top.predecessor
 
-        rsp=ParseXML(m.top.imageContent.content)
-        m.imagesObject = googleImageListing(rsp.entry)
-        googleDisplayImageMenu(album, m.imagesObject)
+        'rsp=ParseXML(m.top.imageContent.content)
+        'm.imagesObject = googleImageListing(rsp.entry)
+        'googleDisplayImageMenu(album, m.imagesObject)
         
     else
         'Get user albums
@@ -76,6 +79,33 @@ Sub doGetAlbumList()
 
     signedHeader = oauth_sign(m.global.selectedUser)
     makeRequest(signedHeader, m.gp_prefix + "/albums", "GET", "", 0, tmpData)
+End Sub
+
+
+Sub doGetLibraryImages(pageNext="" As String)
+    print "Albums.brs - [doGetLibraryImages]"
+    
+    startIndex = 1
+
+    start = str(startIndex)
+    start = start.Replace(" ", "")
+
+    print "GooglePhotos pageNext: "; pageNext
+    print "GooglePhotos Res: "; getResolution()
+
+    tmpData = [ "doGetLibraryImages", "", start ]
+
+    params = "pageSize=100"
+    if pageNext<>"" then
+        params = params + "&pageToken=" + pageNext
+    else
+        'First query, reset MetaData
+        m.videosMetaData    = []
+        m.imagesMetaData    = []
+    end if
+    
+    signedHeader = oauth_sign(m.global.selectedUser)
+    makeRequest(signedHeader, m.gp_prefix + "/mediaItems", "GET", params, 7, tmpData)
 End Sub
 
 
@@ -173,18 +203,12 @@ Sub handleGetAlbumImages(event as object)
         else if rsp.DoesExist("error")
             errorMsg = "Json error response: [handleGetAlbumImages] " + json.error
         else
-            showall = 1
-            if ( m.albumsObject[m.albummarkupgrid.itemSelected].GetTitle() = "Google Photos Timeline" ) then
-                ' Remove any archived items from default store
-                showall = 0
-            end if
-
-            imageList = googleImageListing(rsp, showall)
+            imageList = googleImageListing(rsp)
 
             for each media in imageList
                 tmp             = {}
+                tmp.id          = media.GetID()
                 tmp.url         = media.GetURL()
-                tmp.thumbnail   = media.GetThumb()
                 tmp.timestamp   = media.GetTimestamp()
                 tmp.description = media.GetDescription()
                 tmp.filename    = media.GetFilename()
@@ -200,12 +224,78 @@ Sub handleGetAlbumImages(event as object)
 
             print "PAGE: "; rsp["nextPageToken"]
             if rsp["nextPageToken"]<>invalid then
-                album = m.albumsObject[m.albummarkupgrid.itemSelected]
+                album = m.albumsObject[m.albummarkupgrid.itemSelected-1]
                 pageNext = rsp["nextPageToken"]
                 doGetAlbumImages(album, pageNext)
+            else
+                googleDisplayImageMenu(m.albumsObject[m.albummarkupgrid.itemSelected-1].GetTitle(), m.albumsObject[m.albummarkupgrid.itemSelected-1].GetImageCount())
             end if
-            
-            googleDisplayImageMenu(m.albumsObject[m.albummarkupgrid.itemSelected])
+        end if
+    end if
+    
+    if errorMsg<>"" then
+        'ShowNotice
+        m.noticeDialog.visible = true
+        buttons =  [ "OK" ]
+        m.noticeDialog.message = errorMsg
+        m.noticeDialog.buttons = buttons
+        m.noticeDialog.setFocus(true)
+        m.noticeDialog.observeField("buttonSelected","noticeClose")
+    end if
+    
+End Sub
+
+
+Sub handleGetLibraryImages(event as object)
+    print "Albums.brs [handleGetLibraryImages]"
+  
+    errorMsg = ""
+    response = event.getData()
+    
+    if (response.code = 401) or (response.code = 403) then
+        'Expired Token
+        doRefreshToken(response.post_data)
+    else if response.code <> 200
+        errorMsg = "An Error Occurred in 'handleGetAlbumImages'. Code: "+(response.code).toStr()+" - " +response.error
+    else
+        rsp=ParseJson(response.content)
+        
+        'print rsp
+ 
+        if rsp = invalid
+            errorMsg = "Unable to parse Google Photos API response. Exit the channel then try again later. Code: "+(response.code).toStr()+" - " +response.error
+        else if type(rsp) <> "roAssociativeArray"
+            errorMsg = "Json response is not an associative array: handleGetAlbumImages"
+        else if rsp.DoesExist("error")
+            errorMsg = "Json error response: [handleGetAlbumImages] " + json.error
+        else
+            imageList = googleImageListing(rsp)
+
+            for each media in imageList
+                tmp             = {}
+                tmp.id          = media.GetID()
+                tmp.url         = media.GetURL()
+                tmp.timestamp   = media.GetTimestamp()
+                tmp.description = media.GetDescription()
+                tmp.filename    = media.GetFilename()
+        
+                if media.IsVideo() then
+                   m.videosMetaData.Push(tmp)
+                   'print "VIDEO: "; tmp.url
+                else
+                   m.imagesMetaData.Push(tmp)
+                   'print "IMAGE: "; tmp.url
+                end if
+            end for
+
+            print "PAGE: "; rsp["nextPageToken"]
+            'if rsp["nextPageToken"]<>invalid then
+            '    album = m.albumsObject[m.albummarkupgrid.itemSelected-1]
+            '    pageNext = rsp["nextPageToken"]
+                'doGetLibraryImages(album, pageNext)
+            'else
+                googleDisplayImageMenu("Google Photos Library")
+            'end if
         end if
     end if
     
@@ -237,10 +327,27 @@ Sub onItemSelected()
 
     selection = m.albummarkupgrid.content.getChild(m.albummarkupgrid.itemSelected)
 
-    if selection.id = "GP_ALBUM_LISTING" then
+    if selection.id = "GP_ALBUM_LISTING_LIBRARY" then
         m.albumSelection = m.albummarkupgrid.itemSelected
-        album = m.albumsObject[m.albummarkupgrid.itemSelected]
-        m.albumName = album.GetTitle()
+        m.albumName = selection.shortdescriptionline1
+
+        m.itemLabelMain2.text = m.albumName
+        m.itemLabelMain3.text = ""
+
+        'TODO: ADD IN DETAILS ABOUT UNABLE TO COUNT LIBRARY PHOTOS, ETC.  Thanks Google..
+        lastPopup = RegRead("ThousandPopup","Settings")
+        if (lastPopup=invalid or lastPopup<>"true") then showThousandPopup()
+        
+        'Display Loading Spinner
+        showLoadingSpinner(3, "GP_LOADING")
+        
+        'API CALL: Get album image listing
+        doGetLibraryImages()
+        
+    else if selection.id = "GP_ALBUM_LISTING" then
+        m.albumSelection = m.albummarkupgrid.itemSelected
+        album = m.albumsObject[m.albummarkupgrid.itemSelected-1]
+        m.albumName = selection.shortdescriptionline1
 
         m.itemLabelMain2.text = m.albumName
         m.itemLabelMain3.text = ""
@@ -277,7 +384,7 @@ Sub onItemSelected()
         
         m.imageThumbList = createObject("RoSGNode","ContentNode")
         for i = 0 to m.imagesMetaData.Count()-1
-            addItem(m.imageThumbList, "GP_BROWSE", m.imagesMetaData[i].thumbnail, "", "")
+            addItem(m.imageThumbList, "GP_BROWSE", m.imagesMetaData[i].url, "", "")
         end for
         
         m.screenActive = createObject("roSGNode", "Browse")
@@ -309,33 +416,27 @@ End Sub
 
 Sub googleDisplayAlbums(albumList As Object)
 
-    if albumList.Count() = 0 then
-        m.itemLabelMain1.text = "There are no albums to display"
-        m.itemLabelMain2.text = "See 'Tips and Tricks' on how to create new albums"
-
-        'Turn off Loading Spinner
-        m.loadingSpinner.visible = "false"
+    'Everyone has a Google Photos Library in account
+    addItem(m.albumListContent, "GP_ALBUM_LISTING_LIBRARY", m.userInfoPhoto[m.global.selectedUser], "Google Photos Library", "")
+    for each album in albumList
+        'All other albums
+        addItem(m.albumListContent, "GP_ALBUM_LISTING", album.GetThumb(), album.GetTitle(), Pluralize(album.GetImageCount(),"Item"))
+    end for
         
-    else
-        for each album in albumList
-            addItem(m.albumListContent, "GP_ALBUM_LISTING", album.GetThumb(), album.GetTitle(), Pluralize(album.GetImageCount(),"Item"))
-        end for
+    m.albummarkupgrid.content = m.albumListContent
         
-        m.albummarkupgrid.content = m.albumListContent
+    centerMarkupGrid()
+    showMarkupGrid()
+    onItemFocused()
         
-        centerMarkupGrid()
-        showMarkupGrid()
-        onItemFocused()
+    m.albummarkupgrid.observeField("itemFocused", "onItemFocused") 
+    m.albummarkupgrid.observeField("itemSelected", "onItemSelected")
         
-        m.albummarkupgrid.observeField("itemFocused", "onItemFocused") 
-        m.albummarkupgrid.observeField("itemSelected", "onItemSelected")
+    'Turn off Loading Spinner
+    m.loadingSpinner.visible = "false"
         
-        'Turn off Loading Spinner
-        m.loadingSpinner.visible = "false"
-        
-        m.itemLabelMain3.text = "<<     Paging     >>"
-    end if
-    
+    m.itemLabelMain3.text = "<<     Paging     >>"
+   
 End Sub
 
 
@@ -409,38 +510,19 @@ Sub onAlbumPageSelected()
 End Sub
 
 
-Sub googleDisplayImageMenu(album As Object, imageList="" As Object)
+Sub googleDisplayImageMenu(albumTitle as String, albumCount=0 as Integer)
     print "Albums.brs - [googleDisplayImageMenu]"
     
     m.menuSelected = createObject("RoSGNode","ContentNode")
-    totalPages     = ceiling(album.GetImageCount() / 1000)
+    totalPages     = ceiling(albumCount / 1000)
     listIcon       = "pkg:/images/browse.png"
     videoOnly      = false
     
     if m.top.predecessor<>"" then
         title      = m.top.predecessor
     else
-        title      = album.GetTitle()
+        title      = albumTitle
     end if
-    
-    'm.videosMetaData=[]
-    'm.imagesMetaData=[]
-    'for each media in imageList
-    '    tmp             = {}
-    '    tmp.url         = media.GetURL()
-    '    tmp.thumbnail   = media.GetThumb()
-    '    tmp.timestamp   = media.GetTimestamp()
-    '    tmp.description = media.GetDescription()
-    '    tmp.filename    = media.GetFilename()
-    '    
-    '    if media.IsVideo() then
-    '        m.videosMetaData.Push(tmp)
-    '        'print "VIDEO: "; tmp.url
-    '    else
-    '        m.imagesMetaData.Push(tmp)
-    '        'print "IMAGE: "; tmp.url
-    '    end if
-    'end for
     
     pagesShow  = ""
     if totalPages > 1 then
@@ -455,15 +537,15 @@ Sub googleDisplayImageMenu(album As Object, imageList="" As Object)
 
     if m.videosMetaData.Count()>0 then        
         if m.imagesMetaData.Count()>0 then 'Combined photo and photo album
-            addItem(m.menuSelected, "GP_SLIDESHOW_START", m.imagesMetaData[0].thumbnail, Pluralize(m.imagesMetaData.Count(),"Photo") + " - Start Slideshow", title)
-            addItem(m.menuSelected, "GP_VIDEO_BROWSE", m.videosMetaData[0].thumbnail, Pluralize(m.videosMetaData.Count(),"Video") + " - Browse", title)
+            addItem(m.menuSelected, "GP_SLIDESHOW_START", m.imagesMetaData[0].url, Pluralize(m.imagesMetaData.Count(),"Photo") + " - Start Slideshow", title)
+            addItem(m.menuSelected, "GP_VIDEO_BROWSE", m.videosMetaData[0].url, Pluralize(m.videosMetaData.Count(),"Video") + " - Browse", title)
             addItem(m.menuSelected, "GP_IMAGE_BROWSE", listIcon, Pluralize(m.imagesMetaData.Count(),"Photo") + " - Browse", title)
        else 'Video only album
-            addItem(m.menuSelected, "GP_VIDEO_BROWSE", m.videosMetaData[0].thumbnail, Pluralize(m.videosMetaData.Count(),"Video") + " - Browse", title)
+            addItem(m.menuSelected, "GP_VIDEO_BROWSE", m.videosMetaData[0].url, Pluralize(m.videosMetaData.Count(),"Video") + " - Browse", title)
             videoOnly = true
         end if
     else 'Photo only album          
-        addItem(m.menuSelected, "GP_SLIDESHOW_START", m.imagesMetaData[0].thumbnail, Pluralize(m.imagesMetaData.Count(),"Photo") + " - Start Slideshow", title)
+        addItem(m.menuSelected, "GP_SLIDESHOW_START", m.imagesMetaData[0].url, Pluralize(m.imagesMetaData.Count(),"Photo") + " - Start Slideshow", title)
         addItem(m.menuSelected, "GP_IMAGE_BROWSE", listIcon, Pluralize(m.imagesMetaData.Count(),"Photo") + " - Browse", title)
     end if
     
@@ -533,7 +615,7 @@ End Sub
 Sub displayVideoBrowse()
     m.videoThumbList = createObject("RoSGNode","ContentNode")
     for i = 0 to m.videosMetaData.Count()-1
-        addItem(m.videoThumbList, "GP_BROWSE", m.videosMetaData[i].thumbnail, "", "")
+        addItem(m.videoThumbList, "GP_BROWSE", m.videosMetaData[i].url, "", "")
     end for
             
     m.screenActive = createObject("roSGNode", "Browse")
@@ -629,7 +711,7 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
                 return true
             end if      
 
-            if (m.albummarkupgrid.content <> invalid) and ( (m.albummarkupgrid.content.getChild(0).id <> "GP_ALBUM_LISTING") or (m.albumPageList.hasFocus() = true) ) and (m.top.imageContent = invalid)
+            if (m.albummarkupgrid.content <> invalid) and ( (m.albummarkupgrid.content.getChild(0).id <> "GP_ALBUM_LISTING_LIBRARY") or (m.albumPageList.hasFocus() = true) )    ' and (m.top.imageContent = invalid)
                 m.albummarkupgrid.content       = m.albumListContent
                 m.albummarkupgrid.jumpToItem    = m.albumSelection
                 m.settingsIcon.visible          = false

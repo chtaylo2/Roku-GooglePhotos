@@ -156,10 +156,6 @@ Function googleAlbumCreateRecord(json As Object) As Object
     album.GetImageCount=function():return Val(getString(m.json,"mediaItemsCount")):end function
     album.GetThumb=function():return getString(m.json,"coverPhotoBaseUrl"):end function
     
-    'if album.GetTitle() = "Auto Backup" then
-    '    album.GetTitle=function():return "Google Photos Timeline":end function
-    'end if
-    
     return album
 End Function
 
@@ -171,15 +167,13 @@ End Function
 ' **
 ' ********************************************************************
 
-Function googleImageListing(jsonlist As Object, showall=1 as Integer) As Object
+Function googleImageListing(jsonlist As Object) As Object
     images=CreateObject("roList")
-    print formatJSON(jsonlist)
+    'print formatJSON(jsonlist)
     for each record in jsonlist["mediaItems"]
         image=googleImageCreateRecord(record)
         if image.GetURL()<>invalid then
-            if showall=1
-                images.Push(image)
-            end if
+            images.Push(image)
         end if
     next
     
@@ -195,7 +189,6 @@ Function googleImageCreateRecord(json As Object) As Object
     image.GetID=function():return getString(m.json,"id"):end function
     image.GetDescription=function():return "":end function
     image.GetURL=function():return getString(m.json,"baseUrl"):end function
-    image.GetThumb=function():return getString(m.json,"baseUrl"):end function
     image.GetFilename=function():return getString(m.json,"filename"):end function
     image.GetTimestamp=function():return getString(m.json["mediaMetadata"],"creationTime"):end function
     image.IsVideo=function():return 0:end function

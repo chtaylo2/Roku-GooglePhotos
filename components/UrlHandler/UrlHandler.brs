@@ -153,6 +153,8 @@ Sub processResponse(msg as Object)
             m.top.poll_token_response = job.context.context.response
         else if result.num = 6
             m.top.userinfo_response   = job.context.context.response
+        else if result.num = 7
+            m.top.libraryImages       = job.context.context.response
         end if
     else
         print "Error: event for unknown job "; idkey

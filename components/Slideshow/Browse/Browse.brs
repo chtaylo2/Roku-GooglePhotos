@@ -42,7 +42,7 @@ Sub onItemFocused()
     'print "FOCUSED: "; m.ImageGrid.itemFocused
     
     if (m.top.metaData[m.ImageGrid.itemFocused].timestamp <> invalid) then
-        mypath = CreateObject("roPath", m.top.metaData[m.ImageGrid.itemFocused].thumbnail)
+        mypath = CreateObject("roPath", m.top.metaData[m.ImageGrid.itemFocused].url)
         fileObj = myPath.Split()   
     
         timestamp = friendlyDate(strtoi(m.top.metaData[m.ImageGrid.itemFocused].timestamp))
