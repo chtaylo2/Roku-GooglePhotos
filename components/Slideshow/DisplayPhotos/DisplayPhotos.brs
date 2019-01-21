@@ -358,7 +358,7 @@ Sub sendNextImage(direction=invalid)
     end if
     
     m.imageTracker = nextID
-    
+
     url = m.imageDisplay[nextID].url
     
     'Pull image from downloaded cache if avalable
@@ -398,9 +398,7 @@ Sub sendNextImage(direction=invalid)
         end if
     end if
     
-    print "DEBUG2: "; m.imageDisplay[nextID]
-    mypath = CreateObject("roPath", m.imageDisplay[nextID].url)
-    fileObj = myPath.Split()
+    print "DEBUG - m.imageDisplay[";nextID;" ]: "; m.imageDisplay[nextID]
     
     m.pauseImageCount.text   = itostr(nextID+1)+" of "+itostr(m.imageDisplay.Count())
     m.pauseImageDetail.text  = friendlyDate(strtoi(m.imageDisplay[nextID].timestamp))

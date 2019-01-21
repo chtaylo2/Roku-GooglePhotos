@@ -191,8 +191,11 @@ Function googleImageCreateRecord(json As Object) As Object
     image.GetURL=function():return getString(m.json,"baseUrl"):end function
     image.GetFilename=function():return getString(m.json,"filename"):end function
     image.GetTimestamp=function():return getString(m.json["mediaMetadata"],"creationTime"):end function
-    image.IsVideo=function():return 0:end function
-    image.GetVideoStatus=function():return "":end function
+    image.IsVideo=function():return (m.json["mediaMetadata"]["video"]<>invalid):end function
+    image.GetVideoStatus=function():return getString(m.json["mediaMetadata"]["video"],"status"):end function
+    
+    print "IsVideo: "; image.IsVideo()
+    print "GetVideoStatus: "; image.GetVideoStatus()
     
     return image
 End Function

@@ -80,7 +80,7 @@ End Sub
 Sub doVideoShow(videoStore as object)
     print "Browse.brs [doVideoShow]"
     
-    thumbnailPath = CreateObject("roPath", videoStore.thumbnail)
+    thumbnailPath = CreateObject("roPath", videoStore.url)
     thumbnailObj  = thumbnailPath.Split()
     
     videoFile     = videoStore.url
@@ -91,7 +91,7 @@ Sub doVideoShow(videoStore as object)
 
     videoContent              = createObject("RoSGNode", "ContentNode")
     videoContent.ContentType  = "movie"
-    videoContent.url          = videoStore.url
+    videoContent.url          = videoStore.url+"=m18"
     videoContent.streamformat = "mp4"
     videoContent.Title        = friendlyDate(StrToI(videoStore.timestamp))
     if videoStore.description <> "" then

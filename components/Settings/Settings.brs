@@ -202,25 +202,30 @@ Sub storeResolutionOptions()
     regSelection = RegRead(regStore, "Settings")
 
     device  = createObject("roDeviceInfo")
-    is4k    = (val(device.GetVideoMode()) = 2160)
+    is4k    = (val(device.GetVideoMode()) >= 2160)
     is1080p = (val(device.GetVideoMode()) = 1080)
+    is720p  = (val(device.GetVideoMode()) = 720)
+    
+    print "RES: "; val(device.GetVideoMode())
 
     m.content = createObject("RoSGNode","ContentNode")
     
     if regSelection = "SD" then radioSelection = 0
-    addItem(m.content, "Standard Definition (SD)", "SD", regStore)
+    addItem(m.content, "Standard Definition 480p (SD)", "SD", regStore)
 
+    if is4k Or is1080p Or is720p then
+        if regSelection = "HD720" then radioSelection = 1
+        addItem(m.content, "High Definition 720p (HD)", "HD720", regStore)
+    end if
+    
     if is4k Or is1080p then
-        if regSelection = "HD" then radioSelection = 1
-        addItem(m.content, "High Definition (HD)", "HD", regStore)
+        if (regSelection = "FHD" or regSelection = "HD") then radioSelection = 2
+        addItem(m.content, "Full High Definition 1080p (FHD)", "FHD", regStore)
     end if
     
     if is4k then
-        if regSelection = "FHD" then radioSelection = 2
-        addItem(m.content, "Full High Definition (FHD)", "FHD", regStore)
-
         if regSelection = "UHD" then radioSelection = 3
-        addItem(m.content, "Ultra High Definition [Beta]", "UHD", regStore)               
+        addItem(m.content, "Ultra High Definition 4K (UHD)", "UHD", regStore)               
     end if
 
     'Store content node and current registry selection

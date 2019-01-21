@@ -105,7 +105,7 @@ Sub doGetLibraryImages(pageNext="" As String)
     end if
     
     signedHeader = oauth_sign(m.global.selectedUser)
-    makeRequest(signedHeader, m.gp_prefix + "/mediaItems", "GET", params, 7, tmpData)
+    makeRequest(signedHeader, m.gp_prefix + "/mediaItems?"+params, "GET", "", 7, tmpData)
 End Sub
 
 
@@ -217,8 +217,10 @@ Sub handleGetAlbumImages(event as object)
                    m.videosMetaData.Push(tmp)
                    'print "VIDEO: "; tmp.url
                 else
+                   'Inject the requested resolution size
+                   tmp.url = tmp.url + getResolution()
                    m.imagesMetaData.Push(tmp)
-                   'print "IMAGE: "; tmp.url
+                   print "IMAGE: "; tmp.url
                 end if
             end for
 

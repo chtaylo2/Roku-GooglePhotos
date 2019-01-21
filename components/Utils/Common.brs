@@ -14,7 +14,7 @@ Function loadCommon()
     ' Common varables for needed for Oauth and GooglePhotos API
     
     m.releaseVersion  = "3.0"
-    m.gp_scope        = "https://photoslibrary.googleapis.com/"
+    m.gp_scope        = "https://photoslibrary.googleapis.com"
     m.gp_prefix       = m.gp_scope + "/v1"
     
     m.oauth_prefix    = "https://www.googleapis.com/oauth2/v4"
@@ -291,23 +291,28 @@ Function getResolution()
 
     if ssres=invalid then
         device  = createObject("roDeviceInfo")
-        is4k    = (val(device.GetVideoMode()) = 2160)
+        is4k    = (val(device.GetVideoMode()) >= 2160)
         is1080p = (val(device.GetVideoMode()) = 1080)
+        is720p  = (val(device.GetVideoMode()) = 720)
 
         if is4k then
-            resolution = "1600"
+            resolution = "=w3840-h2160"
         else if is1080p
-            resolution = "1280"
+            resolution = "=w1920-h1080"
+        else if is720p
+            resolution = "=w1280-h720"
         else
-            resolution = "720"
+            resolution = "=w640-h480"
         end if
-    else
-        if ssres="FHD" or ssres="UHD" then
-            resolution = "1600"
-        else if ssres="HD"
-            resolution = "1280"
+    else    
+        if ssres="UHD" then
+            resolution = "=w3840-h2160"
+        else if (ssres="FHD" or ssres="HD")
+            resolution = "=w1920-h1080"
+        else if ssres="HD720"
+            resolution = "=w1280-h720"
         else
-            resolution = "720"
+            resolution = "=w640-h480"
         end if
     end if
     

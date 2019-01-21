@@ -35,9 +35,11 @@
                     mypath = CreateObject("roPath", item.url)
                     fileObj = myPath.Split()
         
-                    fname =  "tmp:/" + itostr(unique) + "_" + fileObj.filename
+                    fname =  "tmp:/" + itostr(unique) + "_" + item.filename
+                    
+                    print "Fname: "; fname
         
-                    'print "Caching Image: "; item.url
+                    print "Caching Image: "; item.url
                     httpObj.setUrl(item.url)
                     httpObj.AsyncGetToFile( fname )
     
