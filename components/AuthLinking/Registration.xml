@@ -85,7 +85,7 @@
         <Timer
             id          = "LoginTimer"
             repeat      = "true"
-            duration    = "5"
+            duration    = "8"
         />
         
         <Timer

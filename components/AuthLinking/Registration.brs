@@ -47,7 +47,7 @@ Sub doGenerateToken()
     params = "client_id="        + m.clientId
     params = params + "&scope="  + m.oauth_scope
 
-    makeRequest({}, m.oauth_prefix+"/device/code", "POST", params, 4, [])
+    makeRequest({}, m.register_prefix+"/cgi-bin/device/code", "POST", params, 4, [])
 End Sub
 
 
@@ -172,11 +172,9 @@ Sub onCheckAuth(event as object)
         m.LoginTimer.control = "stop"
     else
         params = "client_id="                 + m.clientId
-        params = params + "&client_secret="   + m.clientSecret
         params = params + "&code="            + m.deviceCode
-        params = params + "&grant_type="      + "http://oauth.net/grant_type/device/1.0"
     
-        makeRequest({}, m.oauth_prefix+"/token", "POST", params, 5, [])
+        makeRequest({}, m.register_prefix+"/cgi-bin/device/token", "POST", params, 5, [])
 
         m.LoginTimer.repeat = true
         m.LoginTimer.control = "start"

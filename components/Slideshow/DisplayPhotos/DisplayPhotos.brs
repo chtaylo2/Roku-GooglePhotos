@@ -133,10 +133,6 @@ Sub loadImageList()
             end if 
         end if
         
-        if m.showRes = "UHD" then
-            originalList[nxt].url = originalList[nxt].url.Replace("/s1600/", "/s2160/")
-        end if
-        
         m.imageDisplay.push(originalList[nxt])
         originalList.Delete(nxt)
                  

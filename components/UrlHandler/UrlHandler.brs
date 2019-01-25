@@ -59,7 +59,7 @@ Function addRequest(request as Object) as Boolean
                 method = parameters.method
                 uri = parameters.uri
                 params = parameters.params
-
+                
                 if type(uri) = "roString"
                     urlXfer = createObject("roUrlTransfer")
                     urlXfer.SetCertificatesFile("common:/certs/ca-bundle.crt")

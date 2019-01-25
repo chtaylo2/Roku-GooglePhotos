@@ -187,7 +187,7 @@ Function googleImageCreateRecord(json As Object) As Object
     image.json=json
     image.GetTitle=function():return "":end function
     image.GetID=function():return getString(m.json,"id"):end function
-    image.GetDescription=function():return "":end function
+    image.GetDescription=function():return getString(m.json,"description"):end function
     image.GetURL=function():return getString(m.json,"baseUrl"):end function
     image.GetFilename=function():return getString(m.json,"filename"):end function
     image.GetTimestamp=function():return getString(m.json["mediaMetadata"],"creationTime"):end function
