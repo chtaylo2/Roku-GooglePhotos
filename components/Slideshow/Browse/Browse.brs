@@ -39,7 +39,7 @@ End Sub
 
 Sub onItemFocused()
     'Item selected
-    'print "FOCUSED: "; m.ImageGrid.itemFocused
+    'print "FOCUSED: "; m.top.metaData[m.ImageGrid.itemFocused]
     
     if (m.top.metaData[m.ImageGrid.itemFocused].timestamp <> invalid) then
         mypath = CreateObject("roPath", m.top.metaData[m.ImageGrid.itemFocused].url)

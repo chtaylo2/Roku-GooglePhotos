@@ -133,6 +133,7 @@ Sub loadImageList()
             end if 
         end if
         
+        originalList[nxt].url = originalList[nxt].url+getResolution(m.showRes)
         m.imageDisplay.push(originalList[nxt])
         originalList.Delete(nxt)
                  

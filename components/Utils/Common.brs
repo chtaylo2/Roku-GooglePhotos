@@ -286,33 +286,41 @@ Sub makeRequest(headers as Object, url as String, method as String, post_params 
 End Sub
 
 
-Function getResolution()
+Function getResolution(setting=invalid As String)
     ssres = RegRead("SlideshowRes","Settings")
 
-    if ssres=invalid then
+    resUHD   = "=w3840-h2160"
+    resFHD   = "=w1920-h1080"
+    resHD720 = "=w1280-h720"
+    resSD    = "=w640-h480"
+
+    'Using selected settings
+    if setting<>invalid then
+        if setting="UHD" then
+            resolution = resUHD
+        else if (setting="FHD" or setting="HD")
+            resolution = resFHD
+        else if setting="HD720"
+            resolution = resHD720
+        else
+            resolution = resSD
+        end if    
+    
+    'No res size selected
+    else
         device  = createObject("roDeviceInfo")
         is4k    = (val(device.GetVideoMode()) >= 2160)
         is1080p = (val(device.GetVideoMode()) = 1080)
         is720p  = (val(device.GetVideoMode()) = 720)
 
         if is4k then
-            resolution = "=w3840-h2160"
+            resolution = resUHD
         else if is1080p
-            resolution = "=w1920-h1080"
+            resolution = resFHD
         else if is720p
-            resolution = "=w1280-h720"
+            resolution = resHD720
         else
-            resolution = "=w640-h480"
-        end if
-    else    
-        if ssres="UHD" then
-            resolution = "=w3840-h2160"
-        else if (ssres="FHD" or ssres="HD")
-            resolution = "=w1920-h1080"
-        else if ssres="HD720"
-            resolution = "=w1280-h720"
-        else
-            resolution = "=w640-h480"
+            resolution = resSD
         end if
     end if
     

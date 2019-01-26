@@ -54,6 +54,7 @@ Function addRequest(request as Object) as Boolean
         context = request.context
         if type(context) = "roSGNode"
             parameters = context.parameters
+            'print parameters
             if type(parameters)="roAssociativeArray"
                 headers = parameters.headers
                 method = parameters.method
@@ -133,9 +134,10 @@ Sub processResponse(msg as Object)
             post_data:   post_data
             num:         jobnum
         }
+
         'print "URL RESULT: ";  result
-        'print "MSG: "; msg
-    
+        'print "MSG: "; msg.GetResponseCode()
+        
         ' could handle various error codes, retry, etc. here
         m.jobsById.delete(idKey)
         job.context.context.response = result

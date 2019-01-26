@@ -37,7 +37,7 @@
         
                     fname =  "tmp:/" + itostr(unique) + "_" + item.filename
                     
-                    print "Fname: "; fname
+                    'print "Fname: "; fname
         
                     print "Caching Image: "; item.url
                     httpObj.setUrl(item.url)
@@ -51,7 +51,7 @@
                 fs = CreateObject("roFileSystem")
                 fslist = fs.GetDirectoryListing("tmp:/")
       
-                print "FILESYSTEM STATUS: "; fslist
+                'print "FILESYSTEM STATUS: "; fslist
 
                 m.top.filesystem = fslist.ToArray()
                 m.top.localarray = response

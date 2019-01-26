@@ -154,7 +154,11 @@ Function googleAlbumCreateRecord(json As Object) As Object
     album.GetTitle=function():return getString(m.json,"title"):end function
     album.GetID=function():return getString(m.json,"id"):end function
     album.GetImageCount=function():return Val(getString(m.json,"mediaItemsCount")):end function
-    album.GetThumb=function():return getString(m.json,"coverPhotoBaseUrl"):end function
+    album.GetThumb=function():return getString(m.json,"coverPhotoBaseUrl")+getResolution("SD"):end function
+    
+    album.previousPageTokens = []
+    album.showCountStart = 1
+    album.showCountEnd = 0
     
     return album
 End Function
@@ -194,37 +198,5 @@ Function googleImageCreateRecord(json As Object) As Object
     image.IsVideo=function():return (m.json["mediaMetadata"]["video"]<>invalid):end function
     image.GetVideoStatus=function():return getString(m.json["mediaMetadata"]["video"],"status"):end function
     
-    print "IsVideo: "; image.IsVideo()
-    print "GetVideoStatus: "; image.GetVideoStatus()
-    
     return image
-End Function
-
-
-Function get_thumb()
-    if m.xml.GetNamedElements("media:group")[0].GetNamedElements("media:thumbnail").Count()>0 then
-        return m.xml.GetNamedElements("media:group")[0].GetNamedElements("media:thumbnail")[0].GetAttributes()["url"]
-    end if
-    
-    return "pkg:/images/icon_s.png"
-End Function
-
-
-Function get_image_url()
-    images=m.xml.GetNamedElements("media:group")[0].GetNamedElements("media:content")
-    if m.IsVideo() then
-        if m.GetVideoStatus()="final" or m.GetVideoStatus()="ready" then
-            for each image in images
-                if image.GetAttributes()["type"]="video/mpeg4" then
-                    return image.GetAttributes()["url"]
-                end if
-            end for
-        end if
-    else
-        if images[0]<>invalid then
-            return images[0].GetAttributes()["url"]
-        end if
-    end if
-    
-    return invalid
 End Function
