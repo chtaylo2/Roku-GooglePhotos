@@ -45,7 +45,7 @@ Sub onItemFocused()
         mypath = CreateObject("roPath", m.top.metaData[m.ImageGrid.itemFocused].url)
         fileObj = myPath.Split()   
     
-        timestamp = friendlyDate(strtoi(m.top.metaData[m.ImageGrid.itemFocused].timestamp))
+        timestamp = friendlyDate(m.top.metaData[m.ImageGrid.itemFocused].timestamp)
         m.itemLabelMain2.text = m.top.metaData[m.ImageGrid.itemFocused].filename + " - " + timestamp
     end if
 End Sub
@@ -93,7 +93,7 @@ Sub doVideoShow(videoStore as object)
     videoContent.ContentType  = "movie"
     videoContent.url          = videoStore.url+"=m18"
     videoContent.streamformat = "mp4"
-    videoContent.Title        = friendlyDate(StrToI(videoStore.timestamp))
+    videoContent.Title        = friendlyDate(videoStore.timestamp)
     if videoStore.description <> "" then
         videoContent.TitleSeason = videoStore.description  + " - " + thumbnailObj.filename
     else

@@ -28,7 +28,7 @@ End Sub
 
 Sub loadingComplete()
     m.itemLabelHeader.text = "Google Photos Access Expired"
-    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "We're having trouble refreshing your access token. This is common if it's been over 6 months since you used this channel."
+    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "We're having trouble refreshing your access token. This is common if it's been over 6 months since you used this channel or access was revoked."
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + chr(10) + "Select the Re-Register button below to link your account back to this device!"
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + chr(10) + "If you feel this might be in error, please exit the channel and try again later."
 End Sub

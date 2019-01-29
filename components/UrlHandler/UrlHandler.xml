@@ -6,7 +6,6 @@
         <field id = "request"             type = "assocarray" />
         <field id = "albumList"           type = "assocarray" alwaysNotify = "true"/>
         <field id = "albumImages"         type = "assocarray" alwaysNotify = "true"/>
-        <field id = "libraryImages"       type = "assocarray" alwaysNotify = "true"/>
         <field id = "searchResult"        type = "assocarray" alwaysNotify = "true"/>
         <field id = "refreshToken"        type = "assocarray" alwaysNotify = "true"/>
         <field id = "gen_token_response"  type = "assocarray" alwaysNotify = "true"/>

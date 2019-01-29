@@ -123,20 +123,33 @@ End Function
 '**
 '*********************************************************
 
+' URL Request to fetch album listing
+Sub doGetAlbumList(pageNext="" As String)
+    print "Albums.brs [doGetAlbumList]"  
+
+    tmpData = [ "doGetAlbumList" ]
+
+    params = "pageSize=50"
+    if pageNext<>"" then
+        params = params + "&pageToken=" + pageNext
+    end if
+
+    signedHeader = oauth_sign(m.global.selectedUser)
+    makeRequest(signedHeader, m.gp_prefix + "/albums?"+params, "GET", "", 0, tmpData)
+End Sub
+
+
 ' Create full album list from XML response
 Function googleAlbumListing(jsonlist As Object) As Object
     albumlist=CreateObject("roList")
     
     'print formatJSON(jsonlist)
     for each record in jsonlist["albums"]
-        'print "RECORD: "; record
         album=googleAlbumCreateRecord(record)
-        
-        'print "ALBUM: "; album
-        
-        if album.GetImageCount() > 0 then
+
+        if album.GetImageCount > 0 then
             ' Do not show photos from Google Hangout albums or any marked with "Private" in name
-            if album.GetTitle().instr("Hangout:") = -1 and album.GetTitle().instr("rivate") = -1 then
+            if album.GetTitle.instr("Hangout:") = -1 and album.GetTitle.instr("rivate") = -1 then
                 albumlist.Push(album)
             end if
         end if
@@ -146,23 +159,16 @@ Function googleAlbumListing(jsonlist As Object) As Object
 End Function
 
 
-' Create single album record from XML entry
+' Create single album record from JSON entry
 Function googleAlbumCreateRecord(json As Object) As Object
-    album = CreateObject("roAssociativeArray")
-    album.json=json
-
-    album.GetTitle=function():return getString(m.json,"title"):end function
-    album.GetID=function():return getString(m.json,"id"):end function
-    album.GetImageCount=function():return Val(getString(m.json,"mediaItemsCount")):end function
-    album.GetThumb=function():return getString(m.json,"coverPhotoBaseUrl")+getResolution("SD"):end function
-    
-    album.previousPageTokens = []
-    album.showCountStart = 1
-    album.showCountEnd = 0
-    
+    album               = CreateObject("roAssociativeArray")
+    album.GetTitle      = getString(json,"title")
+    album.GetID         = getString(json,"id")
+    album.GetImageCount = Val(getString(json,"mediaItemsCount"))
+    album.GetThumb      = getString(json,"coverPhotoBaseUrl")+getResolution("SD")
+        
     return album
 End Function
-
 
 
 ' ********************************************************************
@@ -171,12 +177,54 @@ End Function
 ' **
 ' ********************************************************************
 
+Sub doGetLibraryImages(pageNext="" As String)
+    print "Albums.brs - [doGetLibraryImages]"
+    
+    print "GooglePhotos pageNext: "; pageNext
+
+    tmpData = [ "doGetLibraryImages", m.albumActiveObject ]
+
+    params = "pageSize=10"
+    if pageNext<>"" then
+        params = params + "&pageToken=" + pageNext
+    else
+        'First query, reset MetaData
+        m.videosMetaData    = []
+        m.imagesMetaData    = []
+    end if
+    
+    signedHeader = oauth_sign(m.global.selectedUser)
+    makeRequest(signedHeader, m.gp_prefix + "/mediaItems?"+params, "GET", "", 1, tmpData)
+End Sub
+
+
+Sub doGetAlbumImages(albumid As String, pageNext="" As String)
+    print "Albums.brs - [doGetAlbumImages]"
+
+    print "GooglePhotos pageNext: "; pageNext
+
+    tmpData = [ "doGetAlbumImages", m.albumActiveObject ]
+
+    params = "pageSize=10"
+    params = params + "&albumId=" + albumid
+    if pageNext<>"" then
+        params = params + "&pageToken=" + pageNext
+    else
+        'First query, reset MetaData
+        m.videosMetaData    = []
+        m.imagesMetaData    = []
+    end if
+    
+    signedHeader = oauth_sign(m.global.selectedUser)
+    makeRequest(signedHeader, m.gp_prefix + "/mediaItems:search/", "POST", params, 1, tmpData)
+End Sub
+
+
 Function googleImageListing(jsonlist As Object) As Object
     images=CreateObject("roList")
-    'print formatJSON(jsonlist)
     for each record in jsonlist["mediaItems"]
         image=googleImageCreateRecord(record)
-        if image.GetURL()<>invalid then
+        if image.GetURL<>invalid then
             images.Push(image)
         end if
     next
@@ -186,17 +234,15 @@ End Function
 
 
 Function googleImageCreateRecord(json As Object) As Object
-
-    image = CreateObject("roAssociativeArray")
-    image.json=json
-    image.GetTitle=function():return "":end function
-    image.GetID=function():return getString(m.json,"id"):end function
-    image.GetDescription=function():return getString(m.json,"description"):end function
-    image.GetURL=function():return getString(m.json,"baseUrl"):end function
-    image.GetFilename=function():return getString(m.json,"filename"):end function
-    image.GetTimestamp=function():return getString(m.json["mediaMetadata"],"creationTime"):end function
-    image.IsVideo=function():return (m.json["mediaMetadata"]["video"]<>invalid):end function
-    image.GetVideoStatus=function():return getString(m.json["mediaMetadata"]["video"],"status"):end function
+    image                = CreateObject("roAssociativeArray")
+    image.GetTitle       = ""
+    image.GetID          = getString(json,"id")
+    image.GetDescription = getString(json,"description")
+    image.GetURL         = getString(json,"baseUrl")
+    image.GetFilename    = getString(json,"filename")
+    image.GetTimestamp   = getString(json["mediaMetadata"],"creationTime")
+    image.IsVideo        = (json["mediaMetadata"]["video"]<>invalid)
+    image.GetVideoStatus = getString(json["mediaMetadata"]["video"],"status")
     
     return image
 End Function

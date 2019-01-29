@@ -21,6 +21,9 @@ Function loadCommon()
     m.oauth_prefix    = "https://www.googleapis.com/oauth2/v4"
     m.oauth_scope     = "https://picasaweb.google.com/data https://www.googleapis.com/auth/userinfo.email"
     
+    'Help manage API calls. YES, Google monitors this. Which ever comes first
+    m.maxApiPerPage  = 12
+    m.maxImagesPerPage = 20
 End Function
 
 
@@ -439,9 +442,9 @@ End Function
 '******************************************************
 'Get friendly date output given seconds
 '******************************************************
-Function friendlyDate(seconds As Integer) As String
+Function friendlyDate(dateString As String) As String
     calcDate = CreateObject("roDateTime")
-    calcDate.FromSeconds(seconds)
+    calcDate.FromISO8601String(dateString)
     showDate = calcDate.AsDateString("long-date")
     return showDate
 End Function
