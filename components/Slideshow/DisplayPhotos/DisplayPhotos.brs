@@ -226,13 +226,7 @@ Sub onURLRefreshTigger(event as object)
     print "DisplayPhotos.brs [onURLRefreshTigger]"
     
     m.albumActiveObject = m.top.albumobject
-    
-    tmpDownload = []
-    
-    print "DEBUG ALBUM: "; m.albumActiveObject
-    
-    
-    tmpPage = ""
+    tmpPage  = ""
     tmpCount = "1"
     if m.albumActiveObject.previousPageTokens[m.albumActiveObject.previouspagetokens.Count()-1]<>invalid then
         tmpPair = m.albumActiveObject.previousPageTokens[m.albumActiveObject.previouspagetokens.Count()-1].Split("::")
@@ -243,20 +237,12 @@ Sub onURLRefreshTigger(event as object)
     m.albumActiveObject.showCountStart = StrToI(tmpCount)
     m.albumActiveObject.showCountEnd = 0
     m.albumActiveObject.apiCount = 0
-    m.imagesMetaData = {}
-    
+        
     if m.albumActiveObject.GetID = "GP_LIBRARY" then
         doGetLibraryImages(tmpPage)
     else
         doGetAlbumImages(m.albumActiveObject.GetID, tmpPage)
     end if
-
-    count = 0
-    'for each key in m.imageDisplay
-    '    print "DEBUG KEY: "; key.url
-    '    m.imageDisplay[count].url = "http://www.roku-photoview.com/wp-content/uploads/2019/01/Logo_Overhang_FHD.png"
-     '   count++
-    'end for
     
 End Sub
 
@@ -284,16 +270,24 @@ Sub handleGetAlbumImages(event as object)
         else
             imageList = googleImageListing(rsp)
 
+            imagesMetaData = {}
             for each media in imageList
                 if media.IsVideo = 0 then
-                    tmp               = {}
-                    tmp.[media.GetID] = media.GetURL
-                    
-                    m.imagesMetaData.[media.GetID] = media.GetURL
+                    imagesMetaData.[media.GetID] = media.GetURL+getResolution(m.showRes)
                 end if
             end for
 
-print "TEST: "; tmp
+            'Refresh the URL with new image (Valid for 60 minutes)
+            count = 0
+            for each storeItem in m.imageDisplay
+                if (imagesMetaData.[storeItem.id]<>invalid) then ' and (imagesMetaData.[storeItem.id] = storeItem.id) then
+                    print "FOUND: "; storeItem.id
+                    print "DEBUG ORG: "; storeItem.url
+                    print "DEBUG NEW: "; imagesMetaData.[storeItem.id]
+                    m.imageDisplay[count].url = imagesMetaData.[storeItem.id]
+                end if
+                count++
+            end for
 
             if rsp["nextPageToken"]<>invalid then
                 pageNext = rsp["nextPageToken"]
@@ -301,28 +295,13 @@ print "TEST: "; tmp
                 m.albumActiveObject.showCountEnd = m.albumActiveObject.showCountEnd + imageList.Count()
                 m.albumActiveObject.apiCount = m.albumActiveObject.apiCount + 1
                 if (m.albumActiveObject.apiCount < m.maxApiPerPage) and (m.albumActiveObject.showCountEnd < m.maxImagesPerPage) then
-                    print "END: "; m.albumActiveObject.showCountEnd
-                    
                     if m.albumActiveObject.GetID = "GP_LIBRARY" then
                         doGetLibraryImages(pageNext)
                     else
                         doGetAlbumImages(m.albumActiveObject.GetID, pageNext)
                     end if
-                else
-                    if m.albumActiveObject.GetID = "GP_LIBRARY" then
-                        processURLRefresh()
-                    else
-                        processURLRefresh()
-                    end if
-                end if
-            else
-            '    m.albumActiveObject.nextPageToken = invalid
-            '    m.albumActiveObject.showCountEnd = m.albumActiveObject.showCountEnd + imageList.Count()
-                
-                processURLRefresh()
-                
+                end if                
             end if
-
         end if
     end if
     
@@ -338,21 +317,6 @@ print "TEST: "; tmp
     
 End Sub
 
-
-Sub processURLRefresh()
-    count = 0
-    for each storeItem in m.imageDisplay
-        print "DEBUG KEY: "; storeItem.id;
-        print "DEBUG: "; m.imagesMetaData
-        if (m.imagesMetaData.[storeItem.id]<>invalid) then ' and (m.imagesMetaData.[storeItem.id] = storeItem.id) then
-            print "FOUND: "; storeItem.id
-            print "DEBUG ORG: "; storeItem.url
-            print "DEBUG NEW: "; m.imagesMetaData[key.id]
-            m.imageDisplay[count].url = m.imagesMetaData[key.id]
-        end if
-        count++
-    end for
-End Sub
 
 Sub onDownloadTigger(event as object)
     'print "DisplayPhotos.brs [onDownloadTigger]"
@@ -545,8 +509,6 @@ Sub sendNextImage(direction=invalid)
             if m.showDisplay = invalid or rxBlur.IsMatch(m.showDisplay) then m.BlendedPrimaryImage.uri = url
         end if
     end if
-    
-    'print "DEBUG - m.imageDisplay[";nextID;" ]: "; m.imageDisplay[nextID]
     
     m.pauseImageCount.text   = itostr(nextID+1)+" of "+itostr(m.imageDisplay.Count())
     m.pauseImageDetail.text  = friendlyDate(m.imageDisplay[nextID].timestamp)

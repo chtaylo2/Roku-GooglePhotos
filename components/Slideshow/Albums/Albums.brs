@@ -344,9 +344,6 @@ print "DEBUG: "; m.albumActiveObject
     else if selection.id = "GP_SLIDESHOW_START" then 
         print "START SHOW"
         
-        print "DEBUG: "; m.albumActiveObject.previouspagetokens
-        
-        
         m.screenActive = createObject("roSGNode", "DisplayPhotos")
         m.screenActive.predecessor = m.top.predecessor
         m.screenActive.albumobject = m.albumActiveObject
@@ -372,6 +369,7 @@ print "DEBUG: "; m.albumActiveObject
         m.screenActive.albumName = m.albumName + "  -  " + itostr(m.imagesMetaData.Count()) + " Photos"
         m.screenActive.metaData = m.imagesMetaData
         m.screenActive.predecessor = m.top.predecessor
+        m.screenActive.albumobject = m.albumActiveObject
         m.screenActive.content = m.imageThumbList
         m.top.appendChild(m.screenActive)
         m.screenActive.setFocus(true)

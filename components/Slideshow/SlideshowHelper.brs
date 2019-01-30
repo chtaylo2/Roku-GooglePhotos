@@ -184,7 +184,7 @@ Sub doGetLibraryImages(pageNext="" As String)
 
     tmpData = [ "doGetLibraryImages", m.albumActiveObject ]
 
-    params = "pageSize=10"
+    params = "pageSize=100"
     if pageNext<>"" then
         params = params + "&pageToken=" + pageNext
     else
@@ -205,7 +205,7 @@ Sub doGetAlbumImages(albumid As String, pageNext="" As String)
 
     tmpData = [ "doGetAlbumImages", m.albumActiveObject ]
 
-    params = "pageSize=10"
+    params = "pageSize=100"
     params = params + "&albumId=" + albumid
     if pageNext<>"" then
         params = params + "&pageToken=" + pageNext

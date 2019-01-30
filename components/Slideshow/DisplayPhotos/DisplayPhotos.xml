@@ -246,7 +246,7 @@
         
         <Timer
             id          = "URLRefreshTimer"
-            duration    = "10"
+            duration    = "3480"
         />
         
         <Timer
