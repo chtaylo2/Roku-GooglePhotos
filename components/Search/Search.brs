@@ -31,7 +31,7 @@ Sub init()
     'Load in the OAuth Registry entries
     loadReg()
     
-    populateHistory()
+    'populateHistory()
     
     'Set some UI customizations
     m.miniKeyboard.texteditbox.maxTextLength    = 20

@@ -16,6 +16,7 @@ Sub init()
     m.itemLabelMain1    = m.top.findNode("itemLabelMain1")
     m.itemLabelMain2    = m.top.findNode("itemLabelMain2")
     m.itemHeader        = m.top.findNode("itemHeader")
+    m.noticeDialog      = m.top.findNode("noticeDialog")
     m.supportReset      = "Normal"
     
     m.itemHeader.text   = m.userInfoName[m.global.selectedUser] + " • Main Menu"
@@ -58,16 +59,33 @@ Sub onItemSelected()
     'Item selected
     selectedItem = m.markupgrid.content.getChild(m.markupgrid.itemSelected)
     screenToDisplay = selectedItem.shortdescriptionline1
-      
-    m.markupgrid.visible        = false
-    m.itemLabelMain1.visible    = false
-    m.itemLabelMain2.visible    = false
+    
+    if screenToDisplay = "Search" then
+        m.noticeDialog.visible = true
+        buttons =  [ "OK" ]
+        m.noticeDialog.title   = "Notice"
+        m.noticeDialog.message = "Google's new Photo API does not currently have image searching available. A feature request is opened and hope to then have this re-enabled soon."
+        m.noticeDialog.buttons = buttons
+        m.noticeDialog.setFocus(true)
+        m.noticeDialog.observeField("buttonSelected","noticeClose")
+    
+    else
+        m.markupgrid.visible        = false
+        m.itemLabelMain1.visible    = false
+        m.itemLabelMain2.visible    = false
+    
+        m.itemHeader.text           = m.userInfoName[m.global.selectedUser] + " • " + screenToDisplay
+        m.screenActive              = createObject("roSGNode", screenToDisplay)
+        m.screenActive.loaded       = true
+        m.top.appendChild(m.screenActive)
+        m.screenActive.setFocus(true)
+    end if
+End Sub
 
-    m.itemHeader.text           = m.userInfoName[m.global.selectedUser] + " • " + screenToDisplay
-    m.screenActive              = createObject("roSGNode", screenToDisplay)
-    m.screenActive.loaded       = true
-    m.top.appendChild(m.screenActive)
-    m.screenActive.setFocus(true)
+
+Sub noticeClose(event as object)
+    m.noticeDialog.visible = false
+    m.markupgrid.setFocus(true)
 End Sub
 
 

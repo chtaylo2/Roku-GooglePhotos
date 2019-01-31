@@ -13,16 +13,16 @@
 Function loadCommon()
     ' Common varables for needed for Oauth and GooglePhotos API
     
-    m.releaseVersion  = "3.0"
-    m.gp_scope        = "https://photoslibrary.googleapis.com"
-    m.gp_prefix       = m.gp_scope + "/v1"
+    m.releaseVersion   = "3.0"
+    m.gp_scope         = "https://photoslibrary.googleapis.com"
+    m.gp_prefix        = m.gp_scope + "/v1"
     
-    m.register_prefix = "https://www.roku-photoview.com"
-    m.oauth_prefix    = "https://www.googleapis.com/oauth2/v4"
-    m.oauth_scope     = "https://picasaweb.google.com/data https://www.googleapis.com/auth/userinfo.email"
+    m.register_prefix  = "https://www.roku-photoview.com"
+    m.oauth_prefix     = "https://www.googleapis.com/oauth2/v4"
+    m.oauth_scope      = "https://picasaweb.google.com/data https://www.googleapis.com/auth/userinfo.email"
     
     'Help manage API calls. YES, Google monitors this. Which ever comes first
-    m.maxApiPerPage  = 12
+    m.maxApiPerPage    = 12
     m.maxImagesPerPage = 1000
 End Function
 
@@ -38,6 +38,7 @@ Function loadItems()
     m.items     = CreateObject("roList")
     m.items.push("accessToken")
     m.items.push("refreshToken")
+    m.items.push("versionToken")
     m.items.push("userInfoName")
     m.items.push("userInfoEmail")
     m.items.push("userInfoPhoto")
@@ -58,9 +59,6 @@ Function loadDefaults()
     if tmp=invalid RegWrite("SSaverOrder", "Random Order", "Settings")
     tmp = RegRead("SSaverMethod", "Settings")
     if tmp=invalid RegWrite("SSaverMethod", "Multi-Scrolling", "Settings")
-        'Backward compatibility from v1.x
-        if tmp="Fading Photo - Small" RegWrite("SSaverMethod", "YesFading_YesBlur", "Settings")
-        if tmp="Fading Photo - Large" RegWrite("SSaverMethod", "YesFading_YesBlur", "Settings")
     
     tmp = RegRead("SlideshowDisplay", "Settings")
     if tmp=invalid then
@@ -232,6 +230,18 @@ End Function
 Function oauth_count()
     
     loadItems()
+    
+    print "DEBUG: "; m.versionToken
+    'The following to for v2.x to v3 migration. Can be removed in a later version (Sometime after August, 2019)
+    if (m.versionToken = invalid) or (m.versionToken.Count() = 0) then
+        usersLoaded = m.accessToken.Count()
+        for i = 0 to usersLoaded-1
+            m.versionToken.Push("v2token")
+        end for
+        saveReg()
+    end if
+    
+    
     for each item in m.items
         if m.accessToken.Count() <> m.[item].Count() then
             print "accessToken / "; item; " counts do not match"
@@ -239,7 +249,7 @@ Function oauth_count()
             eraseReg()
         end if
     end for
-    
+        
     return m.accessToken.Count()
 
 End Function

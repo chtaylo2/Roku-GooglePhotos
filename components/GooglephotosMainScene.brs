@@ -120,13 +120,23 @@ Function mainLoad()
     print "USERS LOADED: "; usersLoaded
 
     if (m.global.selectedUser <> usersLoaded) and (m.global.selectedUser <> -1) and (m.global.selectedUser <> -2) and (m.global.selectedUser <> -3) and (m.global.selectedUser <> -4)
-        'A user was selected, display!
-        m.itemHeader.text = ""
-        m.top.removeChild(m.screenActive)
-        m.screenActive      = createObject("roSGNode", "MainMenu")
-        m.screenActive.id   = "MainMenu"
-        m.top.appendChild(m.screenActive)
-        m.screenActive.setFocus(true)
+
+        'The following to for v2.x to v3 migration. Can be removed in a later version (Sometime after August, 2019)
+        if m.versionToken[m.global.selectedUser] = "v2token" then
+            m.screenActive          = createObject("roSGNode", "ExpiredPopup")
+            m.screenActive.id       = "RelinkPopup"
+            m.top.appendChild(m.screenActive)
+            m.screenActive.setFocus(true)
+        else
+            'A user was selected, display!
+           m.itemHeader.text = ""
+           m.top.removeChild(m.screenActive)
+           m.screenActive      = createObject("roSGNode", "MainMenu")
+           m.screenActive.id   = "MainMenu"
+           m.top.appendChild(m.screenActive)
+           m.screenActive.setFocus(true)       
+        end if
+
     else if m.global.selectedUser = usersLoaded
         'So user can reselect
         m.global.selectedUser = -4

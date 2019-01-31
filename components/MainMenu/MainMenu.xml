@@ -61,5 +61,11 @@
             translation = "[0,105]"
         />
 
+         <Dialog
+            id      = "noticeDialog"
+            title   = "Error"
+            visible = "false"
+        />
+
   </children>
 </component>

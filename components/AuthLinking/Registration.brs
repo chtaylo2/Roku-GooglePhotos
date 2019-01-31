@@ -144,6 +144,7 @@ Sub onCheckAuth(event as object)
                 ' We have our tokens    
                 m.accessToken.Push(getString(json,"access_token"))
                 m.refreshToken.Push(getString(json,"refresh_token"))
+                m.versionToken.Push("v3token")
                 m.tokenType          = getString(json,"token_type")
                 m.tokenExpiresIn     = getInteger(json,"expires_in")
     
@@ -230,6 +231,7 @@ Sub onStoreUser(event as object)
                             if m.userInfoEmail[i] = infoEmail and infoEmail<>"No email on file" then
                                 m.accessToken.Pop()
                                 m.refreshToken.Pop()
+                                m.versionToken.Pop()
                                 errorMsg = "Account '"  + infoEmail + " is already linked to device"
                                 status = 1
                             end if

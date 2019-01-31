@@ -10,7 +10,16 @@
 
         <Group
             id = "showRegistration">
-            
+
+            <Rectangle
+                id      = "Background"
+                color   = "#EBEBEB"
+                height  = "1080"
+                width   = "1920"
+                opacity = "1"
+                translation = "[0,270]"
+            />
+        
             <Label
                 id          = "Row1"
                 font        = "font:MediumBoldSystemFont"

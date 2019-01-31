@@ -103,6 +103,8 @@ Function handleRefreshToken(event as object)
             doGetScreensaverAlbumList(refreshData.post_data[1])
         else if refreshData.post_data[0] = "doGetScreensaverAlbumImages" then
             doGetScreensaverAlbumImages(refreshData.post_data[1], refreshData.post_data[2])
+        else if refreshData.post_data[0] = "doGetLibraryImages" then
+            doGetLibraryImages(refreshData.post_data[1], refreshData.post_data[2])
         else if refreshData.post_data[0] = "doGetAlbumImages" then
             doGetAlbumImages(refreshData.post_data[1], refreshData.post_data[2])
         else if refreshData.post_data[0] = "doGetSearch" then
@@ -182,7 +184,7 @@ Sub doGetLibraryImages(pageNext="" As String)
     
     print "GooglePhotos pageNext: "; pageNext
 
-    tmpData = [ "doGetLibraryImages", m.albumActiveObject ]
+    tmpData = [ "doGetLibraryImages", m.albumActiveObject, pageNext ]
 
     params = "pageSize=100"
     if pageNext<>"" then
@@ -203,7 +205,7 @@ Sub doGetAlbumImages(albumid As String, pageNext="" As String)
 
     print "GooglePhotos pageNext: "; pageNext
 
-    tmpData = [ "doGetAlbumImages", m.albumActiveObject ]
+    tmpData = [ "doGetAlbumImages", m.albumActiveObject, pageNext ]
 
     params = "pageSize=100"
     params = params + "&albumId=" + albumid
