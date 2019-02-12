@@ -167,7 +167,7 @@ Sub handleGetAlbumImages(event as object)
                     m.itemLabelMain3.text = pagesShow
                     
                     if m.albumActiveObject[albumid].GetID = "GP_LIBRARY" then
-                        doGetLibraryImages(m.global.selectedUser, pageNext)
+                        doGetLibraryImages("GP_LIBRARY", m.global.selectedUser, pageNext)
                     else
                         doGetAlbumImages(albumid, m.global.selectedUser, pageNext)
                     end if
@@ -253,7 +253,7 @@ Sub onItemSelected()
         showLoadingSpinner(3, "GP_LOADING")
         
         'API CALL: Get album image listing
-        doGetLibraryImages(m.global.selectedUser)
+        doGetLibraryImages("GP_LIBRARY", m.global.selectedUser)
         
     else if selection.id = "GP_ALBUM_LISTING" then
         m.albumSelection = m.albummarkupgrid.itemSelected
@@ -264,7 +264,6 @@ Sub onItemSelected()
         m.albumName = selection.shortdescriptionline1
 
 print "DEBUG: "; m.albumActiveObject[albumid]
-
 
         m.albumActiveObject[albumid].previousPageTokens = []
         m.albumActiveObject[albumid].showCountStart = 1
@@ -308,7 +307,7 @@ print "DEBUG: "; m.albumActiveObject[albumid]
         
         'API CALL: Get image listing - Next page
         if m.albumActiveObject[albumid].GetID = "GP_LIBRARY" then
-            doGetLibraryImages(m.global.selectedUser, m.albumActiveObject[albumid].nextPageToken)
+            doGetLibraryImages("GP_LIBRARY", m.global.selectedUser, m.albumActiveObject[albumid].nextPageToken)
         else
             doGetAlbumImages(albumid, m.global.selectedUser, m.albumActiveObject[albumid].nextPageToken)
         end if
@@ -336,7 +335,7 @@ print "DEBUG: "; m.albumActiveObject[albumid]
         
         'API CALL: Get image listing - Previous page
         if m.albumActiveObject[albumid].GetID = "GP_LIBRARY" then
-            doGetLibraryImages(m.global.selectedUser, tmpPage)
+            doGetLibraryImages("GP_LIBRARY", m.global.selectedUser, tmpPage)
         else
             doGetAlbumImages(albumid, m.global.selectedUser, tmpPage)
         end if

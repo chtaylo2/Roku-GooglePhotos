@@ -163,15 +163,13 @@ Sub processAlbums()
     regStore  = "SSaverAlbums"
     regAlbums = RegRead(regStore, "Settings")
     album_cache_count = 0
-    
-        m.albumActiveObject["GP_LIBRARY"] = {}
-        m.albumActiveObject["GP_LIBRARY"].GetID = "GP_LIBRARY"
-        m.albumActiveObject["GP_LIBRARY"].GetImageCount = 0
-        m.albumActiveObject["GP_LIBRARY"].showCountStart = 1
-        m.albumActiveObject["GP_LIBRARY"].showCountEnd = 0
-        m.albumActiveObject["GP_LIBRARY"].apiCount = 0
-    
-    
+
+    tmp = {}
+    tmp.GetImageCount = 0
+    tmp.showCountStart = 1
+    tmp.showCountEnd = 0
+    tmp.apiCount = 0
+        
     'Look for Time in History
     'albumHistory = "Day|Week|Month".Split("|")
     'for each album in albumHistory
@@ -196,7 +194,9 @@ Sub processAlbums()
             albumUser = item.Split(":")
             if albumUser[0] = "GP_LIBRARY" then
                 m.predecessor = "null"
-                doGetLibraryImages(albumUser[1])
+                tmp.GetID = "GP_LIBRARY_" + StrI(albumUser[1])
+                m.albumActiveObject["GP_LIBRARY_" + StrI(albumUser[1])] = tmp
+                doGetLibraryImages(tmp.GetID, albumUser[1])
             end if
         end for
 
@@ -204,10 +204,15 @@ Sub processAlbums()
         'If m.userIndex is set to 100, means user wants random photos from each linked account shown.
         if m.userIndex = 100 then
             for i = 0 to m.userCount-1
-                doGetLibraryImages(i)
+                tmp.GetID = "GP_LIBRARY_" + StrI(i)
+                m.albumActiveObject["GP_LIBRARY_" + StrI(i)] = tmp
+                print "TEST: "; m.albumActiveObject
+                doGetLibraryImages(tmp.GetID, i)
             end for
         else
-            doGetLibraryImages(m.userIndex)
+            tmp.GetID = "GP_LIBRARY_" + StrI(m.userIndex)
+            m.albumActiveObject["GP_LIBRARY_" + StrI(m.userIndex)] = tmp
+            doGetLibraryImages(tmp.GetID, m.userIndex)
         end if
     end if
 
@@ -230,7 +235,6 @@ Sub processAlbums()
     
                 m.albumActiveObject[m.albumsObject[album_idx].GetID] = {}
                 doGetAlbumImages(m.albumsObject[album_idx].GetID, m.albumsObject[album_idx].GetUserIndex)
-                print "DEBUG - ALBUMID: "; m.albumsObject[album_idx].GetID; " - "; m.albumsObject[album_idx].GetUserIndex
                 m.albumsObject.delete(album_idx)
                                 
                 album_cache_count = album_cache_count+1
@@ -241,7 +245,7 @@ Sub processAlbums()
                 end if
             end if
         end for
-    end if
+    end if    
 End Sub
 
 
@@ -277,9 +281,7 @@ Sub handleGetAlbumImages(event as object)
                     m.photoItems.Push(tmp)
                 end if    
             end for
-            
-            print "DEBUG: "; response.post_data[1]
-            
+
             if m.albumActiveObject[albumid].showCountEnd=invalid then
                 m.albumActiveObject[albumid].showCountEnd = 0
             end if
@@ -294,8 +296,8 @@ Sub handleGetAlbumImages(event as object)
                 m.albumActiveObject[albumid].apiCount = m.albumActiveObject[albumid].apiCount + 1
 
                 if (m.albumActiveObject[albumid].apiCount < m.maxApiPerPage) and (m.albumActiveObject[albumid].showCountEnd < m.maxImagesPerPage) then    
-                    if m.albumActiveObject[albumid].GetID = "GP_LIBRARY" then
-                        doGetLibraryImages(response.post_data[2], pageNext)
+                    if albumid.Instr("GP_LIBRARY") >= 0 then
+                        doGetLibraryImages(response.post_data[1], response.post_data[2], pageNext)
                     else
                         doGetAlbumImages(response.post_data[1], response.post_data[2], pageNext)
                     end if
@@ -317,6 +319,9 @@ Sub onApiTimerTrigger()
     print "API CALLS LEFT: "; m.apiPending; " - Image Count: "; m.photoItems.Count()
 
     if m.apiPending = 0 then
+    
+        print "DEBUG: "; m.albumActiveObject
+    
         execScreensaver()
         m.apiTimer.control = "stop"
     end if

@@ -94,11 +94,8 @@ Function handleRefreshToken(event as object)
     
     if status = 0 then
         if refreshData.post_data[0] = "doGetLibraryImages" then
-            doGetLibraryImages(refreshData.post_data[2], refreshData.post_data[3])
+            doGetLibraryImages(refreshData.post_data[1], refreshData.post_data[2], refreshData.post_data[3])
         else if refreshData.post_data[0] = "doGetAlbumImages" then
-            print "DEBUG 1: "; refreshData.post_data[1]
-            print "DEBUG 2: "; refreshData.post_data[2]
-            print "DEBUG 3: "; refreshData.post_data[3]
             doGetAlbumImages(refreshData.post_data[1], refreshData.post_data[2], refreshData.post_data[3])
         else if refreshData.post_data[0] = "doGetSearch" then
             doGetSearch(refreshData.post_data[1])
@@ -173,12 +170,12 @@ End Function
 ' **
 ' ********************************************************************
 
-Sub doGetLibraryImages(selectedUser=0 as Integer, pageNext="" As String)
+Sub doGetLibraryImages(albumid As String, selectedUser=0 as Integer, pageNext="" As String)
     print "SlideshowHelper.brs - [doGetLibraryImages]"
     
     print "GooglePhotos pageNext: "; pageNext
 
-    tmpData = [ "doGetLibraryImages", "GP_LIBRARY", selectedUser, pageNext ]
+    tmpData = [ "doGetLibraryImages", albumid, selectedUser, pageNext ]
 
     params = "pageSize=100"
     if pageNext<>"" then

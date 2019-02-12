@@ -241,8 +241,8 @@ Sub onURLRefreshTigger()
         m.albumActiveObject[albumid].showCountEnd = 0
         m.albumActiveObject[albumid].apiCount = 0
             
-        if albumid = "GP_LIBRARY" then
-            doGetLibraryImages(tmpPage)
+        if albumid.Instr("GP_LIBRARY") >= 0 then
+            doGetLibraryImages(albumid, tmpPage)
         else
             doGetAlbumImages(albumid, tmpPage)
         end if    
@@ -300,8 +300,8 @@ Sub handleGetAlbumImages(event as object)
                 m.albumActiveObject.showCountEnd = m.albumActiveObject.showCountEnd + imageList.Count()
                 m.albumActiveObject.apiCount = m.albumActiveObject.apiCount + 1
                 if (m.albumActiveObject.apiCount < m.maxApiPerPage) and (m.albumActiveObject.showCountEnd < m.maxImagesPerPage) then
-                    if m.albumActiveObject.GetID = "GP_LIBRARY" then
-                        doGetLibraryImages(pageNext)
+                    if m.albumActiveObject.GetID.Instr("GP_LIBRARY") >= 0 then
+                        doGetLibraryImages(m.albumActiveObject.GetID, pageNext)
                     else
                         doGetAlbumImages(m.albumActiveObject.GetID, pageNext)
                     end if

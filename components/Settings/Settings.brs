@@ -87,8 +87,6 @@ Sub doGetAlbumSelection()
     if selectedUser <> usersLoaded then
         m.loadingSpinner.visible = true
         m.infoLabel.text = m.infoLabel.text + chr(10) + chr(10) + "Current user selected: " + m.userInfoName[selectedUser]
-        'signedHeader = oauth_sign(selectedUser)
-        'makeRequest(signedHeader, m.gp_prefix + "?kind=album&v=3.0&fields=entry(title,gphoto:numphotos,gphoto:user,gphoto:id,media:group(media:description,media:thumbnail))&thumbsize=300", "GET", "", 0, tmpData)
         doGetAlbumList(selectedUser)
     
     else
@@ -376,7 +374,7 @@ Sub storeLinkedUsers()
         addItem(m.content, "No users linked", "0", "")
     else
         for i = 0 to usersLoaded-1
-            addItem(m.content,  m.userInfoName[i], m.userInfoEmail[i], regStore)
+            addItem(m.content,  m.userInfoName[i] + " - (" + m.userInfoEmail[i] + ")", m.userInfoEmail[i], regStore)
             if regSelection = m.userInfoEmail[i] then radioSelection = i
         end for
         if usersLoaded > 1 then
