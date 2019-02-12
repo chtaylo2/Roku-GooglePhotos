@@ -23,7 +23,7 @@ Function loadCommon()
     
     'Help manage API calls. YES, Google monitors this. Which ever comes first
     m.maxApiPerPage    = 12
-    m.maxImagesPerPage = 1000
+    m.maxImagesPerPage = 100
 End Function
 
 
@@ -233,7 +233,7 @@ Function oauth_count()
     
     print "DEBUG: "; m.versionToken
     'The following to for v2.x to v3 migration. Can be removed in a later version (Sometime after August, 2019)
-    if (m.versionToken = invalid) or (m.versionToken.Count() = 0) then
+    if (m.versionToken = invalid and m.accessToken.Count()<>0) or (m.versionToken.Count() = 0 and m.accessToken.Count()<>0) then
         usersLoaded = m.accessToken.Count()
         for i = 0 to usersLoaded-1
             m.versionToken.Push("v2token")

@@ -39,13 +39,18 @@
                     
                     'print "Fname: "; fname
         
-                    print "Caching Image: "; item.url
+                    'print "Caching Image: "; item.url
                     httpObj.setUrl(item.url)
                     httpObj.AsyncGetToFile( fname )
     
                     msg = wait(0, port)
-        
-                    response[item.url] = fname
+
+                    print "DEBUG: "; msg.GetResponseCode()
+                    if msg.GetResponseCode() = 403 then
+                        response["ACCESS ERROR"] = "403"
+                    else
+                        response[item.url] = fname
+                    end if
                 end for
       
                 fs = CreateObject("roFileSystem")

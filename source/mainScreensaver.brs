@@ -25,7 +25,7 @@ Sub showGooglePhotosScreensaver()
     m.global = screen.getGlobalNode()
  
     m.global.addFields( {SlideshowRes: "", SlideshowDisplay: "", SlideshowDelay: "", SlideshowOrder: "", VideoContinuePlay: ""} )
-    m.global.addFields( {selectedUser: -1} )
+    m.global.addFields( {selectedUser: -1, tmpDEBUG: 0} )
     
     screen.setMessagePort(port)    
     screen.show()

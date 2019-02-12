@@ -33,6 +33,7 @@ Sub init()
     m.loadingSpinner    = m.top.findNode("loadingSpinner")
     m.noticeDialog      = m.top.findNode("noticeDialog")
     m.aboutVersion      = m.top.findNode("aboutVersion")
+    m.apiPending        = 0
     
     m.pinPad.observeField("buttonSelected","processPinEntry")
     m.confirmDialog.observeField("buttonSelected","confirmUnregister")
@@ -86,8 +87,10 @@ Sub doGetAlbumSelection()
     if selectedUser <> usersLoaded then
         m.loadingSpinner.visible = true
         m.infoLabel.text = m.infoLabel.text + chr(10) + chr(10) + "Current user selected: " + m.userInfoName[selectedUser]
-        signedHeader = oauth_sign(selectedUser)
-        makeRequest(signedHeader, m.gp_prefix + "?kind=album&v=3.0&fields=entry(title,gphoto:numphotos,gphoto:user,gphoto:id,media:group(media:description,media:thumbnail))&thumbsize=300", "GET", "", 0, tmpData)
+        'signedHeader = oauth_sign(selectedUser)
+        'makeRequest(signedHeader, m.gp_prefix + "?kind=album&v=3.0&fields=entry(title,gphoto:numphotos,gphoto:user,gphoto:id,media:group(media:description,media:thumbnail))&thumbsize=300", "GET", "", 0, tmpData)
+        doGetAlbumList(selectedUser)
+    
     else
         m.infoLabel.text = m.infoLabel.text + chr(10) + chr(10) + "Unable to select albums for 'All (Random)'. A future version might allow this."
     end if
@@ -110,10 +113,14 @@ Sub handleGetAlbumSelection(event as object)
     else if response.code <> 200
         errorMsg = "An Error Occurred in 'handleGetAlbumSelection'. Code: "+(response.code).toStr()+" - " +response.error
     else
-        rsp=ParseXML(response.content)
-        print rsp
-        if rsp=invalid then
+        rsp=ParseJson(response.content)
+        print rsp["albums"]
+        if rsp = invalid
             errorMsg = "Unable to parse Google Photos API response. Exit the channel then try again later. Code: "+(response.code).toStr()+" - " +response.error
+        else if type(rsp) <> "roAssociativeArray"
+            errorMsg = "Json response is not an associative array: handleGetAlbumSelection"
+        else if rsp.DoesExist("error")
+            errorMsg = "Json error response: [handleGetAlbumSelection] " + json.error
         else
 
             'Display Time in History selections
@@ -136,15 +143,15 @@ Sub handleGetAlbumSelection(event as object)
             end for
             
             'Display user album selections
-            m.albumsObject = googleAlbumListing(rsp.entry)
+            m.albumsObject = googleAlbumListing(rsp)
             for each album in m.albumsObject
-                addItem(m.albumContent, album.GetTitle(), album.GetID(), "")
+                addItem(m.albumContent, album.GetTitle, album.GetID, "")
                 saved = 0
                 if (regAlbums <> invalid) and (regAlbums <> "")
                     parsedString = regAlbums.Split("|")
                     for each item in parsedString
                         albumUser = item.Split(":")
-                        if albumUser[0] = album.GetID() then
+                        if albumUser[0] = album.GetID then
                             'Check selected album
                             saved = 1
                         end if

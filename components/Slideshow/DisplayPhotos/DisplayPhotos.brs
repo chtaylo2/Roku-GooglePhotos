@@ -47,7 +47,7 @@ Sub init()
     m.SecondaryImage.observeField("loadStatus","onSecondaryLoadedTrigger")
     m.RotationTimer.observeField("fire","onRotationTigger")
     m.DownloadTimer.observeField("fire","onDownloadTigger")
-    m.URLRefreshTimer.observeField("fire","onURLRefreshTigger")
+    'm.URLRefreshTimer.observeField("fire","onURLRefreshTigger")
     m.top.observeField("content","loadImageList")
 
     m.showRes       = RegRead("SlideshowRes", "Settings")
@@ -83,7 +83,7 @@ Sub init()
     
     m.RotationTimer.repeat   = true
     m.DownloadTimer.repeat   = true
-    m.URLRefreshTimer.repeat = true
+    m.URLRefreshTimer.repeat = false
 
     'Load common variables
     loadCommon()
@@ -177,20 +177,19 @@ Sub loadImageList()
          
         m.RotationTimer.control   = "start"
         m.DownloadTimer.control   = "start"
-        m.URLRefreshTimer.control = "start"
+        'm.URLRefreshTimer.control = "start"
      
         'Trigger a PAUSE if photo selected
         if m.top.startIndex <> -1 then
             onKeyEvent("OK", true)
         end if
         
-        if m.top.id = "DisplayScreensaver" then
+        'if m.top.id = "DisplayScreensaver" then
             'We don't need pre-downloading of photos for screensaver. Disable
-            m.DownloadTimer.control = "stop"
-        end if
+        '    m.DownloadTimer.control = "stop"
+        'end if
         
     end if
-     
 End Sub
 
 
@@ -222,27 +221,33 @@ Sub onRotationTigger(event as object)
 End Sub
 
 
-Sub onURLRefreshTigger(event as object)
+Sub onURLRefreshTigger()
     print "DisplayPhotos.brs [onURLRefreshTigger]"
     
     m.albumActiveObject = m.top.albumobject
-    tmpPage  = ""
-    tmpCount = "1"
-    if m.albumActiveObject.previousPageTokens[m.albumActiveObject.previouspagetokens.Count()-1]<>invalid then
-        tmpPair = m.albumActiveObject.previousPageTokens[m.albumActiveObject.previouspagetokens.Count()-1].Split("::")
-        tmpPage = tmpPair[0]
-        tmpCount = tmpPair[1]
-    end if
 
-    m.albumActiveObject.showCountStart = StrToI(tmpCount)
-    m.albumActiveObject.showCountEnd = 0
-    m.albumActiveObject.apiCount = 0
-        
-    if m.albumActiveObject.GetID = "GP_LIBRARY" then
-        doGetLibraryImages(tmpPage)
-    else
-        doGetAlbumImages(m.albumActiveObject.GetID, tmpPage)
-    end if
+    for each albumid in m.albumActiveObject
+        print "DEBUG: "; albumid
+        print m.top.albumobject[albumid]
+        tmpPage  = ""
+        tmpCount = "1"
+        if m.albumActiveObject[albumid].previousPageTokens[m.albumActiveObject[albumid].previouspagetokens.Count()-1]<>invalid then
+            tmpPair = m.albumActiveObject[albumid].previousPageTokens[m.albumActiveObject[albumid].previouspagetokens.Count()-1].Split("::")
+            tmpPage = tmpPair[0]
+            tmpCount = tmpPair[1]
+        end if
+    
+        m.albumActiveObject[albumid].showCountStart = StrToI(tmpCount)
+        m.albumActiveObject[albumid].showCountEnd = 0
+        m.albumActiveObject[albumid].apiCount = 0
+            
+        if albumid = "GP_LIBRARY" then
+            doGetLibraryImages(tmpPage)
+        else
+            doGetAlbumImages(albumid, tmpPage)
+        end if    
+    end for    
+
     
 End Sub
 
@@ -253,7 +258,7 @@ Sub handleGetAlbumImages(event as object)
     errorMsg = ""
     response = event.getData()
     
-    if (response.code = 401) or (response.code = 403) then
+    if (response.code = 401) or (response.code = 403) or (m.global.tmpDEBUG = 5) then
         'Expired Token
         doRefreshToken(response.post_data)
     else if response.code <> 200
@@ -362,7 +367,18 @@ Sub processDownloads(event as object)
         
         m.imageLocalCacheByURL[key] = tmpFS
         m.imageLocalCacheByFS[tmpFS] = key
+        
+        print "DEBUG: CACHE - "; tmpFS; " -- "; m.URLRefreshTimer.control; " --- 403 ERROR COUNT: "; m.global.tmpDEBUG
+        if tmpFS = "403" then
+            m.global.tmpDEBUG = m.global.tmpDEBUG + 1
+        end if
+        
+        if (tmpFS = "403") and (m.URLRefreshTimer.control <> "start") then
+            onURLRefreshTigger()
+            m.URLRefreshTimer.control = "start"
+        end if   
     end for
+    
 End Sub
 
 

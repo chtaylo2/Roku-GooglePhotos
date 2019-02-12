@@ -19,6 +19,8 @@
 Sub doRefreshToken(post_data=[] as Object, selectedUser=-1 as Integer)
     print "SlideshowHelper.brs [doRefreshToken]"
 
+    post_data.Push(selectedUser)
+    
     params = "client_id="                  + m.clientId
     params = params + "&client_secret="    + m.clientSecret
     params = params + "&grant_type="       + "refresh_token"
@@ -63,25 +65,17 @@ Function handleRefreshToken(event as object)
             else
                 status = 0
                 ' We have our tokens
-                
-                if refreshData.post_data[0]<>invalid and (refreshData.post_data[0] = "doGetScreensaverAlbumList" or refreshData.post_data[0] = "doGetScreensaverAlbumImages" or refreshData.post_data[0] = "doGetAlbumSelection") then
-                    'Don't use global set user. Screensaver uses this.
-                    m.accessToken[refreshData.post_data[1]]  = getString(json,"access_token")
-                else
-                    m.accessToken[m.global.selectedUser]  = getString(json,"access_token")
-                end if
+
+                m.accessToken[refreshData.post_data[refreshData.post_data.Count()-1]]  = getString(json,"access_token")
                     
                 m.tokenType          = getString(json,"token_type")
                 m.tokenExpiresIn     = getInteger(json,"expires_in")
                 refreshToken         = getString(json,"refresh_token")
                 
                 if refreshToken <> ""
-                        m.refreshToken[m.global.selectedUser] = refreshToken
+                        m.refreshToken[refreshData.post_data[refreshData.post_data.Count()-1]] = refreshToken
                 end if
-    
-                'Query User info
-                'status = m.RequestUserInfo(m.accessToken.Count()-1, false)
-    
+
                 'Save cached values to registry
                 saveReg()
             end if
@@ -99,20 +93,19 @@ Function handleRefreshToken(event as object)
     end if   
     
     if status = 0 then
-        if refreshData.post_data[0] = "doGetScreensaverAlbumList" then
-            doGetScreensaverAlbumList(refreshData.post_data[1])
-        else if refreshData.post_data[0] = "doGetScreensaverAlbumImages" then
-            doGetScreensaverAlbumImages(refreshData.post_data[1], refreshData.post_data[2])
-        else if refreshData.post_data[0] = "doGetLibraryImages" then
-            doGetLibraryImages(refreshData.post_data[1], refreshData.post_data[2])
+        if refreshData.post_data[0] = "doGetLibraryImages" then
+            doGetLibraryImages(refreshData.post_data[2], refreshData.post_data[3])
         else if refreshData.post_data[0] = "doGetAlbumImages" then
-            doGetAlbumImages(refreshData.post_data[1], refreshData.post_data[2])
+            print "DEBUG 1: "; refreshData.post_data[1]
+            print "DEBUG 2: "; refreshData.post_data[2]
+            print "DEBUG 3: "; refreshData.post_data[3]
+            doGetAlbumImages(refreshData.post_data[1], refreshData.post_data[2], refreshData.post_data[3])
         else if refreshData.post_data[0] = "doGetSearch" then
             doGetSearch(refreshData.post_data[1])
         else if refreshData.post_data[0] = "doGetAlbumSelection" then
             doGetAlbumSelection()
         else
-            doGetAlbumList()
+            doGetAlbumList(refreshData.post_data[1])
         end if
     end if
     
@@ -126,17 +119,18 @@ End Function
 '*********************************************************
 
 ' URL Request to fetch album listing
-Sub doGetAlbumList(pageNext="" As String)
-    print "Albums.brs [doGetAlbumList]"  
+Sub doGetAlbumList(selectedUser=0 as Integer, pageNext="" As String)
+    print "SlideshowHelper.brs [doGetAlbumList]"  
 
-    tmpData = [ "doGetAlbumList" ]
+    tmpData = [ "doGetAlbumList", selectedUser ]
 
     params = "pageSize=50"
     if pageNext<>"" then
         params = params + "&pageToken=" + pageNext
     end if
 
-    signedHeader = oauth_sign(m.global.selectedUser)
+    m.apiPending = m.apiPending+1
+    signedHeader = oauth_sign(selectedUser)
     makeRequest(signedHeader, m.gp_prefix + "/albums?"+params, "GET", "", 0, tmpData)
 End Sub
 
@@ -179,12 +173,12 @@ End Function
 ' **
 ' ********************************************************************
 
-Sub doGetLibraryImages(pageNext="" As String)
-    print "Albums.brs - [doGetLibraryImages]"
+Sub doGetLibraryImages(selectedUser=0 as Integer, pageNext="" As String)
+    print "SlideshowHelper.brs - [doGetLibraryImages]"
     
     print "GooglePhotos pageNext: "; pageNext
 
-    tmpData = [ "doGetLibraryImages", m.albumActiveObject, pageNext ]
+    tmpData = [ "doGetLibraryImages", "GP_LIBRARY", selectedUser, pageNext ]
 
     params = "pageSize=100"
     if pageNext<>"" then
@@ -195,17 +189,18 @@ Sub doGetLibraryImages(pageNext="" As String)
         m.imagesMetaData    = []
     end if
     
-    signedHeader = oauth_sign(m.global.selectedUser)
+    m.apiPending = m.apiPending+1
+    signedHeader = oauth_sign(selectedUser)
     makeRequest(signedHeader, m.gp_prefix + "/mediaItems?"+params, "GET", "", 1, tmpData)
 End Sub
 
 
-Sub doGetAlbumImages(albumid As String, pageNext="" As String)
-    print "Albums.brs - [doGetAlbumImages]"
+Sub doGetAlbumImages(albumid As String, selectedUser=0 as Integer, pageNext="" As String)
+    print "SlideshowHelper.brs - [doGetAlbumImages]"
 
     print "GooglePhotos pageNext: "; pageNext
 
-    tmpData = [ "doGetAlbumImages", m.albumActiveObject, pageNext ]
+    tmpData = [ "doGetAlbumImages", albumid, selectedUser, pageNext ]
 
     params = "pageSize=100"
     params = params + "&albumId=" + albumid
@@ -216,8 +211,9 @@ Sub doGetAlbumImages(albumid As String, pageNext="" As String)
         m.videosMetaData    = []
         m.imagesMetaData    = []
     end if
-    
-    signedHeader = oauth_sign(m.global.selectedUser)
+   
+    m.apiPending = m.apiPending+1 
+    signedHeader = oauth_sign(selectedUser)
     makeRequest(signedHeader, m.gp_prefix + "/mediaItems:search/", "POST", params, 1, tmpData)
 End Sub
 
