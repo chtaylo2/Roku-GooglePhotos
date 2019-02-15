@@ -16,6 +16,9 @@ Sub init()
     m.itemOverhang     = m.top.findNode("itemOverhang")
     m.searchProgress   = m.top.findNode("searchProgress")
     m.noticeDialog     = m.top.findNode("noticeDialog")
+
+    m.apiPending        = 0
+    m.albumActiveObject = {}
     
     'Load common variables
     loadCommon()
@@ -55,21 +58,49 @@ Sub loadListContent()
     d1seconds    = datepast.asseconds() - (60 * 60 * 24 * 7)
     datepast.FromSeconds(d1seconds)
     
-    current      = date.AsDateString("no-weekday")
-    currentYear  = date.GetYear().ToStr()
-    currentMonth = current.Split(" ")[0].ToStr()
-    currentDay   = zeroCheck(date.GetDayOfMonth().ToStr())
+    cYear1 = date.GetYear()-1
+    cYear2 = date.GetYear()-2
+    cYear3 = date.GetYear()-3
+    cYear4 = date.GetYear()-4
+    cYear5 = date.GetYear()-5
+    cMonth = date.GetMonth().ToStr()
+    cDay   = date.GetDayOfMonth().ToStr()
     
-    past         = datepast.AsDateString("no-weekday")
-    pastYear     = datepast.GetYear().ToStr()
-    pastMonth    = past.Split(" ")[0].ToStr()
-    pastDay      = zeroCheck(datepast.GetDayOfMonth().ToStr())
+    pYear1 = datepast.GetYear()-1
+    pYear2 = datepast.GetYear()-2
+    pYear3 = datepast.GetYear()-3
+    pYear4 = datepast.GetYear()-4
+    pYear5 = datepast.GetYear()-5
+    pMonth = datepast.GetMonth().ToStr()
+    pDay   = datepast.GetDayOfMonth().ToStr()
+  
+  'DAY
+    print "{'dateFilter': {'dates': [{'day': "+cDay+",'month': "+cMonth+",'year': "+cYear1.ToStr()+"}"
+    print "{'day': "+cDay+",'month': "+cMonth+",'year': "+cYear2.ToStr()+"}"
+    print "{'day': "+cDay+",'month': "+cMonth+",'year': "+cYear3.ToStr()+"}"
+    print "{'day': "+cDay+",'month': "+cMonth+",'year': "+cYear4.ToStr()+"}"
+    print "{'day': "+cDay+",'month': "+cMonth+",'year': "+cYear5.ToStr()+"}]}}"
+ 
+  'WEEk
+    print "{'dateFilter': {'ranges': [{'startDate': {'day': "+pDay+",'month': "+pMonth+",'year': "+pYear1.ToStr()+"},'endDate': {'day': "+cDay+",'month': "+cMonth+",'year': "+cYear1.ToStr()+"}},"
+    print "{'startDate': {'day': "+pDay+",'month': "+pMonth+",'year': "+pYear2.ToStr()+"},'endDate': {'day': "+cDay+",'month': "+cMonth+",'year': "+cYear2.ToStr()+"}},"
+    print "{'startDate': {'day': "+pDay+",'month': "+pMonth+",'year': "+pYear3.ToStr()+"},'endDate': {'day': "+cDay+",'month': "+cMonth+",'year': "+cYear3.ToStr()+"}},"
+    print "{'startDate': {'day': "+pDay+",'month': "+pMonth+",'year': "+pYear4.ToStr()+"},'endDate': {'day': "+cDay+",'month': "+cMonth+",'year': "+cYear4.ToStr()+"}},"
+    print "{'startDate': {'day': "+pDay+",'month': "+pMonth+",'year': "+pYear5.ToStr()+"},'endDate': {'day': "+cDay+",'month': "+cMonth+",'year': "+cYear5.ToStr()+"}}]}}"
+  
+  'MONTH  
+    print "{'dateFilter': {'dates': [{'month': "+cMonth+",'year': "+cYear1.ToStr()+"}"
+    print "{'month': "+cMonth+",'year': "+cYear2.ToStr()+"}"
+    print "{'month': "+cMonth+",'year': "+cYear3.ToStr()+"}"
+    print "{'month': "+cMonth+",'year': "+cYear4.ToStr()+"}"
+    print "{'month': "+cMonth+",'year': "+cYear5.ToStr()+"}]}}"
+    
     
     m.content = createObject("RoSGNode","ContentNode")
     addItem(m.content, "Shuffle All Photos", "3", "junk")
-    addItem(m.content, "Rediscover this Day in History", "%22"+currentMonth+" "+currentDay+"%22 "+"-"+currentYear, "Rediscover this Day in History")
-    addItem(m.content, "Rediscover this Week in History", "%22"+pastMonth+" "+pastDay+" - "+currentMonth+" "+currentDay+"%22 "+"-"+pastYear+" -"+currentYear, "Rediscover this Week in History")
-    addItem(m.content, "Rediscover this Month in History", "%22"+currentMonth+"%22 "+"-"+currentYear, "Rediscover this Month in History")
+    addItem(m.content, "Rediscover this Day in History", "{'dateFilter': {'dates': [{'day': "+cDay+",'month': "+cMonth+",'year': "+cYear1.ToStr()+"},{'day': "+cDay+",'month': "+cMonth+",'year': "+cYear2.ToStr()+"},{'day': "+cDay+",'month': "+cMonth+",'year': "+cYear3.ToStr()+"},{'day': "+cDay+",'month': "+cMonth+",'year': "+cYear4.ToStr()+"},{'day': "+cDay+",'month': "+cMonth+",'year': "+cYear5.ToStr()+"}]}}", "Rediscover this Day in History")
+    addItem(m.content, "Rediscover this Week in History", "{'dateFilter': {'ranges': [{'startDate': {'day': "+pDay+",'month': "+pMonth+",'year': "+pYear1.ToStr()+"},'endDate': {'day': "+cDay+",'month': "+cMonth+",'year': "+cYear1.ToStr()+"}},{'startDate': {'day': "+pDay+",'month': "+pMonth+",'year': "+pYear2.ToStr()+"},'endDate': {'day': "+cDay+",'month': "+cMonth+",'year': "+cYear2.ToStr()+"}},{'startDate': {'day': "+pDay+",'month': "+pMonth+",'year': "+pYear3.ToStr()+"},'endDate': {'day': "+cDay+",'month': "+cMonth+",'year': "+cYear3.ToStr()+"}},{'startDate': {'day': "+pDay+",'month': "+pMonth+",'year': "+pYear4.ToStr()+"},'endDate': {'day': "+cDay+",'month': "+cMonth+",'year': "+cYear4.ToStr()+"}},{'startDate': {'day': "+pDay+",'month': "+pMonth+",'year': "+pYear5.ToStr()+"},'endDate': {'day': "+cDay+",'month': "+cMonth+",'year': "+cYear5.ToStr()+"}}]}}", "Rediscover this Week in History")
+    addItem(m.content, "Rediscover this Month in History", "{'dateFilter': {'dates': [{'month': "+cMonth+",'year': "+cYear1.ToStr()+"},{'month': "+cMonth+",'year': "+cYear2.ToStr()+"},{'month': "+cMonth+",'year': "+cYear3.ToStr()+"},{'month': "+cMonth+",'year': "+cYear4.ToStr()+"},{'month': "+cMonth+",'year': "+cYear5.ToStr()+"}]}}", "Rediscover this Month in History")
 
     'Store content node and current registry selection
     m.dynamicAlbumList.content = m.content
@@ -94,31 +125,25 @@ Sub onItemSelected()
         m.screenActive.setFocus(true)
     else
     
+        m.imagesMetaData = []
+        m.videosMetaData = []
+    
+        m.albumActiveObject["SearchResults"] = {}
+        m.albumActiveObject["SearchResults"].GetTitle = "Search Results"
+        m.albumActiveObject["SearchResults"].GetID = "SearchResults"
+        m.albumActiveObject["SearchResults"].GetImageCount = 0
+        m.albumActiveObject["SearchResults"].previousPageTokens = []
+        m.albumActiveObject["SearchResults"].showCountStart = 1
+        m.albumActiveObject["SearchResults"].showCountEnd = 0
+        m.albumActiveObject["SearchResults"].apiCount = 0
+        m.albumActiveObject["SearchResults"].GetUserIndex = m.global.selectedUser
+    
         'Item selected
         keyword = m.dynamicAlbumList.content.getChild(m.dynamicAlbumList.itemFocused).description
         m.top.tracking = m.dynamicAlbumList.content.getChild(m.dynamicAlbumList.itemFocused).titleseason
-        doGetSearch(keyword)
+        doGetSearch(keyword, m.global.selectedUser)
     end if
     
-End Sub
-
-
-' URL Request to fetch search
-Sub doGetSearch(keyword as string)
-    print "DynamicAlbums.brs [doGetSearch]"
-    
-    if keyword <> ""
-        m.searchProgress.message = m.top.tracking+" - Searching Albums"
-        m.searchProgress.visible = true
-    
-        tmpData = [ "doGetSearch", keyword ]
-        
-        keyword = keyword.Replace(" ", "+")
-        'print "KEYWORD: "; keyword
-        
-        signedHeader = oauth_sign(m.global.selectedUser)
-        makeRequest(signedHeader, m.gp_prefix + "?kind=photo&v=3.0&q="+keyword+"&max-results=1000&thumbsize=220&imgmax="+getResolution(), "GET", "", 3, tmpData)
-    end if
 End Sub
 
 
@@ -127,33 +152,85 @@ Sub handleGetSearch(event as object)
 
     errorMsg = ""
     response = event.getData()
+    albumid  = response.post_data[1]
+    keywords = response.post_data[2]
+    
+    'print "DEBUG: "; response
     
     if (response.code = 401) or (response.code = 403) then
         'Expired Token
-        doRefreshToken(response.post_data)
+        doRefreshToken(response.post_data, m.global.selectedUser)
     else if response.code <> 200
         errorMsg = "An Error Occurred in 'handleGetSearch'. Code: "+(response.code).toStr()+" - " +response.error
     else
-        rsp=ParseXML(response.content)
-        
-        print rsp
+        rsp=ParseJson(response.content)
+        'print rsp
         if rsp=invalid then
             errorMsg = "Unable to parse Google Photos API response. Exit the channel then try again later. Code: "+(response.code).toStr()+" - " +response.error
+        else if type(rsp) <> "roAssociativeArray"
+            errorMsg = "Json response is not an associative array: handleGetSearch"
+        else if rsp.DoesExist("error")
+            errorMsg = "Json error response: [handleGetSearch] " + json.error
         else
+
+            imageList = googleImageListing(rsp)
+
+            for each media in imageList
+                tmp             = {}
+                tmp.id          = media.GetID
+                tmp.url         = media.GetURL
+                tmp.timestamp   = media.GetTimestamp
+                tmp.description = media.GetDescription
+                tmp.filename    = media.GetFilename
         
-            results=rsp.GetNamedElements("openSearch:totalResults")[0].GetText()
+                if media.IsVideo then
+                   m.videosMetaData.Push(tmp)
+                   print "VIDEO: "; tmp.url
+                else
+                   m.imagesMetaData.Push(tmp)
+                   print "IMAGE: "; tmp.url
+                end if
+            end for
+
+            if rsp["nextPageToken"]<>invalid then
+                pageNext = rsp["nextPageToken"]
+                m.albumActiveObject[albumid].nextPageToken = pageNext
+                m.albumActiveObject[albumid].showCountEnd = m.albumActiveObject[albumid].showCountEnd + imageList.Count()
+                m.albumActiveObject[albumid].apiCount = m.albumActiveObject[albumid].apiCount + 1
+                if (m.albumActiveObject[albumid].apiCount < m.maxApiPerPage) and (m.albumActiveObject[albumid].showCountEnd < m.maxImagesPerPage) then
+                    pagesShow = "Media Items"+StrI(m.albumActiveObject[albumid].showCountStart)+" -"+StrI(m.albumActiveObject[albumid].showCountStart+m.albumActiveObject[albumid].showCountEnd-1)
+                    if m.albumActiveObject[albumid].GetImageCount<>0 then
+                        pagesShow = pagesShow+" of"+StrI(m.albumActiveObject[albumid].GetImageCount)
+                    end if
+                    print "END: "; m.albumActiveObject[albumid].showCountEnd
+                    m.searchProgress.message = m.top.tracking+" - Searching Albums -- "+pagesShow
+                    
+                    doGetSearch(keywords, m.global.selectedUser, pageNext)
+                else
+                    print "DEBUG: "; m.albumActiveObject[albumid]
+                end if
+            else
+                m.albumActiveObject[albumid].nextPageToken = invalid
+                m.albumActiveObject[albumid].showCountEnd = m.albumActiveObject[albumid].showCountEnd + imageList.Count()
+
+                print "DEBUG: "; m.albumActiveObject[albumid]
             
+
+
             m.searchProgress.visible = false
             
-            if strtoi(results) > 0 then
+           if m.albumActiveObject[albumid].showcountend > 0 then
             
                 'Hide blackout screen
                 m.FadeBackground.visible   = false
                 m.dynamicAlbumList.visible = false
                 m.itemOverhang.visible     = false         
             
+                m.albumActiveObject[albumid].videosMetaData = m.videosMetaData
+                m.albumActiveObject[albumid].imagesMetaData = m.imagesMetaData
+            
                 m.screenActive = createObject("roSGNode", "My Albums")
-                m.screenActive.imageContent = response
+                m.screenActive.imageContent = m.albumActiveObject
                 m.screenActive.predecessor = m.top.tracking
                 m.screenActive.loaded = true
                 m.top.appendChild(m.screenActive)
@@ -168,6 +245,10 @@ Sub handleGetSearch(event as object)
                 m.noticeDialog.setFocus(true)
                 m.noticeDialog.observeField("buttonSelected","noticeClose")                
             end if
+            
+            end if
+            
+            
         end if
         
     end if

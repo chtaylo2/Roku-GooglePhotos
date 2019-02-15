@@ -38,14 +38,13 @@
                     fname =  "tmp:/" + itostr(unique) + "_" + item.filename
                     
                     'print "Fname: "; fname
-        
                     'print "Caching Image: "; item.url
+                    
                     httpObj.setUrl(item.url)
                     httpObj.AsyncGetToFile( fname )
     
                     msg = wait(0, port)
-
-                    print "DEBUG: "; msg.GetResponseCode()
+                    
                     if msg.GetResponseCode() = 403 then
                         response["ACCESS ERROR"] = "403"
                     else

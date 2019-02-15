@@ -36,6 +36,7 @@ Sub init()
     m.imageDisplay              = []
     m.imageTracker              = -1
     m.imageOnScreen             = ""
+    m.apiPending                = 0
     m.albumActiveObject         = invalid
     
     m.pauseImageCount.font.size   = 29
@@ -182,13 +183,7 @@ Sub loadImageList()
         'Trigger a PAUSE if photo selected
         if m.top.startIndex <> -1 then
             onKeyEvent("OK", true)
-        end if
-        
-        'if m.top.id = "DisplayScreensaver" then
-            'We don't need pre-downloading of photos for screensaver. Disable
-        '    m.DownloadTimer.control = "stop"
-        'end if
-        
+        end if       
     end if
 End Sub
 
@@ -227,25 +222,26 @@ Sub onURLRefreshTigger()
     m.albumActiveObject = m.top.albumobject
 
     for each albumid in m.albumActiveObject
-        print "DEBUG: "; albumid
-        print m.top.albumobject[albumid]
-        tmpPage  = ""
-        tmpCount = "1"
-        if m.albumActiveObject[albumid].previousPageTokens[m.albumActiveObject[albumid].previouspagetokens.Count()-1]<>invalid then
-            tmpPair = m.albumActiveObject[albumid].previousPageTokens[m.albumActiveObject[albumid].previouspagetokens.Count()-1].Split("::")
-            tmpPage = tmpPair[0]
-            tmpCount = tmpPair[1]
+        if type(m.albumActiveObject[albumid]) = "roAssociativeArray" then
+            print "DEBUG: "; albumid
+            tmpPage  = ""
+            tmpCount = "1"
+            if m.albumActiveObject[albumid].previousPageTokens[m.albumActiveObject[albumid].previouspagetokens.Count()-1]<>invalid then
+                tmpPair = m.albumActiveObject[albumid].previousPageTokens[m.albumActiveObject[albumid].previouspagetokens.Count()-1].Split("::")
+                tmpPage = tmpPair[0]
+                tmpCount = tmpPair[1]
+            end if
+        
+            m.albumActiveObject[albumid].showCountStart = StrToI(tmpCount)
+            m.albumActiveObject[albumid].showCountEnd = 0
+            m.albumActiveObject[albumid].apiCount = 0
+                
+            if albumid.Instr("GP_LIBRARY") >= 0 then
+                doGetLibraryImages(albumid, m.albumActiveObject[albumid].GetUserIndex, tmpPage)
+            else
+                doGetAlbumImages(albumid, m.albumActiveObject[albumid].GetUserIndex, tmpPage)
+            end if
         end if
-    
-        m.albumActiveObject[albumid].showCountStart = StrToI(tmpCount)
-        m.albumActiveObject[albumid].showCountEnd = 0
-        m.albumActiveObject[albumid].apiCount = 0
-            
-        if albumid.Instr("GP_LIBRARY") >= 0 then
-            doGetLibraryImages(albumid, tmpPage)
-        else
-            doGetAlbumImages(albumid, tmpPage)
-        end if    
     end for    
 
     
@@ -257,10 +253,11 @@ Sub handleGetAlbumImages(event as object)
   
     errorMsg = ""
     response = event.getData()
+    albumid  = response.post_data[1]
     
-    if (response.code = 401) or (response.code = 403) or (m.global.tmpDEBUG = 5) then
+    if (response.code = 401) or (response.code = 403) then
         'Expired Token
-        doRefreshToken(response.post_data)
+        doRefreshToken(response.post_data, response.post_data[1])
     else if response.code <> 200
         errorMsg = "An Error Occurred in 'handleGetAlbumImages'. Code: "+(response.code).toStr()+" - " +response.error
     else
@@ -296,14 +293,14 @@ Sub handleGetAlbumImages(event as object)
 
             if rsp["nextPageToken"]<>invalid then
                 pageNext = rsp["nextPageToken"]
-                m.albumActiveObject.nextPageToken = pageNext
-                m.albumActiveObject.showCountEnd = m.albumActiveObject.showCountEnd + imageList.Count()
-                m.albumActiveObject.apiCount = m.albumActiveObject.apiCount + 1
-                if (m.albumActiveObject.apiCount < m.maxApiPerPage) and (m.albumActiveObject.showCountEnd < m.maxImagesPerPage) then
-                    if m.albumActiveObject.GetID.Instr("GP_LIBRARY") >= 0 then
-                        doGetLibraryImages(m.albumActiveObject.GetID, pageNext)
+                m.albumActiveObject[albumid].nextPageToken = pageNext
+                m.albumActiveObject[albumid].showCountEnd = m.albumActiveObject[albumid].showCountEnd + imageList.Count()
+                m.albumActiveObject[albumid].apiCount = m.albumActiveObject[albumid].apiCount + 1
+                if (m.albumActiveObject[albumid].apiCount < m.maxApiPerPage) and (m.albumActiveObject[albumid].showCountEnd < m.maxImagesPerPage) then
+                    if m.albumActiveObject[albumid].GetID.Instr("GP_LIBRARY") >= 0 then
+                        doGetLibraryImages(m.albumActiveObject[albumid].GetID, m.albumActiveObject[albumid].GetUserIndex, pageNext)
                     else
-                        doGetAlbumImages(m.albumActiveObject.GetID, pageNext)
+                        doGetAlbumImages(m.albumActiveObject[albumid].GetID, m.albumActiveObject[albumid].GetUserIndex, pageNext)
                     end if
                 end if                
             end if
@@ -376,7 +373,13 @@ Sub processDownloads(event as object)
         if (tmpFS = "403") and (m.URLRefreshTimer.control <> "start") then
             onURLRefreshTigger()
             m.URLRefreshTimer.control = "start"
-        end if   
+        end if
+        
+        m.global.tmpDEBUG = m.global.tmpDEBUG + 1
+        if m.global.tmpDEBUG = 7 or m.global.tmpDEBUG = 14 then
+            print "EXECUTE REFRESH"
+            onURLRefreshTigger()
+        end if
     end for
     
 End Sub

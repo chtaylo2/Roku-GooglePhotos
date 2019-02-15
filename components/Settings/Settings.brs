@@ -140,6 +140,22 @@ Sub handleGetAlbumSelection(event as object)
                 if saved = 0 checkedObj.Push(false)                
             end for
             
+            'Display Google Photos Library
+            addItem(m.albumContent, "Google Photos Library", "GP_LIBRARY", "")
+            saved = 0
+            if (regAlbums <> invalid) and (regAlbums <> "")
+                parsedString = regAlbums.Split("|")
+                for each item in parsedString
+                    albumUser = item.Split(":")
+                    if (albumUser[0] = "GP_LIBRARY") and (albumUser[1] = response.post_data[1].Tostr()) then
+                        'Check selected album
+                        saved = 1
+                    end if
+                end for
+            end if
+            if saved = 1 checkedObj.Push(true)
+            if saved = 0 checkedObj.Push(false)
+            
             'Display user album selections
             m.albumsObject = googleAlbumListing(rsp)
             for each album in m.albumsObject

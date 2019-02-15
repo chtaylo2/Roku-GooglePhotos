@@ -166,6 +166,39 @@ End Function
 
 ' ********************************************************************
 ' **
+' ** SEARCH HANDLERS
+' **
+' ********************************************************************
+
+Sub doGetSearch(keyword as string, selectedUser=0 as Integer, pageNext="" As String)
+    print "SlideshowHelper.brs [doGetSearch]"
+    
+    if keyword <> ""
+        m.searchProgress.message = m.top.tracking+" - Searching Albums"
+        m.searchProgress.visible = true
+    
+        tmpData = [ "doGetSearch", "SearchResults", keyword ]
+
+        params = "'pageSize': '100',"
+
+        if pageNext<>"" then
+            params = params + "'pageToken': '" + pageNext + "',"
+        end if
+        
+        params = params + "'filters': " + keyword
+
+        print "params: "; params
+        
+        m.apiPending = m.apiPending+1
+        signedHeader = oauth_sign(selectedUser)
+        signedHeader["Content-type"] = "application/json"
+        makeRequest(signedHeader, m.gp_prefix + "/mediaItems:search/", "POST", "{" + params + "}", 3, tmpData)  
+    end if
+End Sub
+
+
+' ********************************************************************
+' **
 ' ** IMAGE HANDLERS
 ' **
 ' ********************************************************************

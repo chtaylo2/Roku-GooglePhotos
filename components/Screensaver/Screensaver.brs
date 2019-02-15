@@ -60,12 +60,15 @@ Sub init()
         generic1            = {}
         generic1.timestamp  = "284040000"
         generic1.url        = "pkg:/images/screensaver_splash.png"
+        generic1.filename   = "screensaver_splash.png"
         generic2            = {}
         generic2.timestamp  = "284040000"
         generic2.url        = "pkg:/images/cat_pic_1.jpg"
+        generic2.filename   = "cat_pic_1.jpg"
         generic3            = {}
         generic3.timestamp  = "284040000"
         generic3.url        = "pkg:/images/cat_pic_2.jpg"
+        generic3.filename   = "cat_pic_1.jpg"
         m.photoItems.Push(generic1)
         m.photoItems.Push(generic1)
         m.photoItems.Push(generic1)
@@ -148,10 +151,6 @@ Sub handleGetAlbumList(event as object)
                     album.GetUserIndex = response.post_data[1]
                     m.albumsObject.Push(album)
                 end for
-                
-                processAlbums()
-                print "HERE: "; m.albumsObject
-                
             end if
         end if
     end if
@@ -169,6 +168,7 @@ Sub processAlbums()
     tmp.showCountStart = 1
     tmp.showCountEnd = 0
     tmp.apiCount = 0
+    tmp.previousPageTokens = []
         
     'Look for Time in History
     'albumHistory = "Day|Week|Month".Split("|")
@@ -186,17 +186,17 @@ Sub processAlbums()
     ' end for   
 
     'Handle GooglePhotos Library Albums
-    if (regAlbums <> invalid) and (regAlbums <> "")
+    if (regAlbums <> invalid) and (regAlbums <> "") and (m.userIndex <> 100)
         'User has selected albums for screensaver
         parsedString = regAlbums.Split("|")
         for each item in parsedString
-            print "HERE: "; parsedString
             albumUser = item.Split(":")
             if albumUser[0] = "GP_LIBRARY" then
                 m.predecessor = "null"
-                tmp.GetID = "GP_LIBRARY_" + StrI(albumUser[1])
-                m.albumActiveObject["GP_LIBRARY_" + StrI(albumUser[1])] = tmp
-                doGetLibraryImages(tmp.GetID, albumUser[1])
+                tmp.GetID = "GP_LIBRARY_" + albumUser[1]
+                tmp.GetUserIndex = Strtoi(albumUser[1])
+                m.albumActiveObject["GP_LIBRARY_" + albumUser[1]] = tmp
+                doGetLibraryImages(tmp.GetID, Strtoi(albumUser[1]))
             end if
         end for
 
@@ -205,12 +205,13 @@ Sub processAlbums()
         if m.userIndex = 100 then
             for i = 0 to m.userCount-1
                 tmp.GetID = "GP_LIBRARY_" + StrI(i)
+                tmp.GetUserIndex = i
                 m.albumActiveObject["GP_LIBRARY_" + StrI(i)] = tmp
-                print "TEST: "; m.albumActiveObject
                 doGetLibraryImages(tmp.GetID, i)
             end for
         else
             tmp.GetID = "GP_LIBRARY_" + StrI(m.userIndex)
+            tmp.GetUserIndex = m.userIndex
             m.albumActiveObject["GP_LIBRARY_" + StrI(m.userIndex)] = tmp
             doGetLibraryImages(tmp.GetID, m.userIndex)
         end if
@@ -219,13 +220,15 @@ Sub processAlbums()
     if m.albumsObject.Count()>0 then
         for each album in m.albumsObject
             'User has selected albums for screensaver
-            if (regAlbums <> invalid) and (regAlbums <> "")
+            if (regAlbums <> invalid) and (regAlbums <> "") and (m.userIndex <> 100)
                 parsedString = regAlbums.Split("|")
                 for each item in parsedString
                     albumUser = item.Split(":")
                     if albumUser[0] = album.GetID then
                         m.predecessor = "null"
                         m.albumActiveObject[album.GetID] = {}
+                        m.albumActiveObject[album.GetID].GetID = album.GetID
+                        m.albumActiveObject[album.GetID].GetUserIndex = album.GetUserIndex
                         doGetAlbumImages(album.GetID, album.GetUserIndex)
                     end if
                 end for
@@ -234,6 +237,8 @@ Sub processAlbums()
                 album_idx = Rnd(m.albumsObject.Count())-1
     
                 m.albumActiveObject[m.albumsObject[album_idx].GetID] = {}
+                m.albumActiveObject[m.albumsObject[album_idx].GetID].GetID = m.albumsObject[album_idx].GetID
+                m.albumActiveObject[m.albumsObject[album_idx].GetID].GetUserIndex = m.albumsObject[album_idx].GetUserIndex
                 doGetAlbumImages(m.albumsObject[album_idx].GetID, m.albumsObject[album_idx].GetUserIndex)
                 m.albumsObject.delete(album_idx)
                                 
@@ -245,7 +250,7 @@ Sub processAlbums()
                 end if
             end if
         end for
-    end if    
+    end if
 End Sub
 
 
@@ -261,13 +266,14 @@ Sub handleGetAlbumImages(event as object)
         doRefreshToken(response.post_data, response.post_data[2])
     else if response.code = 200
         rsp=ParseJson(response.content)
-        print rsp
+        'print rsp
         if rsp<>invalid then        
             imagesObject = googleImageListing(rsp)
             
             localCount = 0
             for each image in imagesObject
                 tmp = {}
+                tmp.id          = image.GetID
                 tmp.url         = image.GetURL
                 tmp.timestamp   = image.GetTimestamp
                 tmp.description = image.GetDescription
@@ -287,6 +293,9 @@ Sub handleGetAlbumImages(event as object)
             end if
             if m.albumActiveObject[albumid].apiCount=invalid then
                 m.albumActiveObject[albumid].apiCount = 0
+            end if
+            if m.albumActiveObject[albumid].previousPageTokens=invalid then
+                m.albumActiveObject[albumid].previousPageTokens = []
             end if
             
             if rsp["nextPageToken"]<>invalid then
@@ -319,11 +328,12 @@ Sub onApiTimerTrigger()
     print "API CALLS LEFT: "; m.apiPending; " - Image Count: "; m.photoItems.Count()
 
     if m.apiPending = 0 then
-    
-        print "DEBUG: "; m.albumActiveObject
-    
-        execScreensaver()
-        m.apiTimer.control = "stop"
+        if m.albumActiveObject.Count() = 0 then
+            processAlbums()
+        else   
+            execScreensaver()
+            m.apiTimer.control = "stop"
+        end if
     end if
 
 End Sub
@@ -335,10 +345,12 @@ Sub execScreensaver()
         generic1            = {}
         generic1.timestamp  = "284040000"
         generic1.url        = "pkg:/images/screensaver_splash.png"
+        generic1.filename   = "screensaver_splash.png"
         m.photoItems.Push(generic1)
         generic1            = {}
         generic1.timestamp  = "284040000"
         generic1.url        = "pkg:/images/black_pixel.png"
+        generic1.filename   = "black_pixel.png"
         m.photoItems.Push(generic1)
         m.predecessor       = "No images found. Try another album"
     end if

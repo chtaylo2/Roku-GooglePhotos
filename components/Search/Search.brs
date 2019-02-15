@@ -81,7 +81,7 @@ End Sub
 
 
 ' URL Request to fetch search
-Sub doGetSearch(keyword as string)
+Sub doGetSearch_DISABLED(keyword as string)
     print "Search.brs [doGetSearch]"
     
     if keyword <> ""

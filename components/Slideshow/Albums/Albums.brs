@@ -47,18 +47,15 @@ Sub loadingComplete()
     m.top.unobserveField("loaded")
 
     if m.top.imageContent<>invalid then
-        'Show search results
-    
-        'TODO: WILL WE SUPPORT SEARCH?
+       'Search Results
+       
+        albumid             = "SearchResults"
+        m.albumActiveObject = m.top.imageContent
         
-        'album = CreateObject("roAssociativeArray")
-        'album.GetTitle=function():return "Unused":end function
-        'album.GetImageCount=function():return Int(1):end function
-        'm.albumName = m.top.predecessor
+        m.imagesMetaData = m.albumActiveObject[albumid].imagesMetaData
+        m.videosMetaData = m.albumActiveObject[albumid].videosMetaData
 
-        'rsp=ParseXML(m.top.imageContent.content)
-        'm.imagesObject = googleImageListing(rsp.entry)
-        'googleDisplayImageMenu(album, m.imagesObject)
+        googleDisplayImageMenu(albumid, m.albumActiveObject[albumid].GetTitle, m.albumActiveObject[albumid].GetImageCount)
         
     else
         'Get user albums
@@ -239,6 +236,7 @@ Sub onItemSelected()
         m.albumActiveObject["GP_LIBRARY"].showCountStart = 1
         m.albumActiveObject["GP_LIBRARY"].showCountEnd = 0
         m.albumActiveObject["GP_LIBRARY"].apiCount = 0
+        m.albumActiveObject["GP_LIBRARY"].GetUserIndex = m.global.selectedUser
     
         m.albumSelection = m.albummarkupgrid.itemSelected
         m.albumName = selection.shortdescriptionline1       
@@ -269,6 +267,7 @@ print "DEBUG: "; m.albumActiveObject[albumid]
         m.albumActiveObject[albumid].showCountStart = 1
         m.albumActiveObject[albumid].showCountEnd = 0
         m.albumActiveObject[albumid].apiCount = 0
+        m.albumActiveObject[albumid].GetUserIndex = m.global.selectedUser
         m.imagesMetaData = []
         m.videosMetaData = []
         
