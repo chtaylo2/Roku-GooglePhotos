@@ -170,6 +170,63 @@ End Function
 ' **
 ' ********************************************************************
 
+Function doSearchGenerate() As Object
+    'Get Dates
+    date         = CreateObject("roDateTime")
+    datepast     = createobject("rodatetime")
+    date.ToLocalTime()
+    datepast.ToLocalTime()
+ 
+    'Calculate 7 days prior
+    d1seconds    = datepast.asseconds() - (60 * 60 * 24 * 7)
+    datepast.FromSeconds(d1seconds)
+    
+    cYear1 = date.GetYear()-1
+    cYear2 = date.GetYear()-2
+    cYear3 = date.GetYear()-3
+    cYear4 = date.GetYear()-4
+    cYear5 = date.GetYear()-5
+    cMonth = date.GetMonth().ToStr()
+    cDay   = date.GetDayOfMonth().ToStr()
+    
+    pYear1 = datepast.GetYear()-1
+    pYear2 = datepast.GetYear()-2
+    pYear3 = datepast.GetYear()-3
+    pYear4 = datepast.GetYear()-4
+    pYear5 = datepast.GetYear()-5
+    pMonth = datepast.GetMonth().ToStr()
+    pDay   = datepast.GetDayOfMonth().ToStr()
+  
+  'DAY
+    print "{'dateFilter': {'dates': [{'day': "+cDay+",'month': "+cMonth+",'year': "+cYear1.ToStr()+"}"
+    print "{'day': "+cDay+",'month': "+cMonth+",'year': "+cYear2.ToStr()+"}"
+    print "{'day': "+cDay+",'month': "+cMonth+",'year': "+cYear3.ToStr()+"}"
+    print "{'day': "+cDay+",'month': "+cMonth+",'year': "+cYear4.ToStr()+"}"
+    print "{'day': "+cDay+",'month': "+cMonth+",'year': "+cYear5.ToStr()+"}]}}"
+ 
+  'WEEk
+    print "{'dateFilter': {'ranges': [{'startDate': {'day': "+pDay+",'month': "+pMonth+",'year': "+pYear1.ToStr()+"},'endDate': {'day': "+cDay+",'month': "+cMonth+",'year': "+cYear1.ToStr()+"}},"
+    print "{'startDate': {'day': "+pDay+",'month': "+pMonth+",'year': "+pYear2.ToStr()+"},'endDate': {'day': "+cDay+",'month': "+cMonth+",'year': "+cYear2.ToStr()+"}},"
+    print "{'startDate': {'day': "+pDay+",'month': "+pMonth+",'year': "+pYear3.ToStr()+"},'endDate': {'day': "+cDay+",'month': "+cMonth+",'year': "+cYear3.ToStr()+"}},"
+    print "{'startDate': {'day': "+pDay+",'month': "+pMonth+",'year': "+pYear4.ToStr()+"},'endDate': {'day': "+cDay+",'month': "+cMonth+",'year': "+cYear4.ToStr()+"}},"
+    print "{'startDate': {'day': "+pDay+",'month': "+pMonth+",'year': "+pYear5.ToStr()+"},'endDate': {'day': "+cDay+",'month': "+cMonth+",'year': "+cYear5.ToStr()+"}}]}}"
+  
+  'MONTH  
+    print "{'dateFilter': {'dates': [{'month': "+cMonth+",'year': "+cYear1.ToStr()+"}"
+    print "{'month': "+cMonth+",'year': "+cYear2.ToStr()+"}"
+    print "{'month': "+cMonth+",'year': "+cYear3.ToStr()+"}"
+    print "{'month': "+cMonth+",'year': "+cYear4.ToStr()+"}"
+    print "{'month': "+cMonth+",'year': "+cYear5.ToStr()+"}]}}"
+    
+    searchStrings       = {}
+    searchStrings.day   = "{'dateFilter': {'dates': [{'day': "+cDay+",'month': "+cMonth+",'year': "+cYear1.ToStr()+"},{'day': "+cDay+",'month': "+cMonth+",'year': "+cYear2.ToStr()+"},{'day': "+cDay+",'month': "+cMonth+",'year': "+cYear3.ToStr()+"},{'day': "+cDay+",'month': "+cMonth+",'year': "+cYear4.ToStr()+"},{'day': "+cDay+",'month': "+cMonth+",'year': "+cYear5.ToStr()+"}]}}"
+    searchStrings.week  = "{'dateFilter': {'ranges': [{'startDate': {'day': "+pDay+",'month': "+pMonth+",'year': "+pYear1.ToStr()+"},'endDate': {'day': "+cDay+",'month': "+cMonth+",'year': "+cYear1.ToStr()+"}},{'startDate': {'day': "+pDay+",'month': "+pMonth+",'year': "+pYear2.ToStr()+"},'endDate': {'day': "+cDay+",'month': "+cMonth+",'year': "+cYear2.ToStr()+"}},{'startDate': {'day': "+pDay+",'month': "+pMonth+",'year': "+pYear3.ToStr()+"},'endDate': {'day': "+cDay+",'month': "+cMonth+",'year': "+cYear3.ToStr()+"}},{'startDate': {'day': "+pDay+",'month': "+pMonth+",'year': "+pYear4.ToStr()+"},'endDate': {'day': "+cDay+",'month': "+cMonth+",'year': "+cYear4.ToStr()+"}},{'startDate': {'day': "+pDay+",'month': "+pMonth+",'year': "+pYear5.ToStr()+"},'endDate': {'day': "+cDay+",'month': "+cMonth+",'year': "+cYear5.ToStr()+"}}]}}"
+    searchStrings.month = "{'dateFilter': {'dates': [{'month': "+cMonth+",'year': "+cYear1.ToStr()+"},{'month': "+cMonth+",'year': "+cYear2.ToStr()+"},{'month': "+cMonth+",'year': "+cYear3.ToStr()+"},{'month': "+cMonth+",'year': "+cYear4.ToStr()+"},{'month': "+cMonth+",'year': "+cYear5.ToStr()+"}]}}"
+
+    return searchStrings
+End Function
+
+
 Sub doGetSearch(keyword as string, selectedUser=0 as Integer, pageNext="" As String)
     print "SlideshowHelper.brs [doGetSearch]"
     

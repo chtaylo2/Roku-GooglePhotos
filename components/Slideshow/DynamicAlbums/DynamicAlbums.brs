@@ -49,60 +49,11 @@ End Sub
 
 
 Sub loadListContent()
-    
-    'Get Dates
-    date         = CreateObject("roDateTime")
-    datepast     = createobject("rodatetime")
-    date.ToLocalTime()
-    datepast.ToLocalTime()
- 
-    'Calculate 7 days prior
-    d1seconds    = datepast.asseconds() - (60 * 60 * 24 * 7)
-    datepast.FromSeconds(d1seconds)
-    
-    cYear1 = date.GetYear()-1
-    cYear2 = date.GetYear()-2
-    cYear3 = date.GetYear()-3
-    cYear4 = date.GetYear()-4
-    cYear5 = date.GetYear()-5
-    cMonth = date.GetMonth().ToStr()
-    cDay   = date.GetDayOfMonth().ToStr()
-    
-    pYear1 = datepast.GetYear()-1
-    pYear2 = datepast.GetYear()-2
-    pYear3 = datepast.GetYear()-3
-    pYear4 = datepast.GetYear()-4
-    pYear5 = datepast.GetYear()-5
-    pMonth = datepast.GetMonth().ToStr()
-    pDay   = datepast.GetDayOfMonth().ToStr()
-  
-  'DAY
-    print "{'dateFilter': {'dates': [{'day': "+cDay+",'month': "+cMonth+",'year': "+cYear1.ToStr()+"}"
-    print "{'day': "+cDay+",'month': "+cMonth+",'year': "+cYear2.ToStr()+"}"
-    print "{'day': "+cDay+",'month': "+cMonth+",'year': "+cYear3.ToStr()+"}"
-    print "{'day': "+cDay+",'month': "+cMonth+",'year': "+cYear4.ToStr()+"}"
-    print "{'day': "+cDay+",'month': "+cMonth+",'year': "+cYear5.ToStr()+"}]}}"
- 
-  'WEEk
-    print "{'dateFilter': {'ranges': [{'startDate': {'day': "+pDay+",'month': "+pMonth+",'year': "+pYear1.ToStr()+"},'endDate': {'day': "+cDay+",'month': "+cMonth+",'year': "+cYear1.ToStr()+"}},"
-    print "{'startDate': {'day': "+pDay+",'month': "+pMonth+",'year': "+pYear2.ToStr()+"},'endDate': {'day': "+cDay+",'month': "+cMonth+",'year': "+cYear2.ToStr()+"}},"
-    print "{'startDate': {'day': "+pDay+",'month': "+pMonth+",'year': "+pYear3.ToStr()+"},'endDate': {'day': "+cDay+",'month': "+cMonth+",'year': "+cYear3.ToStr()+"}},"
-    print "{'startDate': {'day': "+pDay+",'month': "+pMonth+",'year': "+pYear4.ToStr()+"},'endDate': {'day': "+cDay+",'month': "+cMonth+",'year': "+cYear4.ToStr()+"}},"
-    print "{'startDate': {'day': "+pDay+",'month': "+pMonth+",'year': "+pYear5.ToStr()+"},'endDate': {'day': "+cDay+",'month': "+cMonth+",'year': "+cYear5.ToStr()+"}}]}}"
-  
-  'MONTH  
-    print "{'dateFilter': {'dates': [{'month': "+cMonth+",'year': "+cYear1.ToStr()+"}"
-    print "{'month': "+cMonth+",'year': "+cYear2.ToStr()+"}"
-    print "{'month': "+cMonth+",'year': "+cYear3.ToStr()+"}"
-    print "{'month': "+cMonth+",'year': "+cYear4.ToStr()+"}"
-    print "{'month': "+cMonth+",'year': "+cYear5.ToStr()+"}]}}"
-    
-    
     m.content = createObject("RoSGNode","ContentNode")
-    addItem(m.content, "Shuffle All Photos", "3", "junk")
-    addItem(m.content, "Rediscover this Day in History", "{'dateFilter': {'dates': [{'day': "+cDay+",'month': "+cMonth+",'year': "+cYear1.ToStr()+"},{'day': "+cDay+",'month': "+cMonth+",'year': "+cYear2.ToStr()+"},{'day': "+cDay+",'month': "+cMonth+",'year': "+cYear3.ToStr()+"},{'day': "+cDay+",'month': "+cMonth+",'year': "+cYear4.ToStr()+"},{'day': "+cDay+",'month': "+cMonth+",'year': "+cYear5.ToStr()+"}]}}", "Rediscover this Day in History")
-    addItem(m.content, "Rediscover this Week in History", "{'dateFilter': {'ranges': [{'startDate': {'day': "+pDay+",'month': "+pMonth+",'year': "+pYear1.ToStr()+"},'endDate': {'day': "+cDay+",'month': "+cMonth+",'year': "+cYear1.ToStr()+"}},{'startDate': {'day': "+pDay+",'month': "+pMonth+",'year': "+pYear2.ToStr()+"},'endDate': {'day': "+cDay+",'month': "+cMonth+",'year': "+cYear2.ToStr()+"}},{'startDate': {'day': "+pDay+",'month': "+pMonth+",'year': "+pYear3.ToStr()+"},'endDate': {'day': "+cDay+",'month': "+cMonth+",'year': "+cYear3.ToStr()+"}},{'startDate': {'day': "+pDay+",'month': "+pMonth+",'year': "+pYear4.ToStr()+"},'endDate': {'day': "+cDay+",'month': "+cMonth+",'year': "+cYear4.ToStr()+"}},{'startDate': {'day': "+pDay+",'month': "+pMonth+",'year': "+pYear5.ToStr()+"},'endDate': {'day': "+cDay+",'month': "+cMonth+",'year': "+cYear5.ToStr()+"}}]}}", "Rediscover this Week in History")
-    addItem(m.content, "Rediscover this Month in History", "{'dateFilter': {'dates': [{'month': "+cMonth+",'year': "+cYear1.ToStr()+"},{'month': "+cMonth+",'year': "+cYear2.ToStr()+"},{'month': "+cMonth+",'year': "+cYear3.ToStr()+"},{'month': "+cMonth+",'year': "+cYear4.ToStr()+"},{'month': "+cMonth+",'year': "+cYear5.ToStr()+"}]}}", "Rediscover this Month in History")
+    'addItem(m.content, "Shuffle All Photos", "3", "junk")
+    addItem(m.content, "Rediscover this Day in History", "day", "Rediscover this Day in History")
+    addItem(m.content, "Rediscover this Week in History", "week", "Rediscover this Week in History")
+    addItem(m.content, "Rediscover this Month in History", "month", "Rediscover this Month in History")
 
     'Store content node and current registry selection
     m.dynamicAlbumList.content = m.content
@@ -116,20 +67,26 @@ End Sub
 Sub onItemSelected()
     print "DynamicAlbums.brs [onItemSelected]"
     
-    if m.dynamicAlbumList.itemFocused = 0 then
+    'if m.dynamicAlbumList.itemFocused = 0 then
     
-        m.dynamicAlbumList.visible = false
-        m.itemOverhang.visible     = false         
+    '    m.dynamicAlbumList.visible = false
+    '    m.itemOverhang.visible     = false         
             
-        m.screenActive = createObject("roSGNode", "Shuffle Photos")
-        m.screenActive.loaded = true
-        m.top.appendChild(m.screenActive)
-        m.screenActive.setFocus(true)
-    else
+    '    m.screenActive = createObject("roSGNode", "Shuffle Photos")
+    '    m.screenActive.loaded = true
+    '    m.top.appendChild(m.screenActive)
+    '    m.screenActive.setFocus(true)
+    'else
         m.apiTimer.control = "start"
         'm.imagesMetaData   = []
         'm.videosMetaData   = []
     
+        'Item selected
+        keyword = m.dynamicAlbumList.content.getChild(m.dynamicAlbumList.itemFocused).description
+        m.top.tracking = m.dynamicAlbumList.content.getChild(m.dynamicAlbumList.itemFocused).titleseason
+
+        searchStrings = doSearchGenerate()
+        
         m.albumActiveObject["SearchResults"] = {}
         m.albumActiveObject["SearchResults"].GetTitle = "Search Results"
         m.albumActiveObject["SearchResults"].GetID = "SearchResults"
@@ -139,18 +96,15 @@ Sub onItemSelected()
         m.albumActiveObject["SearchResults"].showCountEnd = 0
         m.albumActiveObject["SearchResults"].apiCount = 0
         m.albumActiveObject["SearchResults"].GetUserIndex = m.global.selectedUser
+        m.albumActiveObject["SearchResults"].keyword = keyword
         m.albumActiveObject["SearchResults"].imagesMetaData = []
         m.albumActiveObject["SearchResults"].videosMetaData = []
-    
-        'Item selected
-        keyword = m.dynamicAlbumList.content.getChild(m.dynamicAlbumList.itemFocused).description
-        m.top.tracking = m.dynamicAlbumList.content.getChild(m.dynamicAlbumList.itemFocused).titleseason
         
         m.searchProgress.message = m.top.tracking+" - Searching Albums"
         m.searchProgress.visible = true
-        
-        doGetSearch(keyword, m.global.selectedUser)
-    end if
+
+        doGetSearch(searchStrings[keyword], m.global.selectedUser)
+    'end if
     
 End Sub
 

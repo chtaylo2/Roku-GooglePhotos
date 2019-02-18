@@ -239,6 +239,9 @@ Sub onURLRefreshTigger()
                 
             if albumid.Instr("GP_LIBRARY") >= 0 then
                 doGetLibraryImages(albumid, m.albumActiveObject[albumid].GetUserIndex, tmpPage)
+            else if albumid.Instr("SearchResults") >= 0 then
+                searchStrings = doSearchGenerate()
+                doGetSearch(searchStrings[m.albumActiveObject[albumid].keyword], m.albumActiveObject[albumid].GetUserIndex, tmpPage)
             else
                 doGetAlbumImages(albumid, m.albumActiveObject[albumid].GetUserIndex, tmpPage)
             end if
@@ -376,11 +379,11 @@ Sub processDownloads(event as object)
             m.URLRefreshTimer.control = "start"
         end if
         
-        'm.global.tmpDEBUG = m.global.tmpDEBUG + 1
-        'if m.global.tmpDEBUG = 7 or m.global.tmpDEBUG = 14 then
-        '    print "EXECUTE REFRESH"
-        '    onURLRefreshTigger()
-        'end if
+        m.global.tmpDEBUG = m.global.tmpDEBUG + 1
+        if m.global.tmpDEBUG = 7 or m.global.tmpDEBUG = 14 then
+            print "EXECUTE REFRESH"
+            onURLRefreshTigger()
+        end if
     end for
     
 End Sub
