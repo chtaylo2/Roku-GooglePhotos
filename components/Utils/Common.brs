@@ -463,10 +463,9 @@ End Function
 '******************************************************
 'Get short friendly date output given seconds
 '******************************************************
-Function friendlyDateShort(seconds As Integer) As String
-    if seconds = 284040000 then return "No images found"
+Function friendlyDateShort(dateString As String) As String
     calcDate = CreateObject("roDateTime")
-    calcDate.FromSeconds(seconds)
+    calcDate.FromISO8601String(dateString)
     showDate = calcDate.AsDateString("no-weekday")
     return showDate
 End Function

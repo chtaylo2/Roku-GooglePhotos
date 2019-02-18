@@ -98,7 +98,7 @@ Function handleRefreshToken(event as object)
         else if refreshData.post_data[0] = "doGetAlbumImages" then
             doGetAlbumImages(refreshData.post_data[1], refreshData.post_data[2], refreshData.post_data[3])
         else if refreshData.post_data[0] = "doGetSearch" then
-            doGetSearch(refreshData.post_data[1])
+            doGetSearch(refreshData.post_data[2], refreshData.post_data[3], refreshData.post_data[4])
         else if refreshData.post_data[0] = "doGetAlbumSelection" then
             doGetAlbumSelection()
         else
@@ -173,11 +173,8 @@ End Function
 Sub doGetSearch(keyword as string, selectedUser=0 as Integer, pageNext="" As String)
     print "SlideshowHelper.brs [doGetSearch]"
     
-    if keyword <> ""
-        m.searchProgress.message = m.top.tracking+" - Searching Albums"
-        m.searchProgress.visible = true
-    
-        tmpData = [ "doGetSearch", "SearchResults", keyword ]
+    if keyword <> ""    
+        tmpData = [ "doGetSearch", "SearchResults", keyword, selectedUser, pageNext  ]
 
         params = "'pageSize': '100',"
 

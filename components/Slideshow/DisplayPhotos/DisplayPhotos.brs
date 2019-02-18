@@ -29,6 +29,7 @@ Sub init()
     m.MoveTimer                 = m.top.findNode("moveWatermark")
     m.RediscoverScreen          = m.top.findNode("RediscoverScreen")
     m.RediscoverDetail          = m.top.findNode("RediscoverDetail")
+    m.noticeDialog              = m.top.findNode("noticeDialog")
 
     m.fromBrowse                = false
     m.imageLocalCacheByURL      = {}
@@ -257,7 +258,7 @@ Sub handleGetAlbumImages(event as object)
     
     if (response.code = 401) or (response.code = 403) then
         'Expired Token
-        doRefreshToken(response.post_data, response.post_data[1])
+        doRefreshToken(response.post_data, response.post_data[2])
     else if response.code <> 200
         errorMsg = "An Error Occurred in 'handleGetAlbumImages'. Code: "+(response.code).toStr()+" - " +response.error
     else
@@ -375,11 +376,11 @@ Sub processDownloads(event as object)
             m.URLRefreshTimer.control = "start"
         end if
         
-        m.global.tmpDEBUG = m.global.tmpDEBUG + 1
-        if m.global.tmpDEBUG = 7 or m.global.tmpDEBUG = 14 then
-            print "EXECUTE REFRESH"
-            onURLRefreshTigger()
-        end if
+        'm.global.tmpDEBUG = m.global.tmpDEBUG + 1
+        'if m.global.tmpDEBUG = 7 or m.global.tmpDEBUG = 14 then
+        '    print "EXECUTE REFRESH"
+        '    onURLRefreshTigger()
+        'end if
     end for
     
 End Sub

@@ -51,6 +51,7 @@ Sub loadingComplete()
        
         albumid             = "SearchResults"
         m.albumActiveObject = m.top.imageContent
+        m.albumName         = m.top.predecessor
         
         m.imagesMetaData = m.albumActiveObject[albumid].imagesMetaData
         m.videosMetaData = m.albumActiveObject[albumid].videosMetaData
@@ -614,7 +615,7 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
                 return true
             end if      
 
-            if (m.albummarkupgrid.content <> invalid) and ( (m.albummarkupgrid.content.getChild(0).id <> "GP_ALBUM_LISTING_LIBRARY") or (m.albumPageList.hasFocus() = true) )    ' and (m.top.imageContent = invalid)
+            if (m.albummarkupgrid.content <> invalid) and ( (m.albummarkupgrid.content.getChild(0).id <> "GP_ALBUM_LISTING_LIBRARY") or (m.albumPageList.hasFocus() = true) ) and (m.top.imageContent = invalid)  
                 m.albummarkupgrid.content       = m.albumListContent
                 m.albummarkupgrid.jumpToItem    = m.albumSelection
                 m.settingsIcon.visible          = false

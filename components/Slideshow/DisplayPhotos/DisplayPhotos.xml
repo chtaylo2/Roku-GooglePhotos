@@ -254,6 +254,12 @@
             repeat      = "true"
             duration    = "1200"
         />
+        
+        <Dialog
+            id          = "noticeDialog"
+            title       = "Error"
+            visible     = "false"
+        />
             
    </children>
 </component>

@@ -16,7 +16,9 @@ Sub init()
     m.itemOverhang     = m.top.findNode("itemOverhang")
     m.searchProgress   = m.top.findNode("searchProgress")
     m.noticeDialog     = m.top.findNode("noticeDialog")
-
+    m.apiTimer         = m.top.findNode("apiTimer")
+    m.apiTimer.observeField("fire","onApiTimerTrigger")
+    
     m.apiPending        = 0
     m.albumActiveObject = {}
     
@@ -124,9 +126,9 @@ Sub onItemSelected()
         m.top.appendChild(m.screenActive)
         m.screenActive.setFocus(true)
     else
-    
-        m.imagesMetaData = []
-        m.videosMetaData = []
+        m.apiTimer.control = "start"
+        'm.imagesMetaData   = []
+        'm.videosMetaData   = []
     
         m.albumActiveObject["SearchResults"] = {}
         m.albumActiveObject["SearchResults"].GetTitle = "Search Results"
@@ -137,10 +139,16 @@ Sub onItemSelected()
         m.albumActiveObject["SearchResults"].showCountEnd = 0
         m.albumActiveObject["SearchResults"].apiCount = 0
         m.albumActiveObject["SearchResults"].GetUserIndex = m.global.selectedUser
+        m.albumActiveObject["SearchResults"].imagesMetaData = []
+        m.albumActiveObject["SearchResults"].videosMetaData = []
     
         'Item selected
         keyword = m.dynamicAlbumList.content.getChild(m.dynamicAlbumList.itemFocused).description
         m.top.tracking = m.dynamicAlbumList.content.getChild(m.dynamicAlbumList.itemFocused).titleseason
+        
+        m.searchProgress.message = m.top.tracking+" - Searching Albums"
+        m.searchProgress.visible = true
+        
         doGetSearch(keyword, m.global.selectedUser)
     end if
     
@@ -156,7 +164,7 @@ Sub handleGetSearch(event as object)
     keywords = response.post_data[2]
     
     'print "DEBUG: "; response
-    
+    m.apiPending = m.apiPending-1
     if (response.code = 401) or (response.code = 403) then
         'Expired Token
         doRefreshToken(response.post_data, m.global.selectedUser)
@@ -184,26 +192,23 @@ Sub handleGetSearch(event as object)
                 tmp.filename    = media.GetFilename
         
                 if media.IsVideo then
-                   m.videosMetaData.Push(tmp)
-                   print "VIDEO: "; tmp.url
+                    m.albumActiveObject[albumid].videosMetaData.Push(tmp)
+                    'print "VIDEO: "; tmp.url
                 else
-                   m.imagesMetaData.Push(tmp)
-                   print "IMAGE: "; tmp.url
+                    m.albumActiveObject[albumid].imagesMetaData.Push(tmp)
+                    'print "IMAGE: "; tmp.url
                 end if
             end for
-
+            
             if rsp["nextPageToken"]<>invalid then
                 pageNext = rsp["nextPageToken"]
                 m.albumActiveObject[albumid].nextPageToken = pageNext
                 m.albumActiveObject[albumid].showCountEnd = m.albumActiveObject[albumid].showCountEnd + imageList.Count()
                 m.albumActiveObject[albumid].apiCount = m.albumActiveObject[albumid].apiCount + 1
                 if (m.albumActiveObject[albumid].apiCount < m.maxApiPerPage) and (m.albumActiveObject[albumid].showCountEnd < m.maxImagesPerPage) then
-                    pagesShow = "Media Items"+StrI(m.albumActiveObject[albumid].showCountStart)+" -"+StrI(m.albumActiveObject[albumid].showCountStart+m.albumActiveObject[albumid].showCountEnd-1)
-                    if m.albumActiveObject[albumid].GetImageCount<>0 then
-                        pagesShow = pagesShow+" of"+StrI(m.albumActiveObject[albumid].GetImageCount)
-                    end if
-                    print "END: "; m.albumActiveObject[albumid].showCountEnd
-                    m.searchProgress.message = m.top.tracking+" - Searching Albums -- "+pagesShow
+                    pagesShow = "Items Found"+StrI(m.albumActiveObject[albumid].showCountStart+m.albumActiveObject[albumid].showCountEnd-1)
+                    print "END: "; m.top.tracking+" - Searching Albums - "+pagesShow
+                    m.searchProgress.message = m.top.tracking+" - Searching Albums - "+pagesShow
                     
                     doGetSearch(keywords, m.global.selectedUser, pageNext)
                 else
@@ -214,43 +219,9 @@ Sub handleGetSearch(event as object)
                 m.albumActiveObject[albumid].showCountEnd = m.albumActiveObject[albumid].showCountEnd + imageList.Count()
 
                 print "DEBUG: "; m.albumActiveObject[albumid]
-            
-
-
-            m.searchProgress.visible = false
-            
-           if m.albumActiveObject[albumid].showcountend > 0 then
-            
-                'Hide blackout screen
-                m.FadeBackground.visible   = false
-                m.dynamicAlbumList.visible = false
-                m.itemOverhang.visible     = false         
-            
-                m.albumActiveObject[albumid].videosMetaData = m.videosMetaData
-                m.albumActiveObject[albumid].imagesMetaData = m.imagesMetaData
-            
-                m.screenActive = createObject("roSGNode", "My Albums")
-                m.screenActive.imageContent = m.albumActiveObject
-                m.screenActive.predecessor = m.top.tracking
-                m.screenActive.loaded = true
-                m.top.appendChild(m.screenActive)
-                m.screenActive.setFocus(true)
                 
-            else
-                m.noticeDialog.visible = true
-                buttons =  [ "OK" ]
-                m.noticeDialog.title   = "Notice"
-                m.noticeDialog.message = "No media found matching this search. Try a different date range"
-                m.noticeDialog.buttons = buttons
-                m.noticeDialog.setFocus(true)
-                m.noticeDialog.observeField("buttonSelected","noticeClose")                
             end if
-            
-            end if
-            
-            
         end if
-        
     end if
 
     if errorMsg<>"" then
@@ -264,6 +235,39 @@ Sub handleGetSearch(event as object)
         m.noticeDialog.observeField("buttonSelected","noticeClose")
     end if   
 
+End Sub
+
+
+Sub onApiTimerTrigger()
+    print "API CALLS LEFT: "; m.apiPending;
+
+    if m.apiPending = 0 then
+        m.searchProgress.visible = false
+        m.apiTimer.control = "stop"
+        
+        if m.albumActiveObject["SearchResults"].showcountend > 0 then
+            'Hide blackout screen
+            m.FadeBackground.visible   = false
+            m.dynamicAlbumList.visible = false
+            m.itemOverhang.visible     = false         
+            
+            m.screenActive = createObject("roSGNode", "My Albums")
+            m.screenActive.imageContent = m.albumActiveObject
+            m.screenActive.predecessor = m.top.tracking
+            m.screenActive.loaded = true
+            m.top.appendChild(m.screenActive)
+            m.screenActive.setFocus(true)
+                
+        else
+            m.noticeDialog.visible = true
+            buttons =  [ "OK" ]
+            m.noticeDialog.title   = "Notice"
+            m.noticeDialog.message = "No media found matching this search. Try a different date range"
+            m.noticeDialog.buttons = buttons
+            m.noticeDialog.setFocus(true)
+            m.noticeDialog.observeField("buttonSelected","noticeClose")                
+        end if
+    end if
 End Sub
 
 
