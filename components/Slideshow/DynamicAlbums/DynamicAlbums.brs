@@ -161,19 +161,12 @@ Sub handleGetSearch(event as object)
                 m.albumActiveObject[albumid].apiCount = m.albumActiveObject[albumid].apiCount + 1
                 if (m.albumActiveObject[albumid].apiCount < m.maxApiPerPage) and (m.albumActiveObject[albumid].showCountEnd < m.maxImagesPerPage) then
                     pagesShow = "Items Found"+StrI(m.albumActiveObject[albumid].showCountStart+m.albumActiveObject[albumid].showCountEnd-1)
-                    print "END: "; m.top.tracking+" - Searching Albums - "+pagesShow
                     m.searchProgress.message = m.top.tracking+" - Searching Albums - "+pagesShow
-                    
                     doGetSearch(keywords, m.global.selectedUser, pageNext)
-                else
-                    print "DEBUG: "; m.albumActiveObject[albumid]
                 end if
             else
                 m.albumActiveObject[albumid].nextPageToken = invalid
                 m.albumActiveObject[albumid].showCountEnd = m.albumActiveObject[albumid].showCountEnd + imageList.Count()
-
-                print "DEBUG: "; m.albumActiveObject[albumid]
-                
             end if
         end if
     end if

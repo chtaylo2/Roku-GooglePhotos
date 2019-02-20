@@ -8,6 +8,7 @@
 Sub init()
     m.UriHandler = createObject("roSGNode","Content UrlHandler")
     m.UriHandler.observeField("albumImages","handleGetAlbumImages")
+    m.UriHandler.observeField("searchResult","handleGetSearch")
     m.UriHandler.observeField("refreshToken","handleRefreshToken")
     
     m.PrimaryImage              = m.top.findNode("PrimaryImage")
@@ -30,6 +31,7 @@ Sub init()
     m.RediscoverScreen          = m.top.findNode("RediscoverScreen")
     m.RediscoverDetail          = m.top.findNode("RediscoverDetail")
     m.noticeDialog              = m.top.findNode("noticeDialog")
+    m.apiTimer                  = m.top.findNode("apiTimer")
 
     m.fromBrowse                = false
     m.imageLocalCacheByURL      = {}
@@ -49,7 +51,7 @@ Sub init()
     m.SecondaryImage.observeField("loadStatus","onSecondaryLoadedTrigger")
     m.RotationTimer.observeField("fire","onRotationTigger")
     m.DownloadTimer.observeField("fire","onDownloadTigger")
-    'm.URLRefreshTimer.observeField("fire","onURLRefreshTigger")
+    m.apiTimer.observeField("fire","onApiTimerTrigger")
     m.top.observeField("content","loadImageList")
 
     m.showRes       = RegRead("SlideshowRes", "Settings")
@@ -177,10 +179,9 @@ Sub loadImageList()
         onRotationTigger({})
         onDownloadTigger({})
          
-        m.RotationTimer.control   = "start"
-        m.DownloadTimer.control   = "start"
-        'm.URLRefreshTimer.control = "start"
-     
+        m.RotationTimer.control = "start"
+        m.DownloadTimer.control = "start"
+        
         'Trigger a PAUSE if photo selected
         if m.top.startIndex <> -1 then
             onKeyEvent("OK", true)
@@ -224,7 +225,6 @@ Sub onURLRefreshTigger()
 
     for each albumid in m.albumActiveObject
         if type(m.albumActiveObject[albumid]) = "roAssociativeArray" then
-            print "DEBUG: "; albumid
             tmpPage  = ""
             tmpCount = "1"
             if m.albumActiveObject[albumid].previousPageTokens[m.albumActiveObject[albumid].previouspagetokens.Count()-1]<>invalid then
@@ -240,6 +240,16 @@ Sub onURLRefreshTigger()
             if albumid.Instr("GP_LIBRARY") >= 0 then
                 doGetLibraryImages(albumid, m.albumActiveObject[albumid].GetUserIndex, tmpPage)
             else if albumid.Instr("SearchResults") >= 0 then
+            
+                m.albumActiveObject[albumid].GetImageCount = 0
+                m.albumActiveObject[albumid].previousPageTokens = []
+                m.albumActiveObject[albumid].showCountStart = 1
+                m.albumActiveObject[albumid].showCountEnd = 0
+                m.albumActiveObject[albumid].apiCount = 0
+                m.albumActiveObject[albumid].imagesMetaData = []
+            
+                m.apiTimer.control = "start"
+                
                 searchStrings = doSearchGenerate()
                 doGetSearch(searchStrings[m.albumActiveObject[albumid].keyword], m.albumActiveObject[albumid].GetUserIndex, tmpPage)
             else
@@ -286,10 +296,7 @@ Sub handleGetAlbumImages(event as object)
             'Refresh the URL with new image (Valid for 60 minutes)
             count = 0
             for each storeItem in m.imageDisplay
-                if (imagesMetaData.[storeItem.id]<>invalid) then ' and (imagesMetaData.[storeItem.id] = storeItem.id) then
-                    print "FOUND: "; storeItem.id
-                    print "DEBUG ORG: "; storeItem.url
-                    print "DEBUG NEW: "; imagesMetaData.[storeItem.id]
+                if (imagesMetaData.[storeItem.id]<>invalid) then
                     m.imageDisplay[count].url = imagesMetaData.[storeItem.id]
                 end if
                 count++
@@ -321,6 +328,82 @@ Sub handleGetAlbumImages(event as object)
         m.noticeDialog.observeField("buttonSelected","noticeClose")
     end if
     
+End Sub
+
+
+Sub handleGetSearch(event as object)
+    print "DisplayPhotos.brs [handleGetSearch]"
+
+    errorMsg = ""
+    response = event.getData()
+    albumid  = response.post_data[1]
+    keywords = response.post_data[2]
+
+    print m.albumActiveObject["SearchResults"]
+    print "COUNT: "; m.albumActiveObject[albumid].imagesMetaData.Count()
+    
+    m.apiPending = m.apiPending-1
+    if (response.code = 401) or (response.code = 403) then
+        'Expired Token
+        doRefreshToken(response.post_data, m.global.selectedUser)
+    else if response.code <> 200
+        errorMsg = "An Error Occurred in 'handleGetSearch'. Code: "+(response.code).toStr()+" - " +response.error
+    else
+        rsp=ParseJson(response.content)
+        'print rsp
+        if rsp=invalid then
+            errorMsg = "Unable to parse Google Photos API response. Exit the channel then try again later. Code: "+(response.code).toStr()+" - " +response.error
+        else if type(rsp) <> "roAssociativeArray"
+            errorMsg = "Json response is not an associative array: handleGetSearch"
+        else if rsp.DoesExist("error")
+            errorMsg = "Json error response: [handleGetSearch] " + json.error
+        else
+
+            imageList = googleImageListing(rsp)
+
+            for each media in imageList
+                tmp             = {}
+                tmp.id          = media.GetID
+                tmp.url         = media.GetURL
+                tmp.timestamp   = media.GetTimestamp
+                tmp.description = media.GetDescription
+                tmp.filename    = media.GetFilename
+        
+                if media.IsVideo = 0 then
+                    m.albumActiveObject[albumid].imagesMetaData.Push(tmp)
+                    'print "IMAGE: "; tmp.url
+                end if
+            end for
+            
+            if rsp["nextPageToken"]<>invalid then
+                pageNext = rsp["nextPageToken"]
+                m.albumActiveObject[albumid].nextPageToken = pageNext
+                m.albumActiveObject[albumid].showCountEnd = m.albumActiveObject[albumid].showCountEnd + imageList.Count()
+                m.albumActiveObject[albumid].apiCount = m.albumActiveObject[albumid].apiCount + 1
+                if (m.albumActiveObject[albumid].apiCount < m.maxApiPerPage) and (m.albumActiveObject[albumid].showCountEnd < m.maxImagesPerPage) then
+                    doGetSearch(keywords, m.albumActiveObject[albumid].GetUserIndex, pageNext)
+                end if
+            else
+                m.albumActiveObject[albumid].nextPageToken = invalid
+                m.albumActiveObject[albumid].showCountEnd = m.albumActiveObject[albumid].showCountEnd + imageList.Count()
+            end if
+            
+            print m.albumActiveObject["SearchResults"]
+            print "COUNT: "; m.albumActiveObject[albumid].imagesMetaData.Count()
+        end if
+    end if
+
+    if errorMsg<>"" then
+        'ShowError
+        m.noticeDialog.visible = true
+        buttons =  [ "OK" ]
+        m.noticeDialog.title   = "Error"
+        m.noticeDialog.message = errorMsg
+        m.noticeDialog.buttons = buttons
+        m.noticeDialog.setFocus(true)
+        m.noticeDialog.observeField("buttonSelected","noticeClose")
+    end if   
+
 End Sub
 
 
@@ -379,11 +462,11 @@ Sub processDownloads(event as object)
             m.URLRefreshTimer.control = "start"
         end if
         
-        m.global.tmpDEBUG = m.global.tmpDEBUG + 1
-        if m.global.tmpDEBUG = 7 or m.global.tmpDEBUG = 14 then
-            print "EXECUTE REFRESH"
-            onURLRefreshTigger()
-        end if
+        'm.global.tmpDEBUG = m.global.tmpDEBUG + 1
+        'if m.global.tmpDEBUG = 6 or m.global.tmpDEBUG = 15 or m.global.tmpDEBUG = 21 then
+        '    print "EXECUTE REFRESH"
+        '    onURLRefreshTigger()
+        'end if
     end for
     
 End Sub
@@ -581,6 +664,20 @@ Sub onMoveTrigger()
     else
         m.Watermark.translation        = "[1700,1010]"
         m.RediscoverScreen.translation = "[0,1010]"
+    end if
+End Sub
+
+
+Sub onApiTimerTrigger()
+    print "API CALLS LEFT: "; m.apiPending;
+
+    if m.apiPending = 0 then
+        m.apiTimer.control = "stop"
+        
+        if m.albumActiveObject["SearchResults"].showcountend > 0 then
+            print "DEBUG: "; m.albumActiveObject["SearchResults"].imagesMetaData
+            m.imageDisplay = m.albumActiveObject["SearchResults"].imagesMetaData          
+        end if
     end if
 End Sub
 

@@ -255,6 +255,12 @@
             duration    = "1200"
         />
         
+        <Timer
+            id       = "apiTimer"
+            repeat   = "true"
+            duration = "2"
+        />
+        
         <Dialog
             id          = "noticeDialog"
             title       = "Error"
