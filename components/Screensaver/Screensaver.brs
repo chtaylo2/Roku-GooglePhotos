@@ -10,6 +10,7 @@ Sub init()
     m.UriHandler = createObject("roSGNode","Content UrlHandler")
     m.UriHandler.observeField("albumList","handleGetAlbumList")
     m.UriHandler.observeField("albumImages","handleGetAlbumImages")
+    m.UriHandler.observeField("searchResult","handleGetAlbumImages")
     m.UriHandler.observeField("refreshToken","handleRefreshToken")
     m.UriHandler.observeField("searchResult","handleGetScreensaverAlbumImages")
 
@@ -162,29 +163,33 @@ Sub processAlbums()
     regStore  = "SSaverAlbums"
     regAlbums = RegRead(regStore, "Settings")
     album_cache_count = 0
-
-    tmp = {}
-    tmp.GetImageCount = 0
-    tmp.showCountStart = 1
-    tmp.showCountEnd = 0
-    tmp.apiCount = 0
-    tmp.previousPageTokens = []
-        
-    'Look for Time in History
-    'albumHistory = "Day|Week|Month".Split("|")
-    'for each album in albumHistory
-    '    if (regAlbums <> invalid) and (regAlbums <> "")
-    '        parsedString = regAlbums.Split("|")
-    '        for each item in parsedString
-    '            albumUser = item.Split(":")
-    '            if albumUser[0] = album then
-    '                 m.predecessor = "This "+album+" in History"
-    '                 doGetScreensaverSearch(album, response.post_data[1])
-    '            end if
-    '        end for
-    '    end if
-    ' end for   
-
+       
+    'Look for Time in History - We'll only allow 1 of these selections. Doesn't make sense to allow multiple as they are inclusive.
+    albumHistory = "Day|Week|Month".Split("|")
+    searchStrings = doSearchGenerate()
+    for each album in albumHistory
+        if (regAlbums <> invalid) and (regAlbums <> "")
+            parsedString = regAlbums.Split("|")
+            for each item in parsedString
+                albumUser = item.Split(":")
+                if albumUser[0] = album then
+                    m.predecessor = "This "+album+" in History"
+                    tmp                    = {}
+                    tmp.GetImageCount      = 0
+                    tmp.showCountStart     = 1
+                    tmp.showCountEnd       = 0
+                    tmp.apiCount           = 0
+                    tmp.previousPageTokens = []
+                    tmp.GetID              = "SearchResults"
+                    tmp.GetUserIndex       = Strtoi(albumUser[1])
+                    tmp.keyword            = album
+                    m.albumActiveObject[tmp.GetID] = tmp
+                    doGetSearch(tmp.GetID, searchStrings[album], Strtoi(albumUser[1]))
+                end if
+            end for
+        end if
+    end for
+    
     'Handle GooglePhotos Library Albums
     if (regAlbums <> invalid) and (regAlbums <> "") and (m.userIndex <> 100)
         'User has selected albums for screensaver
@@ -193,9 +198,15 @@ Sub processAlbums()
             albumUser = item.Split(":")
             if albumUser[0] = "GP_LIBRARY" then
                 m.predecessor = "null"
-                tmp.GetID = "GP_LIBRARY_" + albumUser[1]
-                tmp.GetUserIndex = Strtoi(albumUser[1])
-                m.albumActiveObject["GP_LIBRARY_" + albumUser[1]] = tmp
+                tmp                    = {}
+                tmp.GetImageCount      = 0
+                tmp.showCountStart     = 1
+                tmp.showCountEnd       = 0
+                tmp.apiCount           = 0
+                tmp.previousPageTokens = []
+                tmp.GetID              = "GP_LIBRARY_" + albumUser[1]
+                tmp.GetUserIndex       = Strtoi(albumUser[1])
+                m.albumActiveObject[tmp.GetID] = tmp
                 doGetLibraryImages(tmp.GetID, Strtoi(albumUser[1]))
             end if
         end for
@@ -204,15 +215,27 @@ Sub processAlbums()
         'If m.userIndex is set to 100, means user wants random photos from each linked account shown.
         if m.userIndex = 100 then
             for i = 0 to m.userCount-1
-                tmp.GetID = "GP_LIBRARY_" + StrI(i)
-                tmp.GetUserIndex = i
-                m.albumActiveObject["GP_LIBRARY_" + StrI(i)] = tmp
+                tmp                    = {}
+                tmp.GetImageCount      = 0
+                tmp.showCountStart     = 1
+                tmp.showCountEnd       = 0
+                tmp.apiCount           = 0
+                tmp.previousPageTokens = []
+                tmp.GetID              = "GP_LIBRARY_" + i.ToStr()
+                tmp.GetUserIndex       = i
+                m.albumActiveObject[tmp.GetID] = tmp
                 doGetLibraryImages(tmp.GetID, i)
             end for
         else
-            tmp.GetID = "GP_LIBRARY_" + StrI(m.userIndex)
-            tmp.GetUserIndex = m.userIndex
-            m.albumActiveObject["GP_LIBRARY_" + StrI(m.userIndex)] = tmp
+            tmp                    = {}
+            tmp.GetImageCount      = 0
+            tmp.showCountStart     = 1
+            tmp.showCountEnd       = 0
+            tmp.apiCount           = 0
+            tmp.previousPageTokens = []
+            tmp.GetID              = "GP_LIBRARY_" + m.userIndex.ToStr()
+            tmp.GetUserIndex       = m.userIndex
+            m.albumActiveObject[tmp.GetID] = tmp
             doGetLibraryImages(tmp.GetID, m.userIndex)
         end if
     end if
@@ -306,19 +329,19 @@ Sub handleGetAlbumImages(event as object)
 
                 if (m.albumActiveObject[albumid].apiCount < m.maxApiPerPage) and (m.albumActiveObject[albumid].showCountEnd < m.maxImagesPerPage) then    
                     if albumid.Instr("GP_LIBRARY") >= 0 then
-                        doGetLibraryImages(response.post_data[1], response.post_data[2], pageNext)
+                        doGetLibraryImages(albumid, response.post_data[2], pageNext)
+                    else if albumid.Instr("SearchResults") >= 0 then
+                        searchStrings = doSearchGenerate()
+                        doGetSearch(albumid, searchStrings[m.albumActiveObject[albumid].keyword], response.post_data[3], pageNext)
                     else
-                        doGetAlbumImages(response.post_data[1], response.post_data[2], pageNext)
+                        doGetAlbumImages(albumid, response.post_data[2], pageNext)
                     end if
                 end if
             else
                 m.albumActiveObject[albumid].nextPageToken = invalid
                 m.albumActiveObject[albumid].showCountEnd = m.albumActiveObject[albumid].showCountEnd + localCount
-            end if           
+            end if
             
-            print "COUNT: "; m.photoItems.Count()
-            print "API CALLS: "; m.apiPending
-
         end if
     end if
 End Sub
@@ -355,6 +378,13 @@ Sub execScreensaver()
         m.predecessor       = "No images found. Try another album"
     end if
 
+    for each albumid in m.albumActiveObject
+        print "ALBUMID: "; albumid
+        print m.albumActiveObject[albumid]
+    end for 
+    print m.albumActiveObject
+    print "TOTAL SENDING: "; m.photoItems.Count()
+    
     print "START SHOW"
     m.screenActive = createObject("roSGNode", "DisplayPhotos")
     m.screenActive.id = "DisplayScreensaver"

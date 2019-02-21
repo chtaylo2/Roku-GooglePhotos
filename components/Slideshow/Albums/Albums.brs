@@ -169,10 +169,10 @@ Sub handleGetAlbumImages(event as object)
                     m.itemLabelMain3.text = pagesShow
                     
                     if m.albumActiveObject[albumid].GetID = "GP_LIBRARY" then
-                        doGetLibraryImages("GP_LIBRARY", m.global.selectedUser, pageNext)
+                        doGetLibraryImages(albumid, m.global.selectedUser, pageNext)
                     else if m.albumActiveObject[albumid].GetID = "SearchResults" then
                         searchStrings = doSearchGenerate()
-                        doGetSearch(searchStrings[m.albumActiveObject[albumid].keyword], m.global.selectedUser, pageNext)
+                        doGetSearch(albumid, searchStrings[m.albumActiveObject[albumid].keyword], m.global.selectedUser, pageNext)
                     else
                         doGetAlbumImages(albumid, m.global.selectedUser, pageNext)
                     end if
@@ -299,10 +299,10 @@ Sub onItemSelected()
         
         'API CALL: Get image listing - Next page
         if m.albumActiveObject[albumid].GetID = "GP_LIBRARY" then
-            doGetLibraryImages("GP_LIBRARY", m.global.selectedUser, m.albumActiveObject[albumid].nextPageToken)
+            doGetLibraryImages(albumid, m.global.selectedUser, m.albumActiveObject[albumid].nextPageToken)
         else if m.albumActiveObject[albumid].GetID = "SearchResults" then
             searchStrings = doSearchGenerate()
-            doGetSearch(searchStrings[m.albumActiveObject[albumid].keyword], m.global.selectedUser, m.albumActiveObject[albumid].nextPageToken)
+            doGetSearch(albumid, searchStrings[m.albumActiveObject[albumid].keyword], m.global.selectedUser, m.albumActiveObject[albumid].nextPageToken)
         else
             doGetAlbumImages(albumid, m.global.selectedUser, m.albumActiveObject[albumid].nextPageToken)
         end if
@@ -330,10 +330,10 @@ Sub onItemSelected()
         
         'API CALL: Get image listing - Previous page
         if m.albumActiveObject[albumid].GetID = "GP_LIBRARY" then
-            doGetLibraryImages("GP_LIBRARY", m.global.selectedUser, tmpPage)
+            doGetLibraryImages(albumid, m.global.selectedUser, tmpPage)
         else if m.albumActiveObject[albumid].GetID = "SearchResults" then
             searchStrings = doSearchGenerate()
-            doGetSearch(searchStrings[m.albumActiveObject[albumid].keyword], m.global.selectedUser, tmpPage)
+            doGetSearch(albumid, searchStrings[m.albumActiveObject[albumid].keyword], m.global.selectedUser, tmpPage)
         else
             doGetAlbumImages(albumid, m.global.selectedUser, tmpPage)
         end if

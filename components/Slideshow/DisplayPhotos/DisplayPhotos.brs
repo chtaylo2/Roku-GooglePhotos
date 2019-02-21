@@ -251,7 +251,7 @@ Sub onURLRefreshTigger()
                 m.apiTimer.control = "start"
                 
                 searchStrings = doSearchGenerate()
-                doGetSearch(searchStrings[m.albumActiveObject[albumid].keyword], m.albumActiveObject[albumid].GetUserIndex, tmpPage)
+                doGetSearch(albumid, searchStrings[m.albumActiveObject[albumid].keyword], m.albumActiveObject[albumid].GetUserIndex, tmpPage)
             else
                 doGetAlbumImages(albumid, m.albumActiveObject[albumid].GetUserIndex, tmpPage)
             end if
@@ -381,7 +381,7 @@ Sub handleGetSearch(event as object)
                 m.albumActiveObject[albumid].showCountEnd = m.albumActiveObject[albumid].showCountEnd + imageList.Count()
                 m.albumActiveObject[albumid].apiCount = m.albumActiveObject[albumid].apiCount + 1
                 if (m.albumActiveObject[albumid].apiCount < m.maxApiPerPage) and (m.albumActiveObject[albumid].showCountEnd < m.maxImagesPerPage) then
-                    doGetSearch(keywords, m.albumActiveObject[albumid].GetUserIndex, pageNext)
+                    doGetSearch(albumid, keywords, m.albumActiveObject[albumid].GetUserIndex, pageNext)
                 end if
             else
                 m.albumActiveObject[albumid].nextPageToken = invalid
@@ -462,11 +462,11 @@ Sub processDownloads(event as object)
             m.URLRefreshTimer.control = "start"
         end if
         
-        'm.global.tmpDEBUG = m.global.tmpDEBUG + 1
-        'if m.global.tmpDEBUG = 6 or m.global.tmpDEBUG = 15 or m.global.tmpDEBUG = 21 then
-        '    print "EXECUTE REFRESH"
-        '    onURLRefreshTigger()
-        'end if
+       'm.global.tmpDEBUG = m.global.tmpDEBUG + 1
+       'if m.global.tmpDEBUG = 10 or m.global.tmpDEBUG = 35 then
+       '    print "EXECUTE REFRESH"
+       '    onURLRefreshTigger()
+       'end if
     end for
     
 End Sub
@@ -669,7 +669,7 @@ End Sub
 
 
 Sub onApiTimerTrigger()
-    print "API CALLS LEFT: "; m.apiPending;
+    print "API CALLS LEFT: "; m.apiPending
 
     if m.apiPending = 0 then
         m.apiTimer.control = "stop"

@@ -180,7 +180,7 @@ Sub handleGetAlbumSelection(event as object)
         end if
     end if
     
-    m.loadingSpinner.visible = false
+    m.loadingSpinner.visible = "false"
     
     if errorMsg<>"" then
         'ShowNotice
@@ -530,8 +530,8 @@ Sub showsubselected()
             'Screensaver Setting
             RegWrite(itemcontent.titleseason, itemcontent.description, "Settings")
             
-            if (m.settingsList.itemSelected = 4) and (m.settingsUserscheckedItem <> m.settingSubList.itemSelected) then
-                'Reset any album selections
+            if (m.settingsList.itemSelected = 5) and (m.settingsUserscheckedItem <> m.settingSubList.itemSelected) then
+                'Reset any album selections - new user selected
                 RegWrite("SSaverAlbums", "", "Settings")
             end if
         else
@@ -555,15 +555,47 @@ Sub showalbumselected()
     selectedUser = m.settingSubList.itemFocused
     albumsTotal  = m.albumSelection.content.getChildCount()
     
-    saveList = ""
+    saveList    = ""
+    errorMsg    = ""
+    selectCount = 0
     for i = 0 to albumsTotal
         itemcontent  = m.albumSelection.content.getChild(i)
         checkState   = m.albumSelection.checkedState[i]
         if checkState = true then
-            saveList = saveList + itemcontent.description + ":" + itostr(selectedUser) + "|"
+            if m.albumSelection.checkedState[2] = true then
+                saveList = m.albumSelection.content.getChild(2).description + ":" + itostr(selectedUser) + "|"
+            else if m.albumSelection.checkedState[1] = true then
+                saveList = m.albumSelection.content.getChild(1).description + ":" + itostr(selectedUser) + "|"
+            else if m.albumSelection.checkedState[0] = true then
+                saveList = m.albumSelection.content.getChild(0).description + ":" + itostr(selectedUser) + "|"
+            else
+                'Control the number of API calls we make. Sorry but Google monitors this.
+                if selectCount < 5 then
+                    saveList = saveList + itemcontent.description + ":" + itostr(selectedUser) + "|"
+                    selectCount = selectCount + 1
+                else
+                    errorMsg = "You may select 5 albums max, for screensaver playback. Other album selections will not be saved."
+                end if
+            end if
+            
+            if (m.albumSelection.checkedState[2] = true or m.albumSelection.checkedState[1] = true or m.albumSelection.checkedState[0] = true) and (i > 2) then
+                errorMsg = "Time in history albums are currently mutually exclusive. Other album selections will not be saved."
+            end if
         end if
     end for
     
+    if errorMsg<>"" then
+        'ShowError
+        m.noticeDialog.visible = true
+        buttons =  [ "OK" ]
+        m.noticeDialog.title   = "Notice"
+        m.noticeDialog.message = errorMsg
+        m.noticeDialog.buttons = buttons
+        m.noticeDialog.setFocus(true)
+        m.noticeDialog.observeField("buttonSelected","noticeClose")
+    end if
+    
+    print "DEBUG: "; saveList
     RegWrite(regStore, saveList, "Settings")       
 End Sub
 
@@ -617,7 +649,7 @@ End Sub
 Sub noticeClose(event as object)
     m.noticeDialog.visible   = false
     m.loadingSpinner.visible = false
-    'm.albummarkupgrid.setFocus(true)
+    m.albumSelection.setFocus(true)
 End Sub
 
 
