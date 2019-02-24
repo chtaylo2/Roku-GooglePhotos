@@ -198,7 +198,7 @@ Sub onApiTimerTrigger()
             m.dynamicAlbumList.visible = false
             m.itemOverhang.visible     = false         
             
-            m.screenActive = createObject("roSGNode", "My Albums")
+            m.screenActive = createObject("roSGNode", "Google Photos Albums")
             m.screenActive.imageContent = m.albumActiveObject
             m.screenActive.predecessor = m.top.tracking
             m.screenActive.loaded = true

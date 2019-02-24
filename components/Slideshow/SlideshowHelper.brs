@@ -1,6 +1,6 @@
 '*************************************************************
 '** PhotoView for Google Photos
-'** Copyright (c) 2017-2018 Chris Taylor.  All rights reserved.
+'** Copyright (c) 2017-2019 Chris Taylor.  All rights reserved.
 '** Use of code within this application subject to the MIT License (MIT)
 '** https://raw.githubusercontent.com/chtaylo2/Roku-GooglePhotos/master/LICENSE
 '*************************************************************
@@ -105,7 +105,6 @@ Function handleRefreshToken(event as object)
             doGetAlbumList(refreshData.post_data[1])
         end if
     end if
-    
 End Function
 
 
@@ -328,3 +327,55 @@ Function googleImageCreateRecord(json As Object) As Object
     
     return image
 End Function
+
+
+' ********************************************************************
+' **
+' ** REFRESH HANDLERS
+' **
+' ********************************************************************
+
+Sub onURLRefreshTigger()
+    print "SlideshowHelper.brs [onURLRefreshTigger]"
+    
+    m.albumActiveObject = m.top.albumobject
+
+    for each albumid in m.albumActiveObject
+    
+      print "ALBUMID: "; albumid
+      print "OBJECT: "; m.albumActiveObject[albumid]
+    
+        if type(m.albumActiveObject[albumid]) = "roAssociativeArray" then
+            tmpPage  = ""
+            tmpCount = "1"
+            if m.albumActiveObject[albumid].previousPageTokens[m.albumActiveObject[albumid].previouspagetokens.Count()-1]<>invalid then
+                tmpPair = m.albumActiveObject[albumid].previousPageTokens[m.albumActiveObject[albumid].previouspagetokens.Count()-1].Split("::")
+                tmpPage = tmpPair[0]
+                tmpCount = tmpPair[1]
+            end if
+        
+            m.albumActiveObject[albumid].showCountStart = StrToI(tmpCount)
+            m.albumActiveObject[albumid].showCountEnd = 0
+            m.albumActiveObject[albumid].apiCount = 0
+                
+            if albumid.Instr("GP_LIBRARY") >= 0 then
+                doGetLibraryImages(albumid, m.albumActiveObject[albumid].GetUserIndex, tmpPage)
+            else if albumid.Instr("SearchResults") >= 0 then
+            
+                m.albumActiveObject[albumid].GetImageCount = 0
+                m.albumActiveObject[albumid].previousPageTokens = []
+                m.albumActiveObject[albumid].showCountStart = 1
+                m.albumActiveObject[albumid].showCountEnd = 0
+                m.albumActiveObject[albumid].apiCount = 0
+                m.albumActiveObject[albumid].imagesMetaData = []
+            
+                m.apiTimer.control = "start"
+                
+                searchStrings = doSearchGenerate()
+                doGetSearch(albumid, searchStrings[m.albumActiveObject[albumid].keyword], m.albumActiveObject[albumid].GetUserIndex, tmpPage)
+            else
+                doGetAlbumImages(albumid, m.albumActiveObject[albumid].GetUserIndex, tmpPage)
+            end if
+        end if
+    end for
+End Sub

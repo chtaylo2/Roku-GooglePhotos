@@ -19,7 +19,7 @@ Function loadCommon()
     
     m.register_prefix  = "https://www.roku-photoview.com"
     m.oauth_prefix     = "https://www.googleapis.com/oauth2/v4"
-    m.oauth_scope      = "https://picasaweb.google.com/data https://www.googleapis.com/auth/userinfo.email"
+    m.oauth_scope      = ""
     
     'Help manage API calls. YES, Google monitors this. Which ever comes first
     m.maxApiPerPage    = 12

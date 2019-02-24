@@ -1,6 +1,6 @@
 <?xml version = "1.0" encoding = "utf-8" ?> 
 
-<component name = "My Albums" extends = "Group" initialFocus = "albumGrid" >
+<component name = "Google Photos Albums" extends = "Group" initialFocus = "albumGrid" >
     
     <interface>
         <field id = "predecessor"  type = "string" />

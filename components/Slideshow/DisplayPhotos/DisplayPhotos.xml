@@ -246,7 +246,7 @@
         
         <Timer
             id          = "URLRefreshTimer"
-            duration    = "600"
+            duration    = "1500"
         />
         
         <Timer
@@ -256,9 +256,9 @@
         />
         
         <Timer
-            id       = "apiTimer"
-            repeat   = "true"
-            duration = "2"
+            id          = "apiTimer"
+            repeat      = "true"
+            duration    = "2"
         />
         
         <Dialog

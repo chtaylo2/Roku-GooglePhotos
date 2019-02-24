@@ -199,11 +199,13 @@ Sub onRotationTigger(event as object)
     
         'We only allow multi scroll if starting direct, can't come from Browse Images.
         if m.screenActive = invalid then
-            m.screenActive = createObject("roSGNode", "MultiScroll")
-            m.screenActive.id = m.top.id
+            m.screenActive             = createObject("roSGNode", "MultiScroll")
+            m.screenActive.id          = m.top.id
             m.screenActive.predecessor = m.top.predecessor
-            m.screenActive.content = m.imageDisplay
-            m.screenActive.loaded = "true"
+            m.screenActive.content     = m.imageDisplay
+            m.screenActive.albumobject = m.top.albumobject
+            m.screenActive.showres     = m.showRes
+            m.screenActive.loaded      = "true"
             m.top.appendChild(m.screenActive)
             m.screenActive.setFocus(true)
         end if
@@ -215,50 +217,6 @@ Sub onRotationTigger(event as object)
     else
         sendNextImage()
     end if
-End Sub
-
-
-Sub onURLRefreshTigger()
-    print "DisplayPhotos.brs [onURLRefreshTigger]"
-    
-    m.albumActiveObject = m.top.albumobject
-
-    for each albumid in m.albumActiveObject
-        if type(m.albumActiveObject[albumid]) = "roAssociativeArray" then
-            tmpPage  = ""
-            tmpCount = "1"
-            if m.albumActiveObject[albumid].previousPageTokens[m.albumActiveObject[albumid].previouspagetokens.Count()-1]<>invalid then
-                tmpPair = m.albumActiveObject[albumid].previousPageTokens[m.albumActiveObject[albumid].previouspagetokens.Count()-1].Split("::")
-                tmpPage = tmpPair[0]
-                tmpCount = tmpPair[1]
-            end if
-        
-            m.albumActiveObject[albumid].showCountStart = StrToI(tmpCount)
-            m.albumActiveObject[albumid].showCountEnd = 0
-            m.albumActiveObject[albumid].apiCount = 0
-                
-            if albumid.Instr("GP_LIBRARY") >= 0 then
-                doGetLibraryImages(albumid, m.albumActiveObject[albumid].GetUserIndex, tmpPage)
-            else if albumid.Instr("SearchResults") >= 0 then
-            
-                m.albumActiveObject[albumid].GetImageCount = 0
-                m.albumActiveObject[albumid].previousPageTokens = []
-                m.albumActiveObject[albumid].showCountStart = 1
-                m.albumActiveObject[albumid].showCountEnd = 0
-                m.albumActiveObject[albumid].apiCount = 0
-                m.albumActiveObject[albumid].imagesMetaData = []
-            
-                m.apiTimer.control = "start"
-                
-                searchStrings = doSearchGenerate()
-                doGetSearch(albumid, searchStrings[m.albumActiveObject[albumid].keyword], m.albumActiveObject[albumid].GetUserIndex, tmpPage)
-            else
-                doGetAlbumImages(albumid, m.albumActiveObject[albumid].GetUserIndex, tmpPage)
-            end if
-        end if
-    end for    
-
-    
 End Sub
 
 
@@ -508,7 +466,7 @@ Sub onPrimaryLoadedTrigger(event as object)
         centery = (1080 - markupRectAlbum.height) / 2
 
         m.PrimaryImage.translation = [ centerx, centery ]
-        
+
         'Controls the image fading
         rxFade = CreateObject("roRegex", "NoFading", "i")        
         if rxFade.IsMatch(m.showDisplay) or rxFade.IsMatch(m.imageOnScreen) then
@@ -562,6 +520,10 @@ End Sub
 
 Sub sendNextImage(direction=invalid)
     print "DisplayPhotos.brs [sendNextImage]"
+    
+    date         = CreateObject("roDateTime")
+    date.ToLocalTime()
+    print "  -- time: "; date.ToISOString()
         
     'Get next image to display.
     if m.top.startIndex <> -1 then

@@ -121,7 +121,7 @@ Sub handleGetSearch(event as object)
             m.searchProgress.visible = false
             
             if strtoi(results) > 0 then
-                m.screenActive = createObject("roSGNode", "My Albums")
+                m.screenActive = createObject("roSGNode", "Google Photos Albums")
                 m.screenActive.imageContent = response
                 m.screenActive.predecessor = "Search Results"
                 m.screenActive.loaded = true

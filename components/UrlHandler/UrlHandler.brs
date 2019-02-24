@@ -19,7 +19,7 @@ Sub go()
     ' Holds requests by id
     m.jobsById = {}
     ' UriFetcher event loop
-    
+
     while true
         msg = wait(0, m.port)
         mt = type(msg)
@@ -60,7 +60,7 @@ Function addRequest(request as Object) as Boolean
                 method = parameters.method
                 uri = parameters.uri
                 params = parameters.params
-                'print parameters
+                print parameters
                 
                 if type(uri) = "roString"
                     urlXfer = createObject("roUrlTransfer")
@@ -136,8 +136,10 @@ Sub processResponse(msg as Object)
             num:         jobnum
         }
 
-        'print "URL RESULT: ";  result
-        'print "MSG: "; msg.GetResponseCode()
+        if msg.GetResponseCode() <> 200 then
+           print "URL RESULT: ";  result
+           print "MSG: "; msg.GetResponseCode()
+        end if
         
         ' could handle various error codes, retry, etc. here
         m.jobsById.delete(idKey)
