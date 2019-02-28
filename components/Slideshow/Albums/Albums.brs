@@ -30,6 +30,7 @@ Sub init()
     m.apiPending        = 0
     m.albumActiveObject = {}
     m.albumSelection    = 0
+    m.albumsObject      = {}
     
     'Load common variables
     loadCommon()
@@ -65,6 +66,9 @@ Sub loadingComplete()
     else
         'Get user albums
         
+        m.albumsObject["albums"] = []
+        m.albumsObject.apiCount = 0
+        
         'Display Loading Spinner
         showLoadingSpinner(5, "GP_ALBUM_LISTING")
         
@@ -96,8 +100,24 @@ Sub handleGetAlbumList(event as object)
         else if rsp.DoesExist("error")
             errorMsg = "Json error response: [handleGetAlbumList] " + json.error
         else
-            m.albumsObject = googleAlbumListing(rsp)
-            googleDisplayAlbums(m.albumsObject)        
+            albumList = googleAlbumListing(rsp)         
+            
+            for each album in albumList
+                m.albumsObject["albums"].Push(album)
+            end for          
+
+            if rsp["nextPageToken"]<>invalid then
+                pageNext = rsp["nextPageToken"]
+                m.albumsObject.nextPageToken = pageNext
+                m.albumsObject.apiCount = m.albumsObject.apiCount + 1
+                if m.albumsObject.apiCount < m.maxApiPerPage then
+                    doGetAlbumList(m.global.selectedUser, pageNext)
+                else
+                    googleDisplayAlbums(m.albumsObject["albums"])
+                end if
+            else
+                googleDisplayAlbums(m.albumsObject["albums"])
+            end if           
         end if
     end if
     
@@ -251,10 +271,10 @@ Sub onItemSelected()
         
     else if selection.id = "GP_ALBUM_LISTING" then
         m.albumSelection = m.albummarkupgrid.itemSelected
-        albumid = m.albumsObject[m.albummarkupgrid.itemSelected-1].GetID
+        albumid = m.albumsObject["albums"][m.albummarkupgrid.itemSelected-1].GetID
         m.albumActiveObject[albumid] = {}
         m.albumActiveObject["currentID"] = albumid
-        m.albumActiveObject[albumid] = m.albumsObject[m.albummarkupgrid.itemSelected-1]
+        m.albumActiveObject[albumid] = m.albumsObject["albums"][m.albummarkupgrid.itemSelected-1]
         m.albumName = selection.shortdescriptionline1
 
         m.albumActiveObject[albumid].previousPageTokens = []
@@ -604,6 +624,7 @@ End Sub
 Function onKeyEvent(key as String, press as Boolean) as Boolean
     if press then
         print "KEY: "; key
+        
         if key = "back"
             if (m.screenActive <> invalid)            
                 m.top.removeChild(m.screenActive)
@@ -624,7 +645,7 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
                 return true
             end if
             
-        else if (key = "options") and (m.screenActive = invalid) and (m.albummarkupgrid.content.getChild(0).id = "GP_SLIDESHOW_START" or m.albummarkupgrid.content.getChild(0).id = "GP_VIDEO_BROWSE")
+        else if (key = "options") and (m.screenActive = invalid) and (m.albummarkupgrid.content.getChild(0).id = "GP_SLIDESHOW_START" or m.albummarkupgrid.content.getChild(0).id = "GP_VIDEO_BROWSE" or m.albummarkupgrid.content.getChild(0).id = "GP_PULL_PREVIOUS")
             showTempSetting()
             return true
             

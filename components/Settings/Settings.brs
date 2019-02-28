@@ -33,6 +33,7 @@ Sub init()
     m.loadingSpinner    = m.top.findNode("loadingSpinner")
     m.noticeDialog      = m.top.findNode("noticeDialog")
     m.aboutVersion      = m.top.findNode("aboutVersion")
+    m.albumsObject      = {}
     m.apiPending        = 0
     
     m.pinPad.observeField("buttonSelected","processPinEntry")
@@ -70,7 +71,7 @@ End Sub
 
 
 ' URL Request to fetch album listing - Used for screensaver album selection
-Sub doGetAlbumSelection()
+Sub doGetAlbumSelection(pageNext="" As String)
     print "Settings.brs [doGetAlbumSelection]"  
 
     usersLoaded               = oauth_count()
@@ -82,12 +83,12 @@ Sub doGetAlbumSelection()
             
     m.infoLabel.text = "Select albums to display while the screensaver is active. If none are selected, random photos will be shown. Only the first 1,000 images, per album, are pulled."
 
-    tmpData = [ "doGetAlbumSelection", selectedUser ]
+    tmpData = [ "doGetAlbumSelection", selectedUser, pageNext ]
 
     if selectedUser <> usersLoaded then
         m.loadingSpinner.visible = true
         m.infoLabel.text = m.infoLabel.text + chr(10) + chr(10) + "Current user selected: " + m.userInfoName[selectedUser]
-        doGetAlbumList(selectedUser)
+        doGetAlbumList(selectedUser, pageNext)
     
     else
         m.infoLabel.text = m.infoLabel.text + chr(10) + chr(10) + "Unable to select albums for 'All (Random)'. A future version might allow this."
@@ -98,12 +99,8 @@ End Sub
 Sub handleGetAlbumSelection(event as object)
     print "Settings.brs [handleGetAlbumSelection]"
   
-    m.albumContent = createObject("RoSGNode","ContentNode")
     errorMsg       = ""
     response       = event.getData()
-    regStore       = "SSaverAlbums"
-    regAlbums      = RegRead(regStore, "Settings")
-    checkedObj     = []
 
     if (response.code = 401) or (response.code = 403) then
         'Expired Token
@@ -120,67 +117,26 @@ Sub handleGetAlbumSelection(event as object)
         else if rsp.DoesExist("error")
             errorMsg = "Json error response: [handleGetAlbumSelection] " + json.error
         else
-
-            'Display Time in History selections
-            albumHistory = "Day|Week|Month".Split("|")
-            for each album in albumHistory
-                addItem(m.albumContent, "• "+album+" in History - Auto Refresh", album, "")
-                saved = 0
-                if (regAlbums <> invalid) and (regAlbums <> "")
-                    parsedString = regAlbums.Split("|")
-                    for each item in parsedString
-                        albumUser = item.Split(":")
-                        if albumUser[0] = album then
-                            'Check selected album
-                            saved = 1
-                        end if
-                    end for
-                end if
-                if saved = 1 checkedObj.Push(true)
-                if saved = 0 checkedObj.Push(false)                
-            end for
+            albumList = googleAlbumListing(rsp)         
             
-            'Display Google Photos Library
-            addItem(m.albumContent, "Google Photos Library", "GP_LIBRARY", "")
-            saved = 0
-            if (regAlbums <> invalid) and (regAlbums <> "")
-                parsedString = regAlbums.Split("|")
-                for each item in parsedString
-                    albumUser = item.Split(":")
-                    if (albumUser[0] = "GP_LIBRARY") and (albumUser[1] = response.post_data[1].Tostr()) then
-                        'Check selected album
-                        saved = 1
-                    end if
-                end for
+            for each album in albumList
+                m.albumsObject["albums"].Push(album)
+            end for          
+
+            if rsp["nextPageToken"]<>invalid then
+                pageNext = rsp["nextPageToken"]
+                m.albumsObject.nextPageToken = pageNext
+                m.albumsObject.apiCount = m.albumsObject.apiCount + 1
+                if m.albumsObject.apiCount < m.maxApiPerPage then
+                    doGetAlbumList(m.settingSubList.itemFocused, pageNext)
+                else
+                    printAlbumSelection(m.albumsObject["albums"])
+                end if
+            else
+                printAlbumSelection(m.albumsObject["albums"])
             end if
-            if saved = 1 checkedObj.Push(true)
-            if saved = 0 checkedObj.Push(false)
-            
-            'Display user album selections
-            m.albumsObject = googleAlbumListing(rsp)
-            for each album in m.albumsObject
-                addItem(m.albumContent, album.GetTitle, album.GetID, "")
-                saved = 0
-                if (regAlbums <> invalid) and (regAlbums <> "")
-                    parsedString = regAlbums.Split("|")
-                    for each item in parsedString
-                        albumUser = item.Split(":")
-                        if albumUser[0] = album.GetID then
-                            'Check selected album
-                            saved = 1
-                        end if
-                    end for
-                end if
-                if saved = 1 checkedObj.Push(true)
-                if saved = 0 checkedObj.Push(false)
-            end for
-
-            m.albumSelection.content = m.albumContent
-            m.albumSelection.checkedState = checkedObj
         end if
     end if
-    
-    m.loadingSpinner.visible = "false"
     
     if errorMsg<>"" then
         'ShowNotice
@@ -192,6 +148,74 @@ Sub handleGetAlbumSelection(event as object)
         m.noticeDialog.observeField("buttonSelected","noticeClose")
     end if   
     
+End Sub
+
+
+Sub printAlbumSelection(albumList As Object)
+    print "Settings.brs [printAlbumSelection]"
+    
+    m.albumContent = createObject("RoSGNode","ContentNode")
+    regStore       = "SSaverAlbums"
+    regAlbums      = RegRead(regStore, "Settings")
+    checkedObj     = []
+    
+    m.loadingSpinner.visible = "false"
+    
+    'Display Time in History selections
+    albumHistory = "Day|Week|Month".Split("|")
+    for each album in albumHistory
+        addItem(m.albumContent, "• "+album+" in History - Auto Refresh", album, "")
+        saved = 0
+        if (regAlbums <> invalid) and (regAlbums <> "")
+            parsedString = regAlbums.Split("|")
+            for each item in parsedString
+                albumUser = item.Split(":")
+                if albumUser[0] = album then
+                    'Check selected album
+                    saved = 1
+                end if
+            end for
+        end if
+        if saved = 1 checkedObj.Push(true)
+        if saved = 0 checkedObj.Push(false)                
+    end for
+            
+    'Display Google Photos Library
+    addItem(m.albumContent, "Google Photos Library", "GP_LIBRARY", "")
+    saved = 0
+    if (regAlbums <> invalid) and (regAlbums <> "")
+        parsedString = regAlbums.Split("|")
+        for each item in parsedString
+            albumUser = item.Split(":")
+            if (albumUser[0] = "GP_LIBRARY") and (albumUser[1] = response.post_data[1].Tostr()) then
+                'Check selected album
+                saved = 1
+            end if
+        end for
+    end if
+    if saved = 1 checkedObj.Push(true)
+    if saved = 0 checkedObj.Push(false)
+            
+    'Display user album selections
+    for each album in albumList
+        addItem(m.albumContent, album.GetTitle, album.GetID, "")
+        saved = 0
+        if (regAlbums <> invalid) and (regAlbums <> "")
+            parsedString = regAlbums.Split("|")
+            for each item in parsedString
+                albumUser = item.Split(":")
+                if albumUser[0] = album.GetID then
+                    'Check selected album
+                    saved = 1
+                end if
+            end for
+        end if
+        if saved = 1 checkedObj.Push(true)
+        if saved = 0 checkedObj.Push(false)
+    end for
+
+    m.albumSelection.content = m.albumContent
+    m.albumSelection.checkedState = checkedObj
 End Sub
 
 
@@ -658,6 +682,8 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
         print "KEY: "; key
         if (key = "options" or key = "right") and (m.settingSubList.hasFocus() = true) and (m.settingsList.itemFocused = 5)
             'Select Linked User
+            m.albumsObject["albums"] = []
+            m.albumsObject.apiCount = 0
             doGetAlbumSelection()
             m.settingSubList.itemSelected = m.settingSubList.itemFocused
             m.settingSubList.visible = false

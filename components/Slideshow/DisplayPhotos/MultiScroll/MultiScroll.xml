@@ -74,6 +74,12 @@
         />
         
         <Timer
+            id          = "apiTimer"
+            repeat      = "true"
+            duration    = "2"
+        />
+        
+        <Timer
             id          = "URLRefreshTimer"
             duration    = "1500"
         />

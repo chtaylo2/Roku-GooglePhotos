@@ -78,8 +78,6 @@ Sub onItemSelected()
     '    m.screenActive.setFocus(true)
     'else
         m.apiTimer.control = "start"
-        'm.imagesMetaData   = []
-        'm.videosMetaData   = []
     
         'Item selected
         keyword = m.dynamicAlbumList.content.getChild(m.dynamicAlbumList.itemFocused).description
@@ -117,7 +115,6 @@ Sub handleGetSearch(event as object)
     albumid  = response.post_data[1]
     keywords = response.post_data[2]
     
-    'print "DEBUG: "; response
     m.apiPending = m.apiPending-1
     if (response.code = 401) or (response.code = 403) then
         'Expired Token

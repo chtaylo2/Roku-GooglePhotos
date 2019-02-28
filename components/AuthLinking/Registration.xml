@@ -27,7 +27,7 @@
                 height      = "150"
                 width       = "1200"
                 wrap        = "true"
-                text        = "To link this Roku device to your Google Photos account, go to:"
+                text        = "To link this Roku device to your Google account, go to:"
                 translation = "[225,300]"
             />
     
@@ -73,8 +73,20 @@
                 height      = "150"
                 width       = "1920"
                 wrap        = "true"
-                text        = "This screen will automatically update as soon as your activation completes"
+                text        = "This screen will automatically update"
                 translation = "[0, 750]"
+            />
+            
+            <Label
+                id          = "Row6"
+                font        = "font:SmallBoldSystemFont"
+                color       = "#808080"
+                horizAlign  = "left"
+                height      = "150"
+                width       = "1300"
+                wrap        = "true"
+                text        = "Permissions requested:&#xA;   • View your Google Photos library – Required to view your photos.&#xA;   • Manage and add to shared albums on your behalf – Required to view your shared albums. "
+                translation = "[100, 850]"
             />
     
             <ButtonGroup

@@ -12,12 +12,14 @@ Sub init()
     m.Row3              = m.top.findNode("Row3")
     m.Row4              = m.top.findNode("Row4")
     m.Row5              = m.top.findNode("Row5")
+    m.Row6              = m.top.findNode("Row6")
     m.LoginTimer        = m.top.findNode("LoginTimer")
     m.stopScanning      = m.top.findNode("stopScanning")
     m.showRegistration  = m.top.findNode("showRegistration")
     m.noticeDialog      = m.top.findNode("noticeDialog")
     
     m.Row4.font.size = 65
+    m.Row6.font.size = 25
     
     m.UriHandler = createObject("roSGNode","Content UrlHandler")
     m.UriHandler.observeField("gen_token_response","onNewToken")
@@ -254,6 +256,7 @@ Sub onStoreUser(event as object)
                     m.Row3.text = infoName + "'s Google account has been successfully linked to this device"
                     m.Row4.text = ""
                     m.Row5.text = ""
+                    m.Row6.text = ""
                     
                     m.buttongroup.buttons = [ "Continue" ]
                     m.buttongroup.setFocus(true)

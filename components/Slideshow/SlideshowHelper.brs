@@ -118,7 +118,7 @@ End Function
 Sub doGetAlbumList(selectedUser=0 as Integer, pageNext="" As String)
     print "SlideshowHelper.brs [doGetAlbumList]"  
 
-    tmpData = [ "doGetAlbumList", selectedUser ]
+    tmpData = [ "doGetAlbumList", selectedUser, pageNext ]
 
     params = "pageSize=50"
     if pageNext<>"" then
@@ -195,27 +195,6 @@ Function doSearchGenerate() As Object
     pYear5 = datepast.GetYear()-5
     pMonth = datepast.GetMonth().ToStr()
     pDay   = datepast.GetDayOfMonth().ToStr()
-  
-  'DAY
-    print "{'dateFilter': {'dates': [{'day': "+cDay+",'month': "+cMonth+",'year': "+cYear1.ToStr()+"}"
-    print "{'day': "+cDay+",'month': "+cMonth+",'year': "+cYear2.ToStr()+"}"
-    print "{'day': "+cDay+",'month': "+cMonth+",'year': "+cYear3.ToStr()+"}"
-    print "{'day': "+cDay+",'month': "+cMonth+",'year': "+cYear4.ToStr()+"}"
-    print "{'day': "+cDay+",'month': "+cMonth+",'year': "+cYear5.ToStr()+"}]}}"
- 
-  'WEEk
-    print "{'dateFilter': {'ranges': [{'startDate': {'day': "+pDay+",'month': "+pMonth+",'year': "+pYear1.ToStr()+"},'endDate': {'day': "+cDay+",'month': "+cMonth+",'year': "+cYear1.ToStr()+"}},"
-    print "{'startDate': {'day': "+pDay+",'month': "+pMonth+",'year': "+pYear2.ToStr()+"},'endDate': {'day': "+cDay+",'month': "+cMonth+",'year': "+cYear2.ToStr()+"}},"
-    print "{'startDate': {'day': "+pDay+",'month': "+pMonth+",'year': "+pYear3.ToStr()+"},'endDate': {'day': "+cDay+",'month': "+cMonth+",'year': "+cYear3.ToStr()+"}},"
-    print "{'startDate': {'day': "+pDay+",'month': "+pMonth+",'year': "+pYear4.ToStr()+"},'endDate': {'day': "+cDay+",'month': "+cMonth+",'year': "+cYear4.ToStr()+"}},"
-    print "{'startDate': {'day': "+pDay+",'month': "+pMonth+",'year': "+pYear5.ToStr()+"},'endDate': {'day': "+cDay+",'month': "+cMonth+",'year': "+cYear5.ToStr()+"}}]}}"
-  
-  'MONTH  
-    print "{'dateFilter': {'dates': [{'month': "+cMonth+",'year': "+cYear1.ToStr()+"}"
-    print "{'month': "+cMonth+",'year': "+cYear2.ToStr()+"}"
-    print "{'month': "+cMonth+",'year': "+cYear3.ToStr()+"}"
-    print "{'month': "+cMonth+",'year': "+cYear4.ToStr()+"}"
-    print "{'month': "+cMonth+",'year': "+cYear5.ToStr()+"}]}}"
     
     searchStrings       = {}
     searchStrings.day   = "{'dateFilter': {'dates': [{'day': "+cDay+",'month': "+cMonth+",'year': "+cYear1.ToStr()+"},{'day': "+cDay+",'month': "+cMonth+",'year': "+cYear2.ToStr()+"},{'day': "+cDay+",'month': "+cMonth+",'year': "+cYear3.ToStr()+"},{'day': "+cDay+",'month': "+cMonth+",'year': "+cYear4.ToStr()+"},{'day': "+cDay+",'month': "+cMonth+",'year': "+cYear5.ToStr()+"}]}}"
@@ -230,7 +209,7 @@ Sub doGetSearch(albumid As String, keyword as string, selectedUser=0 as Integer,
     print "SlideshowHelper.brs [doGetSearch]"
     
     if keyword <> ""    
-        tmpData = [ "doGetSearch", albumid, keyword, selectedUser, pageNext  ]
+        tmpData = [ "doGetSearch", albumid, keyword, selectedUser, pageNext ]
 
         params = "'pageSize': '100',"
 

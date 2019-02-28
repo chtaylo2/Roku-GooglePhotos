@@ -28,10 +28,13 @@ Sub init()
     m.RediscoverDetail  = m.top.findNode("RediscoverDetail")
     m.DownloadTimer     = m.top.findNode("DownloadTimer")
     m.URLRefreshTimer   = m.top.findNode("URLRefreshTimer")
+    m.noticeDialog      = m.top.findNode("noticeDialog")
+    m.apiTimer          = m.top.findNode("apiTimer")
     
     m.WaveTimer.observeField("fire","onWaveTigger")
     m.RefreshTimer.observeField("fire","onRefreshTigger")
     m.top.observeField("loaded","loadImageList")
+    m.apiTimer.observeField("fire","onApiTimerTrigger")
     m.scroll_node_1.observeField("loadStatus","onLoadMonitor")
     m.scroll_node_2.observeField("loadStatus","onLoadMonitor")
     m.scroll_node_3.observeField("loadStatus","onLoadMonitor")
@@ -336,6 +339,81 @@ Sub handleGetAlbumImages(event as object)
 End Sub
 
 
+Sub handleGetSearch(event as object)
+    print "DisplayPhotos.brs [handleGetSearch]"
+
+    errorMsg = ""
+    response = event.getData()
+    albumid  = response.post_data[1]
+    keywords = response.post_data[2]
+
+    print m.albumActiveObject["SearchResults"]
+    print "COUNT: "; m.albumActiveObject[albumid].imagesMetaData.Count()
+    
+    m.apiPending = m.apiPending-1
+    if (response.code = 401) or (response.code = 403) then
+        'Expired Token
+        doRefreshToken(response.post_data, m.global.selectedUser)
+    else if response.code <> 200
+        errorMsg = "An Error Occurred in 'handleGetSearch'. Code: "+(response.code).toStr()+" - " +response.error
+    else
+        rsp=ParseJson(response.content)
+        'print rsp
+        if rsp=invalid then
+            errorMsg = "Unable to parse Google Photos API response. Exit the channel then try again later. Code: "+(response.code).toStr()+" - " +response.error
+        else if type(rsp) <> "roAssociativeArray"
+            errorMsg = "Json response is not an associative array: handleGetSearch"
+        else if rsp.DoesExist("error")
+            errorMsg = "Json error response: [handleGetSearch] " + json.error
+        else
+
+            imageList = googleImageListing(rsp)
+
+            for each media in imageList
+                tmp             = {}
+                tmp.id          = media.GetID
+                tmp.url         = media.GetURL + getResolution(m.top.showres)
+                tmp.timestamp   = media.GetTimestamp
+                tmp.description = media.GetDescription
+                tmp.filename    = media.GetFilename
+        
+                if media.IsVideo = 0 then
+                    m.albumActiveObject[albumid].imagesMetaData.Push(tmp)
+                end if
+            end for
+            
+            if rsp["nextPageToken"]<>invalid then
+                pageNext = rsp["nextPageToken"]
+                m.albumActiveObject[albumid].nextPageToken = pageNext
+                m.albumActiveObject[albumid].showCountEnd = m.albumActiveObject[albumid].showCountEnd + imageList.Count()
+                m.albumActiveObject[albumid].apiCount = m.albumActiveObject[albumid].apiCount + 1
+                if (m.albumActiveObject[albumid].apiCount < m.maxApiPerPage) and (m.albumActiveObject[albumid].showCountEnd < m.maxImagesPerPage) then
+                    doGetSearch(albumid, keywords, m.albumActiveObject[albumid].GetUserIndex, pageNext)
+                end if
+            else
+                m.albumActiveObject[albumid].nextPageToken = invalid
+                m.albumActiveObject[albumid].showCountEnd = m.albumActiveObject[albumid].showCountEnd + imageList.Count()
+            end if
+            
+            print m.albumActiveObject["SearchResults"]
+            print "COUNT: "; m.albumActiveObject[albumid].imagesMetaData.Count()
+        end if
+    end if
+
+    if errorMsg<>"" then
+        'ShowError
+        m.noticeDialog.visible = true
+        buttons =  [ "OK" ]
+        m.noticeDialog.title   = "Error"
+        m.noticeDialog.message = errorMsg
+        m.noticeDialog.buttons = buttons
+        m.noticeDialog.setFocus(true)
+        m.noticeDialog.observeField("buttonSelected","noticeClose")
+    end if   
+
+End Sub
+
+
 Function GetNextImage()
 
     print "NEXT: "; m.imageTracker
@@ -368,6 +446,20 @@ Sub onLoadMonitor(event as object)
         end if
     end if
 
+End Sub
+
+
+Sub onApiTimerTrigger()
+    print "API CALLS LEFT: "; m.apiPending
+
+    if m.apiPending = 0 then
+        m.apiTimer.control = "stop"
+        
+        if m.albumActiveObject["SearchResults"].showcountend > 0 then
+            print "DEBUG: "; m.albumActiveObject["SearchResults"].imagesMetaData
+            m.imageDisplay = m.albumActiveObject["SearchResults"].imagesMetaData          
+        end if
+    end if
 End Sub
 
 
