@@ -39,13 +39,16 @@ Sub init()
     'Load default settings
     loadDefaults()
 
-    m.userCount         = oauth_count()
-    selectedUser        = RegRead("SSaverUser","Settings")
-    m.userIndex         = 0
-    m.apiPending        = 0
-    m.photoItems        = []
-    m.albumsObject      = []
-    m.albumActiveObject = {}
+    m.userCount              = oauth_count()
+    selectedUser             = RegRead("SSaverUser","Settings")
+    regAlbums                = RegRead("SSaverAlbums", "Settings")
+    m.userIndex              = 0
+    m.apiPending             = 0
+    m.photoItems             = []
+    m.albumActiveObject      = {}
+    m.albumsObject           = {}
+    m.albumsObject["albums"] = []
+    m.albumsObject.apiCount = 0
     
     if selectedUser = invalid then      
         m.userIndex = 0
@@ -81,9 +84,10 @@ Sub init()
             for i = 0 to m.userCount-1
                 doGetAlbumList(i)
             end for
-        else
-            'Check Token Validity
+        else if (regAlbums = invalid or regAlbums = "")
             doGetAlbumList(m.userIndex)
+        else
+            'Do nothing here. apiTimer will trigger processAlbums()
         end if
     end if
     
@@ -146,14 +150,22 @@ Sub handleGetAlbumList(event as object)
         rsp=ParseJson(response.content)
         print rsp["albums"]
         if rsp<>invalid then   
-            tmp = googleAlbumListing(rsp)
-            if tmp.Count()>0 then
-                for each album in tmp
+            albumList = googleAlbumListing(rsp)         
+            
+            for each album in albumList
                     album.GetUserIndex = response.post_data[1]
-                    m.albumsObject.Push(album)
-                end for
+                    m.albumsObject["albums"].Push(album)
+            end for          
+
+            if rsp["nextPageToken"]<>invalid then
+                pageNext = rsp["nextPageToken"]
+                m.albumsObject.nextPageToken = pageNext
+                m.albumsObject.apiCount = m.albumsObject.apiCount + 1
+                if m.albumsObject.apiCount < m.maxApiPerPage then
+                    doGetAlbumList(response.post_data[1], pageNext)
+                end if
             end if
-        end if
+        end if       
     end if
 End Sub
 
@@ -240,37 +252,37 @@ Sub processAlbums()
         end if
     end if
 
-    if m.albumsObject.Count()>0 then
-        for each album in m.albumsObject
-            'User has selected albums for screensaver
-            if (regAlbums <> invalid) and (regAlbums <> "") and (m.userIndex <> 100)
-                parsedString = regAlbums.Split("|")
-                for each item in parsedString
-                    albumUser = item.Split(":")
-                    if albumUser[0] = album.GetID then
-                        m.predecessor = "null"
-                        m.albumActiveObject[album.GetID] = {}
-                        m.albumActiveObject[album.GetID].GetID = album.GetID
-                        m.albumActiveObject[album.GetID].GetUserIndex = album.GetUserIndex
-                        doGetAlbumImages(album.GetID, album.GetUserIndex)
-                    end if
-                end for
-            else
-                ' Randomly pull 5 additional albums and cache photos
-                album_idx = Rnd(m.albumsObject.Count())-1
-    
-                m.albumActiveObject[m.albumsObject[album_idx].GetID] = {}
-                m.albumActiveObject[m.albumsObject[album_idx].GetID].GetID = m.albumsObject[album_idx].GetID
-                m.albumActiveObject[m.albumsObject[album_idx].GetID].GetUserIndex = m.albumsObject[album_idx].GetUserIndex
-                doGetAlbumImages(m.albumsObject[album_idx].GetID, m.albumsObject[album_idx].GetUserIndex)
-                m.albumsObject.delete(album_idx)
-                                
-                album_cache_count = album_cache_count+1
+    'User has selected albums for screensaver
+    if (regAlbums <> invalid) and (regAlbums <> "") and (m.userIndex <> 100)
+        parsedString = regAlbums.Split("|")
+        for each item in parsedString
+            if item <> "" then
+                albumUser = item.Split(":")
                 m.predecessor = "null"
+                m.albumActiveObject[albumUser[0]] = {}
+                m.albumActiveObject[albumUser[0]].GetID = albumUser[0]
+                m.albumActiveObject[albumUser[0]].GetUserIndex = Strtoi(albumUser[1])
+                doGetAlbumImages(albumUser[0], Strtoi(albumUser[1]))
+            end if
+        end for
+        
+    else if m.albumsObject["albums"].Count()>0 then
+    
+        for each album in m.albumsObject["albums"]
+            ' Randomly pull 5 additional albums and cache photos
+            album_idx = Rnd(m.albumsObject["albums"].Count())-1
+    
+            m.albumActiveObject[m.albumsObject["albums"][album_idx].GetID] = {}
+            m.albumActiveObject[m.albumsObject["albums"][album_idx].GetID].GetID = m.albumsObject["albums"][album_idx].GetID
+            m.albumActiveObject[m.albumsObject["albums"][album_idx].GetID].GetUserIndex = m.albumsObject["albums"][album_idx].GetUserIndex
+            doGetAlbumImages(m.albumsObject["albums"][album_idx].GetID, m.albumsObject["albums"][album_idx].GetUserIndex)
+            m.albumsObject["albums"].delete(album_idx)
+                                
+            album_cache_count = album_cache_count+1
+            m.predecessor = "null"
             
-                if album_cache_count>=5
-                    exit for
-                end if
+            if album_cache_count>=5
+                exit for
             end if
         end for
     end if
@@ -353,7 +365,8 @@ Sub onApiTimerTrigger()
     if m.apiPending = 0 then
         if m.albumActiveObject.Count() = 0 then
             processAlbums()
-        else   
+        else
+            print m.albumActiveObject
             execScreensaver()
             m.apiTimer.control = "stop"
         end if
@@ -378,13 +391,7 @@ Sub execScreensaver()
         m.predecessor       = "No images found. Try another album"
     end if
 
-    for each albumid in m.albumActiveObject
-        print "ALBUMID: "; albumid
-        print m.albumActiveObject[albumid]
-    end for 
-    print m.albumActiveObject
     print "TOTAL SENDING: "; m.photoItems.Count()
-    
     print "START SHOW"
     m.screenActive = createObject("roSGNode", "DisplayPhotos")
     m.screenActive.id = "DisplayScreensaver"

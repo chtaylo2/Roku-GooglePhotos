@@ -175,12 +175,14 @@ Sub loadImageList()
         m.screenActive.content = m.imageDisplay
     else
     
-        'We have an image list. Start display
-        onRotationTigger({})
-        onDownloadTigger({})
-         
-        m.RotationTimer.control = "start"
-        m.DownloadTimer.control = "start"
+        if not rxNoFound.IsMatch(m.top.predecessor) then
+            'We have an image list. Start display
+            onRotationTigger({})
+            onDownloadTigger({})
+             
+            m.RotationTimer.control = "start"
+            m.DownloadTimer.control = "start"
+        end if
         
         'Trigger a PAUSE if photo selected
         if m.top.startIndex <> -1 then
@@ -300,7 +302,7 @@ Sub handleGetSearch(event as object)
     m.apiPending = m.apiPending-1
     if (response.code = 401) or (response.code = 403) then
         'Expired Token
-        doRefreshToken(response.post_data, m.global.selectedUser)
+        doRefreshToken(response.post_data, response.post_data[3])
     else if response.code <> 200
         errorMsg = "An Error Occurred in 'handleGetSearch'. Code: "+(response.code).toStr()+" - " +response.error
     else
