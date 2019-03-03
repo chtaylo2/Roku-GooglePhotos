@@ -101,7 +101,7 @@ Sub onItemSelected()
         m.searchProgress.message = m.top.tracking+" - Searching Albums"
         m.searchProgress.visible = true
 
-        doGetSearch("SearchResults", searchStrings[keyword], m.global.selectedUser)
+        doGetSearch("SearchResults", m.global.selectedUser, searchStrings[keyword])
     'end if
     
 End Sub
@@ -159,7 +159,7 @@ Sub handleGetSearch(event as object)
                 if (m.albumActiveObject[albumid].apiCount < m.maxApiPerPage) and (m.albumActiveObject[albumid].showCountEnd < m.maxImagesPerPage) then
                     pagesShow = "Items Found"+StrI(m.albumActiveObject[albumid].showCountStart+m.albumActiveObject[albumid].showCountEnd-1)
                     m.searchProgress.message = m.top.tracking+" - Searching Albums - "+pagesShow
-                    doGetSearch(albumid, keywords, m.global.selectedUser, pageNext)
+                    doGetSearch(albumid, m.global.selectedUser, keywords, pageNext)
                 end if
             else
                 m.albumActiveObject[albumid].nextPageToken = invalid

@@ -205,11 +205,11 @@ Function doSearchGenerate() As Object
 End Function
 
 
-Sub doGetSearch(albumid As String, keyword as string, selectedUser=0 as Integer, pageNext="" As String)
+Sub doGetSearch(albumid As String, selectedUser as Integer, keyword as string, pageNext="" As String)
     print "SlideshowHelper.brs [doGetSearch]"
     
     if keyword <> ""    
-        tmpData = [ "doGetSearch", albumid, keyword, selectedUser, pageNext ]
+        tmpData = [ "doGetSearch", albumid, selectedUser, keyword, pageNext ]
 
         params = "'pageSize': '100',"
 
@@ -351,7 +351,7 @@ Sub onURLRefreshTigger()
                 m.apiTimer.control = "start"
                 
                 searchStrings = doSearchGenerate()
-                doGetSearch(albumid, searchStrings[m.albumActiveObject[albumid].keyword], m.albumActiveObject[albumid].GetUserIndex, tmpPage)
+                doGetSearch(albumid, m.albumActiveObject[albumid].GetUserIndex, searchStrings[m.albumActiveObject[albumid].keyword], tmpPage)
             else
                 doGetAlbumImages(albumid, m.albumActiveObject[albumid].GetUserIndex, tmpPage)
             end if

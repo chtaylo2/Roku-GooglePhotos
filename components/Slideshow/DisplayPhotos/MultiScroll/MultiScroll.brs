@@ -190,7 +190,7 @@ Sub onMoveTrigger()
     'To prevent screen burn-in
     if m.Watermark.translation[1] = 1010 then
          m.Watermark.translation        = "[1700,10]"
-         m.RediscoverScreen.translation = "[0,10]"
+         m.RediscoverScreen.translation = "[0,25]"
     else
         m.Watermark.translation        = "[1700,1010]"
         m.RediscoverScreen.translation = "[0,1010]"
@@ -345,7 +345,7 @@ Sub handleGetSearch(event as object)
     errorMsg = ""
     response = event.getData()
     albumid  = response.post_data[1]
-    keywords = response.post_data[2]
+    keywords = response.post_data[3]
 
     print m.albumActiveObject["SearchResults"]
     print "COUNT: "; m.albumActiveObject[albumid].imagesMetaData.Count()
@@ -353,7 +353,7 @@ Sub handleGetSearch(event as object)
     m.apiPending = m.apiPending-1
     if (response.code = 401) or (response.code = 403) then
         'Expired Token
-        doRefreshToken(response.post_data, m.global.selectedUser)
+        doRefreshToken(response.post_data, response.post_data[2])
     else if response.code <> 200
         errorMsg = "An Error Occurred in 'handleGetSearch'. Code: "+(response.code).toStr()+" - " +response.error
     else
@@ -388,7 +388,7 @@ Sub handleGetSearch(event as object)
                 m.albumActiveObject[albumid].showCountEnd = m.albumActiveObject[albumid].showCountEnd + imageList.Count()
                 m.albumActiveObject[albumid].apiCount = m.albumActiveObject[albumid].apiCount + 1
                 if (m.albumActiveObject[albumid].apiCount < m.maxApiPerPage) and (m.albumActiveObject[albumid].showCountEnd < m.maxImagesPerPage) then
-                    doGetSearch(albumid, keywords, m.albumActiveObject[albumid].GetUserIndex, pageNext)
+                    doGetSearch(albumid, m.albumActiveObject[albumid].GetUserIndex, keywords, pageNext)
                 end if
             else
                 m.albumActiveObject[albumid].nextPageToken = invalid

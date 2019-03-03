@@ -192,7 +192,7 @@ Sub handleGetAlbumImages(event as object)
                         doGetLibraryImages(albumid, m.global.selectedUser, pageNext)
                     else if m.albumActiveObject[albumid].GetID = "SearchResults" then
                         searchStrings = doSearchGenerate()
-                        doGetSearch(albumid, searchStrings[m.albumActiveObject[albumid].keyword], m.global.selectedUser, pageNext)
+                        doGetSearch(albumid, m.global.selectedUser, searchStrings[m.albumActiveObject[albumid].keyword], pageNext)
                     else
                         doGetAlbumImages(albumid, m.global.selectedUser, pageNext)
                     end if
@@ -322,7 +322,7 @@ Sub onItemSelected()
             doGetLibraryImages(albumid, m.global.selectedUser, m.albumActiveObject[albumid].nextPageToken)
         else if m.albumActiveObject[albumid].GetID = "SearchResults" then
             searchStrings = doSearchGenerate()
-            doGetSearch(albumid, searchStrings[m.albumActiveObject[albumid].keyword], m.global.selectedUser, m.albumActiveObject[albumid].nextPageToken)
+            doGetSearch(albumid, m.global.selectedUser, searchStrings[m.albumActiveObject[albumid].keyword], m.albumActiveObject[albumid].nextPageToken)
         else
             doGetAlbumImages(albumid, m.global.selectedUser, m.albumActiveObject[albumid].nextPageToken)
         end if
@@ -353,7 +353,7 @@ Sub onItemSelected()
             doGetLibraryImages(albumid, m.global.selectedUser, tmpPage)
         else if m.albumActiveObject[albumid].GetID = "SearchResults" then
             searchStrings = doSearchGenerate()
-            doGetSearch(albumid, searchStrings[m.albumActiveObject[albumid].keyword], m.global.selectedUser, tmpPage)
+            doGetSearch(albumid, m.global.selectedUser, searchStrings[m.albumActiveObject[albumid].keyword], tmpPage)
         else
             doGetAlbumImages(albumid, m.global.selectedUser, tmpPage)
         end if
