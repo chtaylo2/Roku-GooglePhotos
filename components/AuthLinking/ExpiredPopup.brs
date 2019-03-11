@@ -61,13 +61,7 @@ Sub onButtonPress(event as object)
     'Check for linked user
     usersLoaded = oauth_count()
     
-    if usersLoaded > 0 then
-        'THIS CAUSES THE REGISTRATION SCREEN TO TRIGGER (Still valid users)
-        m.global.selectedUser = -3        
-    else
-        'THIS CAUSES THE REGISTRATION SCREEN TO TRIGGER (No more valid users)
-        m.global.selectedUser = -2
-    end if
+    m.global.selectedUser = -3
 End Sub
 
 

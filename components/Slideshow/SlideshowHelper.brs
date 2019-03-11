@@ -128,6 +128,7 @@ Sub doGetAlbumList(selectedUser=0 as Integer, pageNext="" As String)
     m.apiPending = m.apiPending+1
     signedHeader = oauth_sign(selectedUser)
     makeRequest(signedHeader, m.gp_prefix + "/albums?"+params, "GET", "", 0, tmpData)
+    
 End Sub
 
 

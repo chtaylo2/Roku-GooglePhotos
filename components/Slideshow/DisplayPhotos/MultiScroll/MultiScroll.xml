@@ -78,6 +78,11 @@
             repeat      = "true"
             duration    = "2"
         />
+
+        <Timer
+            id          = "ScreenSaverTimer"
+            duration    = "18000"
+        />
         
         <Timer
             id          = "URLRefreshTimer"

@@ -26,6 +26,7 @@ Sub init()
     m.RotationTimer             = m.top.findNode("RotationTimer")
     m.DownloadTimer             = m.top.findNode("DownloadTimer")
     m.URLRefreshTimer           = m.top.findNode("URLRefreshTimer")
+    m.ScreenSaverTimer          = m.top.findNode("ScreenSaverTimer")
     m.Watermark                 = m.top.findNode("Watermark")
     m.MoveTimer                 = m.top.findNode("moveWatermark")
     m.RediscoverScreen          = m.top.findNode("RediscoverScreen")
@@ -85,9 +86,10 @@ Sub init()
         m.DownloadTimer.duration = 2
     end if
     
-    m.RotationTimer.repeat   = true
-    m.DownloadTimer.repeat   = true
-    m.URLRefreshTimer.repeat = false
+    m.RotationTimer.repeat    = true
+    m.DownloadTimer.repeat    = true
+    m.URLRefreshTimer.repeat  = false
+    m.ScreenSaverTimer.repeat = false
 
     'Load common variables
     loadCommon()
@@ -130,7 +132,9 @@ Sub loadImageList()
         m.Watermark.visible = true
         
         m.MoveTimer.observeField("fire","onMoveTrigger")
-        m.MoveTimer.control = "start"
+        m.ScreenSaverTimer.observeField("fire","onScreenSaverTimer")
+        m.MoveTimer.control        = "start"
+        m.ScreenSaverTimer.control = "start"
         
     end if    
     
@@ -213,7 +217,6 @@ Sub onRotationTigger(event as object)
         end if
 
         m.Watermark.visible     = false
-        m.MoveTimer.control     = "stop" 
         m.RotationTimer.control = "stop"
         m.DownloadTimer.control = "stop"
     else
@@ -409,7 +412,6 @@ Sub processDownloads(event as object)
         m.imageLocalCacheByURL[key] = tmpFS
         m.imageLocalCacheByFS[tmpFS] = key
         
-        print "DEBUG: CACHE - "; tmpFS; " -- "; m.URLRefreshTimer.control; " --- 403 ERROR COUNT: "; m.global.tmpDEBUG
         if tmpFS = "403" then
             m.global.tmpDEBUG = m.global.tmpDEBUG + 1
         end if
@@ -418,12 +420,6 @@ Sub processDownloads(event as object)
             onURLRefreshTigger()
             m.URLRefreshTimer.control = "start"
         end if
-        
-       'm.global.tmpDEBUG = m.global.tmpDEBUG + 1
-       'if m.global.tmpDEBUG = 10 or m.global.tmpDEBUG = 35 then
-       '    print "EXECUTE REFRESH"
-       '    onURLRefreshTigger()
-       'end if
     end for
     
 End Sub
@@ -629,6 +625,30 @@ Sub onMoveTrigger()
 End Sub
 
 
+Sub onScreenSaverTimer()
+
+    ' ** Why the hell is this here you ask? **
+    '  Screensaver will now expire after 5 hours due to the API and download limitations Google has set. I don't want all API usage going to people not sitting in front of thier device. Sorry, but that's the way it is right now, plan and simple.
+    '  In months to come, I'll review how this channel is doing on the API usage and see if this can be extended or removed.
+    '  Last review: March, 2019
+
+    m.RotationTimer.control    = "stop"
+    m.DownloadTimer.control    = "stop"
+    
+    generic1            = {}
+    generic1.timestamp  = "284040000"
+    generic1.url        = "pkg:/images/black_pixel.png"
+    generic1.filename   = "black_pixel.png"
+    m.imageTracker      = 0
+    m.imageDisplay      = []
+    m.imageDisplay.Push(generic1)
+    
+    sendNextImage()
+    m.RediscoverDetail.text    = "Screensaver has expired after 5 hours"
+    m.RediscoverScreen.visible = "true"
+End Sub
+
+
 Sub onApiTimerTrigger()
     print "API CALLS LEFT: "; m.apiPending
 
@@ -636,7 +656,6 @@ Sub onApiTimerTrigger()
         m.apiTimer.control = "stop"
         
         if m.albumActiveObject["SearchResults"].showcountend > 0 then
-            print "DEBUG: "; m.albumActiveObject["SearchResults"].imagesMetaData
             m.imageDisplay = m.albumActiveObject["SearchResults"].imagesMetaData          
         end if
     end if

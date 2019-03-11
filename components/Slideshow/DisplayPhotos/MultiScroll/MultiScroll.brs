@@ -30,6 +30,7 @@ Sub init()
     m.URLRefreshTimer   = m.top.findNode("URLRefreshTimer")
     m.noticeDialog      = m.top.findNode("noticeDialog")
     m.apiTimer          = m.top.findNode("apiTimer")
+    m.ScreenSaverTimer  = m.top.findNode("ScreenSaverTimer")
     
     m.WaveTimer.observeField("fire","onWaveTigger")
     m.RefreshTimer.observeField("fire","onRefreshTigger")
@@ -44,8 +45,9 @@ Sub init()
     m.scroll_node_7.observeField("loadStatus","onLoadMonitor")
     m.scroll_node_8.observeField("loadStatus","onLoadMonitor")
 
-    m.DownloadTimer.repeat   = true
-    m.URLRefreshTimer.repeat = false
+    m.DownloadTimer.repeat    = true
+    m.URLRefreshTimer.repeat  = false
+    m.ScreenSaverTimer.repeat = false
     
     m.imageLocalCacheByURL   = {}
     m.imageLocalCacheByFS    = {}
@@ -167,7 +169,9 @@ Sub loadImageList()
         m.Watermark.visible = true
         
         m.MoveTimer.observeField("fire","onMoveTrigger")
-        m.MoveTimer.control = "start"
+        m.ScreenSaverTimer.observeField("fire","onScreenSaverTimer")
+        m.MoveTimer.control        = "start"
+        m.ScreenSaverTimer.control = "start"
         
     end if
     
@@ -421,9 +425,6 @@ Function GetNextImage()
     if m.imageDisplay.Count()-1 = m.imageTracker then
         m.imageTracker = 0
         url = m.imageDisplay[m.imageTracker].url
-    'else if m.imageTracker = 10 then
-    '    m.imageTracker = m.imageTracker + 1
-    '    url = m.imageDisplay[m.imageTracker].url + "BAD"
     else
         m.imageTracker = m.imageTracker + 1
         url = m.imageDisplay[m.imageTracker].url
@@ -449,6 +450,19 @@ Sub onLoadMonitor(event as object)
 End Sub
 
 
+Sub onScreenSaverTimer()
+
+    ' ** Why the hell is this here you ask? **
+    '  Screensaver will now expire after 5 hours due to the API and download limitations Google has set. I don't want all API usage going to people not sitting in front of thier device. Sorry, but that's the way it is right now, plan and simple.
+    '  In months to come, I'll review how this channel is doing on the API usage and see if this can be extended or removed.
+    '  Last review: March, 2019
+
+    m.RefreshTimer.control     = "stop"
+    m.DownloadTimer.control    = "stop"
+    m.RediscoverScreen.visible = "false"
+End Sub
+
+
 Sub onApiTimerTrigger()
     print "API CALLS LEFT: "; m.apiPending
 
@@ -456,7 +470,6 @@ Sub onApiTimerTrigger()
         m.apiTimer.control = "stop"
         
         if m.albumActiveObject["SearchResults"].showcountend > 0 then
-            print "DEBUG: "; m.albumActiveObject["SearchResults"].imagesMetaData
             m.imageDisplay = m.albumActiveObject["SearchResults"].imagesMetaData          
         end if
     end if
