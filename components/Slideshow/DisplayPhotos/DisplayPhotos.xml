@@ -262,8 +262,8 @@
         />
 
         <Timer
-            id          = "ScreenSaverTimer"
-            duration    = "18000"
+            id          = "DisplayTimer"
+            duration    = "0"
         />
                 
         <Dialog

@@ -60,7 +60,7 @@ Function addRequest(request as Object) as Boolean
                 method = parameters.method
                 uri = parameters.uri
                 params = parameters.params
-                print parameters
+                'print parameters
                 
                 if type(uri) = "roString"
                     urlXfer = createObject("roUrlTransfer")
@@ -158,6 +158,8 @@ Sub processResponse(msg as Object)
             m.top.poll_token_response = job.context.context.response
         else if result.num = 6
             m.top.userinfo_response   = job.context.context.response
+        else if result.num = 7
+            m.top.appstatus_response  = job.context.context.response
         end if
     else
         print "Error: event for unknown job "; idkey

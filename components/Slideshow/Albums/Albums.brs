@@ -19,11 +19,6 @@ Sub init()
     m.itemLabelMain3    = m.top.findNode("itemLabelMain3")
     m.settingsIcon      = m.top.findNode("settingsIcon")
     m.noticeDialog      = m.top.findNode("noticeDialog")
-    
-    m.albumPageList     = m.top.findNode("albumPageList")
-    m.albumPageThumb    = m.top.findNode("albumPageThumb")
-    m.albumPageInfo1    = m.top.findNode("albumPageInfo1")
-    m.albumPageInfo2    = m.top.findNode("albumPageInfo2")
 
     m.albumListContent  = createObject("RoSGNode","ContentNode")
    
@@ -419,7 +414,6 @@ Sub googleDisplayAlbums(albumList As Object)
         addItem(m.albumListContent, "GP_ALBUM_LISTING", album.GetThumb, album.GetTitle, Pluralize(album.GetImageCount,"Item"))
     end for
     
-    print "DEBUG: "; m.albumListContent.Count()
     m.albummarkupgrid.content = m.albumListContent
     
     centerMarkupGrid()
@@ -431,7 +425,7 @@ Sub googleDisplayAlbums(albumList As Object)
         
     'Turn off Loading Spinner
     m.loadingSpinner.visible = "false"
-        
+
     m.itemLabelMain3.text = "<<     Paging     >>"
    
 End Sub
@@ -634,7 +628,7 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
                 return true
             end if      
 
-            if (m.albummarkupgrid.content <> invalid) and ( (m.albummarkupgrid.content.getChild(0).id <> "GP_ALBUM_LISTING_LIBRARY") or (m.albumPageList.hasFocus() = true) ) and (m.top.imageContent = invalid)  
+            if (m.albummarkupgrid.content <> invalid) and ( ( m.albummarkupgrid.content.getChild(0).id <> "GP_ALBUM_LISTING" ) and ( m.albummarkupgrid.content.getChild(0).id <> "GP_ALBUM_LISTING_LIBRARY" ) ) and (m.top.imageContent = invalid)
                 m.albummarkupgrid.content       = m.albumListContent
                 m.albummarkupgrid.jumpToItem    = m.albumSelection
                 m.settingsIcon.visible          = false

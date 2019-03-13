@@ -6,6 +6,9 @@
 '*************************************************************
 
 Sub init()
+    m.UriHandler = createObject("roSGNode","Content UrlHandler")
+    m.UriHandler.observeField("appstatus_response","handleAppStatus")
+    
     m.top.setFocus(true)
     
     ' Load in the OAuth Registry entries
@@ -25,7 +28,33 @@ Sub init()
     m.readMarkupGridTask = createObject("roSGNode", "Local ContentReader")
     m.readMarkupGridTask.file = "pkg:/data/homeGridContent.xml"
     m.readMarkupGridTask.observeField("content", "showmarkupgrid")
-    m.readMarkupGridTask.control = "RUN"  
+    m.readMarkupGridTask.control = "RUN"
+    
+    makeRequest({}, "https://www.roku-photoview.com/status/roku_status_v3.xml" + "?" + getRandomString(10), "GET", "", 7, [])
+    
+End Sub
+
+
+Sub handleAppStatus(event as object)
+    print "MainMenu.brs [handleAppStatus]"
+  
+    response = event.getData()
+    if response.code = 200
+        rsp = ParseXML(response.content)
+        if rsp.GetNamedElements("status")[0].GetText() <> "" then
+            m.itemHeader.text      = rsp.GetNamedElements("status_header")[0].GetText()
+            m.screenActive         = createObject("roSGNode", "StatusPopup")
+            m.screenActive.content = rsp.GetNamedElements("status")[0].GetText()
+            m.screenActive.id      = "StatusPopup"
+            m.top.appendChild(m.screenActive)
+            m.screenActive.setFocus(true)
+            
+            m.markupgrid.visible        = false
+            m.itemLabelMain1.visible    = false
+            m.itemLabelMain2.visible    = false
+            
+        end if
+    end if   
 End Sub
 
 
@@ -64,7 +93,7 @@ Sub onItemSelected()
         m.noticeDialog.visible = true
         buttons =  [ "OK" ]
         m.noticeDialog.title   = "Notice"
-        m.noticeDialog.message = "Google's new Photo API does not currently have image searching available. A feature request is opened and hope to then have this re-enabled soon."
+        m.noticeDialog.message = "Google Photos new API does not currently have image searching available. A feature request is opened and hope to then have this re-enabled soon."
         m.noticeDialog.buttons = buttons
         m.noticeDialog.setFocus(true)
         m.noticeDialog.observeField("buttonSelected","noticeClose")
@@ -92,6 +121,18 @@ End Sub
 Function onKeyEvent(key as String, press as Boolean) as Boolean
     if press then
         print "KEY: "; key
+        
+        if key = "OK" and (m.screenActive <> invalid) and (m.screenActive.id = "StatusPopup") then
+            m.top.removeChild(m.screenActive)
+            m.screenActive = invalid
+            
+            m.itemHeader.text        = m.userInfoName[m.global.selectedUser] + " • Main Menu"
+            m.markupgrid.visible     = true
+            m.itemLabelMain1.visible = true
+            m.itemLabelMain2.visible = true
+            m.markupgrid.setFocus(true)
+        end if
+        
         
         'This will monitor events looking for the registery delete sequence
         m.supportReset = supportResetMonitor(key, m.supportReset)

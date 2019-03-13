@@ -148,7 +148,6 @@ Sub handleGetAlbumList(event as object)
         doRefreshToken(response.post_data, response.post_data[1])
     else if response.code = 200
         rsp=ParseJson(response.content)
-        print rsp["albums"]
         if rsp<>invalid then   
             albumList = googleAlbumListing(rsp)         
             
@@ -202,7 +201,6 @@ Sub processAlbums()
         end if
     end for
     
-    
     if m.albumActiveObject["SearchResults"] = invalid then
     
         'Handle GooglePhotos Library Albums
@@ -222,6 +220,9 @@ Sub processAlbums()
                     tmp.GetID              = "GP_LIBRARY_" + albumUser[1]
                     tmp.GetUserIndex       = Strtoi(albumUser[1])
                     m.albumActiveObject[tmp.GetID] = tmp
+                    
+                    print "TEMP: "; tmp.GetID
+                    
                     doGetLibraryImages(tmp.GetID, Strtoi(albumUser[1]))
                 end if
             end for
@@ -261,11 +262,13 @@ Sub processAlbums()
             for each item in parsedString
                 if item <> "" then
                     albumUser = item.Split(":")
-                    m.predecessor = "null"
-                    m.albumActiveObject[albumUser[0]] = {}
-                    m.albumActiveObject[albumUser[0]].GetID = albumUser[0]
-                    m.albumActiveObject[albumUser[0]].GetUserIndex = Strtoi(albumUser[1])
-                    doGetAlbumImages(albumUser[0], Strtoi(albumUser[1]))
+                    if albumUser[0] <> "GP_LIBRARY" then
+                        m.predecessor = "null"
+                        m.albumActiveObject[albumUser[0]] = {}
+                        m.albumActiveObject[albumUser[0]].GetID = albumUser[0]
+                        m.albumActiveObject[albumUser[0]].GetUserIndex = Strtoi(albumUser[1])
+                        doGetAlbumImages(albumUser[0], Strtoi(albumUser[1]))
+                    end if
                 end if
             end for
             
@@ -370,7 +373,6 @@ Sub onApiTimerTrigger()
         if m.albumActiveObject.Count() = 0 then
             processAlbums()
         else
-            print m.albumActiveObject
             execScreensaver()
             m.apiTimer.control = "stop"
         end if

@@ -206,7 +206,7 @@ Function doSearchGenerate() As Object
 End Function
 
 
-Sub doGetSearch(albumid As String, selectedUser as Integer, keyword as string, pageNext="" As String)
+Sub doGetSearch(albumid As String, selectedUser As Integer, keyword As String, pageNext="" As String)
     print "SlideshowHelper.brs [doGetSearch]"
     
     if keyword <> ""    

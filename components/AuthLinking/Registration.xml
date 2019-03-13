@@ -85,8 +85,8 @@
                 height      = "150"
                 width       = "1300"
                 wrap        = "true"
-                text        = "Permissions requested:&#xA;   • View your Google Photos library – Required to view your photos.&#xA;   • Manage and add to shared albums on your behalf – Required to view your shared albums. "
-                translation = "[100, 850]"
+                text        = "Permissions requested:&#xA;   • View your Google Photos library – Required to view your photos."
+                translation = "[100, 950]"
             />
     
             <ButtonGroup

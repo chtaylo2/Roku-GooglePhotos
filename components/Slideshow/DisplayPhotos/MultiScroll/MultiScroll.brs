@@ -30,7 +30,7 @@ Sub init()
     m.URLRefreshTimer   = m.top.findNode("URLRefreshTimer")
     m.noticeDialog      = m.top.findNode("noticeDialog")
     m.apiTimer          = m.top.findNode("apiTimer")
-    m.ScreenSaverTimer  = m.top.findNode("ScreenSaverTimer")
+    m.DisplayTimer      = m.top.findNode("DisplayTimer")
     
     m.WaveTimer.observeField("fire","onWaveTigger")
     m.RefreshTimer.observeField("fire","onRefreshTigger")
@@ -45,9 +45,9 @@ Sub init()
     m.scroll_node_7.observeField("loadStatus","onLoadMonitor")
     m.scroll_node_8.observeField("loadStatus","onLoadMonitor")
 
-    m.DownloadTimer.repeat    = true
-    m.URLRefreshTimer.repeat  = false
-    m.ScreenSaverTimer.repeat = false
+    m.DownloadTimer.repeat   = true
+    m.URLRefreshTimer.repeat = false
+    m.DisplayTimer.repeat    = false
     
     m.imageLocalCacheByURL   = {}
     m.imageLocalCacheByFS    = {}
@@ -169,11 +169,14 @@ Sub loadImageList()
         m.Watermark.visible = true
         
         m.MoveTimer.observeField("fire","onMoveTrigger")
-        m.ScreenSaverTimer.observeField("fire","onScreenSaverTimer")
         m.MoveTimer.control        = "start"
-        m.ScreenSaverTimer.control = "start"
-        
-    end if
+        m.DisplayTimer.duration    = "18000"  '5 hours
+    else
+        m.DisplayTimer.duration    = "43200"  '12 hours
+    end if    
+    
+    m.DisplayTimer.observeField("fire","onDisplayTimer")
+    m.DisplayTimer.control     = "start"
     
     m.scroll_node_1.control = "start"
     m.scroll_node_5.control = "start"
@@ -450,7 +453,7 @@ Sub onLoadMonitor(event as object)
 End Sub
 
 
-Sub onScreenSaverTimer()
+Sub onDisplayTimer()
 
     ' ** Why the hell is this here you ask? **
     '  Screensaver will now expire after 5 hours due to the API and download limitations Google has set. I don't want all API usage going to people not sitting in front of thier device. Sorry, but that's the way it is right now, plan and simple.

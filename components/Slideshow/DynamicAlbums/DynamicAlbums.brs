@@ -113,7 +113,7 @@ Sub handleGetSearch(event as object)
     errorMsg = ""
     response = event.getData()
     albumid  = response.post_data[1]
-    keywords = response.post_data[2]
+    keywords = response.post_data[3]
     
     m.apiPending = m.apiPending-1
     if (response.code = 401) or (response.code = 403) then

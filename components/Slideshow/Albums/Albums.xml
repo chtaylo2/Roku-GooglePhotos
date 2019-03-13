@@ -89,50 +89,6 @@
             vertAlign   = "center"
             translation = "[0,421]"
         />
-
-        <LabelList
-            id                   = "albumPageList"
-            translation          = "[ 300, 300 ]"
-            itemSize             = "[450,45]"
-            itemSpacing          = "[0,30]"
-            wrapDividerBitmapUri = "pkg:/images/wrapBitmap.png"
-            color                = "#808080" >
-
-            <Poster 
-                id              = "albumPageThumb"
-                loadheight      = "375"
-                loadwidth       = "375"
-                width           = "375"
-                translation     = "[ 789, 30 ]"
-                loadDisplayMode = "scaleTofit"
-            />
-
-            <Label 
-                id          = "albumPageInfo1" 
-                height      = "300" 
-                width       = "450" 
-                wrap        = "true"
-                horizAlign  = "center"
-                vertAlign   = "center"
-                color       ="#808080"
-                font        = "font:MediumBoldSystemFont"
-                translation = "[ 750, 300 ]"
-            />
-         
-            <Label 
-                id          = "albumPageInfo2" 
-                height      = "300" 
-                width       = "450" 
-                wrap        = "true"
-                text        = "Items: 1 thru 1000"
-                horizAlign  = "center"
-                vertAlign   = "center"
-                color       = "#808080"
-                font        = "font:MediumSystemFont"
-                translation = "[ 750, 375 ]"
-            />
-      
-        </LabelList>
         
         <Dialog
             id      = "noticeDialog"

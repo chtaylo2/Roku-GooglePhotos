@@ -80,7 +80,7 @@
         />
 
         <Timer
-            id          = "ScreenSaverTimer"
+            id          = "DisplayTimer"
             duration    = "18000"
         />
         

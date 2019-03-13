@@ -54,20 +54,23 @@ Function loadDefaults()
     tmp = RegRead("SSaverUser", "Settings")
     if tmp=invalid RegWrite("SSaverUser", "0", "Settings")
     tmp = RegRead("SSaverDelay", "Settings")
-    if tmp=invalid RegWrite("SSaverDelay", itostr(12), "Settings")
+    if tmp=invalid RegWrite("SSaverDelay", itostr(15), "Settings")
     tmp = RegRead("SSaverOrder", "Settings")
     if tmp=invalid RegWrite("SSaverOrder", "Random Order", "Settings")
     tmp = RegRead("SSaverMethod", "Settings")
     if tmp=invalid RegWrite("SSaverMethod", "Multi-Scrolling", "Settings")
     
     tmp = RegRead("SlideshowDisplay", "Settings")
-    if tmp=invalid then
-        RegWrite("SlideshowDisplay", "YesFading_YesBlur", "Settings")
-        'Backward compatibility from v1.x - Change default from 3 to 5
-        RegWrite("SlideshowDelay", itostr(5), "Settings")
-    end if
+    if tmp=invalid RegWrite("SlideshowDisplay", "YesFading_YesBlur", "Settings")
     tmp = RegRead("SlideshowDelay", "Settings")
-    if tmp=invalid RegWrite("SlideshowDelay", itostr(5), "Settings")
+    if tmp=invalid RegWrite("SlideshowDelay", itostr(8), "Settings")
+    
+    'v3 - Minimum delay is 5 seconds. Sorry - but Google enforces a downlaod limit.
+    tmp = RegRead("SlideshowDelay", "Settings")
+    if Strtoi(tmp) < 5 RegWrite("SlideshowDelay", itostr(5), "Settings")
+    tmp = RegRead("SSaverDelay", "Settings")
+    if Strtoi(tmp) < 5 RegWrite("SSaverDelay", itostr(5), "Settings")
+    
     tmp = RegRead("SlideshowOrder", "Settings")
     if tmp=invalid RegWrite("SlideshowOrder", "Album Order", "Settings")
     
@@ -269,7 +272,7 @@ Function oauth_sign(userIndex As Integer) as Object
     
     if m.accessToken[userIndex] <> ""
         signedHeader["Authorization"] = "Bearer " + m.accessToken[userIndex]
-        print "Creating Signed Headers: "; m.accessToken[userIndex]
+        'print "Creating Signed Headers: "; m.accessToken[userIndex]
     end if
     
     return signedHeader
@@ -557,4 +560,17 @@ Function DeleteRegistry()
     end for
     print i.toStr() " Registry Keys Deleted"
     m.global.selectedUser = -2
+End Function
+
+
+'******************************************************
+'Create random string
+'******************************************************
+Function getRandomString(length As Integer) As String
+    hexChars = "0123456789ABCDEF"
+    hexString = ""
+    For i = 1 to length
+        hexString = hexString + hexChars.Mid(Rnd(16) - 1, 1)
+    Next
+    Return hexString
 End Function

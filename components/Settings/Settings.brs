@@ -322,9 +322,9 @@ Sub storeDelayOptions()
     regSelection = RegRead(regStore, "Settings")
 
     tmp = ""
-    if regSelection = "3"
+    if regSelection = "5"
         radioSelection = 0
-    else if regSelection = "5"
+    else if regSelection = "8"
         radioSelection = 1
     else if regSelection = "10"
         radioSelection = 2
@@ -338,8 +338,8 @@ Sub storeDelayOptions()
     end if
     
     m.content = createObject("RoSGNode","ContentNode")
-    addItem(m.content, "3 seconds", "3", regStore)
-    addItem(m.content, "5 seconds (Default)", "5", regStore)
+    addItem(m.content, "5 seconds", "5", regStore)
+    addItem(m.content, "8 seconds (Default)", "8", regStore)
     addItem(m.content, "10 seconds", "10", regStore)
     addItem(m.content, "15 seconds", "15", regStore)
     addItem(m.content, "30 seconds", "30", regStore)
@@ -619,7 +619,6 @@ Sub showalbumselected()
         m.noticeDialog.observeField("buttonSelected","noticeClose")
     end if
     
-    print "DEBUG: "; saveList
     RegWrite(regStore, saveList, "Settings")       
 End Sub
 
@@ -646,7 +645,16 @@ Sub processPinEntry(event as object)
     if event.getData() = 0
         'SAVE
         pinInt = strtoi(m.pinPad.pin)
-        if pinInt > 0
+        if pinInt < 5
+            'ShowError
+            m.noticeDialog.visible = true
+            buttons =  [ "OK" ]
+            m.noticeDialog.title   = "Notice"
+            m.noticeDialog.message = "Delay must be greater then 5 seconds due to requirements from Google."
+            m.noticeDialog.buttons = buttons
+            m.noticeDialog.setFocus(true)
+            m.noticeDialog.observeField("buttonSelected","noticeClose2")
+        else
             itemcontent = m.settingSubList.content.getChild(m.settingSubList.itemSelected)
             
             if m.setScope = "temporary"
@@ -656,12 +664,12 @@ Sub processPinEntry(event as object)
                 'Global Setting
                 RegWrite(itemcontent.titleseason, itostr(pinInt), "Settings")
             end if
-        end if
         
-        storeDelayOptions()
-        showfocus()
-        m.pinPad.visible = false
-        m.settingSubList.setFocus(true)
+            storeDelayOptions()
+            showfocus()
+            m.pinPad.visible = false
+            m.settingSubList.setFocus(true)
+        end if
     else
         'CANCEL
         m.pinPad.visible = false
@@ -674,6 +682,11 @@ Sub noticeClose(event as object)
     m.noticeDialog.visible   = false
     m.loadingSpinner.visible = false
     m.albumSelection.setFocus(true)
+End Sub
+
+Sub noticeClose2(event as object)
+    m.noticeDialog.visible   = false
+    m.pinPad.setFocus(true)
 End Sub
 
 
