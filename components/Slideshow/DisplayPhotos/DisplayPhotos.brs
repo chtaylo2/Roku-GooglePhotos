@@ -1,11 +1,16 @@
 '*************************************************************
 '** PhotoView for Google Photos
-'** Copyright (c) 2017-2018 Chris Taylor.  All rights reserved.
+'** Copyright (c) 2017-2019 Chris Taylor.  All rights reserved.
 '** Use of code within this application subject to the MIT License (MIT)
 '** https://raw.githubusercontent.com/chtaylo2/Roku-GooglePhotos/master/LICENSE
 '*************************************************************
 
-Sub init()    
+Sub init()
+    m.UriHandler = createObject("roSGNode","Content UrlHandler")
+    m.UriHandler.observeField("albumImages","handleGetAlbumImages")
+    m.UriHandler.observeField("searchResult","handleGetSearch")
+    m.UriHandler.observeField("refreshToken","handleRefreshToken")
+    
     m.PrimaryImage              = m.top.findNode("PrimaryImage")
     m.SecondaryImage            = m.top.findNode("SecondaryImage")
     m.BlendedPrimaryImage       = m.top.findNode("BlendedPrimaryImage")
@@ -20,10 +25,14 @@ Sub init()
     m.pauseImageDetail2         = m.top.findNode("pauseImageDetail2")
     m.RotationTimer             = m.top.findNode("RotationTimer")
     m.DownloadTimer             = m.top.findNode("DownloadTimer")
+    m.URLRefreshTimer           = m.top.findNode("URLRefreshTimer")
+    m.DisplayTimer              = m.top.findNode("DisplayTimer")
     m.Watermark                 = m.top.findNode("Watermark")
     m.MoveTimer                 = m.top.findNode("moveWatermark")
     m.RediscoverScreen          = m.top.findNode("RediscoverScreen")
     m.RediscoverDetail          = m.top.findNode("RediscoverDetail")
+    m.noticeDialog              = m.top.findNode("noticeDialog")
+    m.apiTimer                  = m.top.findNode("apiTimer")
 
     m.fromBrowse                = false
     m.imageLocalCacheByURL      = {}
@@ -31,6 +40,8 @@ Sub init()
     m.imageDisplay              = []
     m.imageTracker              = -1
     m.imageOnScreen             = ""
+    m.apiPending                = 0
+    m.albumActiveObject         = invalid
     
     m.pauseImageCount.font.size   = 29
     m.pauseImageDetail.font.size  = 29
@@ -41,6 +52,7 @@ Sub init()
     m.SecondaryImage.observeField("loadStatus","onSecondaryLoadedTrigger")
     m.RotationTimer.observeField("fire","onRotationTigger")
     m.DownloadTimer.observeField("fire","onDownloadTigger")
+    m.apiTimer.observeField("fire","onApiTimerTrigger")
     m.top.observeField("content","loadImageList")
 
     m.showRes       = RegRead("SlideshowRes", "Settings")
@@ -74,8 +86,20 @@ Sub init()
         m.DownloadTimer.duration = 2
     end if
     
-    m.RotationTimer.repeat = true
-    m.DownloadTimer.repeat = true
+    m.RotationTimer.repeat   = true
+    m.DownloadTimer.repeat   = true
+    m.URLRefreshTimer.repeat = false
+    m.DisplayTimer.repeat    = false
+
+    'Load common variables
+    loadCommon()
+    
+    'Load privlanged variables
+    loadPrivlanged()
+
+    'Load registration variables
+    loadReg()
+    
 End Sub
 
 
@@ -108,9 +132,14 @@ Sub loadImageList()
         m.Watermark.visible = true
         
         m.MoveTimer.observeField("fire","onMoveTrigger")
-        m.MoveTimer.control = "start"
-        
+        m.MoveTimer.control        = "start"
+        m.DisplayTimer.duration    = "18000"  '5 hours
+    else
+        m.DisplayTimer.duration    = "43200"  '12 hours
     end if    
+    
+    m.DisplayTimer.observeField("fire","onDisplayTimer")
+    m.DisplayTimer.control     = "start"
     
     'Copy original list since we can't change origin
     originalList = m.top.content
@@ -133,10 +162,7 @@ Sub loadImageList()
             end if 
         end if
         
-        if m.showRes = "UHD" then
-            originalList[nxt].url = originalList[nxt].url.Replace("/s1600/", "/s2160/")
-        end if
-        
+        originalList[nxt].url = originalList[nxt].url+getResolution(m.showRes)
         m.imageDisplay.push(originalList[nxt])
         originalList.Delete(nxt)
                  
@@ -156,25 +182,20 @@ Sub loadImageList()
         m.screenActive.content = m.imageDisplay
     else
     
-        'We have an image list. Start display
-        onRotationTigger({})
-        onDownloadTigger({})
-         
-        m.RotationTimer.control = "start"
-        m.DownloadTimer.control = "start"
-     
+        if not rxNoFound.IsMatch(m.top.predecessor) then
+            'We have an image list. Start display
+            onRotationTigger({})
+            onDownloadTigger({})
+             
+            m.RotationTimer.control = "start"
+            m.DownloadTimer.control = "start"
+        end if
+        
         'Trigger a PAUSE if photo selected
         if m.top.startIndex <> -1 then
             onKeyEvent("OK", true)
-        end if
-        
-        if m.top.id = "DisplayScreensaver" then
-            'We don't need pre-downloading of photos for screensaver. Disable
-            m.DownloadTimer.control = "stop"
-        end if
-        
+        end if       
     end if
-     
 End Sub
 
 
@@ -187,17 +208,18 @@ Sub onRotationTigger(event as object)
     
         'We only allow multi scroll if starting direct, can't come from Browse Images.
         if m.screenActive = invalid then
-            m.screenActive = createObject("roSGNode", "MultiScroll")
-            m.screenActive.id = m.top.id
+            m.screenActive             = createObject("roSGNode", "MultiScroll")
+            m.screenActive.id          = m.top.id
             m.screenActive.predecessor = m.top.predecessor
-            m.screenActive.content = m.imageDisplay
-            m.screenActive.loaded = "true"
+            m.screenActive.content     = m.imageDisplay
+            m.screenActive.albumobject = m.top.albumobject
+            m.screenActive.showres     = m.showRes
+            m.screenActive.loaded      = "true"
             m.top.appendChild(m.screenActive)
             m.screenActive.setFocus(true)
         end if
 
         m.Watermark.visible     = false
-        m.MoveTimer.control     = "stop" 
         m.RotationTimer.control = "stop"
         m.DownloadTimer.control = "stop"
     else
@@ -206,9 +228,151 @@ Sub onRotationTigger(event as object)
 End Sub
 
 
+Sub handleGetAlbumImages(event as object)
+    print "DisplayPhotos.brs [handleGetAlbumImages]"
+  
+    errorMsg = ""
+    response = event.getData()
+    albumid  = response.post_data[1]
+    
+    if (response.code = 401) or (response.code = 403) then
+        'Expired Token
+        doRefreshToken(response.post_data, response.post_data[2])
+    else if response.code <> 200
+        errorMsg = "An Error Occurred in 'handleGetAlbumImages'. Code: "+(response.code).toStr()+" - " +response.error
+    else
+        rsp=ParseJson(response.content)
+
+        if rsp = invalid
+            errorMsg = "Unable to parse Google Photos API response. Exit the channel then try again later. Code: "+(response.code).toStr()+" - " +response.error
+        else if type(rsp) <> "roAssociativeArray"
+            errorMsg = "Json response is not an associative array: handleGetAlbumImages"
+        else if rsp.DoesExist("error")
+            errorMsg = "Json error response: [handleGetAlbumImages] " + json.error
+        else
+            imageList = googleImageListing(rsp)
+
+            imagesMetaData = {}
+            for each media in imageList
+                if media.IsVideo = 0 then
+                    imagesMetaData.[media.GetID] = media.GetURL+getResolution(m.showRes)
+                end if
+            end for
+
+            'Refresh the URL with new image (Valid for 60 minutes)
+            count = 0
+            for each storeItem in m.imageDisplay
+                if (imagesMetaData.[storeItem.id]<>invalid) then
+                    m.imageDisplay[count].url = imagesMetaData.[storeItem.id]
+                end if
+                count++
+            end for
+
+            if rsp["nextPageToken"]<>invalid then
+                pageNext = rsp["nextPageToken"]
+                m.albumActiveObject[albumid].nextPageToken = pageNext
+                m.albumActiveObject[albumid].showCountEnd = m.albumActiveObject[albumid].showCountEnd + imageList.Count()
+                m.albumActiveObject[albumid].apiCount = m.albumActiveObject[albumid].apiCount + 1
+                if (m.albumActiveObject[albumid].apiCount < m.maxApiPerPage) and (m.albumActiveObject[albumid].showCountEnd < m.maxImagesPerPage) then
+                    if m.albumActiveObject[albumid].GetID.Instr("GP_LIBRARY") >= 0 then
+                        doGetLibraryImages(m.albumActiveObject[albumid].GetID, m.albumActiveObject[albumid].GetUserIndex, pageNext)
+                    else
+                        doGetAlbumImages(m.albumActiveObject[albumid].GetID, m.albumActiveObject[albumid].GetUserIndex, pageNext)
+                    end if
+                end if                
+            end if
+        end if
+    end if
+    
+    if errorMsg<>"" then
+        'ShowNotice
+        m.noticeDialog.visible = true
+        buttons =  [ "OK" ]
+        m.noticeDialog.message = errorMsg
+        m.noticeDialog.buttons = buttons
+        m.noticeDialog.setFocus(true)
+        m.noticeDialog.observeField("buttonSelected","noticeClose")
+    end if
+    
+End Sub
+
+
+Sub handleGetSearch(event as object)
+    print "DisplayPhotos.brs [handleGetSearch]"
+
+    errorMsg = ""
+    response = event.getData()
+    albumid  = response.post_data[1]
+    keywords = response.post_data[3]
+    
+    m.apiPending = m.apiPending-1
+    if (response.code = 401) or (response.code = 403) then
+        'Expired Token
+        doRefreshToken(response.post_data, response.post_data[2])
+    else if response.code <> 200
+        errorMsg = "An Error Occurred in 'handleGetSearch'. Code: "+(response.code).toStr()+" - " +response.error
+    else
+        rsp=ParseJson(response.content)
+        'print rsp
+        if rsp=invalid then
+            errorMsg = "Unable to parse Google Photos API response. Exit the channel then try again later. Code: "+(response.code).toStr()+" - " +response.error
+        else if type(rsp) <> "roAssociativeArray"
+            errorMsg = "Json response is not an associative array: handleGetSearch"
+        else if rsp.DoesExist("error")
+            errorMsg = "Json error response: [handleGetSearch] " + json.error
+        else
+
+            imageList = googleImageListing(rsp)
+
+            for each media in imageList
+                tmp             = {}
+                tmp.id          = media.GetID
+                tmp.url         = media.GetURL + getResolution(m.showRes)
+                tmp.timestamp   = media.GetTimestamp
+                tmp.description = media.GetDescription
+                tmp.filename    = media.GetFilename
+        
+                if media.IsVideo = 0 then
+                    m.albumActiveObject[albumid].imagesMetaData.Push(tmp)
+                    'print "IMAGE: "; tmp.url
+                end if
+            end for
+            
+            if rsp["nextPageToken"]<>invalid then
+                pageNext = rsp["nextPageToken"]
+                m.albumActiveObject[albumid].nextPageToken = pageNext
+                m.albumActiveObject[albumid].showCountEnd = m.albumActiveObject[albumid].showCountEnd + imageList.Count()
+                m.albumActiveObject[albumid].apiCount = m.albumActiveObject[albumid].apiCount + 1
+                if (m.albumActiveObject[albumid].apiCount < m.maxApiPerPage) and (m.albumActiveObject[albumid].showCountEnd < m.maxImagesPerPage) then
+                    doGetSearch(albumid, m.albumActiveObject[albumid].GetUserIndex, keywords, pageNext)
+                end if
+            else
+                m.albumActiveObject[albumid].nextPageToken = invalid
+                m.albumActiveObject[albumid].showCountEnd = m.albumActiveObject[albumid].showCountEnd + imageList.Count()
+            end if
+            
+            print m.albumActiveObject["SearchResults"]
+            print "COUNT: "; m.albumActiveObject[albumid].imagesMetaData.Count()
+        end if
+    end if
+
+    if errorMsg<>"" then
+        'ShowError
+        m.noticeDialog.visible = true
+        buttons =  [ "OK" ]
+        m.noticeDialog.title   = "Error"
+        m.noticeDialog.message = errorMsg
+        m.noticeDialog.buttons = buttons
+        m.noticeDialog.setFocus(true)
+        m.noticeDialog.observeField("buttonSelected","noticeClose")
+    end if   
+
+End Sub
+
+
 Sub onDownloadTigger(event as object)
     'print "DisplayPhotos.brs [onDownloadTigger]"
-    
+
     tmpDownload = []
     
     'Download Next 5 images - Only when needed
@@ -250,7 +414,13 @@ Sub processDownloads(event as object)
         
         m.imageLocalCacheByURL[key] = tmpFS
         m.imageLocalCacheByFS[tmpFS] = key
+        
+        if (tmpFS = "403") and (m.URLRefreshTimer.control <> "start") then
+            onURLRefreshTigger()
+            m.URLRefreshTimer.control = "start"
+        end if
     end for
+    
 End Sub
 
 
@@ -290,7 +460,7 @@ Sub onPrimaryLoadedTrigger(event as object)
         centery = (1080 - markupRectAlbum.height) / 2
 
         m.PrimaryImage.translation = [ centerx, centery ]
-        
+
         'Controls the image fading
         rxFade = CreateObject("roRegex", "NoFading", "i")        
         if rxFade.IsMatch(m.showDisplay) or rxFade.IsMatch(m.imageOnScreen) then
@@ -344,6 +514,10 @@ End Sub
 
 Sub sendNextImage(direction=invalid)
     print "DisplayPhotos.brs [sendNextImage]"
+    
+    date         = CreateObject("roDateTime")
+    date.ToLocalTime()
+    print "  -- time: "; date.ToISOString()
         
     'Get next image to display.
     if m.top.startIndex <> -1 then
@@ -358,7 +532,7 @@ Sub sendNextImage(direction=invalid)
     end if
     
     m.imageTracker = nextID
-    
+
     url = m.imageDisplay[nextID].url
     
     'Pull image from downloaded cache if avalable
@@ -398,21 +572,18 @@ Sub sendNextImage(direction=invalid)
         end if
     end if
     
-    mypath = CreateObject("roPath", m.imageDisplay[nextID].url)
-    fileObj = myPath.Split()
-    
     m.pauseImageCount.text   = itostr(nextID+1)+" of "+itostr(m.imageDisplay.Count())
-    m.pauseImageDetail.text  = friendlyDate(strtoi(m.imageDisplay[nextID].timestamp))
+    m.pauseImageDetail.text  = friendlyDate(m.imageDisplay[nextID].timestamp)
 
     'RediscoverScreen text change if needed      
     if m.rxHistory.IsMatch(m.top.predecessor) then
-        m.RediscoverDetail.text  = m.top.predecessor.Replace("Rediscover this", "This")+" - "+ friendlyDateShort(strtoi(m.imageDisplay[nextID].timestamp))
+        m.RediscoverDetail.text  = m.top.predecessor.Replace("Rediscover this", "This")+" - "+ friendlyDateShort(m.imageDisplay[nextID].timestamp)
     end if
     
     if m.imageDisplay[nextID].description <> invalid and m.imageDisplay[nextID].description <> "" then
-        m.pauseImageDetail2.text = m.imageDisplay[nextID].description + " - " + fileObj.filename.DecodeUri()
+        m.pauseImageDetail2.text = m.imageDisplay[nextID].description + " - " + m.imageDisplay[nextID].filename
     else
-        m.pauseImageDetail2.text = fileObj.filename.DecodeUri()
+        m.pauseImageDetail2.text = m.imageDisplay[nextID].filename
     end if
     
     'Stop rotating if only 1 image album
@@ -444,11 +615,52 @@ End Function
 Sub onMoveTrigger()
     'To prevent screen burn-in
     if m.Watermark.translation[1] = 1010 then
-         m.Watermark.translation        = "[1700,10]"
-         m.RediscoverScreen.translation = "[0,10]"
+        m.Watermark.translation        = "[1700,10]"
+        m.RediscoverScreen.translation = "[0,25]"
     else
         m.Watermark.translation        = "[1700,1010]"
         m.RediscoverScreen.translation = "[0,1010]"
+    end if
+End Sub
+
+
+Sub onDisplayTimer()
+
+    ' ** Why the hell is this here you ask? **
+    '  Screensaver will now expire after 5 hours due to the API and download limitations Google has set. I don't want all API usage going to people not sitting in front of thier device. Sorry, but that's the way it is right now, plan and simple.
+    '  In months to come, I'll review how this channel is doing on the API usage and see if this can be extended or removed.
+    '  Last review: March, 2019
+
+    m.RotationTimer.control    = "stop"
+    m.DownloadTimer.control    = "stop"
+    
+    generic1            = {}
+    generic1.timestamp  = "284040000"
+    generic1.url        = "pkg:/images/black_pixel.png"
+    generic1.filename   = "black_pixel.png"
+    m.imageTracker      = 0
+    m.imageDisplay      = []
+    m.imageDisplay.Push(generic1)
+    
+    sendNextImage()
+    if m.top.id = "DisplayScreensaver" then
+        m.RediscoverDetail.text    = "Screensaver has expired after 5 hours"
+    else
+        m.RediscoverDetail.text    = "Slideshow has expired after 12 hours"
+    end if
+    m.RediscoverScreen.visible = "true"
+End Sub
+
+
+Sub onApiTimerTrigger()
+    print "API CALLS LEFT: "; m.apiPending
+
+    if m.apiPending = 0 then
+        m.apiTimer.control = "stop"
+        
+        if m.albumActiveObject["SearchResults"].showcountend > 0 then
+            m.imageDisplay = m.albumActiveObject["SearchResults"].imagesMetaData          
+        end if
     end if
 End Sub
 

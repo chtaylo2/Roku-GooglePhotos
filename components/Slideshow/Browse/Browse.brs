@@ -1,6 +1,6 @@
 '*************************************************************
 '** PhotoView for Google Photos
-'** Copyright (c) 2017-2018 Chris Taylor.  All rights reserved.
+'** Copyright (c) 2017-2019 Chris Taylor.  All rights reserved.
 '** Use of code within this application subject to the MIT License (MIT)
 '** https://raw.githubusercontent.com/chtaylo2/Roku-GooglePhotos/master/LICENSE
 '*************************************************************
@@ -39,14 +39,14 @@ End Sub
 
 Sub onItemFocused()
     'Item selected
-    'print "FOCUSED: "; m.ImageGrid.itemFocused
+    'print "FOCUSED: "; m.top.metaData[m.ImageGrid.itemFocused]
     
     if (m.top.metaData[m.ImageGrid.itemFocused].timestamp <> invalid) then
-        mypath = CreateObject("roPath", m.top.metaData[m.ImageGrid.itemFocused].thumbnail)
+        mypath = CreateObject("roPath", m.top.metaData[m.ImageGrid.itemFocused].url)
         fileObj = myPath.Split()   
     
-        timestamp = friendlyDate(strtoi(m.top.metaData[m.ImageGrid.itemFocused].timestamp))
-        m.itemLabelMain2.text = fileObj.filename.DecodeUri() + " - " + timestamp
+        timestamp = friendlyDate(m.top.metaData[m.ImageGrid.itemFocused].timestamp)
+        m.itemLabelMain2.text = m.top.metaData[m.ImageGrid.itemFocused].filename + " - " + timestamp
     end if
 End Sub
 
@@ -59,6 +59,7 @@ Sub onItemSelected()
         m.screenActive              = createObject("roSGNode", "DisplayPhotos")
         m.screenActive.startIndex   = m.ImageGrid.itemSelected
         m.screenActive.predecessor  = m.top.predecessor
+        m.screenActive.albumobject  = m.top.albumobject
         m.screenActive.content      = m.top.metaData
         m.top.appendChild(m.screenActive)
         m.screenActive.setFocus(true)
@@ -80,7 +81,7 @@ End Sub
 Sub doVideoShow(videoStore as object)
     print "Browse.brs [doVideoShow]"
     
-    thumbnailPath = CreateObject("roPath", videoStore.thumbnail)
+    thumbnailPath = CreateObject("roPath", videoStore.url)
     thumbnailObj  = thumbnailPath.Split()
     
     videoFile     = videoStore.url
@@ -91,9 +92,9 @@ Sub doVideoShow(videoStore as object)
 
     videoContent              = createObject("RoSGNode", "ContentNode")
     videoContent.ContentType  = "movie"
-    videoContent.url          = videoStore.url
+    videoContent.url          = videoStore.url+"=m18"
     videoContent.streamformat = "mp4"
-    videoContent.Title        = friendlyDate(StrToI(videoStore.timestamp))
+    videoContent.Title        = friendlyDate(videoStore.timestamp)
     if videoStore.description <> "" then
         videoContent.TitleSeason = videoStore.description  + " - " + thumbnailObj.filename
     else

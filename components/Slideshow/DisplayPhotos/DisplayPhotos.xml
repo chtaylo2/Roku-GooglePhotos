@@ -4,6 +4,7 @@
 
     <interface>
         <field id = "predecessor"    type = "string" />
+        <field id = "albumobject"    type = "assocarray" />
         <field id = "content"        type = "array" />
         <field id = "startIndex"     type = "integer" value="-1" />
     </interface>
@@ -244,9 +245,31 @@
         />
         
         <Timer
+            id          = "URLRefreshTimer"
+            duration    = "1500"
+        />
+        
+        <Timer
             id          = "moveWatermark"
             repeat      = "true"
             duration    = "1200"
+        />
+        
+        <Timer
+            id          = "apiTimer"
+            repeat      = "true"
+            duration    = "2"
+        />
+
+        <Timer
+            id          = "DisplayTimer"
+            duration    = "0"
+        />
+                
+        <Dialog
+            id          = "noticeDialog"
+            title       = "Error"
+            visible     = "false"
         />
             
    </children>

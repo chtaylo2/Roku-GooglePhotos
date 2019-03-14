@@ -1,12 +1,13 @@
 <?xml version = "1.0" encoding = "utf-8" ?>
 
-<component name = "InfoPopup" extends = "Group" >
+<component name = "StatusPopup" extends = "Group" >
 
     <interface>
         <field id = "closeReady" type = "string" />
+        <field id = "content"    type = "string" />
     </interface>
     
-    <script type = "text/brightscript" uri = "pkg:/components/InfoPopup/InfoPopup.brs" />
+    <script type = "text/brightscript" uri = "pkg:/components/StatusPopup/StatusPopup.brs" />
     <script type = "text/brightscript" uri = "pkg:/components/Utils/Common.brs" />
 
     <children>
@@ -21,13 +22,13 @@
 
             <Label
                 id              = "itemLabelMain"
-                width           = "1600"
+                width           = "1500"
                 font            = "font:MediumBoldSystemFont"
                 color           = "#808080"
                 horizAlign      = "left"
                 vertAlign       = "center"
                 wrap            = "true"
-                translation     = "[75,75]"
+                translation     = "[75,50]"
             />
             
         </Label>

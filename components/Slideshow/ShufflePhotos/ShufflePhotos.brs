@@ -1,6 +1,6 @@
 '*************************************************************
 '** PhotoView for Google Photos
-'** Copyright (c) 2017-2018 Chris Taylor.  All rights reserved.
+'** Copyright (c) 2017-2019 Chris Taylor.  All rights reserved.
 '** Use of code within this application subject to the MIT License (MIT)
 '** https://raw.githubusercontent.com/chtaylo2/Roku-GooglePhotos/master/LICENSE
 '*************************************************************
@@ -49,29 +49,29 @@ End Sub
 
 
 ' URL Request to fetch album listing
-Sub doGetAlbumList()
-    print "ShufflePhotos.brs [doGetAlbumList]"  
+'Sub doGetAlbumList()
+'    print "ShufflePhotos.brs [doGetAlbumList]"  
 
-    tmpData = [ "doGetAlbumList" ]
+'    tmpData = [ "doGetAlbumList" ]
     
-    m.apiPending = m.apiPending+1
-    signedHeader = oauth_sign(m.global.selectedUser)
-    makeRequest(signedHeader, m.gp_prefix + "?kind=album&v=3.0&fields=entry(title,gphoto:numphotos,gphoto:user,gphoto:id,media:group(media:description,media:thumbnail))&thumbsize=300", "GET", "", 0, tmpData)
-End Sub
+''    m.apiPending = m.apiPending+1
+ ''   signedHeader = oauth_sign(m.global.selectedUser)
+'    makeRequest(signedHeader, m.gp_prefix + "?kind=album&v=3.0&fields=entry(title,gphoto:numphotos,gphoto:user,gphoto:id,media:group(media:description,media:thumbnail))&thumbsize=300", "GET", "", 0, tmpData)
+'End Sub
 
 
-Sub doGetAlbumImages(album As Object)
-    print "ShufflePhotos.brs - [doGetAlbumImages]"
+'Sub doGetAlbumImages(album As Object)
+ '   print "ShufflePhotos.brs - [doGetAlbumImages]"
 
-    tmpData = [ "doGetAlbumImages", album ]
+ '   tmpData = [ "doGetAlbumImages", album ]
     
-    m.apiPending = m.apiPending+1
-    signedHeader = oauth_sign(m.global.selectedUser)
-    makeRequest(signedHeader, m.gp_prefix + "/albumid/"+album.GetID()+"?start-index=1&max-results=1000&kind=photo&v=3.0&fields=entry(title,gphoto:timestamp,gphoto:id,gphoto:streamId,gphoto:videostatus,media:group(media:description,media:content,media:thumbnail))&thumbsize=330&imgmax="+getResolution(), "GET", "", 1, tmpData)
-End Sub
+ '   m.apiPending = m.apiPending+1
+ '   signedHeader = oauth_sign(m.global.selectedUser)
+ '   makeRequest(signedHeader, m.gp_prefix + "/albumid/"+album.GetID()+"?start-index=1&max-results=1000&kind=photo&v=3.0&fields=entry(title,gphoto:timestamp,gphoto:id,gphoto:streamId,gphoto:videostatus,media:group(media:description,media:content,media:thumbnail))&thumbsize=330&imgmax="+getResolution(), "GET", "", 1, tmpData)
+'End Sub
 
 
-Sub handleGetAlbumList(event as object)
+Sub handleGetAlbumListOFF(event as object)
     print "ShufflePhotos.brs [handleGetAlbumList]"
   
     errorMsg = ""
@@ -127,7 +127,7 @@ Sub handleGetAlbumList(event as object)
 End Sub
 
 
-Sub handleGetAlbumImages(event as object)
+Sub handleGetAlbumImagesOFF(event as object)
     print "ShufflePhotos.brs [handleGetAlbumImages]"
 
     errorMsg = ""

@@ -1,6 +1,6 @@
 '*************************************************************
 '** PhotoView for Google Photos
-'** Copyright (c) 2017-2018 Chris Taylor.  All rights reserved.
+'** Copyright (c) 2017-2019 Chris Taylor.  All rights reserved.
 '** Use of code within this application subject to the MIT License (MIT)
 '** https://raw.githubusercontent.com/chtaylo2/Roku-GooglePhotos/master/LICENSE
 '*************************************************************
@@ -33,6 +33,8 @@ Sub init()
     m.loadingSpinner    = m.top.findNode("loadingSpinner")
     m.noticeDialog      = m.top.findNode("noticeDialog")
     m.aboutVersion      = m.top.findNode("aboutVersion")
+    m.albumsObject      = {}
+    m.apiPending        = 0
     
     m.pinPad.observeField("buttonSelected","processPinEntry")
     m.confirmDialog.observeField("buttonSelected","confirmUnregister")
@@ -69,7 +71,7 @@ End Sub
 
 
 ' URL Request to fetch album listing - Used for screensaver album selection
-Sub doGetAlbumSelection()
+Sub doGetAlbumSelection(pageNext="" As String)
     print "Settings.brs [doGetAlbumSelection]"  
 
     usersLoaded               = oauth_count()
@@ -81,13 +83,13 @@ Sub doGetAlbumSelection()
             
     m.infoLabel.text = "Select albums to display while the screensaver is active. If none are selected, random photos will be shown. Only the first 1,000 images, per album, are pulled."
 
-    tmpData = [ "doGetAlbumSelection", selectedUser ]
+    tmpData = [ "doGetAlbumSelection", selectedUser, pageNext ]
 
     if selectedUser <> usersLoaded then
         m.loadingSpinner.visible = true
         m.infoLabel.text = m.infoLabel.text + chr(10) + chr(10) + "Current user selected: " + m.userInfoName[selectedUser]
-        signedHeader = oauth_sign(selectedUser)
-        makeRequest(signedHeader, m.gp_prefix + "?kind=album&v=3.0&fields=entry(title,gphoto:numphotos,gphoto:user,gphoto:id,media:group(media:description,media:thumbnail))&thumbsize=300", "GET", "", 0, tmpData)
+        doGetAlbumList(selectedUser, pageNext)
+    
     else
         m.infoLabel.text = m.infoLabel.text + chr(10) + chr(10) + "Unable to select albums for 'All (Random)'. A future version might allow this."
     end if
@@ -97,12 +99,8 @@ End Sub
 Sub handleGetAlbumSelection(event as object)
     print "Settings.brs [handleGetAlbumSelection]"
   
-    m.albumContent = createObject("RoSGNode","ContentNode")
     errorMsg       = ""
     response       = event.getData()
-    regStore       = "SSaverAlbums"
-    regAlbums      = RegRead(regStore, "Settings")
-    checkedObj     = []
 
     if (response.code = 401) or (response.code = 403) then
         'Expired Token
@@ -110,56 +108,35 @@ Sub handleGetAlbumSelection(event as object)
     else if response.code <> 200
         errorMsg = "An Error Occurred in 'handleGetAlbumSelection'. Code: "+(response.code).toStr()+" - " +response.error
     else
-        rsp=ParseXML(response.content)
-        print rsp
-        if rsp=invalid then
+        rsp=ParseJson(response.content)
+        print rsp["albums"]
+        if rsp = invalid
             errorMsg = "Unable to parse Google Photos API response. Exit the channel then try again later. Code: "+(response.code).toStr()+" - " +response.error
+        else if type(rsp) <> "roAssociativeArray"
+            errorMsg = "Json response is not an associative array: handleGetAlbumSelection"
+        else if rsp.DoesExist("error")
+            errorMsg = "Json error response: [handleGetAlbumSelection] " + json.error
         else
-
-            'Display Time in History selections
-            albumHistory = "Day|Week|Month".Split("|")
-            for each album in albumHistory
-                addItem(m.albumContent, "• "+album+" in History - Auto Refresh", album, "")
-                saved = 0
-                if (regAlbums <> invalid) and (regAlbums <> "")
-                    parsedString = regAlbums.Split("|")
-                    for each item in parsedString
-                        albumUser = item.Split(":")
-                        if albumUser[0] = album then
-                            'Check selected album
-                            saved = 1
-                        end if
-                    end for
-                end if
-                if saved = 1 checkedObj.Push(true)
-                if saved = 0 checkedObj.Push(false)                
-            end for
+            albumList = googleAlbumListing(rsp)         
             
-            'Display user album selections
-            m.albumsObject = googleAlbumListing(rsp.entry)
-            for each album in m.albumsObject
-                addItem(m.albumContent, album.GetTitle(), album.GetID(), "")
-                saved = 0
-                if (regAlbums <> invalid) and (regAlbums <> "")
-                    parsedString = regAlbums.Split("|")
-                    for each item in parsedString
-                        albumUser = item.Split(":")
-                        if albumUser[0] = album.GetID() then
-                            'Check selected album
-                            saved = 1
-                        end if
-                    end for
-                end if
-                if saved = 1 checkedObj.Push(true)
-                if saved = 0 checkedObj.Push(false)
-            end for
+            for each album in albumList
+                m.albumsObject["albums"].Push(album)
+            end for          
 
-            m.albumSelection.content = m.albumContent
-            m.albumSelection.checkedState = checkedObj
+            if rsp["nextPageToken"]<>invalid then
+                pageNext = rsp["nextPageToken"]
+                m.albumsObject.nextPageToken = pageNext
+                m.albumsObject.apiCount = m.albumsObject.apiCount + 1
+                if m.albumsObject.apiCount < m.maxApiPerPage then
+                    doGetAlbumList(m.settingSubList.itemFocused, pageNext)
+                else
+                    printAlbumSelection(m.albumsObject["albums"])
+                end if
+            else
+                printAlbumSelection(m.albumsObject["albums"])
+            end if
         end if
     end if
-    
-    m.loadingSpinner.visible = false
     
     if errorMsg<>"" then
         'ShowNotice
@@ -171,6 +148,74 @@ Sub handleGetAlbumSelection(event as object)
         m.noticeDialog.observeField("buttonSelected","noticeClose")
     end if   
     
+End Sub
+
+
+Sub printAlbumSelection(albumList As Object)
+    print "Settings.brs [printAlbumSelection]"
+    
+    m.albumContent = createObject("RoSGNode","ContentNode")
+    regStore       = "SSaverAlbums"
+    regAlbums      = RegRead(regStore, "Settings")
+    checkedObj     = []
+    
+    m.loadingSpinner.visible = "false"
+    
+    'Display Time in History selections
+    albumHistory = "Day|Week|Month".Split("|")
+    for each album in albumHistory
+        addItem(m.albumContent, "• "+album+" in History - Auto Refresh", album, "")
+        saved = 0
+        if (regAlbums <> invalid) and (regAlbums <> "")
+            parsedString = regAlbums.Split("|")
+            for each item in parsedString
+                albumUser = item.Split(":")
+                if albumUser[0] = album then
+                    'Check selected album
+                    saved = 1
+                end if
+            end for
+        end if
+        if saved = 1 checkedObj.Push(true)
+        if saved = 0 checkedObj.Push(false)                
+    end for
+            
+    'Display Google Photos Library
+    addItem(m.albumContent, "Google Photos Library", "GP_LIBRARY", "")
+    saved = 0
+    if (regAlbums <> invalid) and (regAlbums <> "")
+        parsedString = regAlbums.Split("|")
+        for each item in parsedString
+            albumUser = item.Split(":")
+            if (albumUser[0] = "GP_LIBRARY") and (albumUser[1] = response.post_data[1].Tostr()) then
+                'Check selected album
+                saved = 1
+            end if
+        end for
+    end if
+    if saved = 1 checkedObj.Push(true)
+    if saved = 0 checkedObj.Push(false)
+            
+    'Display user album selections
+    for each album in albumList
+        addItem(m.albumContent, album.GetTitle, album.GetID, "")
+        saved = 0
+        if (regAlbums <> invalid) and (regAlbums <> "")
+            parsedString = regAlbums.Split("|")
+            for each item in parsedString
+                albumUser = item.Split(":")
+                if albumUser[0] = album.GetID then
+                    'Check selected album
+                    saved = 1
+                end if
+            end for
+        end if
+        if saved = 1 checkedObj.Push(true)
+        if saved = 0 checkedObj.Push(false)
+    end for
+
+    m.albumSelection.content = m.albumContent
+    m.albumSelection.checkedState = checkedObj
 End Sub
 
 
@@ -202,25 +247,30 @@ Sub storeResolutionOptions()
     regSelection = RegRead(regStore, "Settings")
 
     device  = createObject("roDeviceInfo")
-    is4k    = (val(device.GetVideoMode()) = 2160)
+    is4k    = (val(device.GetVideoMode()) >= 2160)
     is1080p = (val(device.GetVideoMode()) = 1080)
+    is720p  = (val(device.GetVideoMode()) = 720)
+    
+    print "RES: "; val(device.GetVideoMode())
 
     m.content = createObject("RoSGNode","ContentNode")
     
     if regSelection = "SD" then radioSelection = 0
-    addItem(m.content, "Standard Definition (SD)", "SD", regStore)
+    addItem(m.content, "Standard Definition 480p (SD)", "SD", regStore)
 
+    if is4k Or is1080p Or is720p then
+        if regSelection = "HD720" then radioSelection = 1
+        addItem(m.content, "High Definition 720p (HD)", "HD720", regStore)
+    end if
+    
     if is4k Or is1080p then
-        if regSelection = "HD" then radioSelection = 1
-        addItem(m.content, "High Definition (HD)", "HD", regStore)
+        if (regSelection = "FHD" or regSelection = "HD") then radioSelection = 2
+        addItem(m.content, "Full High Definition 1080p (FHD)", "FHD", regStore)
     end if
     
     if is4k then
-        if regSelection = "FHD" then radioSelection = 2
-        addItem(m.content, "Full High Definition (FHD)", "FHD", regStore)
-
         if regSelection = "UHD" then radioSelection = 3
-        addItem(m.content, "Ultra High Definition [Beta]", "UHD", regStore)               
+        addItem(m.content, "Ultra High Definition 4K (UHD)", "UHD", regStore)               
     end if
 
     'Store content node and current registry selection
@@ -272,9 +322,9 @@ Sub storeDelayOptions()
     regSelection = RegRead(regStore, "Settings")
 
     tmp = ""
-    if regSelection = "3"
+    if regSelection = "5"
         radioSelection = 0
-    else if regSelection = "5"
+    else if regSelection = "8"
         radioSelection = 1
     else if regSelection = "10"
         radioSelection = 2
@@ -288,8 +338,8 @@ Sub storeDelayOptions()
     end if
     
     m.content = createObject("RoSGNode","ContentNode")
-    addItem(m.content, "3 seconds", "3", regStore)
-    addItem(m.content, "5 seconds (Default)", "5", regStore)
+    addItem(m.content, "5 seconds", "5", regStore)
+    addItem(m.content, "8 seconds (Default)", "8", regStore)
     addItem(m.content, "10 seconds", "10", regStore)
     addItem(m.content, "15 seconds", "15", regStore)
     addItem(m.content, "30 seconds", "30", regStore)
@@ -364,7 +414,7 @@ Sub storeLinkedUsers()
         addItem(m.content, "No users linked", "0", "")
     else
         for i = 0 to usersLoaded-1
-            addItem(m.content,  m.userInfoName[i], m.userInfoEmail[i], regStore)
+            addItem(m.content,  m.userInfoName[i] + " - (" + m.userInfoEmail[i] + ")", m.userInfoEmail[i], regStore)
             if regSelection = m.userInfoEmail[i] then radioSelection = i
         end for
         if usersLoaded > 1 then
@@ -504,8 +554,8 @@ Sub showsubselected()
             'Screensaver Setting
             RegWrite(itemcontent.titleseason, itemcontent.description, "Settings")
             
-            if (m.settingsList.itemSelected = 4) and (m.settingsUserscheckedItem <> m.settingSubList.itemSelected) then
-                'Reset any album selections
+            if (m.settingsList.itemSelected = 5) and (m.settingsUserscheckedItem <> m.settingSubList.itemSelected) then
+                'Reset any album selections - new user selected
                 RegWrite("SSaverAlbums", "", "Settings")
             end if
         else
@@ -529,14 +579,45 @@ Sub showalbumselected()
     selectedUser = m.settingSubList.itemFocused
     albumsTotal  = m.albumSelection.content.getChildCount()
     
-    saveList = ""
+    saveList    = ""
+    errorMsg    = ""
+    selectCount = 0
     for i = 0 to albumsTotal
         itemcontent  = m.albumSelection.content.getChild(i)
         checkState   = m.albumSelection.checkedState[i]
         if checkState = true then
-            saveList = saveList + itemcontent.description + ":" + itostr(selectedUser) + "|"
+            if m.albumSelection.checkedState[2] = true then
+                saveList = m.albumSelection.content.getChild(2).description + ":" + itostr(selectedUser) + "|"
+            else if m.albumSelection.checkedState[1] = true then
+                saveList = m.albumSelection.content.getChild(1).description + ":" + itostr(selectedUser) + "|"
+            else if m.albumSelection.checkedState[0] = true then
+                saveList = m.albumSelection.content.getChild(0).description + ":" + itostr(selectedUser) + "|"
+            else
+                'Control the number of API calls we make. Sorry but Google monitors this.
+                if selectCount < 5 then
+                    saveList = saveList + itemcontent.description + ":" + itostr(selectedUser) + "|"
+                    selectCount = selectCount + 1
+                else
+                    errorMsg = "You may select 5 albums max, for screensaver playback. Other album selections will not be saved."
+                end if
+            end if
+            
+            if (m.albumSelection.checkedState[2] = true or m.albumSelection.checkedState[1] = true or m.albumSelection.checkedState[0] = true) and (i > 2) then
+                errorMsg = "Time in history albums are currently mutually exclusive. Other album selections will not be saved."
+            end if
         end if
     end for
+    
+    if errorMsg<>"" then
+        'ShowError
+        m.noticeDialog.visible = true
+        buttons =  [ "OK" ]
+        m.noticeDialog.title   = "Notice"
+        m.noticeDialog.message = errorMsg
+        m.noticeDialog.buttons = buttons
+        m.noticeDialog.setFocus(true)
+        m.noticeDialog.observeField("buttonSelected","noticeClose")
+    end if
     
     RegWrite(regStore, saveList, "Settings")       
 End Sub
@@ -564,7 +645,16 @@ Sub processPinEntry(event as object)
     if event.getData() = 0
         'SAVE
         pinInt = strtoi(m.pinPad.pin)
-        if pinInt > 0
+        if pinInt < 5
+            'ShowError
+            m.noticeDialog.visible = true
+            buttons =  [ "OK" ]
+            m.noticeDialog.title   = "Notice"
+            m.noticeDialog.message = "Delay must be greater then 5 seconds due to requirements from Google."
+            m.noticeDialog.buttons = buttons
+            m.noticeDialog.setFocus(true)
+            m.noticeDialog.observeField("buttonSelected","noticeClose2")
+        else
             itemcontent = m.settingSubList.content.getChild(m.settingSubList.itemSelected)
             
             if m.setScope = "temporary"
@@ -574,12 +664,12 @@ Sub processPinEntry(event as object)
                 'Global Setting
                 RegWrite(itemcontent.titleseason, itostr(pinInt), "Settings")
             end if
-        end if
         
-        storeDelayOptions()
-        showfocus()
-        m.pinPad.visible = false
-        m.settingSubList.setFocus(true)
+            storeDelayOptions()
+            showfocus()
+            m.pinPad.visible = false
+            m.settingSubList.setFocus(true)
+        end if
     else
         'CANCEL
         m.pinPad.visible = false
@@ -591,7 +681,12 @@ End Sub
 Sub noticeClose(event as object)
     m.noticeDialog.visible   = false
     m.loadingSpinner.visible = false
-    'm.albummarkupgrid.setFocus(true)
+    m.albumSelection.setFocus(true)
+End Sub
+
+Sub noticeClose2(event as object)
+    m.noticeDialog.visible   = false
+    m.pinPad.setFocus(true)
 End Sub
 
 
@@ -600,6 +695,8 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
         print "KEY: "; key
         if (key = "options" or key = "right") and (m.settingSubList.hasFocus() = true) and (m.settingsList.itemFocused = 5)
             'Select Linked User
+            m.albumsObject["albums"] = []
+            m.albumsObject.apiCount = 0
             doGetAlbumSelection()
             m.settingSubList.itemSelected = m.settingSubList.itemFocused
             m.settingSubList.visible = false

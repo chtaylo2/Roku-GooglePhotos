@@ -1,6 +1,6 @@
 '*************************************************************
 '** PhotoView for Google Photos
-'** Copyright (c) 2017-2018 Chris Taylor.  All rights reserved.
+'** Copyright (c) 2017-2019 Chris Taylor.  All rights reserved.
 '** Use of code within this application subject to the MIT License (MIT)
 '** https://raw.githubusercontent.com/chtaylo2/Roku-GooglePhotos/master/LICENSE
 '*************************************************************
@@ -19,6 +19,8 @@
 Sub doRefreshToken(post_data=[] as Object, selectedUser=-1 as Integer)
     print "SlideshowHelper.brs [doRefreshToken]"
 
+    post_data.Push(selectedUser)
+    
     params = "client_id="                  + m.clientId
     params = params + "&client_secret="    + m.clientSecret
     params = params + "&grant_type="       + "refresh_token"
@@ -63,25 +65,17 @@ Function handleRefreshToken(event as object)
             else
                 status = 0
                 ' We have our tokens
-                
-                if refreshData.post_data[0]<>invalid and (refreshData.post_data[0] = "doGetScreensaverAlbumList" or refreshData.post_data[0] = "doGetScreensaverAlbumImages" or refreshData.post_data[0] = "doGetAlbumSelection") then
-                    'Don't use global set user. Screensaver uses this.
-                    m.accessToken[refreshData.post_data[1]]  = getString(json,"access_token")
-                else
-                    m.accessToken[m.global.selectedUser]  = getString(json,"access_token")
-                end if
+
+                m.accessToken[refreshData.post_data[refreshData.post_data.Count()-1]]  = getString(json,"access_token")
                     
                 m.tokenType          = getString(json,"token_type")
                 m.tokenExpiresIn     = getInteger(json,"expires_in")
                 refreshToken         = getString(json,"refresh_token")
                 
                 if refreshToken <> ""
-                        m.refreshToken[m.global.selectedUser] = refreshToken
+                        m.refreshToken[refreshData.post_data[refreshData.post_data.Count()-1]] = refreshToken
                 end if
-    
-                'Query User info
-                'status = m.RequestUserInfo(m.accessToken.Count()-1, false)
-    
+
                 'Save cached values to registry
                 saveReg()
             end if
@@ -99,21 +93,18 @@ Function handleRefreshToken(event as object)
     end if   
     
     if status = 0 then
-        if refreshData.post_data[0] = "doGetScreensaverAlbumList" then
-            doGetScreensaverAlbumList(refreshData.post_data[1])
-        else if refreshData.post_data[0] = "doGetScreensaverAlbumImages" then
-            doGetScreensaverAlbumImages(refreshData.post_data[1], refreshData.post_data[2])
+        if refreshData.post_data[0] = "doGetLibraryImages" then
+            doGetLibraryImages(refreshData.post_data[1], refreshData.post_data[2], refreshData.post_data[3])
         else if refreshData.post_data[0] = "doGetAlbumImages" then
-            doGetAlbumImages(refreshData.post_data[1], refreshData.post_data[2])
+            doGetAlbumImages(refreshData.post_data[1], refreshData.post_data[2], refreshData.post_data[3])
         else if refreshData.post_data[0] = "doGetSearch" then
-            doGetSearch(refreshData.post_data[1])
+            doGetSearch(refreshData.post_data[1], refreshData.post_data[2], refreshData.post_data[3], refreshData.post_data[4])
         else if refreshData.post_data[0] = "doGetAlbumSelection" then
             doGetAlbumSelection()
         else
-            doGetAlbumList()
+            doGetAlbumList(refreshData.post_data[1])
         end if
     end if
-    
 End Function
 
 
@@ -123,14 +114,35 @@ End Function
 '**
 '*********************************************************
 
+' URL Request to fetch album listing
+Sub doGetAlbumList(selectedUser=0 as Integer, pageNext="" As String)
+    print "SlideshowHelper.brs [doGetAlbumList]"  
+
+    tmpData = [ "doGetAlbumList", selectedUser, pageNext ]
+
+    params = "pageSize=50"
+    if pageNext<>"" then
+        params = params + "&pageToken=" + pageNext
+    end if
+
+    m.apiPending = m.apiPending+1
+    signedHeader = oauth_sign(selectedUser)
+    makeRequest(signedHeader, m.gp_prefix + "/albums?"+params, "GET", "", 0, tmpData)
+    
+End Sub
+
+
 ' Create full album list from XML response
-Function googleAlbumListing(xmllist As Object) As Object
+Function googleAlbumListing(jsonlist As Object) As Object
     albumlist=CreateObject("roList")
-    for each record in xmllist
+    
+    'print formatJSON(jsonlist)
+    for each record in jsonlist["albums"]
         album=googleAlbumCreateRecord(record)
-        if album.GetImageCount() > 0 then
+
+        if album.GetImageCount > 0 then
             ' Do not show photos from Google Hangout albums or any marked with "Private" in name
-            if album.GetTitle().instr("Hangout:") = -1 and album.GetTitle().instr("rivate") = -1 then
+            if album.GetTitle.instr("Hangout:") = -1 and album.GetTitle.instr("rivate") = -1 then
                 albumlist.Push(album)
             end if
         end if
@@ -140,25 +152,82 @@ Function googleAlbumListing(xmllist As Object) As Object
 End Function
 
 
-' Create single album record from XML entry
-Function googleAlbumCreateRecord(xml As Object) As Object
-    album = CreateObject("roAssociativeArray")
-    album.xml=xml
-
-    album.GetUsername=function():return m.xml.GetNamedElements("gphoto:user")[0].GetText():end function
-    album.GetTitle=function():return m.xml.title[0].GetText():end function
-    album.GetID=function():return m.xml.GetNamedElements("gphoto:id")[0].GetText():end function
-    album.GetDescription=function():return m.xml.GetNamedElements("media:group")[0].GetNamedElements("media:description")[0].GetText():end function
-    album.GetImageCount=function():return Val(m.xml.GetNamedElements("gphoto:numphotos")[0].GetText()):end function
-    album.GetThumb=get_thumb
-    
-    if album.GetTitle() = "Auto Backup" then
-        album.GetTitle=function():return "Google Photos Timeline":end function
-    end if
-    
+' Create single album record from JSON entry
+Function googleAlbumCreateRecord(json As Object) As Object
+    album               = CreateObject("roAssociativeArray")
+    album.GetTitle      = getString(json,"title")
+    album.GetID         = getString(json,"id")
+    album.GetImageCount = Val(getString(json,"mediaItemsCount"))
+    album.GetThumb      = getString(json,"coverPhotoBaseUrl")+getResolution("SD")
+        
     return album
 End Function
 
+
+' ********************************************************************
+' **
+' ** SEARCH HANDLERS
+' **
+' ********************************************************************
+
+Function doSearchGenerate() As Object
+    'Get Dates
+    date         = CreateObject("roDateTime")
+    datepast     = createobject("rodatetime")
+    date.ToLocalTime()
+    datepast.ToLocalTime()
+ 
+    'Calculate 7 days prior
+    d1seconds    = datepast.asseconds() - (60 * 60 * 24 * 7)
+    datepast.FromSeconds(d1seconds)
+    
+    cYear1 = date.GetYear()-1
+    cYear2 = date.GetYear()-2
+    cYear3 = date.GetYear()-3
+    cYear4 = date.GetYear()-4
+    cYear5 = date.GetYear()-5
+    cMonth = date.GetMonth().ToStr()
+    cDay   = date.GetDayOfMonth().ToStr()
+    
+    pYear1 = datepast.GetYear()-1
+    pYear2 = datepast.GetYear()-2
+    pYear3 = datepast.GetYear()-3
+    pYear4 = datepast.GetYear()-4
+    pYear5 = datepast.GetYear()-5
+    pMonth = datepast.GetMonth().ToStr()
+    pDay   = datepast.GetDayOfMonth().ToStr()
+    
+    searchStrings       = {}
+    searchStrings.day   = "{'dateFilter': {'dates': [{'day': "+cDay+",'month': "+cMonth+",'year': "+cYear1.ToStr()+"},{'day': "+cDay+",'month': "+cMonth+",'year': "+cYear2.ToStr()+"},{'day': "+cDay+",'month': "+cMonth+",'year': "+cYear3.ToStr()+"},{'day': "+cDay+",'month': "+cMonth+",'year': "+cYear4.ToStr()+"},{'day': "+cDay+",'month': "+cMonth+",'year': "+cYear5.ToStr()+"}]}}"
+    searchStrings.week  = "{'dateFilter': {'ranges': [{'startDate': {'day': "+pDay+",'month': "+pMonth+",'year': "+pYear1.ToStr()+"},'endDate': {'day': "+cDay+",'month': "+cMonth+",'year': "+cYear1.ToStr()+"}},{'startDate': {'day': "+pDay+",'month': "+pMonth+",'year': "+pYear2.ToStr()+"},'endDate': {'day': "+cDay+",'month': "+cMonth+",'year': "+cYear2.ToStr()+"}},{'startDate': {'day': "+pDay+",'month': "+pMonth+",'year': "+pYear3.ToStr()+"},'endDate': {'day': "+cDay+",'month': "+cMonth+",'year': "+cYear3.ToStr()+"}},{'startDate': {'day': "+pDay+",'month': "+pMonth+",'year': "+pYear4.ToStr()+"},'endDate': {'day': "+cDay+",'month': "+cMonth+",'year': "+cYear4.ToStr()+"}},{'startDate': {'day': "+pDay+",'month': "+pMonth+",'year': "+pYear5.ToStr()+"},'endDate': {'day': "+cDay+",'month': "+cMonth+",'year': "+cYear5.ToStr()+"}}]}}"
+    searchStrings.month = "{'dateFilter': {'dates': [{'month': "+cMonth+",'year': "+cYear1.ToStr()+"},{'month': "+cMonth+",'year': "+cYear2.ToStr()+"},{'month': "+cMonth+",'year': "+cYear3.ToStr()+"},{'month': "+cMonth+",'year': "+cYear4.ToStr()+"},{'month': "+cMonth+",'year': "+cYear5.ToStr()+"}]}}"
+
+    return searchStrings
+End Function
+
+
+Sub doGetSearch(albumid As String, selectedUser As Integer, keyword As String, pageNext="" As String)
+    print "SlideshowHelper.brs [doGetSearch]"
+    
+    if keyword <> ""    
+        tmpData = [ "doGetSearch", albumid, selectedUser, keyword, pageNext ]
+
+        params = "'pageSize': '100',"
+
+        if pageNext<>"" then
+            params = params + "'pageToken': '" + pageNext + "',"
+        end if
+        
+        params = params + "'filters': " + keyword
+
+        print "params: "; params
+        
+        m.apiPending = m.apiPending+1
+        signedHeader = oauth_sign(selectedUser)
+        signedHeader["Content-type"] = "application/json"
+        makeRequest(signedHeader, m.gp_prefix + "/mediaItems:search/", "POST", "{" + params + "}", 3, tmpData)  
+    end if
+End Sub
 
 
 ' ********************************************************************
@@ -167,14 +236,57 @@ End Function
 ' **
 ' ********************************************************************
 
-Function googleImageListing(xmllist As Object, showall=1 as Integer) As Object
+Sub doGetLibraryImages(albumid As String, selectedUser=0 as Integer, pageNext="" As String)
+    print "SlideshowHelper.brs - [doGetLibraryImages]"
+    
+    print "GooglePhotos pageNext: "; pageNext
+
+    tmpData = [ "doGetLibraryImages", albumid, selectedUser, pageNext ]
+    
+    params = "pageSize=100"
+    if pageNext<>"" then
+        params = params + "&pageToken=" + pageNext
+    else
+        'First query, reset MetaData
+        m.videosMetaData    = []
+        m.imagesMetaData    = []
+    end if
+    
+    m.apiPending = m.apiPending+1
+    signedHeader = oauth_sign(selectedUser)
+    makeRequest(signedHeader, m.gp_prefix + "/mediaItems?"+params, "GET", "", 1, tmpData)
+End Sub
+
+
+Sub doGetAlbumImages(albumid As String, selectedUser=0 as Integer, pageNext="" As String)
+    print "SlideshowHelper.brs - [doGetAlbumImages]"
+
+    print "GooglePhotos pageNext: "; pageNext
+
+    tmpData = [ "doGetAlbumImages", albumid, selectedUser, pageNext ]
+
+    params = "pageSize=100"
+    params = params + "&albumId=" + albumid
+    if pageNext<>"" then
+        params = params + "&pageToken=" + pageNext
+    else
+        'First query, reset MetaData
+        m.videosMetaData    = []
+        m.imagesMetaData    = []
+    end if
+   
+    m.apiPending = m.apiPending+1 
+    signedHeader = oauth_sign(selectedUser)
+    makeRequest(signedHeader, m.gp_prefix + "/mediaItems:search/", "POST", params, 1, tmpData)
+End Sub
+
+
+Function googleImageListing(jsonlist As Object) As Object
     images=CreateObject("roList")
-    for each record in xmllist
+    for each record in jsonlist["mediaItems"]
         image=googleImageCreateRecord(record)
-        if image.GetURL()<>invalid then
-            if image.GetStreamID.instr(":archive:") = -1 or showall=1
-                images.Push(image)
-            end if
+        if image.GetURL<>invalid then
+            images.Push(image)
         end if
     next
     
@@ -182,53 +294,68 @@ Function googleImageListing(xmllist As Object, showall=1 as Integer) As Object
 End Function
 
 
-Function googleImageCreateRecord(xml As Object) As Object
-    image = CreateObject("roAssociativeArray")
-    image.xml=xml
-    image.GetTitle=function():return m.xml.GetNamedElements("title")[0].GetText():end function
-    image.GetID=function():return m.xml.GetNamedElements("gphoto:id")[0].GetText():end function
-    image.GetDescription=function():return m.xml.GetNamedElements("media:group")[0].GetNamedElements("media:description")[0].GetText():end function
-    image.GetURL=get_image_url
-    image.GetThumb=get_thumb
-    image.GetTimestamp=function():return Left(m.xml.GetNamedElements("gphoto:timestamp")[0].GetText(), 10):end function
-    image.IsVideo=function():return (m.xml.GetNamedElements("gphoto:videostatus")[0]<>invalid):end function
-    image.GetVideoStatus=function():return m.xml.GetNamedElements("gphoto:videostatus")[0].GetText():end function
-    
-    i=0
-    image.GetStreamID = ""
-    for each streamid in xml.GetNamedElements("gphoto:streamId")
-        image.GetStreamID = ":" + image.GetStreamID + ":" + xml.GetNamedElements("gphoto:streamId")[i].GetText()
-        i=i+1
-    end for
+Function googleImageCreateRecord(json As Object) As Object
+    image                = CreateObject("roAssociativeArray")
+    image.GetTitle       = ""
+    image.GetID          = getString(json,"id")
+    image.GetDescription = getString(json,"description")
+    image.GetURL         = getString(json,"baseUrl")
+    image.GetFilename    = getString(json,"filename")
+    image.GetTimestamp   = getString(json["mediaMetadata"],"creationTime")
+    image.IsVideo        = (json["mediaMetadata"]["video"]<>invalid)
+    image.GetVideoStatus = getString(json["mediaMetadata"]["video"],"status")
     
     return image
 End Function
 
 
-Function get_thumb()
-    if m.xml.GetNamedElements("media:group")[0].GetNamedElements("media:thumbnail").Count()>0 then
-        return m.xml.GetNamedElements("media:group")[0].GetNamedElements("media:thumbnail")[0].GetAttributes()["url"]
-    end if
-    
-    return "pkg:/images/icon_s.png"
-End Function
+' ********************************************************************
+' **
+' ** REFRESH HANDLERS
+' **
+' ********************************************************************
 
-
-Function get_image_url()
-    images=m.xml.GetNamedElements("media:group")[0].GetNamedElements("media:content")
-    if m.IsVideo() then
-        if m.GetVideoStatus()="final" or m.GetVideoStatus()="ready" then
-            for each image in images
-                if image.GetAttributes()["type"]="video/mpeg4" then
-                    return image.GetAttributes()["url"]
-                end if
-            end for
-        end if
-    else
-        if images[0]<>invalid then
-            return images[0].GetAttributes()["url"]
-        end if
-    end if
+Sub onURLRefreshTigger()
+    print "SlideshowHelper.brs [onURLRefreshTigger]"
     
-    return invalid
-End Function
+    m.albumActiveObject = m.top.albumobject
+
+    for each albumid in m.albumActiveObject
+    
+      print "ALBUMID: "; albumid
+      print "OBJECT: "; m.albumActiveObject[albumid]
+    
+        if type(m.albumActiveObject[albumid]) = "roAssociativeArray" then
+            tmpPage  = ""
+            tmpCount = "1"
+            if m.albumActiveObject[albumid].previousPageTokens[m.albumActiveObject[albumid].previouspagetokens.Count()-1]<>invalid then
+                tmpPair = m.albumActiveObject[albumid].previousPageTokens[m.albumActiveObject[albumid].previouspagetokens.Count()-1].Split("::")
+                tmpPage = tmpPair[0]
+                tmpCount = tmpPair[1]
+            end if
+        
+            m.albumActiveObject[albumid].showCountStart = StrToI(tmpCount)
+            m.albumActiveObject[albumid].showCountEnd = 0
+            m.albumActiveObject[albumid].apiCount = 0
+                
+            if albumid.Instr("GP_LIBRARY") >= 0 then
+                doGetLibraryImages(albumid, m.albumActiveObject[albumid].GetUserIndex, tmpPage)
+            else if albumid.Instr("SearchResults") >= 0 then
+            
+                m.albumActiveObject[albumid].GetImageCount = 0
+                m.albumActiveObject[albumid].previousPageTokens = []
+                m.albumActiveObject[albumid].showCountStart = 1
+                m.albumActiveObject[albumid].showCountEnd = 0
+                m.albumActiveObject[albumid].apiCount = 0
+                m.albumActiveObject[albumid].imagesMetaData = []
+            
+                m.apiTimer.control = "start"
+                
+                searchStrings = doSearchGenerate()
+                doGetSearch(albumid, m.albumActiveObject[albumid].GetUserIndex, searchStrings[m.albumActiveObject[albumid].keyword], tmpPage)
+            else
+                doGetAlbumImages(albumid, m.albumActiveObject[albumid].GetUserIndex, tmpPage)
+            end if
+        end if
+    end for
+End Sub

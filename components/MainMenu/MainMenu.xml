@@ -32,7 +32,7 @@
             width       = "1920"
             font        = "font:LargeBoldSystemFont"
             color       = "#808080"
-            text        = "My Albums"
+            text        = "Google Photos Albums"
             horizAlign  = "center"
             vertAlign   = "center"
             translation = "[0,261]"
@@ -59,6 +59,12 @@
             horizAlign  = "right"
             vertAlign   = "top"
             translation = "[0,105]"
+        />
+
+         <Dialog
+            id      = "noticeDialog"
+            title   = "Error"
+            visible = "false"
         />
 
   </children>

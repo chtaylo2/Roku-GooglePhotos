@@ -42,7 +42,13 @@
             title   = "Please wait"
             visible = "false"
         />
-           
+
+        <Timer
+            id       = "apiTimer"
+            repeat   = "true"
+            duration = "2"
+        />
+        
         <Dialog
             id      = "noticeDialog"
             title   = "Error"
