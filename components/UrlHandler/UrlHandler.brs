@@ -1,6 +1,6 @@
 '*************************************************************
 '** PhotoView for Google Photos
-'** Copyright (c) 2017-2018 Chris Taylor.  All rights reserved.
+'** Copyright (c) 2017-2019 Chris Taylor.  All rights reserved.
 '** Use of code within this application subject to the MIT License (MIT)
 '** https://raw.githubusercontent.com/chtaylo2/Roku-GooglePhotos/master/LICENSE
 '*************************************************************
@@ -19,7 +19,7 @@ Sub go()
     ' Holds requests by id
     m.jobsById = {}
     ' UriFetcher event loop
-    
+
     while true
         msg = wait(0, m.port)
         mt = type(msg)
@@ -54,12 +54,14 @@ Function addRequest(request as Object) as Boolean
         context = request.context
         if type(context) = "roSGNode"
             parameters = context.parameters
+            'print parameters
             if type(parameters)="roAssociativeArray"
                 headers = parameters.headers
                 method = parameters.method
                 uri = parameters.uri
                 params = parameters.params
-
+                'print parameters
+                
                 if type(uri) = "roString"
                     urlXfer = createObject("roUrlTransfer")
                     urlXfer.SetCertificatesFile("common:/certs/ca-bundle.crt")
@@ -133,9 +135,12 @@ Sub processResponse(msg as Object)
             post_data:   post_data
             num:         jobnum
         }
-        'print "URL RESULT: ";  result
-        'print "MSG: "; msg
-    
+
+        if msg.GetResponseCode() <> 200 then
+           print "URL RESULT: ";  result
+           print "MSG: "; msg.GetResponseCode()
+        end if
+        
         ' could handle various error codes, retry, etc. here
         m.jobsById.delete(idKey)
         job.context.context.response = result
@@ -153,6 +158,8 @@ Sub processResponse(msg as Object)
             m.top.poll_token_response = job.context.context.response
         else if result.num = 6
             m.top.userinfo_response   = job.context.context.response
+        else if result.num = 7
+            m.top.appstatus_response  = job.context.context.response
         end if
     else
         print "Error: event for unknown job "; idkey

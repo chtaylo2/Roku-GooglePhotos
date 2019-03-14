@@ -10,7 +10,16 @@
 
         <Group
             id = "showRegistration">
-            
+
+            <Rectangle
+                id      = "Background"
+                color   = "#EBEBEB"
+                height  = "1080"
+                width   = "1920"
+                opacity = "1"
+                translation = "[0,270]"
+            />
+        
             <Label
                 id          = "Row1"
                 font        = "font:MediumBoldSystemFont"
@@ -18,7 +27,7 @@
                 height      = "150"
                 width       = "1200"
                 wrap        = "true"
-                text        = "To link this Roku device to your Google Photos account, go to:"
+                text        = "To link this Roku device to your Google account, go to:"
                 translation = "[225,300]"
             />
     
@@ -64,8 +73,20 @@
                 height      = "150"
                 width       = "1920"
                 wrap        = "true"
-                text        = "This screen will automatically update as soon as your activation completes"
+                text        = "This screen will automatically update"
                 translation = "[0, 750]"
+            />
+            
+            <Label
+                id          = "Row6"
+                font        = "font:SmallBoldSystemFont"
+                color       = "#808080"
+                horizAlign  = "left"
+                height      = "150"
+                width       = "1300"
+                wrap        = "true"
+                text        = "Permissions requested:&#xA;   • View your Google Photos library – Required to view your photos."
+                translation = "[100, 950]"
             />
     
             <ButtonGroup
@@ -85,7 +106,7 @@
         <Timer
             id          = "LoginTimer"
             repeat      = "true"
-            duration    = "5"
+            duration    = "8"
         />
         
         <Timer

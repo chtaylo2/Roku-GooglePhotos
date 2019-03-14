@@ -3,12 +3,14 @@
 <component name = "Browse" extends = "Group" initialFocus = "ImageGrid" >
 
     <interface>
-        <field id = "id" type = "string" />
-        <field id = "albumName" type = "string" />
-        <field id = "content" type = "node" />
-        <field id = "metaData" type = "array" />
-        <field id = "itemSelected" type = "node" alias = "ImageGrid.itemSelected" onChange = "onItemSelected" />
-        <field id = "itemFocused" type = "node" alias = "ImageGrid.itemFocused" onChange = "onItemFocused" />
+        <field id = "predecessor"    type = "string" />
+        <field id = "id"             type = "string" />
+        <field id = "albumName"      type = "string" />
+        <field id = "albumobject"    type = "assocarray" />
+        <field id = "content"        type = "node" />
+        <field id = "metaData"       type = "array" />
+        <field id = "itemSelected"   type = "node" alias = "ImageGrid.itemSelected" onChange = "onItemSelected" />
+        <field id = "itemFocused"    type = "node" alias = "ImageGrid.itemFocused"  onChange = "onItemFocused" />
     </interface>
   
     <script type = "text/brightscript" uri = "pkg:/components/SlideShow/Browse/Browse.brs" />

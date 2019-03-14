@@ -1,6 +1,6 @@
 '*************************************************************
 '** PhotoView for Google Photos
-'** Copyright (c) 2017-2018 Chris Taylor.  All rights reserved.
+'** Copyright (c) 2017-2019 Chris Taylor.  All rights reserved.
 '** Use of code within this application subject to the MIT License (MIT)
 '** https://raw.githubusercontent.com/chtaylo2/Roku-GooglePhotos/master/LICENSE
 '*************************************************************
@@ -42,29 +42,16 @@ End Sub
 Sub setFeaturesText()
 
     m.itemLabelHeader.text = "New Channel Features"
-    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "1. Continuous Video playback! Allows continuous looping of videos without having to manually hit play. Enable in settings."
-    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "2. Photo captions are now viewable during slideshow playback. See Tips and Tricks."
+    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "1. Major re-write, moving to Googles Photos new API. We're now an offical 'Google Photos Partner'"
+    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "2. Introducing 'This Time in History' playback. See the new Dynamic Albums option."
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "3. TIP: Screensaver can show specific albums. See 'Linked Users' in screensaver options."
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + chr(10) + "Bug fixes:"
-    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "   - Space in search caused an error"
+    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "   - Empty albums caused error in screensaver"
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "   - Other minor bugs"
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + chr(10) + "Thank you for using the PhotoView Channel."
 
     'Write reg entry to we don't redisplay
     RegWrite("FeaturePopup", m.releaseVersion, "Settings")
-    
-    'BEGIN
-    '' REMAP SLIDESHOW ORDER FOR VERSION 2.1 to 2.2 move.
-    '' FOR BACKWARDS COMPATIBILITY - CAN REMOVE IN NEXT VERSION
-    showOrder = RegRead("SlideshowOrder", "Settings")
-    if showOrder = "Newest to Oldest" RegWrite("SlideshowOrder", "Album Order", "Settings")
-    if showOrder = "Oldest to Newest" RegWrite("SlideshowOrder", "Reverse Album Order", "Settings")
-    saverOrder = RegRead("SSaverOrder", "Settings")
-    if saverOrder = "Newest to Oldest" RegWrite("SSaverOrder", "Album Order", "Settings")
-    if saverOrder = "Oldest to Newest" RegWrite("SSaverOrder", "Reverse Album Order", "Settings")
-    'END
-    
-    
     
 End Sub
 
@@ -81,24 +68,11 @@ Sub setThousandText()
 End Sub
 
 
-Sub setOverLoadText()
-
-    m.itemLabelHeader.text = "Albums over 11,000 Items"
-    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "Google Photo's API, unfortunately, does not allow pulling media after page 11. (Over 11,000 items)"
-    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + chr(10) + "To work around this limitation, it is recommended to break-up large albums into smaller, more manageable ones. For example, albums by Month or Year."
-    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + chr(10) + "If this limitation ever changes, this channel will be updated to handle."
-
-    'Write reg entry to we don't redisplay
-    RegWrite("ThousandPopup", "true", "Settings")
-    
-End Sub
-
-
 Sub setAboutText()
 
     m.itemLabelHeader.text = "About Channel"
-    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "The 'PhotoView for Google Photos' channel was developed by Chris Taylor. It's dedicated to his 2-year-old daughter, who goes nuts every time she herself on TV."
-    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + chr(10) + "This channel is and always will remain FREE, with no ads. We're committed to making this one of the best Photo Apps on the Roku platform."
+    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "The 'PhotoView for Google Photos' channel was developed by Chris Taylor. It's dedicated to his 3-year-old daughter, who goes nuts every time she herself on TV."
+    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + chr(10) + "We're committed to making this one of the best Photo Apps on the Roku platform."
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + chr(10) + "If you have any questions or comments, please see [Tips and Tricks > Bugs / Feature Request]"
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + chr(10) + "Please remember to rate us, this helps spread the word and drive development!"
 

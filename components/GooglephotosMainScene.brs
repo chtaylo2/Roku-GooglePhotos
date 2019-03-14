@@ -1,6 +1,6 @@
 '*************************************************************
 '** PhotoView for Google Photos
-'** Copyright (c) 2017-2018 Chris Taylor.  All rights reserved.
+'** Copyright (c) 2017-2019 Chris Taylor.  All rights reserved.
 '** Use of code within this application subject to the MIT License (MIT)
 '** https://raw.githubusercontent.com/chtaylo2/Roku-GooglePhotos/master/LICENSE
 '*************************************************************
@@ -53,7 +53,6 @@ Function showFeaturesPopup()
     m.itemHeader.text       = "Version " + m.releaseVersion + " • New Features"
     m.screenActive          = createObject("roSGNode", "InfoPopup")
     m.screenActive.id       = "FeaturesPopup"
-    'm.screenActive.display  = "FeaturesPopup"
     m.top.appendChild(m.screenActive)
     m.screenActive.setFocus(true)
 End Function
@@ -89,6 +88,19 @@ Function checkRegistration()
 End function
 
 
+Function reRegistrar()
+    'REGISTER NEW USER
+    m.itemHeader.text   = "Registration"
+    m.screenActive = createObject("roSGNode", "Registration")
+    m.top.appendChild(m.screenActive)
+    m.screenActive.setFocus(true)  
+
+    if m.screenKill<>invalid then
+        m.top.removeChild(m.screenKill)
+    end if
+End function
+
+
 Function selectionLoad()
     m.itemHeader.text   = "Select User"
     m.screenActive      = createObject("roSGNode", "UserSelection")
@@ -103,24 +115,50 @@ End function
 
 
 Function mainLoad()
-    if (m.global.selectedUser <> -1) and (m.global.selectedUser <> -2)
-        'A user was selected, display!
-        m.itemHeader.text = ""
-        m.top.removeChild(m.screenActive)
-        m.screenActive      = createObject("roSGNode", "MainMenu")
-        m.screenActive.id   = "MainMenu"
-        m.top.appendChild(m.screenActive)
-        m.screenActive.setFocus(true)
+
+    usersLoaded = oauth_count()
+    print "USERS LOADED: "; usersLoaded
+    print "SELECTED USER: "; m.global.selectedUser
+
+    if (m.global.selectedUser <> usersLoaded) and (m.global.selectedUser <> -1) and (m.global.selectedUser <> -2) and (m.global.selectedUser <> -3) and (m.global.selectedUser <> -4)
+
+        'The following to for v2.x to v3 migration. Can be removed in a later version (Sometime after August, 2019)
+        if m.versionToken[m.global.selectedUser] = "v2token" then
+            m.screenActive          = createObject("roSGNode", "ExpiredPopup")
+            m.screenActive.id       = "RelinkPopup"
+            m.top.appendChild(m.screenActive)
+            m.screenActive.setFocus(true)
+        else
+            'A user was selected, display!
+           m.itemHeader.text = ""
+           m.top.removeChild(m.screenActive)
+           m.screenActive      = createObject("roSGNode", "MainMenu")
+           m.screenActive.id   = "MainMenu"
+           m.top.appendChild(m.screenActive)
+           m.screenActive.setFocus(true)       
+        end if
+
+    else if m.global.selectedUser = usersLoaded
+        'So user can reselect
+        m.global.selectedUser = -4
+        'Add new user account
+        m.screenKill = m.screenActive
+        reRegistrar()
     else if m.global.selectedUser = -2
         'A user was unregistered
         m.screenKill = m.screenActive
-        checkRegistration()       
+        checkRegistration()
+    else if m.global.selectedUser = -3
+        'A users refresh token expired
+        m.screenKill = m.screenActive
+        reRegistrar()
     end if
 End function
 
 
 Function onKeyEvent(key as String, press as Boolean) as Boolean
     if press then
+        print "KEY (GooglephotosMain): "; key
         if key = "back"
             if (m.screenActive <> invalid) and (m.screenActive.id = "UserSelection" or m.screenActive.id = "Registration" or m.screenActive.id = "FeaturesPopup")
                 return false

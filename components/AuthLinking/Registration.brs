@@ -1,6 +1,6 @@
 '*************************************************************
 '** PhotoView for Google Photos
-'** Copyright (c) 2017-2018 Chris Taylor.  All rights reserved.
+'** Copyright (c) 2017-2019 Chris Taylor.  All rights reserved.
 '** Use of code within this application subject to the MIT License (MIT)
 '** https://raw.githubusercontent.com/chtaylo2/Roku-GooglePhotos/master/LICENSE
 '*************************************************************
@@ -12,12 +12,14 @@ Sub init()
     m.Row3              = m.top.findNode("Row3")
     m.Row4              = m.top.findNode("Row4")
     m.Row5              = m.top.findNode("Row5")
+    m.Row6              = m.top.findNode("Row6")
     m.LoginTimer        = m.top.findNode("LoginTimer")
     m.stopScanning      = m.top.findNode("stopScanning")
     m.showRegistration  = m.top.findNode("showRegistration")
     m.noticeDialog      = m.top.findNode("noticeDialog")
     
     m.Row4.font.size = 65
+    m.Row6.font.size = 25
     
     m.UriHandler = createObject("roSGNode","Content UrlHandler")
     m.UriHandler.observeField("gen_token_response","onNewToken")
@@ -47,7 +49,7 @@ Sub doGenerateToken()
     params = "client_id="        + m.clientId
     params = params + "&scope="  + m.oauth_scope
 
-    makeRequest({}, m.oauth_prefix+"/device/code", "POST", params, 4, [])
+    makeRequest({}, m.register_prefix+"/cgi-bin/device/code", "POST", params, 4, [])
 End Sub
 
 
@@ -67,7 +69,7 @@ Sub onNewToken(event as object)
     tokenData = event.getData()
 
     if tokenData.code <> 200
-        errorMsg = "An Error Occured in 'onNewToken'. Code: "+(tokenData.code).toStr()+" - " +tokenData.error
+        errorMsg = "An Error Occurred in 'onNewToken'. Code: "+(tokenData.code).toStr()+" - " +tokenData.error
     else
         json = ParseJson(tokenData.content)
         if json = invalid
@@ -114,7 +116,7 @@ Sub onCheckAuth(event as object)
     
     if pollData <> invalid
         if pollData.code <> 200
-            errorMsg = "An Error Occured in 'onCheckAuth'. Code: "+(pollData.code).toStr()+" - " +pollData.error
+            errorMsg = "An Error Occurred in 'onCheckAuth'. Code: "+(pollData.code).toStr()+" - " +pollData.error
         else
             json = ParseJson(pollData.content)
             if json = invalid
@@ -144,6 +146,7 @@ Sub onCheckAuth(event as object)
                 ' We have our tokens    
                 m.accessToken.Push(getString(json,"access_token"))
                 m.refreshToken.Push(getString(json,"refresh_token"))
+                m.versionToken.Push("v3token")
                 m.tokenType          = getString(json,"token_type")
                 m.tokenExpiresIn     = getInteger(json,"expires_in")
     
@@ -172,11 +175,9 @@ Sub onCheckAuth(event as object)
         m.LoginTimer.control = "stop"
     else
         params = "client_id="                 + m.clientId
-        params = params + "&client_secret="   + m.clientSecret
         params = params + "&code="            + m.deviceCode
-        params = params + "&grant_type="      + "http://oauth.net/grant_type/device/1.0"
     
-        makeRequest({}, m.oauth_prefix+"/token", "POST", params, 5, [])
+        makeRequest({}, m.register_prefix+"/cgi-bin/device/token", "POST", params, 5, [])
 
         m.LoginTimer.repeat = true
         m.LoginTimer.control = "start"
@@ -195,7 +196,7 @@ Sub onStoreUser(event as object)
     if userData <> invalid
     
         if userData.code <> 200
-            errorMsg = "An Error Occured in 'onStoreUser'. Code: "+(userData.code).toStr()+" - " +userData.error
+            errorMsg = "An Error Occurred in 'onStoreUser'. Code: "+(userData.code).toStr()+" - " +userData.error
         else
             json = ParseJson(userData.content)
             if json = invalid
@@ -232,6 +233,7 @@ Sub onStoreUser(event as object)
                             if m.userInfoEmail[i] = infoEmail and infoEmail<>"No email on file" then
                                 m.accessToken.Pop()
                                 m.refreshToken.Pop()
+                                m.versionToken.Pop()
                                 errorMsg = "Account '"  + infoEmail + " is already linked to device"
                                 status = 1
                             end if
@@ -251,9 +253,10 @@ Sub onStoreUser(event as object)
                     
                     m.Row1.text = ""  
                     m.Row2.text = "Successfully Linked Account!"
-                    m.Row3.text = infoName + "'s Google Photos account has been successfully linked to this device"
+                    m.Row3.text = infoName + "'s Google account has been successfully linked to this device"
                     m.Row4.text = ""
                     m.Row5.text = ""
+                    m.Row6.text = ""
                     
                     m.buttongroup.buttons = [ "Continue" ]
                     m.buttongroup.setFocus(true)

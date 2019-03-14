@@ -1,6 +1,6 @@
 '*************************************************************
 '** PhotoView for Google Photos
-'** Copyright (c) 2017-2018 Chris Taylor.  All rights reserved.
+'** Copyright (c) 2017-2019 Chris Taylor.  All rights reserved.
 '** Use of code within this application subject to the MIT License (MIT)
 '** https://raw.githubusercontent.com/chtaylo2/Roku-GooglePhotos/master/LICENSE
 '*************************************************************
@@ -31,7 +31,7 @@ Sub init()
     'Load in the OAuth Registry entries
     loadReg()
     
-    populateHistory()
+    'populateHistory()
     
     'Set some UI customizations
     m.miniKeyboard.texteditbox.maxTextLength    = 20
@@ -81,7 +81,7 @@ End Sub
 
 
 ' URL Request to fetch search
-Sub doGetSearch(keyword as string)
+Sub doGetSearch_DISABLED(keyword as string)
     print "Search.brs [doGetSearch]"
     
     if keyword <> ""
@@ -107,7 +107,7 @@ Sub handleGetSearch(event as object)
         'Expired Token
         doRefreshToken(response.post_data)
     else if response.code <> 200
-        errorMsg = "An Error Occured in 'handleGetSearch'. Code: "+(response.code).toStr()+" - " +response.error
+        errorMsg = "An Error Occurred in 'handleGetSearch'. Code: "+(response.code).toStr()+" - " +response.error
     else
         rsp=ParseXML(response.content)
         
@@ -121,8 +121,9 @@ Sub handleGetSearch(event as object)
             m.searchProgress.visible = false
             
             if strtoi(results) > 0 then
-                m.screenActive = createObject("roSGNode", "My Albums")
+                m.screenActive = createObject("roSGNode", "Google Photos Albums")
                 m.screenActive.imageContent = response
+                m.screenActive.predecessor = "Search Results"
                 m.screenActive.loaded = true
                 m.top.appendChild(m.screenActive)
                 m.screenActive.setFocus(true)

@@ -1,16 +1,20 @@
 <?xml version = "1.0" encoding = "utf-8" ?>
 
-<component name = "InfoPopup" extends = "Group" >
-
-    <interface>
-        <field id = "closeReady" type = "string" />
-    </interface>
+<component name = "ExpiredPopup" extends = "Group" >
     
-    <script type = "text/brightscript" uri = "pkg:/components/InfoPopup/InfoPopup.brs" />
+    <script type = "text/brightscript" uri = "pkg:/components/AuthLinking/ExpiredPopup.brs" />
     <script type = "text/brightscript" uri = "pkg:/components/Utils/Common.brs" />
 
     <children>
-
+        <Rectangle
+            id                  = "Background"
+            color               = "#EBEBEB"
+            height              = "1080"
+            width               = "1920"
+            opacity             = "1"
+            translation         = "[0,270]"
+        />
+        
         <Label
             id                  = "itemLabelHeader"
             font                = "font:LargeBoldSystemFont"
@@ -21,7 +25,7 @@
 
             <Label
                 id              = "itemLabelMain"
-                width           = "1600"
+                width           = "1500"
                 font            = "font:MediumBoldSystemFont"
                 color           = "#808080"
                 horizAlign      = "left"
@@ -32,17 +36,10 @@
             
         </Label>
         
-        <Button
-            id                  = "buttonContinue"
-            text                = "Continue"
+        <ButtonGroup
+            id                  = "buttonGroup"
             translation         = "[1425, 939]"
-        />
-
-        <Timer
-            id                  = "updateField"
-            repeat              = "false"
-            duration            = "0.5"
-        />
+         />
 
   </children>
 </component>

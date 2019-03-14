@@ -1,6 +1,6 @@
 '*************************************************************
 '** PhotoView for Google Photos
-'** Copyright (c) 2017-2018 Chris Taylor.  All rights reserved.
+'** Copyright (c) 2017-2019 Chris Taylor.  All rights reserved.
 '** Use of code within this application subject to the MIT License (MIT)
 '** https://raw.githubusercontent.com/chtaylo2/Roku-GooglePhotos/master/LICENSE
 '*************************************************************
@@ -34,6 +34,8 @@ Sub showmarkupgrid()
         print "User: "; m.userInfoName[i]
         addItem(m.content,  m.userInfoPhoto[i], m.userInfoName[i], m.userInfoEmail[i])
     end for
+    
+    addItem(m.content,  "pkg:/images/adduser.png", "Add Account", "Link additional account to this device")
     
     'Populate grid content
     m.markupgrid.content = m.content
@@ -71,20 +73,6 @@ Sub onItemSelected()
     'Item selected
     print "SELECTEDUSER: "; m.markupgrid.itemSelected
     m.global.selectedUser = m.markupgrid.itemSelected
-End Sub
-
-
-Sub confirmUnregister(event as object)
-    if event.getData() = 0
-        'CONFIRM
-        print "CONFIRMED!"
-        print "TEST: "; m.screenActive
-        print m.top
-    else
-        'CANCEL
-        m.confirmDialog.visible = false
-        m.markupgrid.setFocus(true)
-    end if
 End Sub
 
 

@@ -1,11 +1,14 @@
 '*************************************************************
 '** PhotoView for Google Photos
-'** Copyright (c) 2017-2018 Chris Taylor.  All rights reserved.
+'** Copyright (c) 2017-2019 Chris Taylor.  All rights reserved.
 '** Use of code within this application subject to the MIT License (MIT)
 '** https://raw.githubusercontent.com/chtaylo2/Roku-GooglePhotos/master/LICENSE
 '*************************************************************
 
 Sub init()
+    m.UriHandler = createObject("roSGNode","Content UrlHandler")
+    m.UriHandler.observeField("appstatus_response","handleAppStatus")
+    
     m.top.setFocus(true)
     
     ' Load in the OAuth Registry entries
@@ -16,6 +19,8 @@ Sub init()
     m.itemLabelMain1    = m.top.findNode("itemLabelMain1")
     m.itemLabelMain2    = m.top.findNode("itemLabelMain2")
     m.itemHeader        = m.top.findNode("itemHeader")
+    m.noticeDialog      = m.top.findNode("noticeDialog")
+    m.supportReset      = "Normal"
     
     m.itemHeader.text   = m.userInfoName[m.global.selectedUser] + " • Main Menu"
     
@@ -23,7 +28,33 @@ Sub init()
     m.readMarkupGridTask = createObject("roSGNode", "Local ContentReader")
     m.readMarkupGridTask.file = "pkg:/data/homeGridContent.xml"
     m.readMarkupGridTask.observeField("content", "showmarkupgrid")
-    m.readMarkupGridTask.control = "RUN"  
+    m.readMarkupGridTask.control = "RUN"
+    
+    makeRequest({}, "https://www.roku-photoview.com/status/roku_status_v3.xml" + "?" + getRandomString(10), "GET", "", 7, [])
+    
+End Sub
+
+
+Sub handleAppStatus(event as object)
+    print "MainMenu.brs [handleAppStatus]"
+  
+    response = event.getData()
+    if response.code = 200
+        rsp = ParseXML(response.content)
+        if rsp.GetNamedElements("status")[0].GetText() <> "" then
+            m.itemHeader.text      = rsp.GetNamedElements("status_header")[0].GetText()
+            m.screenActive         = createObject("roSGNode", "StatusPopup")
+            m.screenActive.content = rsp.GetNamedElements("status")[0].GetText()
+            m.screenActive.id      = "StatusPopup"
+            m.top.appendChild(m.screenActive)
+            m.screenActive.setFocus(true)
+            
+            m.markupgrid.visible        = false
+            m.itemLabelMain1.visible    = false
+            m.itemLabelMain2.visible    = false
+            
+        end if
+    end if   
 End Sub
 
 
@@ -57,21 +88,55 @@ Sub onItemSelected()
     'Item selected
     selectedItem = m.markupgrid.content.getChild(m.markupgrid.itemSelected)
     screenToDisplay = selectedItem.shortdescriptionline1
-      
-    m.markupgrid.visible        = false
-    m.itemLabelMain1.visible    = false
-    m.itemLabelMain2.visible    = false
+    
+    if screenToDisplay = "Search" then
+        m.noticeDialog.visible = true
+        buttons =  [ "OK" ]
+        m.noticeDialog.title   = "Notice"
+        m.noticeDialog.message = "Google Photos new API does not currently have image searching available. A feature request is opened and hope to then have this re-enabled soon."
+        m.noticeDialog.buttons = buttons
+        m.noticeDialog.setFocus(true)
+        m.noticeDialog.observeField("buttonSelected","noticeClose")
+    
+    else
+        m.markupgrid.visible        = false
+        m.itemLabelMain1.visible    = false
+        m.itemLabelMain2.visible    = false
+    
+        m.itemHeader.text           = m.userInfoName[m.global.selectedUser] + " • " + screenToDisplay
+        m.screenActive              = createObject("roSGNode", screenToDisplay)
+        m.screenActive.loaded       = true
+        m.top.appendChild(m.screenActive)
+        m.screenActive.setFocus(true)
+    end if
+End Sub
 
-    m.itemHeader.text           = m.userInfoName[m.global.selectedUser] + " • " + screenToDisplay
-    m.screenActive              = createObject("roSGNode", screenToDisplay)
-    m.screenActive.loaded       = true
-    m.top.appendChild(m.screenActive)
-    m.screenActive.setFocus(true)
+
+Sub noticeClose(event as object)
+    m.noticeDialog.visible = false
+    m.markupgrid.setFocus(true)
 End Sub
 
 
 Function onKeyEvent(key as String, press as Boolean) as Boolean
     if press then
+        print "KEY: "; key
+        
+        if key = "OK" and (m.screenActive <> invalid) and (m.screenActive.id = "StatusPopup") then
+            m.top.removeChild(m.screenActive)
+            m.screenActive = invalid
+            
+            m.itemHeader.text        = m.userInfoName[m.global.selectedUser] + " • Main Menu"
+            m.markupgrid.visible     = true
+            m.itemLabelMain1.visible = true
+            m.itemLabelMain2.visible = true
+            m.markupgrid.setFocus(true)
+        end if
+        
+        
+        'This will monitor events looking for the registery delete sequence
+        m.supportReset = supportResetMonitor(key, m.supportReset)
+        
         if key = "back"        
             if (m.screenActive <> invalid)
                 m.top.removeChild(m.screenActive)

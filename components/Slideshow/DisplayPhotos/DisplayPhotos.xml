@@ -3,8 +3,10 @@
 <component name = "DisplayPhotos" extends = "Group" >
 
     <interface>
-        <field id = "content" type = "array" />
-        <field id = "startIndex" type = "integer" value="-1" />
+        <field id = "predecessor"    type = "string" />
+        <field id = "albumobject"    type = "assocarray" />
+        <field id = "content"        type = "array" />
+        <field id = "startIndex"     type = "integer" value="-1" />
     </interface>
   
     <script type = "text/brightscript" uri = "pkg:/components/SlideShow/DisplayPhotos/DisplayPhotos.brs" />
@@ -201,6 +203,28 @@
       
         </Rectangle>
 
+        <!-- Used to display screensaver screen -->
+        <Rectangle
+            id          = "RediscoverScreen"
+            color       = "0x000000"
+            height      = "35"
+            width       = "600"
+            translation = "[0,1020]"
+            opacity     = ".7"
+            visible     = "false" >
+         
+            <Label 
+               id           = "RediscoverDetail" 
+               height       = "35" 
+               width        = "555"
+               horizAlign   = "left"
+               vertAlign    = "center"
+               color        = "#eaeaea"
+               translation  = "[ 55, 0 ]" >            
+            </Label>
+      
+        </Rectangle>
+        
         <!-- Screensaver watermark -->
         <Poster
             id          = "Watermark"
@@ -221,9 +245,31 @@
         />
         
         <Timer
+            id          = "URLRefreshTimer"
+            duration    = "1500"
+        />
+        
+        <Timer
             id          = "moveWatermark"
             repeat      = "true"
             duration    = "1200"
+        />
+        
+        <Timer
+            id          = "apiTimer"
+            repeat      = "true"
+            duration    = "2"
+        />
+
+        <Timer
+            id          = "DisplayTimer"
+            duration    = "0"
+        />
+                
+        <Dialog
+            id          = "noticeDialog"
+            title       = "Error"
+            visible     = "false"
         />
             
    </children>
