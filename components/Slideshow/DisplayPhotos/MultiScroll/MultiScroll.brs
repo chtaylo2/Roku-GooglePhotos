@@ -170,7 +170,7 @@ Sub loadImageList()
         
         m.MoveTimer.observeField("fire","onMoveTrigger")
         m.MoveTimer.control        = "start"
-        m.DisplayTimer.duration    = "18000"  '5 hours
+        m.DisplayTimer.duration    = "14400"  '4 hours
     else
         m.DisplayTimer.duration    = "43200"  '12 hours
     end if    
@@ -456,7 +456,7 @@ End Sub
 Sub onDisplayTimer()
 
     ' ** Why the hell is this here you ask? **
-    '  Screensaver will now expire after 5 hours due to the API and download limitations Google has set. I don't want all API usage going to people not sitting in front of thier device. Sorry, but that's the way it is right now, plan and simple.
+    '  Screensaver will now expire after 4 hours due to the API and download limitations Google has set. I don't want all API usage going to people not sitting in front of thier device. Sorry, but that's the way it is right now, plan and simple.
     '  In months to come, I'll review how this channel is doing on the API usage and see if this can be extended or removed.
     '  Last review: March, 2019
 
