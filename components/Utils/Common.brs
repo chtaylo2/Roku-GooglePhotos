@@ -58,7 +58,7 @@ Function loadDefaults()
     tmp = RegRead("SSaverOrder", "Settings")
     if tmp=invalid RegWrite("SSaverOrder", "Random Order", "Settings")
     tmp = RegRead("SSaverMethod", "Settings")
-    if tmp=invalid RegWrite("SSaverMethod", "Multi-Scrolling", "Settings")
+    if tmp=invalid RegWrite("SSaverMethod", "YesFading_YesBlur", "Settings")
     
     tmp = RegRead("SlideshowDisplay", "Settings")
     if tmp=invalid RegWrite("SlideshowDisplay", "YesFading_YesBlur", "Settings")

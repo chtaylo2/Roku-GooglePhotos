@@ -17,15 +17,15 @@
 
     <children>
 
-        <ScrollingImage id = "scroll_node_1" duration = "30" />
-        <ScrollingImage id = "scroll_node_2" duration = "26" />
-        <ScrollingImage id = "scroll_node_3" duration = "32" />
-        <ScrollingImage id = "scroll_node_4" duration = "27" />
-        <ScrollingImage id = "scroll_node_5" duration = "27" />
-        <ScrollingImage id = "scroll_node_6" duration = "32" />
-        <ScrollingImage id = "scroll_node_7" duration = "23" />
-        <ScrollingImage id = "scroll_node_8" duration = "20" />
-
+        <ScrollingImage id = "scroll_node_1" duration = "60" />
+        <ScrollingImage id = "scroll_node_2" duration = "52" />
+        <ScrollingImage id = "scroll_node_3" duration = "64" />
+        <ScrollingImage id = "scroll_node_4" duration = "54" />
+        <ScrollingImage id = "scroll_node_5" duration = "54" />
+        <ScrollingImage id = "scroll_node_6" duration = "64" />
+        <ScrollingImage id = "scroll_node_7" duration = "46" />
+        <ScrollingImage id = "scroll_node_8" duration = "40" />
+        
         <!-- Used to display screensaver screen -->
         <Rectangle
             id          = "RediscoverScreen"
@@ -59,7 +59,7 @@
         <Timer
             id          = "waveTimer"
             repeat      = "true"
-            duration    = "5"
+            duration    = "10"
         />
         
         <Timer
