@@ -161,8 +161,13 @@ Sub loadImageList()
                 nxt = 0
             end if 
         end if
-        
-        originalList[nxt].url = originalList[nxt].url+getResolution(m.showRes)
+ 
+        rxLocal = CreateObject("roRegex", "pkg:/", "i")
+        if rxLocal.IsMatch(originalList[nxt].url) then
+            originalList[nxt].url = originalList[nxt].url
+        else
+            originalList[nxt].url = originalList[nxt].url+getResolution(m.showRes)
+        end if
         m.imageDisplay.push(originalList[nxt])
         originalList.Delete(nxt)
                  
