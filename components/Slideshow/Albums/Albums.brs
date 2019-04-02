@@ -283,17 +283,11 @@ Sub onItemSelected()
         m.itemLabelMain2.text = m.albumName
         m.itemLabelMain3.text = ""
         
-        if m.albumActiveObject[albumid].GetImageCount > 1000 then
-            lastPopup = RegRead("ThousandPopup","Settings")
-            if (lastPopup=invalid or lastPopup<>"v3.0true") then showThousandPopup()
-        else
-
-            'Display Loading Spinner
-            showLoadingSpinner(3, "GP_LOADING")
+        'Display Loading Spinner
+        showLoadingSpinner(3, "GP_LOADING")
         
-            'API CALL: Get album image listing
-            doGetAlbumImages(albumid, m.global.selectedUser)
-        end if
+        'API CALL: Get album image listing
+        doGetAlbumImages(albumid, m.global.selectedUser)
     
     else if selection.id = "GP_PULL_NEXT" then
         print "GP_PULL_NEXT"

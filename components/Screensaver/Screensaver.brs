@@ -370,7 +370,7 @@ Sub onApiTimerTrigger()
     print "API CALLS LEFT: "; m.apiPending; " - Image Count: "; m.photoItems.Count()
 
     if m.apiPending = 0 then
-        if m.albumActiveObject.Count() = 0 then
+        if (m.albumActiveObject.Count() = 0) and (m.userCount <> 0) then
             processAlbums()
         else
             execScreensaver()
