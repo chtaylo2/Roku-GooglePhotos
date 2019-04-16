@@ -187,7 +187,7 @@ Sub printAlbumSelection(albumList As Object)
         parsedString = regAlbums.Split("|")
         for each item in parsedString
             albumUser = item.Split(":")
-            if (albumUser[0] = "GP_LIBRARY") and (albumUser[1] = response.post_data[1].Tostr()) then
+            if (albumUser[0] = "GP_LIBRARY") then
                 'Check selected album
                 saved = 1
             end if
