@@ -61,6 +61,43 @@
             
         </Group>
         
+        <LabelList
+            id          = "mediaPageList"
+            translation = "[ 400, 300 ]"
+            itemSize    = "[500,50]"
+            itemSpacing = "[0,20]"
+            color       = "#808080"
+            numRows     = "10"
+            vertFocusAnimationStyle = "floatingFocus" >
+
+            <Label 
+                id          = "mediaPageInfo1" 
+                height      = "200" 
+                width       = "400" 
+                wrap        = "true"
+                text        = "Browse Media"
+                horizAlign  = "center"
+                vertAlign   = "center"
+                color       ="#808080"
+                font        = "font:LargeBoldSystemFont"
+                translation = "[ 700, 150 ]"
+            />
+         
+            <Label 
+                id          = "mediaPageInfo2" 
+                height      = "200" 
+                width       = "400" 
+                wrap        = "true"
+                text        = "Items: 1 thru 100"
+                horizAlign  = "center"
+                vertAlign   = "center"
+                color       = "#808080"
+                font        = "font:MediumSystemFont"
+                translation = "[ 700, 200 ]"
+            />
+      
+        </LabelList>       
+        
         <PosterGrid
             id                    = "ImageGrid"
             itemSpacing           = "[30, 30]"
