@@ -7,7 +7,6 @@
 
 Sub init()
     m.ImageGrid      = m.top.findNode("ImageGrid")
-    m.mediaPageList  = m.top.findNode("mediaPageList")
     m.itemLabelMain1 = m.top.findNode("itemLabelMain1")
     m.itemLabelMain2 = m.top.findNode("itemLabelMain2")
     m.settingsIcon   = m.top.findNode("settingsIcon")
