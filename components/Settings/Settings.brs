@@ -87,7 +87,7 @@ Sub doGetAlbumSelection(pageNext="" As String)
 
     if selectedUser <> usersLoaded then
         m.loadingSpinner.visible = true
-        m.infoLabel.text = m.infoLabel.text + chr(10) + chr(10) + "Current user selected: " + m.userInfoName[selectedUser]
+        m.infoLabel.text = m.infoLabel.text + chr(10) + chr(10) + "Current user selected: " + m.userInfoEmail[selectedUser]
         doGetAlbumList(selectedUser, pageNext)
     
     else
@@ -414,7 +414,7 @@ Sub storeLinkedUsers()
         addItem(m.content, "No users linked", "0", "")
     else
         for i = 0 to usersLoaded-1
-            addItem(m.content,  m.userInfoName[i] + " - (" + m.userInfoEmail[i] + ")", m.userInfoEmail[i], regStore)
+            addItem(m.content,  m.userInfoEmail[i], m.userInfoEmail[i], regStore)
             if regSelection = m.userInfoEmail[i] then radioSelection = i
         end for
         if usersLoaded > 1 then
@@ -526,7 +526,7 @@ Sub showselected()
             'UNREGISTER USER
             m.confirmDialog.visible = true
             buttons                 =  [ "Confirm", "Cancel" ]
-            m.confirmDialog.message = "Are you sure you want to unregister "  + m.userInfoName[m.global.selectedUser] + " from this device?"
+            m.confirmDialog.message = "Are you sure you want to unregister "  + m.userInfoEmail[m.global.selectedUser] + " from this device?"
             m.confirmDialog.buttons = buttons
             m.confirmDialog.setFocus(true)        
         end if    
