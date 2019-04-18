@@ -14,6 +14,9 @@ Sub init()
     ' Load in the OAuth Registry entries
     loadReg()
     
+    'Load common variables
+    loadCommon()
+    
     'Define SG nodes
     m.markupgrid        = m.top.findNode("homeGrid")
     m.itemLabelMain1    = m.top.findNode("itemLabelMain1")
@@ -30,7 +33,7 @@ Sub init()
     m.readMarkupGridTask.observeField("content", "showmarkupgrid")
     m.readMarkupGridTask.control = "RUN"
     
-    makeRequest({}, "https://www.roku-photoview.com/status/roku_status_v3.xml" + "?" + getRandomString(10), "GET", "", 7, [])
+    makeRequest({}, "https://www.roku-photoview.com/status/roku_status_v" + m.releaseVersion + ".xml" + "?" + getRandomString(10), "GET", "", 7, [])
     
 End Sub
 
