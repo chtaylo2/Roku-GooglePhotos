@@ -42,7 +42,7 @@ End Sub
 Sub setFeaturesText()
 
     m.itemLabelHeader.text = "New Channel Features"
-    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "1. Major re-write, moving to Googles Photos new API. We're now an offical 'Google Photos Partner'"
+    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "1. Major re-write, moving to Google Photos new API. We're now an offical 'Google Photos Partner'"
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "2. Introducing 'This Time in History' playback. See the new Dynamic Albums option."
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "3. Usage Optimizations"
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + chr(10) + "Bug fixes:"
@@ -72,7 +72,7 @@ End Sub
 Sub setAboutText()
 
     m.itemLabelHeader.text = "About Channel"
-    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "The 'PhotoView for Google Photos' channel was developed by Chris Taylor. It's dedicated to his 3-year-old daughter, who goes nuts every time she herself on TV."
+    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "The 'PhotoView for Google Photos' channel was developed by Chris Taylor. It's dedicated to his 3-year-old daughter, who goes nuts every time she sees herself on TV."
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + chr(10) + "We're committed to making this one of the best Photo Apps on the Roku platform."
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + chr(10) + "If you have any questions or comments, please see [Tips and Tricks > Bugs / Feature Request]"
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + chr(10) + "Please remember to rate us, this helps spread the word and drive development!"
