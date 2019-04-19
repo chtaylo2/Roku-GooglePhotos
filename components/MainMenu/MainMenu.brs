@@ -25,7 +25,7 @@ Sub init()
     m.noticeDialog      = m.top.findNode("noticeDialog")
     m.supportReset      = "Normal"
     
-    m.itemHeader.text   = m.userInfoEmail[m.global.selectedUser] + " • Main Menu"
+    m.itemHeader.text   = m.userInfoName[m.global.selectedUser] + " • Main Menu"
     
     'Read in content
     m.readMarkupGridTask = createObject("roSGNode", "Local ContentReader")
@@ -106,7 +106,7 @@ Sub onItemSelected()
         m.itemLabelMain1.visible    = false
         m.itemLabelMain2.visible    = false
     
-        m.itemHeader.text           = m.userInfoEmail[m.global.selectedUser] + " • " + screenToDisplay
+        m.itemHeader.text           = m.userInfoName[m.global.selectedUser] + " • " + screenToDisplay
         m.screenActive              = createObject("roSGNode", screenToDisplay)
         m.screenActive.loaded       = true
         m.top.appendChild(m.screenActive)
@@ -129,7 +129,7 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
             m.top.removeChild(m.screenActive)
             m.screenActive = invalid
             
-            m.itemHeader.text        = m.userInfoEmail[m.global.selectedUser] + " • Main Menu"
+            m.itemHeader.text        = m.userInfoName[m.global.selectedUser] + " • Main Menu"
             m.markupgrid.visible     = true
             m.itemLabelMain1.visible = true
             m.itemLabelMain2.visible = true
@@ -145,7 +145,7 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
                 m.top.removeChild(m.screenActive)
                 m.screenActive = invalid
 
-                m.itemHeader.text        = m.userInfoEmail[m.global.selectedUser] + " • Main Menu"
+                m.itemHeader.text        = m.userInfoName[m.global.selectedUser] + " • Main Menu"
                 m.markupgrid.visible     = true
                 m.itemLabelMain1.visible = true
                 m.itemLabelMain2.visible = true
