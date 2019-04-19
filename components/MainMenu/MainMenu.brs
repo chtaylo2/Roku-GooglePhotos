@@ -96,7 +96,7 @@ Sub onItemSelected()
         m.noticeDialog.visible = true
         buttons =  [ "OK" ]
         m.noticeDialog.title   = "Notice"
-        m.noticeDialog.message = "Google Photos new API does not currently have image searching available. A feature request is opened and hope to then have this re-enabled soon."
+        m.noticeDialog.message = "Google Photos new API does not currently have image searching available. A feature request is opened with Google and hope to have this re-enabled soon."
         m.noticeDialog.buttons = buttons
         m.noticeDialog.setFocus(true)
         m.noticeDialog.observeField("buttonSelected","noticeClose")

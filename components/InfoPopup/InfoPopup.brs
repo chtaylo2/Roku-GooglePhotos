@@ -44,9 +44,10 @@ Sub setFeaturesText()
     m.itemLabelHeader.text = "New Channel Features"
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "1. Major re-write, moving to Googles Photos new API. We're now an offical 'Google Photos Partner'"
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "2. Introducing 'This Time in History' playback. See the new Dynamic Albums option."
-    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "3. TIP: Screensaver can show specific albums. See 'Linked Users' in screensaver options."
+    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "3. Usage Optimizations"
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + chr(10) + "Bug fixes:"
-    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "   - Empty albums caused error in screensaver"
+    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "   - Screensaver album selection crash"
+    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "   - Addressing Google API change, removing account name"
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "   - Other minor bugs"
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + chr(10) + "Thank you for using the PhotoView Channel."
 

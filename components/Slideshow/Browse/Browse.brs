@@ -175,8 +175,8 @@ Sub onItemSelected()
         if m.global.SlideshowOrder <> "" m.showOrder = m.global.SlideshowOrder
         if m.global.VideoContinuePlay <> "" m.showVideoPlayback = m.global.VideoContinuePlay
     
-        m.videoPlayingindex = m.ImageGrid.itemSelected
-        doVideoShow(m.metaData[m.ImageGrid.itemSelected])
+        m.videoPlayingindex = m.ImageGrid.itemSelected + (m.pageSelected * m.itemsPerPage)
+        doVideoShow(m.metaData[m.ImageGrid.itemSelected + (m.pageSelected * m.itemsPerPage)])
     end if
 End Sub
 
@@ -199,9 +199,9 @@ Sub doVideoShow(videoStore as object)
     videoContent.streamformat = "mp4"
     videoContent.Title        = friendlyDate(videoStore.timestamp)
     if videoStore.description <> "" then
-        videoContent.TitleSeason = videoStore.description  + " - " + thumbnailObj.filename
+        videoContent.TitleSeason = videoStore.description  + " - " + videoStore.filename
     else
-        videoContent.TitleSeason = thumbnailObj.filename
+        videoContent.TitleSeason = videoStore.filename
     end if
     
     m.VideoPlayer.visible = true
