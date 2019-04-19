@@ -441,12 +441,9 @@ End Function
 Sub onLoadMonitor(event as object)
     print "Status: "; event.getdata()
     if event.getdata() = "failed" then
-        print "ERROR TRIGGERED"
         if m.URLRefreshTimer.control <> "start" then
             onURLRefreshTigger()
             m.URLRefreshTimer.control = "start"
-        else
-            print "NO TRIGGER"
         end if
     end if
 
@@ -470,10 +467,27 @@ Sub onApiTimerTrigger()
     print "API CALLS LEFT: "; m.apiPending
 
     if m.apiPending = 0 then
-        m.apiTimer.control = "stop"
-        
+        m.apiTimer.control = "stop"        
         if m.albumActiveObject["SearchResults"].showcountend > 0 then
-            m.imageDisplay = m.albumActiveObject["SearchResults"].imagesMetaData          
+            'Copy original list since we can't change origin
+            originalList = m.albumActiveObject["SearchResults"].imagesMetaData
+    
+            for i = 0 to m.albumActiveObject["SearchResults"].imagesMetaData.Count()-1
+                if m.top.showorder = "Random Order" then
+                    'Create image display list - RANDOM
+                    nxt = GetRandom(originalList)
+                else if m.top.showorder = "Reverse Album Order"
+                    'Create image display list - REVERSE ALBUM ORDER
+                    nxt = originalList.Count()-1
+                else
+                    'Create image display list - ALBUM ORDER
+                    nxt = 0
+                end if 
+ 
+                originalList[nxt].url = originalList[nxt].url+getResolution(m.top.showres)
+                m.imageDisplay.push(originalList[nxt])
+                originalList.Delete(nxt)   
+            end for    
         end if
     end if
 End Sub
