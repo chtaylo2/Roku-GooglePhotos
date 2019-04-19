@@ -1,8 +1,8 @@
 title=PhotoView for Google Photos
 #
 major_version=5
-minor_version=203
-build_version=20190319
+minor_version=226
+build_version=20190419
 #
 mm_icon_focus_fhd=pkg:/images/mm_icon_focus_hd.png
 mm_icon_focus_hd=pkg:/images/mm_icon_focus_hd.png
@@ -18,3 +18,4 @@ screensaver_private=0
 #
 splash_min_time=2000
 ui_resolutions=fhd
+confirm_partner_button=1

@@ -110,7 +110,11 @@ End Sub
 Sub onCheckAuth(event as object)
     print "Registration.brs [onCheckAuth]"
     status = -1   ' 0 => Finished (got tokens), < 0 => Retry needed, > 0 => fatal error
-        
+
+    'Stop the screensaver from starting
+    m.keyResetTask = createObject("roSGNode", "KeyReset")
+    m.keyResetTask.control = "RUN"
+
     errorMsg = ""
     pollData = m.UriHandler.poll_token_response
     

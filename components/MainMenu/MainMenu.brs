@@ -14,6 +14,9 @@ Sub init()
     ' Load in the OAuth Registry entries
     loadReg()
     
+    'Load common variables
+    loadCommon()
+    
     'Define SG nodes
     m.markupgrid        = m.top.findNode("homeGrid")
     m.itemLabelMain1    = m.top.findNode("itemLabelMain1")
@@ -30,7 +33,7 @@ Sub init()
     m.readMarkupGridTask.observeField("content", "showmarkupgrid")
     m.readMarkupGridTask.control = "RUN"
     
-    makeRequest({}, "https://www.roku-photoview.com/status/roku_status_v3.xml" + "?" + getRandomString(10), "GET", "", 7, [])
+    makeRequest({}, "https://www.roku-photoview.com/status/roku_status_v" + m.releaseVersion + ".xml" + "?" + getRandomString(10), "GET", "", 7, [])
     
 End Sub
 
@@ -93,7 +96,7 @@ Sub onItemSelected()
         m.noticeDialog.visible = true
         buttons =  [ "OK" ]
         m.noticeDialog.title   = "Notice"
-        m.noticeDialog.message = "Google Photos new API does not currently have image searching available. A feature request is opened and hope to then have this re-enabled soon."
+        m.noticeDialog.message = "Google Photos new API does not currently have image searching available. A feature request is opened with Google and hope to have this re-enabled soon."
         m.noticeDialog.buttons = buttons
         m.noticeDialog.setFocus(true)
         m.noticeDialog.observeField("buttonSelected","noticeClose")

@@ -30,26 +30,31 @@
       
                 for i = 0 to m.top.remotearray.Count()-1
                     item = m.top.remotearray[i]
-    
-                    unique = Rnd(10000)
-                    mypath = CreateObject("roPath", item.url)
-                    fileObj = myPath.Split()
-        
-                    fname =  "tmp:/" + itostr(unique) + "_" + item.filename
-                    
-                    'print "Fname: "; fname
-                    'print "Caching Image: "; item.url
-                    
-                    httpObj.setUrl(item.url)
-                    httpObj.AsyncGetToFile( fname )
-    
-                    msg = wait(0, port)
-                    
-                    'print "  -- download result ["; fname; "] - Result ["; msg.GetResponseCode(); "]"
-                    if msg.GetResponseCode() = 403 then
-                        response["ACCESS ERROR"] = "403"
+
+                    rxLocal = CreateObject("roRegex", "pkg:/", "i")
+                    if rxLocal.IsMatch(item.url) then
+                        response[item.url] = item.url
                     else
-                        response[item.url] = fname
+                        unique = Rnd(10000)
+                        mypath = CreateObject("roPath", item.url)
+                        fileObj = myPath.Split()
+
+                        fname =  "tmp:/" + itostr(unique) + "_" + item.filename
+
+                        'print "Fname: "; fname
+                        'print "Caching Image: "; item.url
+
+                        httpObj.setUrl(item.url)
+                        httpObj.AsyncGetToFile( fname )
+
+                        msg = wait(0, port)
+
+                        'print "  -- download result ["; fname; "] - Result ["; msg.GetResponseCode(); "]"
+                        if msg.GetResponseCode() = 403 then
+                            response["ACCESS ERROR"] = "403"
+                        else
+                            response[item.url] = fname
+                        end if
                     end if
                 end for
       

@@ -47,7 +47,7 @@ Sub init()
     m.pauseImageDetail.font.size  = 29
     m.pauseImageDetail2.font.size = 25
     m.RediscoverDetail.font.size  = 25
-    
+
     m.PrimaryImage.observeField("loadStatus","onPrimaryLoadedTrigger")
     m.SecondaryImage.observeField("loadStatus","onSecondaryLoadedTrigger")
     m.RotationTimer.observeField("fire","onRotationTigger")
@@ -161,8 +161,13 @@ Sub loadImageList()
                 nxt = 0
             end if 
         end if
-        
-        originalList[nxt].url = originalList[nxt].url+getResolution(m.showRes)
+ 
+        rxLocal = CreateObject("roRegex", "pkg:/", "i")
+        if rxLocal.IsMatch(originalList[nxt].url) then
+            originalList[nxt].url = originalList[nxt].url
+        else
+            originalList[nxt].url = originalList[nxt].url+getResolution(m.showRes)
+        end if
         m.imageDisplay.push(originalList[nxt])
         originalList.Delete(nxt)
                  
@@ -214,6 +219,7 @@ Sub onRotationTigger(event as object)
             m.screenActive.content     = m.imageDisplay
             m.screenActive.albumobject = m.top.albumobject
             m.screenActive.showres     = m.showRes
+            m.screenActive.showorder   = m.showOrder
             m.screenActive.loaded      = "true"
             m.top.appendChild(m.screenActive)
             m.screenActive.setFocus(true)
@@ -659,7 +665,31 @@ Sub onApiTimerTrigger()
         m.apiTimer.control = "stop"
         
         if m.albumActiveObject["SearchResults"].showcountend > 0 then
-            m.imageDisplay = m.albumActiveObject["SearchResults"].imagesMetaData          
+            'Copy original list since we can't change origin
+            originalList = m.albumActiveObject["SearchResults"].imagesMetaData
+    
+            for i = 0 to m.albumActiveObject["SearchResults"].imagesMetaData.Count()-1
+    
+                if m.top.startIndex <> -1 then
+                    'If coming from browsing, only show in Album Order
+                    nxt = 0
+                else
+                    if m.showOrder = "Random Order" then
+                        'Create image display list - RANDOM
+                        nxt = GetRandom(originalList)
+                    else if m.showOrder = "Reverse Album Order"
+                        'Create image display list - REVERSE ALBUM ORDER
+                        nxt = originalList.Count()-1
+                    else
+                        'Create image display list - ALBUM ORDER
+                        nxt = 0
+                    end if 
+                end if
+ 
+                originalList[nxt].url = originalList[nxt].url+getResolution(m.showRes)
+                m.imageDisplay.push(originalList[nxt])
+                originalList.Delete(nxt)   
+            end for    
         end if
     end if
 End Sub
