@@ -132,21 +132,51 @@ Sub doGetAlbumList(selectedUser=0 as Integer, pageNext="" As String)
 End Sub
 
 
+' URL Request to fetch album listing
+Sub doGetSharedAlbumList(selectedUser=0 as Integer, pageNext="" As String)
+    print "SlideshowHelper.brs [doGetSharedAlbumList]"  
+
+    tmpData = [ "doGetSharedAlbumList", selectedUser, pageNext ]
+
+    params = "pageSize=50"
+    if pageNext<>"" then
+        params = params + "&pageToken=" + pageNext
+    end if
+
+    m.apiPending = m.apiPending+1
+    signedHeader = oauth_sign(selectedUser)
+    makeRequest(signedHeader, m.gp_prefix + "/sharedAlbums?"+params, "GET", "", 0, tmpData)
+    
+End Sub
+
+
 ' Create full album list from XML response
 Function googleAlbumListing(jsonlist As Object) As Object
     albumlist=CreateObject("roList")
     
     'print formatJSON(jsonlist)
-    for each record in jsonlist["albums"]
+    
+    mediaTag = ""
+    
+    if (jsonlist["sharedAlbums"]<>invalid) then
+        mediaTag = "sharedAlbums"
+    else if (jsonlist["albums"]<>invalid) then
+        mediaTag = "albums"
+    else
+        mediaTag = "error"
+    end if
+    
+    for each record in (jsonlist[mediaTag])
         album=googleAlbumCreateRecord(record)
-
+    
         if album.GetImageCount > 0 then
             ' Do not show photos from Google Hangout albums or any marked with "Private" in name
             if album.GetTitle.instr("Hangout:") = -1 and album.GetTitle.instr("rivate") = -1 then
-                albumlist.Push(album)
+            albumlist.Push(album)
             end if
         end if
     next
+    
     
     return albumlist
 End Function

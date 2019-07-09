@@ -71,7 +71,7 @@ Sub showmarkupgrid()
     m.markupgrid.translation = [ centerx + 15, 360 ]
     
     'Select default item
-    m.markupgrid.jumpToItem = 2
+    m.markupgrid.jumpToItem = 3
       
     'Watch for events
     m.markupgrid.observeField("itemFocused", "onItemFocused") 
@@ -96,7 +96,7 @@ Sub onItemSelected()
         m.noticeDialog.visible = true
         buttons =  [ "OK" ]
         m.noticeDialog.title   = "Notice"
-        m.noticeDialog.message = "Google Photos new API does not currently have image searching available. A feature request is opened with Google and hope to have this re-enabled soon."
+        m.noticeDialog.message = "Google Photos announced they will no longer support a 'keyword' search feature in thier API. Unless something changes, this search icon will be removed in a future release. It's unfortunate"
         m.noticeDialog.buttons = buttons
         m.noticeDialog.setFocus(true)
         m.noticeDialog.observeField("buttonSelected","noticeClose")

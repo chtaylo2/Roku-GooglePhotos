@@ -459,6 +459,8 @@ End Sub
 
 
 Sub onPrimaryLoadedTrigger(event as object)
+
+    print "LOAD PRIM: "event.getdata()
     if event.getdata() = "ready" then
         'Center the MarkUp Box
         markupRectAlbum = m.PrimaryImage.localBoundingRect()
@@ -492,6 +494,9 @@ End Sub
 
 
 Sub onSecondaryLoadedTrigger(event as object)
+
+    print "LOAD Sec: "event.getdata()
+
     if event.getdata() = "ready" then
         'Center the MarkUp Box
         markupRectAlbum = m.SecondaryImage.localBoundingRect()
@@ -520,10 +525,6 @@ End Sub
 
 Sub sendNextImage(direction=invalid)
     print "DisplayPhotos.brs [sendNextImage]"
-    
-    'date         = CreateObject("roDateTime")
-    'date.ToLocalTime()
-    'print "  -- time: "; date.ToISOString()
         
     'Get next image to display.
     if m.top.startIndex <> -1 then
@@ -536,6 +537,8 @@ Sub sendNextImage(direction=invalid)
             nextID = GetNextImage(m.imageDisplay, m.imageTracker)
         end if
     end if
+    
+    print "NextID: "; nextID
     
     m.imageTracker = nextID
 
@@ -554,6 +557,7 @@ Sub sendNextImage(direction=invalid)
     ' Whats going on here:
     '   If a direction button is pressed (previous or next) we disable fading for a better user experiance.
     '   Since the images trigger on "loadstatus" change, we first set the URI to null, then populate.
+    '   Due to issue with 2 image albums, we first set the display to null, then populate w/filename
     if direction<>invalid
         if m.imageOnScreen = "PrimaryImage" or m.imageOnScreen = "PrimaryImage_NoFading" then
             m.SecondaryImage.uri = ""
@@ -568,10 +572,12 @@ Sub sendNextImage(direction=invalid)
         end if
     else
         if m.imageOnScreen = "PrimaryImage" or m.imageOnScreen = "PrimaryImage_NoFading" then
+            if m.imageDisplay.Count() = 2 then m.SecondaryImage.uri = ""
             m.SecondaryImage.uri = url
             m.imageOnScreen      = "SecondaryImage"
             if m.showDisplay     = invalid or rxBlur.IsMatch(m.showDisplay) then m.BlendedSecondaryImage.uri = url
         else
+            if m.imageDisplay.Count() = 2 then m.PrimaryImage.uri = ""
             m.PrimaryImage.uri   = url
             m.imageOnScreen      = "PrimaryImage"
             if m.showDisplay = invalid or rxBlur.IsMatch(m.showDisplay) then m.BlendedPrimaryImage.uri = url
