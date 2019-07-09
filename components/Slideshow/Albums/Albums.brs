@@ -57,7 +57,19 @@ Sub loadingComplete()
         
 
         googleDisplayImageMenu(albumid, m.albumActiveObject[albumid].GetTitle, m.albumActiveObject[albumid].GetImageCount)
+    
+    else if m.top.id = "Shared Google Photos Albums" then
+        'Get user albums
         
+        m.albumsObject["albums"] = []
+        m.albumsObject.apiCount = 0
+        
+        'Display Loading Spinner
+        showLoadingSpinner(5, "GP_ALBUM_LISTING")
+        
+        'API CALL: Get album listing
+        doGetSharedAlbumList(m.global.selectedUser)   
+    
     else
         'Get user albums
         
@@ -266,10 +278,18 @@ Sub onItemSelected()
         
     else if selection.id = "GP_ALBUM_LISTING" then
         m.albumSelection = m.albummarkupgrid.itemSelected
-        albumid = m.albumsObject["albums"][m.albummarkupgrid.itemSelected-1].GetID
+        
+        if m.top.id = "Shared Google Photos Albums" then
+            gridSelection = m.albummarkupgrid.itemSelected
+        else
+            gridSelection = m.albummarkupgrid.itemSelected-1
+        end if
+        
+        albumid = m.albumsObject["albums"][gridSelection].GetID
+        
         m.albumActiveObject[albumid] = {}
         m.albumActiveObject["currentID"] = albumid
-        m.albumActiveObject[albumid] = m.albumsObject["albums"][m.albummarkupgrid.itemSelected-1]
+        m.albumActiveObject[albumid] = m.albumsObject["albums"][gridSelection]
         m.albumName = selection.shortdescriptionline1
 
         m.albumActiveObject[albumid].previousPageTokens = []
@@ -401,8 +421,12 @@ End Sub
 
 Sub googleDisplayAlbums(albumList As Object)
 
-    'Everyone has a Google Photos Library in account
-    addItem(m.albumListContent, "GP_ALBUM_LISTING_LIBRARY", m.userInfoPhoto[m.global.selectedUser], "Google Photos Library", "")
+    'Dont add Library item if SharedAlbums selected
+    if m.top.id <> "Shared Google Photos Albums" then
+        'Everyone has a Google Photos Library in account
+        addItem(m.albumListContent, "GP_ALBUM_LISTING_LIBRARY", m.userInfoPhoto[m.global.selectedUser], "Google Photos Library", "")
+    end if
+    
     for each album in albumList
         'All other albums
         addItem(m.albumListContent, "GP_ALBUM_LISTING", album.GetThumb, album.GetTitle, Pluralize(album.GetImageCount,"Item"))

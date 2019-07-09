@@ -1,0 +1,11 @@
+<?xml version = "1.0" encoding = "utf-8" ?> 
+
+<component name = "Shared Google Photos Albums" extends = "Group" >
+    
+    <interface>
+        <field id = "loaded" type = "boolean" onChange = "loadingComplete"/>
+    </interface>
+    
+    <script type = "text/brightscript" uri = "pkg:/components/SlideShow/SharedAlbums/SharedAlbums.brs" />
+    
+</component>
