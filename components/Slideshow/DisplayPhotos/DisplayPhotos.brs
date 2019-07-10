@@ -460,7 +460,6 @@ End Sub
 
 Sub onPrimaryLoadedTrigger(event as object)
 
-    print "LOAD PRIM: "event.getdata()
     if event.getdata() = "ready" then
         'Center the MarkUp Box
         markupRectAlbum = m.PrimaryImage.localBoundingRect()
@@ -494,8 +493,6 @@ End Sub
 
 
 Sub onSecondaryLoadedTrigger(event as object)
-
-    print "LOAD Sec: "event.getdata()
 
     if event.getdata() = "ready" then
         'Center the MarkUp Box
