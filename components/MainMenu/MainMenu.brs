@@ -33,8 +33,6 @@ Sub init()
     m.readMarkupGridTask.observeField("content", "showmarkupgrid")
     m.readMarkupGridTask.control = "RUN"
     
-    makeRequest({}, "https://www.roku-photoview.com/status/roku_status_v" + m.releaseVersion + ".xml" + "?" + getRandomString(10), "GET", "", 7, [])
-    
 End Sub
 
 
@@ -62,6 +60,10 @@ End Sub
 
 
 Sub showmarkupgrid()
+
+    'Show any live status from the site
+    makeRequest({}, "https://www.roku-photoview.com/status/roku_status_v" + m.releaseVersion + ".xml" + "?" + getRandomString(10), "GET", "", 7, [])
+
     'Populate grid content
     m.markupgrid.content = m.readMarkupGridTask.content
 
