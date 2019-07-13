@@ -96,5 +96,11 @@
             duration    = "1200"
         />
         
+        <Dialog
+            id          = "confirmDialog"
+            title       = "Slideshow Paused"
+            visible     = "false"
+        />
+        
     </children>
 </component>

@@ -43,8 +43,8 @@ Sub setFeaturesText()
 
     m.itemLabelHeader.text = "New Channel Features"
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "1. Shared Album support is finally here!"
-    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "2. Checkout 'This Time in History' playback. See the new Dynamic Albums option."
-    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "3. Usage Optimizations"
+    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "2. Implemented HDMI-CEC controls."
+    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "3. Checkout 'This Time in History' playback. See the new Dynamic Albums option."
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + chr(10) + "Bug fixes:"
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "   - Fixed playback issue on albums containing only two items"
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "   - Other minor bugs"

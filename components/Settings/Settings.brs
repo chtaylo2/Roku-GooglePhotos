@@ -43,6 +43,9 @@ End Sub
 
 Sub loadListContent()
 
+    appInfo              = CreateObject("roAppInfo")
+    m.aboutVersion.text  = "Release v" + m.releaseVersion + " - Build " + appInfo.GetVersion()
+    
     if m.top.contentFile = "settingsTemporaryContent"
         'Temporary setting only apply to the running application
         m.setScope           = "temporary"
@@ -51,11 +54,9 @@ Sub loadListContent()
         m.setScope           = "screensaver"
     else
         'Global settings are percistent across reboot
-        appInfo              = CreateObject("roAppInfo")
         m.setScope           = "global"
-        m.aboutVersion.text  = "Release v" + m.releaseVersion + " - Build " + appInfo.GetVersion()
     end if
-
+    
     if m.setScope = "temporary"
         m.settingScopeLabel.text = "Temporary Settings:"
     else if m.setScope = "screensaver"
@@ -222,6 +223,7 @@ End Sub
 Sub setLists()
     'Setup content list for different settings
     storeLinkedUsers()
+    storeCECOptions()
     storeResolutionOptions()
     storeDisplayOptions()
     storeDelayOptions()
@@ -338,12 +340,22 @@ Sub storeDelayOptions()
     end if
     
     m.content = createObject("RoSGNode","ContentNode")
-    addItem(m.content, "5 seconds", "5", regStore)
-    addItem(m.content, "8 seconds (Default)", "8", regStore)
-    addItem(m.content, "10 seconds", "10", regStore)
-    addItem(m.content, "15 seconds", "15", regStore)
-    addItem(m.content, "30 seconds", "30", regStore)
-    addItem(m.content, "Custom Setting"+tmp, "9999", regStore)
+    
+    if m.setScope = "screensaver"
+        addItem(m.content, "5 seconds", "5", regStore)
+        addItem(m.content, "8 seconds", "8", regStore)
+        addItem(m.content, "10 seconds", "10", regStore)
+        addItem(m.content, "15 seconds (Default)", "15", regStore)
+        addItem(m.content, "30 seconds", "30", regStore)
+        addItem(m.content, "Custom Setting"+tmp, "9999", regStore)
+    else
+        addItem(m.content, "5 seconds", "5", regStore)
+        addItem(m.content, "8 seconds (Default)", "8", regStore)
+        addItem(m.content, "10 seconds", "10", regStore)
+        addItem(m.content, "15 seconds", "15", regStore)
+        addItem(m.content, "30 seconds", "30", regStore)
+        addItem(m.content, "Custom Setting"+tmp, "9999", regStore)
+    end if
     
     'Store content node and current registry selection
     m.settingsDelay = m.content
@@ -365,11 +377,18 @@ Sub storeOrder()
 
     m.content = createObject("RoSGNode","ContentNode")
     if regSelection = "Album Order" then radioSelection = 0
-    addItem(m.content, "Album Order (Default)", "Album Order", regStore)
     if regSelection = "Reverse Album Order" then radioSelection = 1
-    addItem(m.content, "Reverse Album Order", "Reverse Album Order", regStore)
     if regSelection = "Random Order" then radioSelection = 2
-    addItem(m.content, "Random Order", "Random Order", regStore)
+    
+    if m.setScope = "screensaver"
+        addItem(m.content, "Album Order", "Album Order", regStore)
+        addItem(m.content, "Reverse Album Order", "Reverse Album Order", regStore)
+        addItem(m.content, "Random Order  (Default)", "Random Order", regStore)
+    else
+        addItem(m.content, "Album Order (Default)", "Album Order", regStore)
+        addItem(m.content, "Reverse Album Order", "Reverse Album Order", regStore)
+        addItem(m.content, "Random Order", "Random Order", regStore)    
+    end if
     
     'Store content node and current registry selection
     m.settingsOrder = m.content
@@ -428,6 +447,25 @@ Sub storeLinkedUsers()
     'Store content node and current registry selection
     m.settingsUsers = m.content
     m.settingsUserscheckedItem = radioSelection
+End Sub
+
+
+Sub storeCECOptions()
+    'Populate HDMI-CEC options
+    
+    radioSelection = 0
+    regStore       = "SSaverCEC"
+    regSelection   = RegRead(regStore, "Settings")
+
+    m.content = createObject("RoSGNode","ContentNode")
+    if regSelection = "HDMI-CEC Enabled" then radioSelection = 0
+    addItem(m.content, "HDMI-CEC Enabled (Default)", "HDMI-CEC Enabled", regStore)
+    if regSelection = "HDMI-CEC Disabled" then radioSelection = 1
+    addItem(m.content, "HDMI-CEC Disabled", "HDMI-CEC Disabled", regStore)
+    
+    'Store content node and current registry selection
+    m.settingsCEC = m.content
+    m.settingsCECcheckedItem = radioSelection
 End Sub
 
 
@@ -495,7 +533,15 @@ Sub showfocus()
                 m.settingSubList.visible        = "false"
             end if
         else if m.settingsList.itemFocused = 6 then
-            m.settingSubList.visible        = "false"
+            if m.setScope = "screensaver"
+                m.albumDirections.visible       = "false"
+                m.settingSubList.visible        = "true"
+                m.settingSubList.content        = m.settingsCEC
+                m.settingSubList.checkedItem    = m.settingsCECcheckedItem
+                m.settingSubList.translation    = [129, itemcontent.x]
+            else
+                m.settingSubList.visible        = "false"
+            end if
         else if m.settingsList.itemFocused = 7 then
             m.settingSubList.visible        = "false"
             m.aboutVersion.visible          = "true"
@@ -508,7 +554,7 @@ Sub showselected()
 
     'Process item selected
     if m.setScope = "screensaver"
-        if m.settingsList.itemSelected = 0 OR m.settingsList.itemSelected = 1 OR m.settingsList.itemSelected = 2 OR m.settingsList.itemSelected = 3 OR m.settingsList.itemSelected = 5 then
+        if m.settingsList.itemSelected = 0 OR m.settingsList.itemSelected = 1 OR m.settingsList.itemSelected = 2 OR m.settingsList.itemSelected = 3 OR m.settingsList.itemSelected = 5 OR m.settingsList.itemSelected = 6 then
             'SETTINGS
             m.settingSubList.setFocus(true)
         end if    
@@ -569,7 +615,8 @@ Sub showsubselected()
     if m.settingsList.itemSelected = 2 then m.settingsDelaycheckedItem   = m.settingSubList.itemSelected
     if m.settingsList.itemSelected = 3 then m.settingsOrdercheckedItem   = m.settingSubList.itemSelected
     if m.settingsList.itemSelected = 4 then m.settingsVideocheckedItem   = m.settingSubList.itemSelected    
-    if m.settingsList.itemSelected = 5 then m.settingsUserscheckedItem   = m.settingSubList.itemSelected    
+    if m.settingsList.itemSelected = 5 then m.settingsUserscheckedItem   = m.settingSubList.itemSelected
+    if m.settingsList.itemSelected = 6 then m.settingsCECcheckedItem     = m.settingSubList.itemSelected
 End Sub
 
 

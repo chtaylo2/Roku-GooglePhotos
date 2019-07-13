@@ -13,7 +13,7 @@
 Function loadCommon()
     ' Common varables for needed for Oauth and GooglePhotos API
     
-    m.releaseVersion   = "3.3"
+    m.releaseVersion   = "3.3.1"
     m.gp_scope         = "https://photoslibrary.googleapis.com"
     m.gp_prefix        = m.gp_scope + "/v1"
     
@@ -59,6 +59,8 @@ Function loadDefaults()
     if tmp=invalid RegWrite("SSaverOrder", "Random Order", "Settings")
     tmp = RegRead("SSaverMethod", "Settings")
     if tmp=invalid RegWrite("SSaverMethod", "YesFading_YesBlur", "Settings")
+    tmp = RegRead("SSaverCEC", "Settings")
+    if tmp=invalid RegWrite("SSaverCEC", "HDMI-CEC Enabled", "Settings")
     
     tmp = RegRead("SlideshowDisplay", "Settings")
     if tmp=invalid RegWrite("SlideshowDisplay", "YesFading_YesBlur", "Settings")

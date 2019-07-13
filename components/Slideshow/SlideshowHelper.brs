@@ -101,6 +101,8 @@ Function handleRefreshToken(event as object)
             doGetSearch(refreshData.post_data[1], refreshData.post_data[2], refreshData.post_data[3], refreshData.post_data[4])
         else if refreshData.post_data[0] = "doGetAlbumSelection" then
             doGetAlbumSelection()
+        else if refreshData.post_data[0] = "doGetSharedAlbumList" then
+            doGetSharedAlbumList(refreshData.post_data[1])
         else
             doGetAlbumList(refreshData.post_data[1])
         end if
