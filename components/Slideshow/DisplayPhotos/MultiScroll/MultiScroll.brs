@@ -31,6 +31,7 @@ Sub init()
     m.noticeDialog      = m.top.findNode("noticeDialog")
     m.apiTimer          = m.top.findNode("apiTimer")
     m.DisplayTimer      = m.top.findNode("DisplayTimer")
+    m.confirmDialog     = m.top.findNode("confirmDialog")
     
     m.WaveTimer.observeField("fire","onWaveTigger")
     m.RefreshTimer.observeField("fire","onRefreshTigger")
@@ -146,6 +147,7 @@ End Sub
 Sub loadImageList()
 
     m.imageDisplay = m.top.content
+    m.settingCEC   = RegRead("SSaverCEC", "Settings")
 
     m.scroll_node_1.imageUri = GetNextImage()
     m.scroll_node_5.imageUri = GetNextImage()
@@ -206,6 +208,7 @@ End Sub
 
 
 Sub onWaveTigger()
+
     if m.WaveStep = 0 then
         m.scroll_node_6.control = "start"
     else if m.WaveStep = 1
@@ -423,6 +426,20 @@ End Sub
 
 Function GetNextImage()
 
+    print "*** DEBUG CURRENT CEC STATUS: "; m.global.CECStatus
+    'Check HDMI-CEC status for TV's which support this
+    if m.global.CECStatus = false then
+        if (m.top.id = "DisplayScreensaver") then
+            if m.settingCEC = "HDMI-CEC Enabled" then
+                m.confirmDialog.observeField("buttonSelected","confirmContinue")
+                onCECTrigger()
+            end if
+        else
+            m.confirmDialog.observeField("buttonSelected","confirmContinue")
+            onCECTrigger()
+        end if
+    end if
+
     print "NEXT: "; m.imageTracker
 
     if m.imageDisplay.Count()-1 = m.imageTracker then
@@ -490,6 +507,34 @@ Sub onApiTimerTrigger()
             end for    
         end if
     end if
+End Sub
+
+
+Sub onCECTrigger()
+    if m.top.id = "DisplayScreensaver" then
+        m.RediscoverDetail.text    = "Screensaver Paused"
+        m.RediscoverScreen.visible = "true"
+    else
+        m.confirmDialog.visible = true
+        buttons                 =  [ "Continue" ]
+        m.confirmDialog.message = "Do you want to continue viewing slideshow?"
+        m.confirmDialog.buttons = buttons
+        m.confirmDialog.setFocus(true)
+    end if
+
+    m.RefreshTimer.control  = "stop"
+    m.DownloadTimer.control = "stop"
+End Sub
+
+
+Sub confirmContinue(event as object)
+    'Force true to prevent a race condition
+    m.global.CECStatus = true
+    
+    m.confirmDialog.visible = false
+    m.RefreshTimer.control  = "start"
+    m.DownloadTimer.control = "start"
+    m.confirmDialog.unobserveField("buttonSelected")
 End Sub
 
 

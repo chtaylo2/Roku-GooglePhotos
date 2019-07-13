@@ -32,6 +32,7 @@ Sub init()
     m.RediscoverScreen          = m.top.findNode("RediscoverScreen")
     m.RediscoverDetail          = m.top.findNode("RediscoverDetail")
     m.noticeDialog              = m.top.findNode("noticeDialog")
+    m.confirmDialog             = m.top.findNode("confirmDialog")
     m.apiTimer                  = m.top.findNode("apiTimer")
 
     m.fromBrowse                = false
@@ -59,6 +60,7 @@ Sub init()
     m.showDisplay   = RegRead("SlideshowDisplay", "Settings")
     m.showOrder     = RegRead("SlideshowOrder", "Settings")
     showDelay       = RegRead("SlideshowDelay", "Settings")
+    m.settingCEC    = ""
     
     'Check any Temporary settings
     if m.global.SlideshowRes <> "" m.showRes = m.global.SlideshowRes
@@ -112,6 +114,7 @@ Sub loadImageList()
         m.showDisplay   = RegRead("SSaverMethod", "Settings")
         m.showOrder     = RegRead("SSaverOrder", "Settings")
         showDelay       = RegRead("SSaverDelay", "Settings")
+        m.settingCEC    = RegRead("SSaverCEC", "Settings")
     
         m.RotationTimer.duration = showDelay
         
@@ -522,6 +525,20 @@ End Sub
 
 Sub sendNextImage(direction=invalid)
     print "DisplayPhotos.brs [sendNextImage]"
+
+    print "*** DEBUG CURRENT CEC STATUS: "; m.global.CECStatus
+    'Check HDMI-CEC status for TV's which support this
+    if m.global.CECStatus = false then
+        if (m.top.id = "DisplayScreensaver") then
+            if m.settingCEC = "HDMI-CEC Enabled" then
+                m.confirmDialog.observeField("buttonSelected","confirmContinue")
+                onCECTrigger()
+            end if
+        else
+            m.confirmDialog.observeField("buttonSelected","confirmContinue")
+            onCECTrigger()
+        end if
+    end if
         
     'Get next image to display.
     if m.top.startIndex <> -1 then
@@ -534,8 +551,6 @@ Sub sendNextImage(direction=invalid)
             nextID = GetNextImage(m.imageDisplay, m.imageTracker)
         end if
     end if
-    
-    print "NextID: "; nextID
     
     m.imageTracker = nextID
 
@@ -638,7 +653,7 @@ Sub onDisplayTimer()
     ' ** Why the hell is this here you ask? **
     '  Screensaver will now expire after 4 hours due to the API and download limitations Google has set. I don't want all API usage going to people not sitting in front of thier device. Sorry, but that's the way it is right now, plan and simple.
     '  In months to come, I'll review how this channel is doing on the API usage and see if this can be extended or removed.
-    '  Last review: March, 2019
+    '  Last review: July, 2019
 
     m.RotationTimer.control    = "stop"
     m.DownloadTimer.control    = "stop"
@@ -695,6 +710,35 @@ Sub onApiTimerTrigger()
             end for    
         end if
     end if
+End Sub
+
+
+Sub onCECTrigger()
+    if m.top.id = "DisplayScreensaver" then
+        m.RediscoverDetail.text    = "Screensaver Paused"
+        m.RediscoverScreen.visible = "true"
+    else
+        m.confirmDialog.visible = true
+        buttons                 =  [ "Continue" ]
+        m.confirmDialog.message = "Do you want to continue viewing slideshow?"
+        m.confirmDialog.buttons = buttons
+        m.confirmDialog.setFocus(true)
+    end if
+        
+    m.RotationTimer.control = "stop"
+    m.DownloadTimer.control = "stop"
+End Sub
+
+
+Sub confirmContinue(event as object)
+    'Force true to prevent a race condition
+    m.global.CECStatus = true
+    
+    m.confirmDialog.visible = false
+    sendNextImage()
+    m.RotationTimer.control = "start"
+    m.DownloadTimer.control = "start"
+    m.confirmDialog.unobserveField("buttonSelected")
 End Sub
 
 

@@ -265,7 +265,13 @@
             id          = "DisplayTimer"
             duration    = "0"
         />
-                
+        
+        <Dialog
+            id          = "confirmDialog"
+            title       = "Slideshow Paused"
+            visible     = "false"
+        />
+        
         <Dialog
             id          = "noticeDialog"
             title       = "Error"
