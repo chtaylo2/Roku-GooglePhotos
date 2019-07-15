@@ -526,7 +526,6 @@ End Sub
 Sub sendNextImage(direction=invalid)
     print "DisplayPhotos.brs [sendNextImage]"
 
-    print "*** DEBUG CURRENT CEC STATUS: "; m.global.CECStatus
     'Check HDMI-CEC status for TV's which support this
     if m.global.CECStatus = false then
         if (m.top.id = "DisplayScreensaver") then
@@ -539,7 +538,7 @@ Sub sendNextImage(direction=invalid)
             onCECTrigger()
         end if
     end if
-        
+     
     'Get next image to display.
     if m.top.startIndex <> -1 then
         nextID = m.top.startIndex
@@ -734,11 +733,12 @@ Sub confirmContinue(event as object)
     'Force true to prevent a race condition
     m.global.CECStatus = true
     
+    m.PrimaryImage.setFocus(true)
     m.confirmDialog.visible = false
+    m.confirmDialog.unobserveField("buttonSelected")
     sendNextImage()
     m.RotationTimer.control = "start"
     m.DownloadTimer.control = "start"
-    m.confirmDialog.unobserveField("buttonSelected")
 End Sub
 
 
