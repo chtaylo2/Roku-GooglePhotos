@@ -426,7 +426,6 @@ End Sub
 
 Function GetNextImage()
 
-    print "*** DEBUG CURRENT CEC STATUS: "; m.global.CECStatus
     'Check HDMI-CEC status for TV's which support this
     if m.global.CECStatus = false then
         if (m.top.id = "DisplayScreensaver") then
@@ -531,10 +530,11 @@ Sub confirmContinue(event as object)
     'Force true to prevent a race condition
     m.global.CECStatus = true
     
+    m.scroll_node_1.setFocus(true)
     m.confirmDialog.visible = false
+    m.confirmDialog.unobserveField("buttonSelected")
     m.RefreshTimer.control  = "start"
     m.DownloadTimer.control = "start"
-    m.confirmDialog.unobserveField("buttonSelected")
 End Sub
 
 

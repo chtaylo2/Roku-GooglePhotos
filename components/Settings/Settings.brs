@@ -121,21 +121,41 @@ Sub handleGetAlbumSelection(event as object)
             albumList = googleAlbumListing(rsp)         
             
             for each album in albumList
+                if m.sharedAPIpull = 1 then
+                    album.GetTitle = "Shared: " + album.GetTitle
+                end if
                 m.albumsObject["albums"].Push(album)
             end for          
 
-            if rsp["nextPageToken"]<>invalid then
-                pageNext = rsp["nextPageToken"]
-                m.albumsObject.nextPageToken = pageNext
-                m.albumsObject.apiCount = m.albumsObject.apiCount + 1
-                if m.albumsObject.apiCount < m.maxApiPerPage then
-                    doGetAlbumList(m.settingSubList.itemFocused, pageNext)
+            if m.sharedAPIpull = 0 then
+                if rsp["nextPageToken"]<>invalid then
+                    pageNext = rsp["nextPageToken"]
+                    m.albumsObject.nextPageToken = pageNext
+                    m.albumsObject.apiCount = m.albumsObject.apiCount + 1
+                    if m.albumsObject.apiCount < m.maxApiPerPage then
+                        doGetAlbumList(m.settingSubList.itemFocused, pageNext)
+                    else
+                        m.sharedAPIpull = 1
+                        doGetSharedAlbumList(m.settingSubList.itemFocused, "")
+                    end if
                 else
-                    printAlbumSelection(m.albumsObject["albums"])
+                    m.sharedAPIpull = 1
+                    doGetSharedAlbumList(m.settingSubList.itemFocused, "")
                 end if
             else
-                printAlbumSelection(m.albumsObject["albums"])
-            end if
+                 if rsp["nextPageToken"]<>invalid then
+                    pageNext = rsp["nextPageToken"]
+                    m.albumsObject.nextPageToken = pageNext
+                    m.albumsObject.apiCountShared = m.albumsObject.apiCountShared + 1
+                    if m.albumsObject.apiCount < m.maxApiPerPage then
+                        doGetSharedAlbumList(m.settingSubList.itemFocused, pageNext)
+                    else
+                        printAlbumSelection(m.albumsObject["albums"])
+                    end if
+                else
+                    printAlbumSelection(m.albumsObject["albums"])
+                end if           
+            end if    
         end if
     end if
     
@@ -742,8 +762,10 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
         print "KEY: "; key
         if (key = "options" or key = "right") and (m.settingSubList.hasFocus() = true) and (m.settingsList.itemFocused = 5)
             'Select Linked User
+            m.sharedAPIpull = 0
             m.albumsObject["albums"] = []
             m.albumsObject.apiCount = 0
+            m.albumsObject.apiCountShared = 0
             doGetAlbumSelection()
             m.settingSubList.itemSelected = m.settingSubList.itemFocused
             m.settingSubList.visible = false

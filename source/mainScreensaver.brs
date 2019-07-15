@@ -45,7 +45,7 @@ Sub showGooglePhotosScreensaver()
         msgType = type(msg)
 
         if msgType = "roCECStatusEvent"
-            print "RECEIVED roCECStatusEvent event - CECStatus.IsActiveSource: -> "; CECStatus.IsActiveSource()
+            'print "RECEIVED roCECStatusEvent event - CECStatus.IsActiveSource: -> "; CECStatus.IsActiveSource()
             
             if CECStatus <> invalid and CECStatus.IsActiveSource() = false then
                 'HDMI-CEC status has changed to false

@@ -191,6 +191,10 @@ Function googleAlbumCreateRecord(json As Object) As Object
     album.GetID         = getString(json,"id")
     album.GetImageCount = Val(getString(json,"mediaItemsCount"))
     album.GetThumb      = getString(json,"coverPhotoBaseUrl")+getResolution("SD")
+    
+    if album.GetTitle = "" then
+        album.GetTitle = "Untitled Album"
+    end if
         
     return album
 End Function

@@ -266,10 +266,6 @@ Sub onItemSelected()
         m.itemLabelMain2.text = m.albumName
         m.itemLabelMain3.text = ""
 
-        'TODO: ADD IN DETAILS ABOUT UNABLE TO COUNT LIBRARY PHOTOS, ETC.  Thanks Google..
-        'lastPopup = RegRead("ThousandPopup","Settings")
-        'if (lastPopup=invalid or lastPopup<>"v3.0true") then showThousandPopup()
-        
         'Display Loading Spinner
         showLoadingSpinner(3, "GP_LOADING")
         
