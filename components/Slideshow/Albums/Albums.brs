@@ -118,7 +118,11 @@ Sub handleGetAlbumList(event as object)
                 m.albumsObject.nextPageToken = pageNext
                 m.albumsObject.apiCount = m.albumsObject.apiCount + 1
                 if m.albumsObject.apiCount < m.maxApiPerPage then
-                    doGetAlbumList(m.global.selectedUser, pageNext)
+                    if response.post_data[0] = "doGetSharedAlbumList" then
+                        doGetSharedAlbumList(m.global.selectedUser, pageNext)
+                    else
+                        doGetAlbumList(m.global.selectedUser, pageNext)
+                    end if  
                 else
                     googleDisplayAlbums(m.albumsObject["albums"])
                 end if
@@ -421,6 +425,8 @@ Sub googleDisplayAlbums(albumList As Object)
     if m.top.id <> "Shared Google Photos Albums" then
         'Everyone has a Google Photos Library in account
         addItem(m.albumListContent, "GP_ALBUM_LISTING_LIBRARY", m.userInfoPhoto[m.global.selectedUser], "Google Photos Library", "")
+    else if albumList.Count() = 0 then
+        addItem(m.albumListContent, "NO_FOUND", "", "No Albums Found", Pluralize(0,"Item"))
     end if
     
     for each album in albumList
@@ -642,7 +648,7 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
                 return true
             end if      
 
-            if (m.albummarkupgrid.content <> invalid) and ( ( m.albummarkupgrid.content.getChild(0).id <> "GP_ALBUM_LISTING" ) and ( m.albummarkupgrid.content.getChild(0).id <> "GP_ALBUM_LISTING_LIBRARY" ) ) and (m.top.imageContent = invalid)
+            if (m.albummarkupgrid.content <> invalid) and ( ( m.albummarkupgrid.content.getChild(0).id <> "NO_FOUND" ) and ( m.albummarkupgrid.content.getChild(0).id <> "GP_ALBUM_LISTING" ) and ( m.albummarkupgrid.content.getChild(0).id <> "GP_ALBUM_LISTING_LIBRARY" ) ) and (m.top.imageContent = invalid)
                 m.albummarkupgrid.content       = m.albumListContent
                 m.albummarkupgrid.jumpToItem    = m.albumSelection
                 m.settingsIcon.visible          = false
