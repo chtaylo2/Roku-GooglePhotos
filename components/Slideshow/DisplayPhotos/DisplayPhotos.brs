@@ -32,6 +32,7 @@ Sub init()
     m.RediscoverScreen          = m.top.findNode("RediscoverScreen")
     m.RediscoverDetail          = m.top.findNode("RediscoverDetail")
     m.noticeDialog              = m.top.findNode("noticeDialog")
+    m.confirmDialog             = m.top.findNode("confirmDialog")
     m.apiTimer                  = m.top.findNode("apiTimer")
 
     m.fromBrowse                = false
@@ -59,6 +60,7 @@ Sub init()
     m.showDisplay   = RegRead("SlideshowDisplay", "Settings")
     m.showOrder     = RegRead("SlideshowOrder", "Settings")
     showDelay       = RegRead("SlideshowDelay", "Settings")
+    m.settingCEC    = ""
     
     'Check any Temporary settings
     if m.global.SlideshowRes <> "" m.showRes = m.global.SlideshowRes
@@ -112,6 +114,7 @@ Sub loadImageList()
         m.showDisplay   = RegRead("SSaverMethod", "Settings")
         m.showOrder     = RegRead("SSaverOrder", "Settings")
         showDelay       = RegRead("SSaverDelay", "Settings")
+        m.settingCEC    = RegRead("SSaverCEC", "Settings")
     
         m.RotationTimer.duration = showDelay
         
@@ -459,6 +462,7 @@ End Sub
 
 
 Sub onPrimaryLoadedTrigger(event as object)
+
     if event.getdata() = "ready" then
         'Center the MarkUp Box
         markupRectAlbum = m.PrimaryImage.localBoundingRect()
@@ -492,6 +496,7 @@ End Sub
 
 
 Sub onSecondaryLoadedTrigger(event as object)
+
     if event.getdata() = "ready" then
         'Center the MarkUp Box
         markupRectAlbum = m.SecondaryImage.localBoundingRect()
@@ -520,11 +525,20 @@ End Sub
 
 Sub sendNextImage(direction=invalid)
     print "DisplayPhotos.brs [sendNextImage]"
-    
-    'date         = CreateObject("roDateTime")
-    'date.ToLocalTime()
-    'print "  -- time: "; date.ToISOString()
-        
+
+    'Check HDMI-CEC status for TV's which support this
+    if m.global.CECStatus = false then
+        if (m.top.id = "DisplayScreensaver") then
+            if m.settingCEC = "HDMI-CEC Enabled" then
+                m.confirmDialog.observeField("buttonSelected","confirmContinue")
+                onCECTrigger()
+            end if
+        else
+            m.confirmDialog.observeField("buttonSelected","confirmContinue")
+            onCECTrigger()
+        end if
+    end if
+     
     'Get next image to display.
     if m.top.startIndex <> -1 then
         nextID = m.top.startIndex
@@ -554,6 +568,7 @@ Sub sendNextImage(direction=invalid)
     ' Whats going on here:
     '   If a direction button is pressed (previous or next) we disable fading for a better user experiance.
     '   Since the images trigger on "loadstatus" change, we first set the URI to null, then populate.
+    '   Due to issue with 2 image albums, we first set the display to null, then populate w/filename
     if direction<>invalid
         if m.imageOnScreen = "PrimaryImage" or m.imageOnScreen = "PrimaryImage_NoFading" then
             m.SecondaryImage.uri = ""
@@ -568,10 +583,12 @@ Sub sendNextImage(direction=invalid)
         end if
     else
         if m.imageOnScreen = "PrimaryImage" or m.imageOnScreen = "PrimaryImage_NoFading" then
+            if m.imageDisplay.Count() = 2 then m.SecondaryImage.uri = ""
             m.SecondaryImage.uri = url
             m.imageOnScreen      = "SecondaryImage"
             if m.showDisplay     = invalid or rxBlur.IsMatch(m.showDisplay) then m.BlendedSecondaryImage.uri = url
         else
+            if m.imageDisplay.Count() = 2 then m.PrimaryImage.uri = ""
             m.PrimaryImage.uri   = url
             m.imageOnScreen      = "PrimaryImage"
             if m.showDisplay = invalid or rxBlur.IsMatch(m.showDisplay) then m.BlendedPrimaryImage.uri = url
@@ -635,7 +652,7 @@ Sub onDisplayTimer()
     ' ** Why the hell is this here you ask? **
     '  Screensaver will now expire after 4 hours due to the API and download limitations Google has set. I don't want all API usage going to people not sitting in front of thier device. Sorry, but that's the way it is right now, plan and simple.
     '  In months to come, I'll review how this channel is doing on the API usage and see if this can be extended or removed.
-    '  Last review: March, 2019
+    '  Last review: July, 2019
 
     m.RotationTimer.control    = "stop"
     m.DownloadTimer.control    = "stop"
@@ -692,6 +709,36 @@ Sub onApiTimerTrigger()
             end for    
         end if
     end if
+End Sub
+
+
+Sub onCECTrigger()
+    if m.top.id = "DisplayScreensaver" then
+        m.RediscoverDetail.text    = "Screensaver Paused"
+        m.RediscoverScreen.visible = "true"
+    else
+        m.confirmDialog.visible = true
+        buttons                 =  [ "Continue" ]
+        m.confirmDialog.message = "Do you want to continue viewing slideshow?"
+        m.confirmDialog.buttons = buttons
+        m.confirmDialog.setFocus(true)
+    end if
+        
+    m.RotationTimer.control = "stop"
+    m.DownloadTimer.control = "stop"
+End Sub
+
+
+Sub confirmContinue(event as object)
+    'Force true to prevent a race condition
+    m.global.CECStatus = true
+    
+    m.PrimaryImage.setFocus(true)
+    m.confirmDialog.visible = false
+    m.confirmDialog.unobserveField("buttonSelected")
+    sendNextImage()
+    m.RotationTimer.control = "start"
+    m.DownloadTimer.control = "start"
 End Sub
 
 

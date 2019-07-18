@@ -33,8 +33,6 @@ Sub init()
     m.readMarkupGridTask.observeField("content", "showmarkupgrid")
     m.readMarkupGridTask.control = "RUN"
     
-    makeRequest({}, "https://www.roku-photoview.com/status/roku_status_v" + m.releaseVersion + ".xml" + "?" + getRandomString(10), "GET", "", 7, [])
-    
 End Sub
 
 
@@ -62,6 +60,10 @@ End Sub
 
 
 Sub showmarkupgrid()
+
+    'Show any live status from the site
+    makeRequest({}, "http://www.photoviewapp.com/status/roku_status_v" + m.releaseVersion + ".xml" + "?" + getRandomString(10), "GET", "", 7, [])
+
     'Populate grid content
     m.markupgrid.content = m.readMarkupGridTask.content
 
@@ -71,7 +73,7 @@ Sub showmarkupgrid()
     m.markupgrid.translation = [ centerx + 15, 360 ]
     
     'Select default item
-    m.markupgrid.jumpToItem = 2
+    m.markupgrid.jumpToItem = 3
       
     'Watch for events
     m.markupgrid.observeField("itemFocused", "onItemFocused") 
@@ -96,7 +98,7 @@ Sub onItemSelected()
         m.noticeDialog.visible = true
         buttons =  [ "OK" ]
         m.noticeDialog.title   = "Notice"
-        m.noticeDialog.message = "Google Photos new API does not currently have image searching available. A feature request is opened with Google and hope to have this re-enabled soon."
+        m.noticeDialog.message = "Google Photos announced they will no longer support a 'keyword' search feature in thier API. Unless something changes, this search icon will be removed in a future release. It's unfortunate"
         m.noticeDialog.buttons = buttons
         m.noticeDialog.setFocus(true)
         m.noticeDialog.observeField("buttonSelected","noticeClose")

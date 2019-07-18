@@ -13,11 +13,12 @@
 Function loadCommon()
     ' Common varables for needed for Oauth and GooglePhotos API
     
-    m.releaseVersion   = "3.2"
+    m.releaseVersion   = "3.3"
     m.gp_scope         = "https://photoslibrary.googleapis.com"
     m.gp_prefix        = m.gp_scope + "/v1"
     
-    m.register_prefix  = "https://www.roku-photoview.com"
+    'Moving m.register_prefix to HTTP (vs. HTTPS) during the domain name transition. Will be moved back in next release.
+    m.register_prefix  = "http://www.photoviewapp.com"
     m.oauth_prefix     = "https://www.googleapis.com/oauth2/v4"
     m.oauth_scope      = ""
     
@@ -59,6 +60,8 @@ Function loadDefaults()
     if tmp=invalid RegWrite("SSaverOrder", "Random Order", "Settings")
     tmp = RegRead("SSaverMethod", "Settings")
     if tmp=invalid RegWrite("SSaverMethod", "YesFading_YesBlur", "Settings")
+    tmp = RegRead("SSaverCEC", "Settings")
+    if tmp=invalid RegWrite("SSaverCEC", "HDMI-CEC Enabled", "Settings")
     
     tmp = RegRead("SlideshowDisplay", "Settings")
     if tmp=invalid RegWrite("SlideshowDisplay", "YesFading_YesBlur", "Settings")
