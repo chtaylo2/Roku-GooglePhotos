@@ -272,7 +272,7 @@ Sub storeResolutionOptions()
     is1080p = (val(m.device.GetVideoMode()) = 1080)
     is720p  = (val(m.device.GetVideoMode()) = 720)
     
-    print "RES: "; val(device.GetVideoMode())
+    print "RES: "; val(m.device.GetVideoMode())
 
     m.content = createObject("RoSGNode","ContentNode")
     
