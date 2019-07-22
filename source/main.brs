@@ -51,6 +51,17 @@ Sub showGooglePhotosScreen()
             
         end if
         
+        if type(msg) = "roInputEvent"
+            if msg.IsInput()
+                info = msg.GetInfo()
+                if info.DoesExist("mediaType") and info.DoesExist("contentID")
+                    print "DEEP LINK TRIGGERED"
+                    mediaType = info.mediaType
+                    contentId = info.contentID
+                end if
+            end if
+        end if
+        
         if msgType = "roSGScreenEvent"
             if msg.isScreenClosed() then return
         end if

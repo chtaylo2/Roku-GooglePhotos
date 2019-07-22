@@ -268,10 +268,9 @@ Sub storeResolutionOptions()
     radioSelection = 0
     regSelection = RegRead(regStore, "Settings")
 
-    device  = createObject("roDeviceInfo")
-    is4k    = (val(device.GetVideoMode()) >= 2160)
-    is1080p = (val(device.GetVideoMode()) = 1080)
-    is720p  = (val(device.GetVideoMode()) = 720)
+    is4k    = (val(m.device.GetVideoMode()) >= 2160)
+    is1080p = (val(m.device.GetVideoMode()) = 1080)
+    is720p  = (val(m.device.GetVideoMode()) = 720)
     
     print "RES: "; val(device.GetVideoMode())
 

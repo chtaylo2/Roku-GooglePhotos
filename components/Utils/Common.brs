@@ -25,6 +25,10 @@ Function loadCommon()
     'Help manage API calls. YES, Google monitors this. Which ever comes first
     m.maxApiPerPage    = 12
     m.maxImagesPerPage = 1000
+    
+    'Load device details
+    m.device           = createObject("roDeviceInfo")
+    
 End Function
 
 

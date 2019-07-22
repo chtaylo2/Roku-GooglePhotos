@@ -13,8 +13,7 @@ Sub init()
 
     m.itemOverhang  = m.top.findNode("itemOverhang")
 
-    device = CreateObject("roDeviceInfo")
-    ds = device.GetDisplaySize()
+    ds = m.device.GetDisplaySize()
     
     if ds.w = 720 then
         print "SD Detected"

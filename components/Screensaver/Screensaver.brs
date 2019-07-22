@@ -18,8 +18,7 @@ Sub init()
     m.apiTimer      = m.top.findNode("apiTimer")
     m.apiTimer.observeField("fire","onApiTimerTrigger")
 
-    device  = createObject("roDeviceInfo")
-    ds = device.GetDisplaySize()
+    ds = m.device.GetDisplaySize()
 
     if ds.w = 1920 then
         m.PhotoViewLogo.uri = "pkg://images/screensaver_splash_FHD.png"
