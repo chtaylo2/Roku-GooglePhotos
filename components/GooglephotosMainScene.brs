@@ -13,8 +13,13 @@ Sub init()
 
     m.itemOverhang  = m.top.findNode("itemOverhang")
 
-    device = CreateObject("roDeviceInfo")
-    ds = device.GetDisplaySize()
+    'Load common variables
+    loadCommon()
+    
+    'Load default settings
+    loadDefaults()
+
+    ds = m.device.GetDisplaySize()
     
     if ds.w = 720 then
         print "SD Detected"
@@ -26,12 +31,6 @@ Sub init()
         print "FHD Detected"
         m.itemOverhang.logoUri = "pkg:/images/Logo_Overhang_FHD.png"
     end if
-        
-    'Load common variables
-    loadCommon()
-    
-    'Load default settings
-    loadDefaults()
     
     'Define SG nodes
     m.itemHeader = m.top.findNode("itemHeader")

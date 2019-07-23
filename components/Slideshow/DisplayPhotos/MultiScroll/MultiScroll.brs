@@ -160,8 +160,7 @@ Sub loadImageList()
     
     if m.top.id = "DisplayScreensaver" then
         'Show watermark on screensaver - Stop bitching, we need some advertisment!
-        device  = createObject("roDeviceInfo")
-        ds = device.GetDisplaySize()
+        ds = m.device.GetDisplaySize()
 
         if ds.w = 1920 then
             m.Watermark.uri = "pkg:/images/PhotoViewWatermark_FHD.png"
@@ -427,7 +426,8 @@ End Sub
 Function GetNextImage()
 
     'Check HDMI-CEC status for TV's which support this
-    if m.global.CECStatus = false then
+    'For some reason, Roku TV's do not properly support this method.
+    if (m.global.CECStatus = false) and (m.device.GetModelType() <> "TV") then
         if (m.top.id = "DisplayScreensaver") then
             if m.settingCEC = "HDMI-CEC Enabled" then
                 m.confirmDialog.observeField("buttonSelected","confirmContinue")

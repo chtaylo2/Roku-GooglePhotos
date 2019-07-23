@@ -124,8 +124,7 @@ Sub loadImageList()
         print "GooglePhotos Screensaver Display: "; m.showDisplay
         
         'Show watermark on screensaver - Stop bitching, we need some advertisment!
-        device  = createObject("roDeviceInfo")
-        ds = device.GetDisplaySize()
+        ds = m.device.GetDisplaySize()
 
         if ds.w = 1920 then
             m.Watermark.uri = "pkg:/images/PhotoViewWatermark_FHD.png"
@@ -136,7 +135,7 @@ Sub loadImageList()
         
         m.MoveTimer.observeField("fire","onMoveTrigger")
         m.MoveTimer.control        = "start"
-        m.DisplayTimer.duration    = "14400"  '4 hours
+        m.DisplayTimer.duration    = "43200"  '12 hours
     else
         m.DisplayTimer.duration    = "43200"  '12 hours
     end if    
@@ -527,7 +526,8 @@ Sub sendNextImage(direction=invalid)
     print "DisplayPhotos.brs [sendNextImage]"
 
     'Check HDMI-CEC status for TV's which support this
-    if m.global.CECStatus = false then
+    'For some reason, Roku TV's do not properly support this method.
+    if (m.global.CECStatus = false) and (m.device.GetModelType() <> "TV") then
         if (m.top.id = "DisplayScreensaver") then
             if m.settingCEC = "HDMI-CEC Enabled" then
                 m.confirmDialog.observeField("buttonSelected","confirmContinue")
@@ -650,7 +650,7 @@ End Sub
 Sub onDisplayTimer()
 
     ' ** Why the hell is this here you ask? **
-    '  Screensaver will now expire after 4 hours due to the API and download limitations Google has set. I don't want all API usage going to people not sitting in front of thier device. Sorry, but that's the way it is right now, plan and simple.
+    '  Screensaver will now expire after 4 (now 12) hours due to the API and download limitations Google has set. I don't want all API usage going to people not sitting in front of thier device. Sorry, but that's the way it is right now, plan and simple.
     '  In months to come, I'll review how this channel is doing on the API usage and see if this can be extended or removed.
     '  Last review: July, 2019
 
@@ -667,7 +667,7 @@ Sub onDisplayTimer()
     
     sendNextImage()
     if m.top.id = "DisplayScreensaver" then
-        m.RediscoverDetail.text    = "Screensaver has expired after 4 hours"
+        m.RediscoverDetail.text    = "Screensaver has expired after 12 hours"
     else
         m.RediscoverDetail.text    = "Slideshow has expired after 12 hours"
     end if

@@ -17,15 +17,6 @@ Sub init()
     m.PhotoViewLogo = m.top.findNode("PhotoViewLogo")
     m.apiTimer      = m.top.findNode("apiTimer")
     m.apiTimer.observeField("fire","onApiTimerTrigger")
-
-    device  = createObject("roDeviceInfo")
-    ds = device.GetDisplaySize()
-
-    if ds.w = 1920 then
-        m.PhotoViewLogo.uri = "pkg://images/screensaver_splash_FHD.png"
-    else
-        m.PhotoViewLogo.uri = "pkg://images/screensaver_splash_HD.png"
-    end if
     
     'Load common variables
     loadCommon()
@@ -38,6 +29,14 @@ Sub init()
     
     'Load default settings
     loadDefaults()
+
+    ds = m.device.GetDisplaySize()
+
+    if ds.w = 1920 then
+        m.PhotoViewLogo.uri = "pkg://images/screensaver_splash_FHD.png"
+    else
+        m.PhotoViewLogo.uri = "pkg://images/screensaver_splash_HD.png"
+    end if
 
     m.userCount              = oauth_count()
     selectedUser             = RegRead("SSaverUser","Settings")
