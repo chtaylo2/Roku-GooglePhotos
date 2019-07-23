@@ -23,7 +23,7 @@ Sub init()
     m.itemLabelMain2.font.size = 25
     m.videoPlayingindex = 0
     m.pageSelected = 0
-    m.itemsPerPage = 100
+    m.itemsPerPage = 200
     m.itemsStart = 0
     m.itemsEnd = 0
     
