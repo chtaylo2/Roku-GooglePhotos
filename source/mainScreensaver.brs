@@ -32,7 +32,10 @@ Sub showGooglePhotosScreensaver()
     screen.setMessagePort(port)    
     screen.show()
 
-    if CECStatus <> invalid and CECStatus.IsActiveSource() = false then
+    'Calculate uptime for devices that were booted in last 30 minutes and not touched. Otherwise, IsActiveSource() == false
+    currentuptime = UpTime(0)
+
+    if (CECStatus <> invalid) and (CECStatus.IsActiveSource() = false) and (currentuptime > 1805) then
         'HDMI-CEC status is false
         m.global.CECStatus = false
     else
