@@ -599,7 +599,7 @@ Sub sendNextImage(direction=invalid)
     m.pauseImageDetail.text  = friendlyDate(m.imageDisplay[nextID].timestamp)
 
     'RediscoverScreen text change if needed      
-    if m.rxHistory.IsMatch(m.top.predecessor) then
+    if m.rxHistory.IsMatch(m.top.predecessor) and (m.RediscoverDetail.text <> "Screensaver Paused") then
         m.RediscoverDetail.text  = m.top.predecessor.Replace("Rediscover this", "This")+" - "+ friendlyDateShort(m.imageDisplay[nextID].timestamp)
     end if
     
@@ -703,7 +703,8 @@ Sub onApiTimerTrigger()
                     end if 
                 end if
  
-                originalList[nxt].url = originalList[nxt].url+getResolution(m.showRes)
+                originalList[nxt].url = originalList[nxt].url
+
                 m.imageDisplay.push(originalList[nxt])
                 originalList.Delete(nxt)   
             end for    
@@ -714,8 +715,16 @@ End Sub
 
 Sub onCECTrigger()
     if m.top.id = "DisplayScreensaver" then
-        m.RediscoverDetail.text    = "Screensaver Paused"
-        m.RediscoverScreen.visible = "true"
+        m.PrimaryImage.unobserveField("loadStatus")
+        m.SecondaryImage.unobserveField("loadStatus")
+
+        m.PrimaryImage.uri          = "pkg:/images/black_pixel.png"
+        m.SecondaryImage.uri        = "pkg:/images/black_pixel.png"
+        m.BlendedPrimaryImage.uri   = "pkg:/images/black_pixel.png"
+        m.BlendedSecondaryImage.uri = "pkg:/images/black_pixel.png"
+
+        m.RediscoverDetail.text     = "Screensaver Paused"
+        m.RediscoverScreen.visible  = "true"
     else
         m.confirmDialog.visible = true
         buttons                 =  [ "Continue" ]
