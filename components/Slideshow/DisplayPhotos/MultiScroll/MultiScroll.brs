@@ -487,7 +487,9 @@ Sub onApiTimerTrigger()
         if m.albumActiveObject["SearchResults"].showcountend > 0 then
             'Copy original list since we can't change origin
             originalList = m.albumActiveObject["SearchResults"].imagesMetaData
-    
+
+            m.imageDisplay = []
+
             for i = 0 to m.albumActiveObject["SearchResults"].imagesMetaData.Count()-1
                 if m.top.showorder = "Random Order" then
                     'Create image display list - RANDOM
@@ -500,7 +502,7 @@ Sub onApiTimerTrigger()
                     nxt = 0
                 end if 
  
-                originalList[nxt].url = originalList[nxt].url+getResolution(m.top.showres)
+                originalList[nxt].url = originalList[nxt].url
                 m.imageDisplay.push(originalList[nxt])
                 originalList.Delete(nxt)   
             end for    
