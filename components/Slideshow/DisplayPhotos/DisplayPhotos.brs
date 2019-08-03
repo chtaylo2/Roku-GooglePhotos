@@ -684,7 +684,9 @@ Sub onApiTimerTrigger()
         if m.albumActiveObject["SearchResults"].showcountend > 0 then
             'Copy original list since we can't change origin
             originalList = m.albumActiveObject["SearchResults"].imagesMetaData
-    
+
+            m.imageDisplay = []
+
             for i = 0 to m.albumActiveObject["SearchResults"].imagesMetaData.Count()-1
     
                 if m.top.startIndex <> -1 then
@@ -704,10 +706,9 @@ Sub onApiTimerTrigger()
                 end if
  
                 originalList[nxt].url = originalList[nxt].url
-
                 m.imageDisplay.push(originalList[nxt])
                 originalList.Delete(nxt)   
-            end for    
+            end for
         end if
     end if
 End Sub
