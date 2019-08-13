@@ -297,7 +297,7 @@ End Sub
 Sub doGetAlbumImages(albumid As String, selectedUser=0 as Integer, pageNext="" As String)
     print "SlideshowHelper.brs - [doGetAlbumImages]"
 
-    print "GooglePhotos pageNext: "; pageNext
+    'print "GooglePhotos pageNext: "; pageNext
 
     tmpData = [ "doGetAlbumImages", albumid, selectedUser, pageNext ]
 

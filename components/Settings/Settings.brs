@@ -110,7 +110,7 @@ Sub handleGetAlbumSelection(event as object)
         errorMsg = "An Error Occurred in 'handleGetAlbumSelection'. Code: "+(response.code).toStr()+" - " +response.error
     else
         rsp=ParseJson(response.content)
-        print rsp["albums"]
+        'print rsp["albums"]
         if rsp = invalid
             errorMsg = "Unable to parse Google Photos API response. Exit the channel then try again later. Code: "+(response.code).toStr()+" - " +response.error
         else if type(rsp) <> "roAssociativeArray"
