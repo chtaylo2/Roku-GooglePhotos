@@ -13,12 +13,12 @@
 Function loadCommon()
     ' Common varables for needed for Oauth and GooglePhotos API
     
-    m.releaseVersion   = "3.3"
+    m.releaseVersion   = "3.3.2"
     m.gp_scope         = "https://photoslibrary.googleapis.com"
     m.gp_prefix        = m.gp_scope + "/v1"
     
     'Moving m.register_prefix to HTTP (vs. HTTPS) during the domain name transition. Will be moved back in next release.
-    m.register_prefix  = "http://www.photoviewapp.com"
+    m.register_prefix  = "https://www.photoviewapp.com"
     m.oauth_prefix     = "https://www.googleapis.com/oauth2/v4"
     m.oauth_scope      = ""
     
