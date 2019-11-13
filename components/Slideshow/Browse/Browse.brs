@@ -142,14 +142,16 @@ End Sub
 
 Sub onItemFocused()
     'Item selected
-    'print "FOCUSED: "; m.metaData[m.ImageGrid.itemFocused]
     
-    if (m.metaData[m.ImageGrid.itemFocused].timestamp <> invalid) then
-        mypath = CreateObject("roPath", m.metaData[m.ImageGrid.itemFocused].url)
+    pageOffset = m.pageSelected * m.itemsPerPage
+    'print "FOCUSED: "; m.metaData[m.ImageGrid.itemFocused + pageOffset]
+    
+    if (m.metaData[m.ImageGrid.itemFocused + pageOffset].timestamp <> invalid) then
+        mypath = CreateObject("roPath", m.metaData[m.ImageGrid.itemFocused + pageOffset].url)
         fileObj = myPath.Split()   
     
-        timestamp = friendlyDate(m.metaData[m.ImageGrid.itemFocused].timestamp)
-        m.itemLabelMain2.text = m.metaData[m.ImageGrid.itemFocused].filename + " - " + timestamp
+        timestamp = friendlyDate(m.metaData[m.ImageGrid.itemFocused + pageOffset].timestamp)
+        m.itemLabelMain2.text = m.metaData[m.ImageGrid.itemFocused + pageOffset].filename + " - " + timestamp
     end if
 End Sub
 
