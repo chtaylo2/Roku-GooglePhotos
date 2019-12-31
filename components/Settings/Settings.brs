@@ -180,12 +180,22 @@ Sub printAlbumSelection(albumList As Object)
     regAlbums      = RegRead(regStore, "Settings")
     checkedObj     = []
     
+    date  = CreateObject("roDateTime")
+    date.ToLocalTime()
+    cYear = date.GetYear()    
+    
     m.loadingSpinner.visible = "false"
     
     'Display Time in History selections
-    albumHistory = "Day|Week|Month".Split("|")
+    c = 0    
+    albumHistory = "Day|Daywithcurr|Week|Weekwithcurr|Month|Monthwithcurr".Split("|")
+    albumHistoryTxt = "Day|Day|Week|Week|Month|Month".Split("|")
     for each album in albumHistory
-        addItem(m.albumContent, "• "+album+" in History - Auto Refresh", album, "")
+        if album.Instr("withcurr") >= 0 then
+            addItem(m.albumContent, "• "+albumHistoryTxt[c]+" in History including " + cYear.ToStr(), album, "")
+        else
+            addItem(m.albumContent, "• "+albumHistoryTxt[c]+" in History", album, "")
+        end if
         saved = 0
         if (regAlbums <> invalid) and (regAlbums <> "")
             parsedString = regAlbums.Split("|")
@@ -198,7 +208,8 @@ Sub printAlbumSelection(albumList As Object)
             end for
         end if
         if saved = 1 checkedObj.Push(true)
-        if saved = 0 checkedObj.Push(false)                
+        if saved = 0 checkedObj.Push(false)
+        c = c + 1
     end for
             
     'Display Google Photos Library
@@ -237,6 +248,7 @@ Sub printAlbumSelection(albumList As Object)
 
     m.albumSelection.content = m.albumContent
     m.albumSelection.checkedState = checkedObj
+    
 End Sub
 
 
@@ -652,7 +664,13 @@ Sub showalbumselected()
         itemcontent  = m.albumSelection.content.getChild(i)
         checkState   = m.albumSelection.checkedState[i]
         if checkState = true then
-            if m.albumSelection.checkedState[2] = true then
+            if m.albumSelection.checkedState[5] = true then
+                saveList = m.albumSelection.content.getChild(5).description + ":" + itostr(selectedUser) + "|"
+            else if m.albumSelection.checkedState[4] = true then
+                saveList = m.albumSelection.content.getChild(4).description + ":" + itostr(selectedUser) + "|"
+            else if m.albumSelection.checkedState[3] = true then
+                saveList = m.albumSelection.content.getChild(3).description + ":" + itostr(selectedUser) + "|"
+            else if m.albumSelection.checkedState[2] = true then
                 saveList = m.albumSelection.content.getChild(2).description + ":" + itostr(selectedUser) + "|"
             else if m.albumSelection.checkedState[1] = true then
                 saveList = m.albumSelection.content.getChild(1).description + ":" + itostr(selectedUser) + "|"
@@ -668,7 +686,7 @@ Sub showalbumselected()
                 end if
             end if
             
-            if (m.albumSelection.checkedState[2] = true or m.albumSelection.checkedState[1] = true or m.albumSelection.checkedState[0] = true) and (i > 2) then
+            if (m.albumSelection.checkedState[5] = true or m.albumSelection.checkedState[4] = true or m.albumSelection.checkedState[3] = true or m.albumSelection.checkedState[2] = true or m.albumSelection.checkedState[1] = true or m.albumSelection.checkedState[0] = true) and (i > 5) then
                 errorMsg = "Time in history albums are currently mutually exclusive. Other album selections will not be saved."
             end if
         end if
