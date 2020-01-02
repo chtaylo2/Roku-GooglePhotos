@@ -335,15 +335,17 @@ End Function
 
 Function googleImageCreateRecord(json As Object) As Object
     image                = CreateObject("roAssociativeArray")
-    image.GetTitle       = ""
-    image.GetID          = getString(json,"id")
     image.GetDescription = getString(json,"description")
-    image.GetURL         = getString(json,"baseUrl")
-    image.GetFilename    = getString(json,"filename")
-    image.GetTimestamp   = getString(json["mediaMetadata"],"creationTime")
-    image.IsVideo        = (json["mediaMetadata"]["video"]<>invalid)
-    image.GetVideoStatus = getString(json["mediaMetadata"]["video"],"status")
-    
+
+    if image.GetDescription.Instr("rivate") = -1 then
+        image.GetTitle       = ""
+        image.GetID          = getString(json,"id")
+        image.GetURL         = getString(json,"baseUrl")
+        image.GetFilename    = getString(json,"filename")
+        image.GetTimestamp   = getString(json["mediaMetadata"],"creationTime")
+        image.IsVideo        = (json["mediaMetadata"]["video"]<>invalid)
+        image.GetVideoStatus = getString(json["mediaMetadata"]["video"],"status")
+    end if
     return image
 End Function
 
