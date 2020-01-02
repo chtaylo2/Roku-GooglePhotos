@@ -40,11 +40,12 @@ End Sub
 Sub setFeaturesText()
 
     m.itemLabelHeader.text = "New Channel Features"
-    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "1. Shared Album support is finally here!"
-    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "2. Implemented HDMI-CEC controls to help save bandwidth."
-    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "3. Checkout 'This Time in History' playback. See the new Dynamic Albums option."
+    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "1. Enhanced 'This Time in History' playback. Current year optionally included."
+    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "2. Items with 'Private' in discription are no longer displayed."
+    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "3. Shared Album support is finally here!"
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + chr(10) + "Bug fixes:"
-    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "   - Fixed playback issue on albums containing only two items"
+    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "   - Fixed main menu offset intoduced with Roku 9.2 OS."
+    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "   - Fixed image naming on browse screen"
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "   - Other minor bugs"
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + chr(10) + "Thank you for using the PhotoView Channel."
 
@@ -57,7 +58,7 @@ End Sub
 Sub setAboutText()
 
     m.itemLabelHeader.text = "About Channel"
-    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "The 'PhotoView for Google Photos' channel was developed by Chris Taylor. It's dedicated to his 3-year-old daughter, who goes nuts every time she sees herself on TV."
+    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "The 'PhotoView for Google Photos' channel was developed by Chris Taylor. It's dedicated to his 4-year-old daughter, who goes nuts every time she sees herself on TV."
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + chr(10) + "We're committed to making this one of the best Photo Apps on the Roku platform."
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + chr(10) + "If you have any questions or comments, please see [Tips and Tricks > Bugs / Feature Request]"
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + chr(10) + "Please remember to rate us, this helps spread the word and drive development!"
