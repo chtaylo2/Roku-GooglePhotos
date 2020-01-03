@@ -31,6 +31,11 @@ Sub showGooglePhotosScreensaver()
     cecstatus.SetMessagePort(port)
     screen.setMessagePort(port)    
     screen.show()
+    
+    scene.signalBeacon("AppLaunchComplete")
+    myEPGComponent.signalBeacon("EPGLaunchInitiate")
+    m.top.signalBeacon("EPGLaunchComplete")
+    
 
     'Calculate uptime for devices that were booted in last 30 minutes and not touched. Otherwise, IsActiveSource() == false
     currentuptime = UpTime(0)
