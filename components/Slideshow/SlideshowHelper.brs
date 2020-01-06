@@ -233,10 +233,19 @@ Function doSearchGenerate() As Object
     pMonth = datepast.GetMonth().ToStr()
     pDay   = datepast.GetDayOfMonth().ToStr()
     
-    searchStrings       = {}
-    searchStrings.day   = "{'dateFilter': {'dates': [{'day': "+cDay+",'month': "+cMonth+",'year': "+cYear1.ToStr()+"},{'day': "+cDay+",'month': "+cMonth+",'year': "+cYear2.ToStr()+"},{'day': "+cDay+",'month': "+cMonth+",'year': "+cYear3.ToStr()+"},{'day': "+cDay+",'month': "+cMonth+",'year': "+cYear4.ToStr()+"},{'day': "+cDay+",'month': "+cMonth+",'year': "+cYear5.ToStr()+"}]}}"
-    searchStrings.week  = "{'dateFilter': {'ranges': [{'startDate': {'day': "+pDay+",'month': "+pMonth+",'year': "+pYear1.ToStr()+"},'endDate': {'day': "+cDay+",'month': "+cMonth+",'year': "+cYear1.ToStr()+"}},{'startDate': {'day': "+pDay+",'month': "+pMonth+",'year': "+pYear2.ToStr()+"},'endDate': {'day': "+cDay+",'month': "+cMonth+",'year': "+cYear2.ToStr()+"}},{'startDate': {'day': "+pDay+",'month': "+pMonth+",'year': "+pYear3.ToStr()+"},'endDate': {'day': "+cDay+",'month': "+cMonth+",'year': "+cYear3.ToStr()+"}},{'startDate': {'day': "+pDay+",'month': "+pMonth+",'year': "+pYear4.ToStr()+"},'endDate': {'day': "+cDay+",'month': "+cMonth+",'year': "+cYear4.ToStr()+"}},{'startDate': {'day': "+pDay+",'month': "+pMonth+",'year': "+pYear5.ToStr()+"},'endDate': {'day': "+cDay+",'month': "+cMonth+",'year': "+cYear5.ToStr()+"}}]}}"
-    searchStrings.month = "{'dateFilter': {'dates': [{'month': "+cMonth+",'year': "+cYear1.ToStr()+"},{'month': "+cMonth+",'year': "+cYear2.ToStr()+"},{'month': "+cMonth+",'year': "+cYear3.ToStr()+"},{'month': "+cMonth+",'year': "+cYear4.ToStr()+"},{'month': "+cMonth+",'year': "+cYear5.ToStr()+"}]}}"
+    'Bug fix in Google API.
+    if datepast.GetMonth() = 12 and date.GetMonth() = 1
+        pMonth = "1"
+        pDay   = "1"
+    end if
+    
+    searchStrings               = {}
+    searchStrings.day           = "{'dateFilter': {'dates': [{'day': "+cDay+",'month': "+cMonth+",'year': "+cYear1.ToStr()+"},{'day': "+cDay+",'month': "+cMonth+",'year': "+cYear2.ToStr()+"},{'day': "+cDay+",'month': "+cMonth+",'year': "+cYear3.ToStr()+"},{'day': "+cDay+",'month': "+cMonth+",'year': "+cYear4.ToStr()+"},{'day': "+cDay+",'month': "+cMonth+",'year': "+cYear5.ToStr()+"}]}}"
+    searchStrings.week          = "{'dateFilter': {'ranges': [{'startDate': {'day': "+pDay+",'month': "+pMonth+",'year': "+pYear1.ToStr()+"},'endDate': {'day': "+cDay+",'month': "+cMonth+",'year': "+cYear1.ToStr()+"}},{'startDate': {'day': "+pDay+",'month': "+pMonth+",'year': "+pYear2.ToStr()+"},'endDate': {'day': "+cDay+",'month': "+cMonth+",'year': "+cYear2.ToStr()+"}},{'startDate': {'day': "+pDay+",'month': "+pMonth+",'year': "+pYear3.ToStr()+"},'endDate': {'day': "+cDay+",'month': "+cMonth+",'year': "+cYear3.ToStr()+"}},{'startDate': {'day': "+pDay+",'month': "+pMonth+",'year': "+pYear4.ToStr()+"},'endDate': {'day': "+cDay+",'month': "+cMonth+",'year': "+cYear4.ToStr()+"}},{'startDate': {'day': "+pDay+",'month': "+pMonth+",'year': "+pYear5.ToStr()+"},'endDate': {'day': "+cDay+",'month': "+cMonth+",'year': "+cYear5.ToStr()+"}}]}}"
+    searchStrings.month         = "{'dateFilter': {'dates': [{'month': "+cMonth+",'year': "+cYear1.ToStr()+"},{'month': "+cMonth+",'year': "+cYear2.ToStr()+"},{'month': "+cMonth+",'year': "+cYear3.ToStr()+"},{'month': "+cMonth+",'year': "+cYear4.ToStr()+"},{'month': "+cMonth+",'year': "+cYear5.ToStr()+"}]}}"
+    searchStrings.daywithcurr   = "{'dateFilter': {'dates': [{'day': "+cDay+",'month': "+cMonth+"}]}}"
+    searchStrings.weekwithcurr  = "{'dateFilter': {'ranges': [{'startDate': {'day': "+pDay+",'month': "+pMonth+"},'endDate': {'day': "+cDay+",'month': "+cMonth+"}}]}}"
+    searchStrings.monthwithcurr = "{'dateFilter': {'dates': [{'month': "+cMonth+"}]}}"
 
     return searchStrings
 End Function
@@ -332,15 +341,17 @@ End Function
 
 Function googleImageCreateRecord(json As Object) As Object
     image                = CreateObject("roAssociativeArray")
-    image.GetTitle       = ""
-    image.GetID          = getString(json,"id")
     image.GetDescription = getString(json,"description")
-    image.GetURL         = getString(json,"baseUrl")
-    image.GetFilename    = getString(json,"filename")
-    image.GetTimestamp   = getString(json["mediaMetadata"],"creationTime")
-    image.IsVideo        = (json["mediaMetadata"]["video"]<>invalid)
-    image.GetVideoStatus = getString(json["mediaMetadata"]["video"],"status")
-    
+
+    if image.GetDescription.Instr("rivate") = -1 then
+        image.GetTitle       = ""
+        image.GetID          = getString(json,"id")
+        image.GetURL         = getString(json,"baseUrl")
+        image.GetFilename    = getString(json,"filename")
+        image.GetTimestamp   = getString(json["mediaMetadata"],"creationTime")
+        image.IsVideo        = (json["mediaMetadata"]["video"]<>invalid)
+        image.GetVideoStatus = getString(json["mediaMetadata"]["video"],"status")
+    end if
     return image
 End Function
 

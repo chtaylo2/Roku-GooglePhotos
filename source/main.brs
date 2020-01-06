@@ -26,6 +26,8 @@ Sub showGooglePhotosScreen()
     screen.setMessagePort(port)    
     screen.show()
 
+    scene.signalBeacon("AppLaunchComplete")
+
     if CECStatus <> invalid and CECStatus.IsActiveSource() = false then
         'HDMI-CEC status is false
         m.global.CECStatus = false

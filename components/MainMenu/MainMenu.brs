@@ -73,7 +73,7 @@ Sub showmarkupgrid()
     m.markupgrid.translation = [ centerx + 15, 360 ]
     
     'Select default item
-    m.markupgrid.jumpToItem = 3
+    m.markupgrid.jumpToItem = 2
       
     'Watch for events
     m.markupgrid.observeField("itemFocused", "onItemFocused") 

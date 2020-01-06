@@ -95,47 +95,6 @@ Sub init()
 End Sub
 
 
-' URL Request to fetch search
-Sub doGetScreensaverSearch(album As Object, selectedUser=0 as Integer)
-    print "Screensaver.brs [doGetScreensaverSearch]"
-    
-    'Get Dates
-    date         = CreateObject("roDateTime")
-    datepast     = createobject("rodatetime")
-    date.ToLocalTime()
-    datepast.ToLocalTime()
- 
-    'Calculate 7 days prior
-    d1seconds    = datepast.asseconds() - (60 * 60 * 24 * 7)
-    datepast.FromSeconds(d1seconds)
-    
-    current      = date.AsDateString("no-weekday")
-    currentYear  = date.GetYear().ToStr()
-    currentMonth = current.Split(" ")[0].ToStr()
-    currentDay   = zeroCheck(date.GetDayOfMonth().ToStr())
-    
-    past         = datepast.AsDateString("no-weekday")
-    pastYear     = datepast.GetYear().ToStr()
-    pastMonth    = past.Split(" ")[0].ToStr()
-    pastDay      = zeroCheck(datepast.GetDayOfMonth().ToStr())
-    
-    if album = "Day" then
-        keyword = "%22"+currentMonth+" "+currentDay+"%22 "+"-"+currentYear
-    else if album = "Week" then
-        keyword = "%22"+pastMonth+" "+pastDay+" - "+currentMonth+" "+currentDay+"%22 "+"-"+pastYear+" -"+currentYear
-    else if album = "Month" then
-        keyword = "%22"+currentMonth+"%22 "+"-"+currentYear
-    end if
-
-    tmpData = [ "doGetScreensaverSearch", keyword ]
-    keyword = keyword.Replace(" ", "+")
-    
-    m.apiPending = m.apiPending+1
-    signedHeader = oauth_sign(selectedUser)
-    makeRequest(signedHeader, m.gp_prefix + "?kind=photo&v=3.0&q="+keyword+"&max-results=1000&thumbsize=220&imgmax="+getResolution(), "GET", "", 3, tmpData)
-End Sub
-
-
 Sub handleGetAlbumList(event as object)
     print "Screensaver.brs [handleGetAlbumList]"
   
@@ -175,7 +134,9 @@ Sub processAlbums()
     album_cache_count = 0
        
     'Look for Time in History - We'll only allow 1 of these selections. Doesn't make sense to allow multiple as they are inclusive.
-    albumHistory = "Day|Week|Month".Split("|")
+    c = 0    
+    albumHistory = "Day|Daywithcurr|Week|Weekwithcurr|Month|Monthwithcurr".Split("|")
+    albumHistoryTxt = "Day|Day|Week|Week|Month|Month".Split("|")
     searchStrings = doSearchGenerate()
     for each album in albumHistory
         if (regAlbums <> invalid) and (regAlbums <> "")
@@ -183,7 +144,7 @@ Sub processAlbums()
             for each item in parsedString
                 albumUser = item.Split(":")
                 if albumUser[0] = album then
-                    m.predecessor = "This "+album+" in History"
+                    m.predecessor = "This "+albumHistoryTxt[c]+" in History"
                     tmp                    = {}
                     tmp.GetImageCount      = 0
                     tmp.showCountStart     = 1
@@ -198,6 +159,7 @@ Sub processAlbums()
                 end if
             end for
         end if
+        c = c + 1
     end for
     
     if m.albumActiveObject["SearchResults"] = invalid then
