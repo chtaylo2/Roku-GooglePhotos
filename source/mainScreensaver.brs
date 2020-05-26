@@ -18,12 +18,12 @@ End Sub
 
 
 Sub showGooglePhotosScreensaver()
-    screen   = CreateObject("roSGScreen")
-    port     = CreateObject("roMessagePort")
+    screen    = CreateObject("roSGScreen")
+    port      = CreateObject("roMessagePort")
     cecstatus = CreateObject("roCECStatus")
    
-    scene    = screen.CreateScene("GooglePhotosScreensaver")
-    m.global = screen.getGlobalNode()
+    scene     = screen.CreateScene("GooglePhotosScreensaver")
+    m.global  = screen.getGlobalNode()
  
     m.global.addFields( {SlideshowRes: "", SlideshowDisplay: "", SlideshowDelay: "", SlideshowOrder: "", VideoContinuePlay: ""} )
     m.global.addFields( {selectedUser: -1, CECStatus: true} )
@@ -74,7 +74,7 @@ Sub showGooglePhotosScreensaverSettings()
     scene    = screen.CreateScene("GooglePhotosScreensaverSettings")
     m.global = screen.getGlobalNode()
  
-    m.global.addFields( {SSaverUser: "", SSaverRes: "", SSaverMethod: "", SSaverDelay: "", SSaverOrder: "", SSaverVideo: "", SSaverCEC: ""} )
+    m.global.addFields( {SSaverUser: "", SSaverRes: "", SSaverMethod: "", SSaverDelay: "", SSaverOrder: "", SSaverTime: "", SSaverVideo: "", SSaverCEC: ""} )
     m.global.addFields( {SlideshowRes: "", SlideshowDisplay: "", SlideshowDelay: "", SlideshowOrder: "", VideoContinuePlay: ""} )
     m.global.addFields( {selectedUser: -1} )
     

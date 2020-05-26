@@ -256,6 +256,7 @@ Sub setLists()
     'Setup content list for different settings
     storeLinkedUsers()
     storeCECOptions()
+    storeDateTimeOptions()
     storeResolutionOptions()
     storeDisplayOptions()
     storeDelayOptions()
@@ -481,6 +482,25 @@ Sub storeLinkedUsers()
 End Sub
 
 
+Sub storeDateTimeOptions()
+    'Populate Date/Time options
+    
+    radioSelection = 0
+    regStore       = "SSaverTime"
+    regSelection   = RegRead(regStore, "Settings")
+
+    m.content = createObject("RoSGNode","ContentNode")
+    if regSelection = "Disabled" then radioSelection = 0
+    addItem(m.content, "Disabled (Default)", "Disabled", regStore)
+    if regSelection = "Enabled" then radioSelection = 1
+    addItem(m.content, "Enabled", "Enabled", regStore)
+    
+    'Store content node and current registry selection
+    m.settingsTime = m.content
+    m.settingsTimecheckedItem = radioSelection
+End Sub
+
+
 Sub storeCECOptions()
     'Populate HDMI-CEC options
     
@@ -514,68 +534,95 @@ Sub showfocus()
         itemcontent = m.settingsList.content.getChild(m.settingsList.itemFocused)
         m.infoLabel.text = itemcontent.description
         
-        'Temporary Setting
-        if (itemcontent.shortdescriptionline1<>"" and m.global.[itemcontent.shortdescriptionline1] <> "")
-            m.infoTempSetting.text = "Override Setting: " + m.global.[itemcontent.shortdescriptionline1]
-        else
-            m.infoTempSetting.text = ""
-        end if
-        
         m.albumDirections.visible = "false"
         m.aboutVersion.visible    = "false"
         
-        if m.settingsList.itemFocused = 0 then
-            m.settingSubList.visible        = "true"
-            m.settingSubList.content        = m.settingsRes
-            m.settingSubList.checkedItem    = m.settingsRescheckedItem
-            m.settingSubList.translation    = [129, itemcontent.x]
-        else if m.settingsList.itemFocused = 1 then
-            m.settingSubList.visible        = "true"
-            m.settingSubList.content        = m.settingsDisplay
-            m.settingSubList.checkedItem    = m.settingsDisplaycheckedItem
-            m.settingSubList.translation    = [129, itemcontent.x]
-        else if m.settingsList.itemFocused = 2 then
-            m.settingSubList.visible        = "true"
-            m.settingSubList.content        = m.settingsDelay
-            m.settingSubList.checkedItem    = m.settingsDelaycheckedItem
-            m.settingSubList.translation    = [129, itemcontent.x]
-        else if m.settingsList.itemFocused = 3 then
-            m.settingSubList.visible        = "true"
-            m.settingSubList.content        = m.settingsOrder
-            m.settingSubList.checkedItem    = m.settingsOrdercheckedItem
-            m.settingSubList.translation    = [129, itemcontent.x]
-        else if m.settingsList.itemFocused = 4 then
-            if m.setScope <> "screensaver"
+        if m.setScope = "screensaver"
+            if m.settingsList.itemFocused = 0 then
                 m.settingSubList.visible        = "true"
-                m.settingSubList.content        = m.settingsVideo
-                m.settingSubList.checkedItem    = m.settingsVideocheckedItem
+                m.settingSubList.content        = m.settingsRes
+                m.settingSubList.checkedItem    = m.settingsRescheckedItem
                 m.settingSubList.translation    = [129, itemcontent.x]
-            else
-                m.settingSubList.visible        = "false"
-            end if
-        else if m.settingsList.itemFocused = 5 then
-            if m.setScope = "screensaver"
-                m.albumDirections.visible       = "true"
+            else if m.settingsList.itemFocused = 1 then
                 m.settingSubList.visible        = "true"
-                m.settingSubList.content        = m.settingsUsers
-                m.settingSubList.checkedItem    = m.settingsUserscheckedItem
+                m.settingSubList.content        = m.settingsDisplay
+                m.settingSubList.checkedItem    = m.settingsDisplaycheckedItem
                 m.settingSubList.translation    = [129, itemcontent.x]
-            else
-                m.settingSubList.visible        = "false"
-            end if
-        else if m.settingsList.itemFocused = 6 then
-            if m.setScope = "screensaver"
+            else if m.settingsList.itemFocused = 2 then
+                m.settingSubList.visible        = "true"
+                m.settingSubList.content        = m.settingsDelay
+                m.settingSubList.checkedItem    = m.settingsDelaycheckedItem
+                m.settingSubList.translation    = [129, itemcontent.x]
+            else if m.settingsList.itemFocused = 3 then
+                m.settingSubList.visible        = "true"
+                m.settingSubList.content        = m.settingsOrder
+                m.settingSubList.checkedItem    = m.settingsOrdercheckedItem
+                m.settingSubList.translation    = [129, itemcontent.x]
+            else if m.settingsList.itemFocused = 4 then
+                m.albumDirections.visible       = "false"
+                m.settingSubList.visible        = "true"
+                m.settingSubList.content        = m.settingsTime
+                m.settingSubList.checkedItem    = m.settingsTimecheckedItem
+                m.settingSubList.translation    = [129, itemcontent.x]
+            else if m.settingsList.itemFocused = 5 then
                 m.albumDirections.visible       = "false"
                 m.settingSubList.visible        = "true"
                 m.settingSubList.content        = m.settingsCEC
                 m.settingSubList.checkedItem    = m.settingsCECcheckedItem
                 m.settingSubList.translation    = [129, itemcontent.x]
-            else
+            else if m.settingsList.itemFocused = 6 then    
+                m.albumDirections.visible       = "true"
+                m.settingSubList.visible        = "true"
+                m.settingSubList.content        = m.settingsUsers
+                m.settingSubList.checkedItem    = m.settingsUserscheckedItem
+                m.settingSubList.translation    = [129, itemcontent.x]
+            else if m.settingsList.itemFocused = 7 then
                 m.settingSubList.visible        = "false"
+                m.aboutVersion.visible          = "true"
             end if
-        else if m.settingsList.itemFocused = 7 then
-            m.settingSubList.visible        = "false"
-            m.aboutVersion.visible          = "true"
+            
+        else
+        
+            'Temporary Setting
+            if (itemcontent.shortdescriptionline1<>"" and m.global.[itemcontent.shortdescriptionline1] <> "")
+                m.infoTempSetting.text = "Override Setting: " + m.global.[itemcontent.shortdescriptionline1]
+            else
+                m.infoTempSetting.text = ""
+            end if
+        
+            if m.settingsList.itemFocused = 0 then
+                m.settingSubList.visible        = "true"
+                m.settingSubList.content        = m.settingsRes
+                m.settingSubList.checkedItem    = m.settingsRescheckedItem
+                m.settingSubList.translation    = [129, itemcontent.x]
+            else if m.settingsList.itemFocused = 1 then
+                m.settingSubList.visible        = "true"
+                m.settingSubList.content        = m.settingsDisplay
+                m.settingSubList.checkedItem    = m.settingsDisplaycheckedItem
+                m.settingSubList.translation    = [129, itemcontent.x]
+            else if m.settingsList.itemFocused = 2 then
+                m.settingSubList.visible        = "true"
+                m.settingSubList.content        = m.settingsDelay
+                m.settingSubList.checkedItem    = m.settingsDelaycheckedItem
+                m.settingSubList.translation    = [129, itemcontent.x]
+            else if m.settingsList.itemFocused = 3 then
+                m.settingSubList.visible        = "true"
+                m.settingSubList.content        = m.settingsOrder
+                m.settingSubList.checkedItem    = m.settingsOrdercheckedItem
+                m.settingSubList.translation    = [129, itemcontent.x]
+            else if m.settingsList.itemFocused = 4 then
+                m.settingSubList.visible        = "true"
+                m.settingSubList.content        = m.settingsVideo
+                m.settingSubList.checkedItem    = m.settingsVideocheckedItem
+                m.settingSubList.translation    = [129, itemcontent.x]
+            else if m.settingsList.itemFocused = 5 then
+                m.settingSubList.visible        = "false"
+            else if m.settingsList.itemFocused = 6 then
+                m.settingSubList.visible        = "false"
+            else if m.settingsList.itemFocused = 7 then
+                m.settingSubList.visible        = "false"
+                m.aboutVersion.visible          = "true"
+            end if        
         end if
     end if 
 End Sub
@@ -585,7 +632,7 @@ Sub showselected()
 
     'Process item selected
     if m.setScope = "screensaver"
-        if m.settingsList.itemSelected = 0 OR m.settingsList.itemSelected = 1 OR m.settingsList.itemSelected = 2 OR m.settingsList.itemSelected = 3 OR m.settingsList.itemSelected = 5 OR m.settingsList.itemSelected = 6 then
+        if m.settingsList.itemSelected = 0 OR m.settingsList.itemSelected = 1 OR m.settingsList.itemSelected = 2 OR m.settingsList.itemSelected = 3 OR m.settingsList.itemSelected = 4 OR m.settingsList.itemSelected = 5 OR m.settingsList.itemSelected = 6 then
             'SETTINGS
             m.settingSubList.setFocus(true)
         end if    
@@ -641,13 +688,22 @@ Sub showsubselected()
         end if
     end if
     
-    if m.settingsList.itemSelected = 0 then m.settingsRescheckedItem     = m.settingSubList.itemSelected
-    if m.settingsList.itemSelected = 1 then m.settingsDisplaycheckedItem = m.settingSubList.itemSelected
-    if m.settingsList.itemSelected = 2 then m.settingsDelaycheckedItem   = m.settingSubList.itemSelected
-    if m.settingsList.itemSelected = 3 then m.settingsOrdercheckedItem   = m.settingSubList.itemSelected
-    if m.settingsList.itemSelected = 4 then m.settingsVideocheckedItem   = m.settingSubList.itemSelected    
-    if m.settingsList.itemSelected = 5 then m.settingsUserscheckedItem   = m.settingSubList.itemSelected
-    if m.settingsList.itemSelected = 6 then m.settingsCECcheckedItem     = m.settingSubList.itemSelected
+    
+    if m.setScope = "screensaver"
+        if m.settingsList.itemSelected = 0 then m.settingsRescheckedItem     = m.settingSubList.itemSelected
+        if m.settingsList.itemSelected = 1 then m.settingsDisplaycheckedItem = m.settingSubList.itemSelected
+        if m.settingsList.itemSelected = 2 then m.settingsDelaycheckedItem   = m.settingSubList.itemSelected
+        if m.settingsList.itemSelected = 3 then m.settingsOrdercheckedItem   = m.settingSubList.itemSelected
+        if m.settingsList.itemSelected = 4 then m.settingsTimecheckedItem    = m.settingSubList.itemSelected
+        if m.settingsList.itemSelected = 5 then m.settingsCECcheckedItem     = m.settingSubList.itemSelected
+        if m.settingsList.itemSelected = 6 then m.settingsUserscheckedItem   = m.settingSubList.itemSelected
+    else
+        if m.settingsList.itemSelected = 0 then m.settingsRescheckedItem     = m.settingSubList.itemSelected
+        if m.settingsList.itemSelected = 1 then m.settingsDisplaycheckedItem = m.settingSubList.itemSelected
+        if m.settingsList.itemSelected = 2 then m.settingsDelaycheckedItem   = m.settingSubList.itemSelected
+        if m.settingsList.itemSelected = 3 then m.settingsOrdercheckedItem   = m.settingSubList.itemSelected
+        if m.settingsList.itemSelected = 4 then m.settingsVideocheckedItem   = m.settingSubList.itemSelected    
+    end if
 End Sub
 
 
@@ -777,7 +833,7 @@ End Sub
 Function onKeyEvent(key as String, press as Boolean) as Boolean
     if press then
         print "KEY: "; key
-        if (key = "options" or key = "right") and (m.settingSubList.hasFocus() = true) and (m.settingsList.itemFocused = 5)
+        if (key = "options" or key = "right") and (m.settingSubList.hasFocus() = true) and (m.settingsList.itemFocused = 6)
             'Select Linked User
             m.sharedAPIpull = 0
             m.albumsObject["albums"] = []
