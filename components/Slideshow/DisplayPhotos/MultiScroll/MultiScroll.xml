@@ -58,6 +58,7 @@
             vertAlign   = "top"
             color       = "#eaeaea"
             wrap        = "true"
+            font        = "font:MediumBoldSystemFont" 
             translation = "[ 0, 18 ]"
         />
         
