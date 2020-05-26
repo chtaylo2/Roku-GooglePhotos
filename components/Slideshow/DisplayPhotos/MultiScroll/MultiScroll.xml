@@ -48,6 +48,18 @@
             </Label>
       
         </Rectangle>
+
+        <!-- Screensaver currenttime label -->  
+        <Label 
+            id          = "currentTime" 
+            height      = "100" 
+            width       = "1890"
+            horizAlign  = "right"
+            vertAlign   = "top"
+            color       = "#eaeaea"
+            wrap        = "true"
+            translation = "[ 0, 18 ]"
+        />
         
         <!-- Screensaver watermark -->
         <Poster
@@ -94,6 +106,12 @@
             id          = "moveWatermark"
             repeat      = "true"
             duration    = "1200"
+        />
+
+        <Timer
+            id          = "DateTimer"
+            repeat      = "true"
+            duration    = "60"
         />
         
         <Dialog
