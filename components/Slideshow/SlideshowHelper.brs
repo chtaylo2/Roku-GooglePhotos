@@ -349,9 +349,11 @@ Function googleImageCreateRecord(json As Object) As Object
         image.GetURL         = getString(json,"baseUrl")
         image.GetFilename    = getString(json,"filename")
         image.GetTimestamp   = getString(json["mediaMetadata"],"creationTime")
+        image.GetWidth       = getString(json["mediaMetadata"],"width")
         image.IsVideo        = (json["mediaMetadata"]["video"]<>invalid)
         image.GetVideoStatus = getString(json["mediaMetadata"]["video"],"status")
     end if
+    
     return image
 End Function
 

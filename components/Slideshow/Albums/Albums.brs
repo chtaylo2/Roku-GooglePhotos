@@ -178,6 +178,7 @@ Sub handleGetAlbumImages(event as object)
                 tmp.filename    = media.GetFilename
         
                 if media.IsVideo then
+                   tmp.width    = media.GetWidth
                    m.videosMetaData.Push(tmp)
                    'print "VIDEO: "; tmp.url
                 else

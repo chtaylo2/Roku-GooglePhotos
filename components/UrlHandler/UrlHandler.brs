@@ -136,6 +136,8 @@ Sub processResponse(msg as Object)
             num:         jobnum
         }
 
+        'print "URL RESULT: ";  result
+        
         if msg.GetResponseCode() <> 200 then
            print "URL RESULT: ";  result
            print "MSG: "; msg.GetResponseCode()
