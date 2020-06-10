@@ -1,6 +1,6 @@
 '*************************************************************
 '** PhotoView for Google Photos
-'** Copyright (c) 2017-2019 Chris Taylor.  All rights reserved.
+'** Copyright (c) 2017-2020 Chris Taylor.  All rights reserved.
 '** Use of code within this application subject to the MIT License (MIT)
 '** https://raw.githubusercontent.com/chtaylo2/Roku-GooglePhotos/master/LICENSE
 '*************************************************************
@@ -209,11 +209,11 @@ Sub onMoveTrigger()
     if m.Watermark.translation[1] = 1010 then
          m.Watermark.translation        = "[1700,10]"
          m.RediscoverScreen.translation = "[0,25]"
-         m.currentTime.translation      = "[0,990]"
+         m.currentTime.translation      = "[0,970]"
     else
         m.Watermark.translation        = "[1700,1010]"
         m.RediscoverScreen.translation = "[0,1010]"
-        m.currentTime.translation      = "[0,18]"
+        m.currentTime.translation      = "[0,25]"
     end if
 End Sub
 

@@ -229,13 +229,13 @@
         <Label 
             id          = "currentTime" 
             height      = "100" 
-            width       = "1890"
+            width       = "1870"
             horizAlign  = "right"
             vertAlign   = "top"
             color       = "#eaeaea"
             font        = "font:MediumBoldSystemFont" 
             wrap        = "true"
-            translation = "[ 0, 18 ]"
+            translation = "[ 0, 25 ]"
         />
                 
         <!-- Screensaver watermark -->

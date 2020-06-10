@@ -1,6 +1,6 @@
 '*************************************************************
 '** PhotoView for Google Photos
-'** Copyright (c) 2017-2019 Chris Taylor.  All rights reserved.
+'** Copyright (c) 2017-2020 Chris Taylor.  All rights reserved.
 '** Use of code within this application subject to the MIT License (MIT)
 '** https://raw.githubusercontent.com/chtaylo2/Roku-GooglePhotos/master/LICENSE
 '*************************************************************
@@ -40,13 +40,11 @@ End Sub
 Sub setFeaturesText()
 
     m.itemLabelHeader.text = "New Channel Features"
-    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "1. Enhanced 'This Time in History' playback. Current year optionally included."
-    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "2. Items with 'Private' in discription are no longer displayed."
+    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "1. New CLOCK functionality added in screensaver. Enable in screensaver settings menu"
+    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "2. Channel now supports higher resolution videos from Google."
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "3. Shared Album support is finally here!"
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + chr(10) + "Bug fixes:"
-    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "   - Fixed main menu offset intoduced with Roku 9.2 OS."
-    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "   - Fixed image naming on browse screen"
-    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "   - Other minor bugs"
+    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "   - No bugs reported"
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + chr(10) + "Thank you for using the PhotoView Channel."
 
     'Write reg entry to we don't redisplay

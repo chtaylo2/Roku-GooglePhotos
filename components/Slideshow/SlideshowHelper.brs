@@ -1,6 +1,6 @@
 '*************************************************************
 '** PhotoView for Google Photos
-'** Copyright (c) 2017-2019 Chris Taylor.  All rights reserved.
+'** Copyright (c) 2017-2020 Chris Taylor.  All rights reserved.
 '** Use of code within this application subject to the MIT License (MIT)
 '** https://raw.githubusercontent.com/chtaylo2/Roku-GooglePhotos/master/LICENSE
 '*************************************************************
@@ -349,9 +349,11 @@ Function googleImageCreateRecord(json As Object) As Object
         image.GetURL         = getString(json,"baseUrl")
         image.GetFilename    = getString(json,"filename")
         image.GetTimestamp   = getString(json["mediaMetadata"],"creationTime")
+        image.GetWidth       = getString(json["mediaMetadata"],"width")
         image.IsVideo        = (json["mediaMetadata"]["video"]<>invalid)
         image.GetVideoStatus = getString(json["mediaMetadata"]["video"],"status")
     end if
+    
     return image
 End Function
 

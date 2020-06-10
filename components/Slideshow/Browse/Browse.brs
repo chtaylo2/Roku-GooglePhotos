@@ -1,6 +1,6 @@
 '*************************************************************
 '** PhotoView for Google Photos
-'** Copyright (c) 2017-2019 Chris Taylor.  All rights reserved.
+'** Copyright (c) 2017-2020 Chris Taylor.  All rights reserved.
 '** Use of code within this application subject to the MIT License (MIT)
 '** https://raw.githubusercontent.com/chtaylo2/Roku-GooglePhotos/master/LICENSE
 '*************************************************************
@@ -26,6 +26,7 @@ Sub init()
     m.itemsPerPage = 200
     m.itemsStart = 0
     m.itemsEnd = 0
+    m.retryvid = 0
     
     m.showVideoPlayback = RegRead("VideoContinuePlay", "Settings")
         
@@ -183,7 +184,7 @@ Sub onItemSelected()
 End Sub
 
 
-Sub doVideoShow(videoStore as object)
+Sub doVideoShow(videoStore as object, forceres="" as string)
     print "Browse.brs [doVideoShow]"
     
     thumbnailPath = CreateObject("roPath", videoStore.url)
@@ -195,9 +196,24 @@ Sub doVideoShow(videoStore as object)
     
     regStorage = RegRead(m.regStore, m.regSection)
 
+    if forceres = "" then
+        videores = "m18"
+        if Strtoi(videoStore.width) >= 720 and Strtoi(videoStore.width) < 1920 then
+            videores = "m22"
+        else if Strtoi(videoStore.width) >= 1920
+            videores = "m37"
+        end if
+    else
+        videores = forceres
+    end if
+    
+    print "videores: "; videores
+    print "videourl: "; videoStore.url + "=" + videores
+    print "store: "; videoStore
+    
     videoContent              = createObject("RoSGNode", "ContentNode")
     videoContent.ContentType  = "movie"
-    videoContent.url          = videoStore.url+"=m18"
+    videoContent.url          = videoStore.url + "=" + videores
     videoContent.streamformat = "mp4"
     videoContent.Title        = friendlyDate(videoStore.timestamp)
     if videoStore.description <> "" then
@@ -205,46 +221,63 @@ Sub doVideoShow(videoStore as object)
     else
         videoContent.TitleSeason = videoStore.filename
     end if
-    
+
     m.VideoPlayer.visible = true
     m.VideoPlayer.content = videoContent
-    m.VideoPlayer.seek    = setVideoPosition(videoObj.filename)
+    m.VideoPlayer.seek    = setVideoPosition(videoObj.filename + "=" + videores)
     m.VideoPlayer.control = "play"
     m.VideoPlayer.setFocus(true)
-
+    
+    m.VideoPlayer.unobserveField("state")
     m.VideoPlayer.observeField("state", "onVideoStateChange")
 End Sub
 
 
 Sub onVideoStateChange()
-    print "Browse.brs - [onVideoStateChange]"
-    if (m.VideoPlayer.state = "error") or (m.VideoPlayer.state = "finished") then
+    print "Browse.brs - [onVideoStateChange] "; m.VideoPlayer.state
+    
+    if (m.VideoPlayer.state = "buffering" and m.retryvid = 1) then
+        'This is to deal with video player sending a finished state after trying to restart with new URL
+        m.retryvid = 0
+        
+    else if ((m.VideoPlayer.state = "error") or (m.VideoPlayer.state = "finished")) and m.retryvid <> 1 then
     
         writeVideoPosition(0)
-        m.VideoPlayer.unobserveField("state")
-       
-        if m.showVideoPlayback = "Continuous Video Playback" then
-            if m.showOrder = "Random Order" then
-                'Create image display list - RANDOM
-                m.videoPlayingindex = GetRandom(m.metaData)               
-            else if m.showOrder = "Reverse Album Order"
-                'Create image display list - REVERSE ALBUM ORDER
-                m.videoPlayingindex = m.videoPlayingindex-1
-                if (m.metaData[m.videoPlayingindex]=invalid) m.videoPlayingindex = m.metaData.Count()-1
-            else
-                'Create image display list - ALBUM ORDER
-                m.videoPlayingindex = m.videoPlayingindex+1
-                if (m.metaData[m.videoPlayingindex]=invalid) m.videoPlayingindex = 0
-            end if 
-                
-            if m.metaData[m.videoPlayingindex]<>invalid
-                'Continue playing the next video inline
-                doVideoShow(m.metaData[m.videoPlayingindex])
+        
+        if (m.VideoPlayer.state = "error") and (right(m.VideoPlayer.content.url, 4) <> "=m18") then
+            if right(m.VideoPlayer.content.url, 4) = "=m37" then
+                print " --> RETRY w/m22"
+                m.retryvid = 1
+                doVideoShow(m.metaData[m.videoPlayingindex], "m22")
+            else if right(m.VideoPlayer.content.url, 4) = "=m22"
+                print " --> RETRY w/m18"
+                m.retryvid = 1
+                doVideoShow(m.metaData[m.videoPlayingindex], "m18")
             end if
         else
-            'Close video screen
-            m.VideoPlayer.visible = false
-            m.ImageGrid.setFocus(true)
+            if m.showVideoPlayback = "Continuous Video Playback" then
+                if m.showOrder = "Random Order" then
+                    'Create image display list - RANDOM
+                    m.videoPlayingindex = GetRandom(m.metaData)
+                else if m.showOrder = "Reverse Album Order"
+                    'Create image display list - REVERSE ALBUM ORDER
+                    m.videoPlayingindex = m.videoPlayingindex-1
+                    if (m.metaData[m.videoPlayingindex]=invalid) m.videoPlayingindex = m.metaData.Count()-1
+                else
+                    'Create image display list - ALBUM ORDER
+                    m.videoPlayingindex = m.videoPlayingindex+1
+                    if (m.metaData[m.videoPlayingindex]=invalid) m.videoPlayingindex = 0
+                end if
+
+                if m.metaData[m.videoPlayingindex]<>invalid
+                    'Continue playing the next video inline
+                    doVideoShow(m.metaData[m.videoPlayingindex])
+                end if
+            else
+                'Close video screen
+                m.VideoPlayer.visible = false
+                m.ImageGrid.setFocus(true)
+            end if
         end if
     end if
 End Sub
@@ -272,7 +305,7 @@ End Function
 Sub writeVideoPosition(position as integer)
 
     regStorage = RegRead(m.regStore, m.regSection)
-    
+
     if (m.VideoPlayer.state <> "error") and (m.VideoPlayer.streamInfo.streamUrl <> invalid) and (m.VideoPlayer.streamInfo.streamUrl <> "") then
     
         videoFile = m.VideoPlayer.streamInfo.streamUrl
