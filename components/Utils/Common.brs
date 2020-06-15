@@ -1,6 +1,6 @@
 '*************************************************************
 '** PhotoView for Google Photos
-'** Copyright (c) 2017-2019 Chris Taylor.  All rights reserved.
+'** Copyright (c) 2017-2020 Chris Taylor.  All rights reserved.
 '** Use of code within this application subject to the MIT License (MIT)
 '** https://raw.githubusercontent.com/chtaylo2/Roku-GooglePhotos/master/LICENSE
 '*************************************************************
@@ -13,7 +13,7 @@
 Function loadCommon()
     ' Common varables for needed for Oauth and GooglePhotos API
     
-    m.releaseVersion   = "3.4"
+    m.releaseVersion   = "3.5"
     m.gp_scope         = "https://photoslibrary.googleapis.com"
     m.gp_prefix        = m.gp_scope + "/v1"
     
@@ -66,6 +66,8 @@ Function loadDefaults()
     if tmp=invalid RegWrite("SSaverMethod", "YesFading_YesBlur", "Settings")
     tmp = RegRead("SSaverCEC", "Settings")
     if tmp=invalid RegWrite("SSaverCEC", "HDMI-CEC Enabled", "Settings")
+    tmp = RegRead("SSaverTime", "Settings")
+    if tmp=invalid RegWrite("SSaverTime", "Disabled", "Settings")
     
     tmp = RegRead("SlideshowDisplay", "Settings")
     if tmp=invalid RegWrite("SlideshowDisplay", "YesFading_YesBlur", "Settings")
@@ -505,6 +507,7 @@ Function strReplaceSpecial(basestr As String) As String
     return newstr
 End Function
 
+
 '******************************************************
 'Replace a leading 0 if only 1 digit is found
 '******************************************************
@@ -512,6 +515,34 @@ Function zeroCheck(day as string) as string
    if len(day)=1 then day="0"+day
    
    return day   
+End Function
+
+
+'******************************************************
+'Get current time.
+'******************************************************
+Function getLocalTime() as string   
+    dt = CreateObject("roDateTime")
+    dt.toLocalTime()
+    
+    chour = dt.GetHours()
+
+    if chour=0 then
+      chour = 12
+      ampm  = "am"
+    else if chour=12 then
+      chour = 12
+      ampm  = "pm"
+    else if chour>12 then 
+      chour = chour-12
+      ampm  = "pm"
+    else if chour<12 then
+      chour=chour
+      ampm="am"
+    endif
+    
+    dateStr = dt.asDateString("no-weekday") + chr(10) + chour.ToStr() + ":" + zeroCheck(dt.getMinutes().ToStr()) + " " + ampm
+    return dateStr
 End Function
 
 

@@ -1,6 +1,6 @@
 '*************************************************************
 '** PhotoView for Google Photos
-'** Copyright (c) 2017-2019 Chris Taylor.  All rights reserved.
+'** Copyright (c) 2017-2020 Chris Taylor.  All rights reserved.
 '** Use of code within this application subject to the MIT License (MIT)
 '** https://raw.githubusercontent.com/chtaylo2/Roku-GooglePhotos/master/LICENSE
 '*************************************************************
@@ -23,6 +23,7 @@ Sub init()
     m.WaveTimer         = m.top.findNode("waveTimer")
     m.RefreshTimer      = m.top.findNode("refreshTimer")
     m.Watermark         = m.top.findNode("Watermark")
+    m.DateTimer         = m.top.findNode("DateTimer")
     m.MoveTimer         = m.top.findNode("moveWatermark")
     m.RediscoverScreen  = m.top.findNode("RediscoverScreen")
     m.RediscoverDetail  = m.top.findNode("RediscoverDetail")
@@ -31,6 +32,7 @@ Sub init()
     m.noticeDialog      = m.top.findNode("noticeDialog")
     m.apiTimer          = m.top.findNode("apiTimer")
     m.DisplayTimer      = m.top.findNode("DisplayTimer")
+    m.currentTime       = m.top.findNode("currentTime")
     m.confirmDialog     = m.top.findNode("confirmDialog")
     
     m.WaveTimer.observeField("fire","onWaveTigger")
@@ -148,6 +150,7 @@ Sub loadImageList()
 
     m.imageDisplay = m.top.content
     m.settingCEC   = RegRead("SSaverCEC", "Settings")
+    m.showTime     = RegRead("SSaverTime", "Settings")
 
     m.scroll_node_1.imageUri = GetNextImage()
     m.scroll_node_5.imageUri = GetNextImage()
@@ -172,6 +175,13 @@ Sub loadImageList()
         m.MoveTimer.observeField("fire","onMoveTrigger")
         m.MoveTimer.control        = "start"
         m.DisplayTimer.duration    = "14400"  '4 hours
+        
+        if m.showTime = "Enabled" then
+            m.DateTimer.observeField("fire","onDateTimerTrigger")
+            m.DateTimer.control = "start"
+            m.currentTime.text  = getLocalTime()
+        end if
+        
     else
         m.DisplayTimer.duration    = "43200"  '12 hours
     end if    
@@ -199,9 +209,11 @@ Sub onMoveTrigger()
     if m.Watermark.translation[1] = 1010 then
          m.Watermark.translation        = "[1700,10]"
          m.RediscoverScreen.translation = "[0,25]"
+         m.currentTime.translation      = "[0,970]"
     else
         m.Watermark.translation        = "[1700,1010]"
         m.RediscoverScreen.translation = "[0,1010]"
+        m.currentTime.translation      = "[0,25]"
     end if
 End Sub
 
@@ -471,7 +483,7 @@ Sub onDisplayTimer()
     ' ** Why the hell is this here you ask? **
     '  Screensaver will now expire after 4 hours due to the API and download limitations Google has set. I don't want all API usage going to people not sitting in front of thier device. Sorry, but that's the way it is right now, plan and simple.
     '  In months to come, I'll review how this channel is doing on the API usage and see if this can be extended or removed.
-    '  Last review: March, 2019
+    '  Last review: May, 2020
 
     m.RefreshTimer.control     = "stop"
     m.DownloadTimer.control    = "stop"
@@ -508,6 +520,11 @@ Sub onApiTimerTrigger()
             end for    
         end if
     end if
+End Sub
+
+
+Sub onDateTimerTrigger()
+    m.currentTime.text = getLocalTime()
 End Sub
 
 

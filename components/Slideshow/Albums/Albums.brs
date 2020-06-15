@@ -1,6 +1,6 @@
 '*************************************************************
 '** PhotoView for Google Photos
-'** Copyright (c) 2017-2019 Chris Taylor.  All rights reserved.
+'** Copyright (c) 2017-2020 Chris Taylor.  All rights reserved.
 '** Use of code within this application subject to the MIT License (MIT)
 '** https://raw.githubusercontent.com/chtaylo2/Roku-GooglePhotos/master/LICENSE
 '*************************************************************
@@ -178,6 +178,7 @@ Sub handleGetAlbumImages(event as object)
                 tmp.filename    = media.GetFilename
         
                 if media.IsVideo then
+                   tmp.width    = media.GetWidth
                    m.videosMetaData.Push(tmp)
                    'print "VIDEO: "; tmp.url
                 else

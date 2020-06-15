@@ -1,6 +1,6 @@
 '*************************************************************
 '** PhotoView for Google Photos
-'** Copyright (c) 2017-2019 Chris Taylor.  All rights reserved.
+'** Copyright (c) 2017-2020 Chris Taylor.  All rights reserved.
 '** Use of code within this application subject to the MIT License (MIT)
 '** https://raw.githubusercontent.com/chtaylo2/Roku-GooglePhotos/master/LICENSE
 '*************************************************************
@@ -27,10 +27,12 @@ Sub init()
     m.DownloadTimer             = m.top.findNode("DownloadTimer")
     m.URLRefreshTimer           = m.top.findNode("URLRefreshTimer")
     m.DisplayTimer              = m.top.findNode("DisplayTimer")
+    m.DateTimer                 = m.top.findNode("DateTimer")
     m.Watermark                 = m.top.findNode("Watermark")
     m.MoveTimer                 = m.top.findNode("moveWatermark")
     m.RediscoverScreen          = m.top.findNode("RediscoverScreen")
     m.RediscoverDetail          = m.top.findNode("RediscoverDetail")
+    m.currentTime               = m.top.findNode("currentTime")
     m.noticeDialog              = m.top.findNode("noticeDialog")
     m.confirmDialog             = m.top.findNode("confirmDialog")
     m.apiTimer                  = m.top.findNode("apiTimer")
@@ -113,6 +115,7 @@ Sub loadImageList()
         m.showRes       = RegRead("SSaverRes", "Settings")
         m.showDisplay   = RegRead("SSaverMethod", "Settings")
         m.showOrder     = RegRead("SSaverOrder", "Settings")
+        m.showTime      = RegRead("SSaverTime", "Settings")
         showDelay       = RegRead("SSaverDelay", "Settings")
         m.settingCEC    = RegRead("SSaverCEC", "Settings")
     
@@ -122,6 +125,7 @@ Sub loadImageList()
         print "GooglePhotos Screensaver Delay:   "; showDelay
         print "GooglePhotos Screensaver Order:   "; m.showOrder
         print "GooglePhotos Screensaver Display: "; m.showDisplay
+        print "GooglePhotos Screensaver ShowTime: "; m.showTime
         
         'Show watermark on screensaver - Stop bitching, we need some advertisment!
         ds = m.device.GetDisplaySize()
@@ -136,6 +140,14 @@ Sub loadImageList()
         m.MoveTimer.observeField("fire","onMoveTrigger")
         m.MoveTimer.control        = "start"
         m.DisplayTimer.duration    = "43200"  '12 hours
+        
+        
+        if m.showTime = "Enabled" then
+            m.DateTimer.observeField("fire","onDateTimerTrigger")
+            m.DateTimer.control = "start"
+            m.currentTime.text  = getLocalTime()
+        end if
+
     else
         m.DisplayTimer.duration    = "43200"  '12 hours
     end if    
@@ -228,6 +240,8 @@ Sub onRotationTigger(event as object)
         end if
 
         m.Watermark.visible     = false
+        m.currentTime.visible   = false
+        m.DateTimer.control     = "stop"
         m.RotationTimer.control = "stop"
         m.DownloadTimer.control = "stop"
     else
@@ -640,9 +654,11 @@ Sub onMoveTrigger()
     if m.Watermark.translation[1] = 1010 then
         m.Watermark.translation        = "[1700,10]"
         m.RediscoverScreen.translation = "[0,25]"
+        m.currentTime.translation      = "[0,970]"
     else
         m.Watermark.translation        = "[1700,1010]"
         m.RediscoverScreen.translation = "[0,1010]"
+        m.currentTime.translation      = "[0,25]"
     end if
 End Sub
 
@@ -711,6 +727,11 @@ Sub onApiTimerTrigger()
             end for
         end if
     end if
+End Sub
+
+
+Sub onDateTimerTrigger()
+    m.currentTime.text = getLocalTime()
 End Sub
 
 
