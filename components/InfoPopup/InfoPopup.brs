@@ -44,7 +44,7 @@ Sub setFeaturesText()
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "2. Channel now supports higher resolution videos from Google."
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "3. Shared Album support is finally here!"
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + chr(10) + "Bug fixes:"
-    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "   - No bugs reported"
+    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "   - Fixed an image download error seen by a few users"
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + chr(10) + "Thank you for using the PhotoView Channel."
 
     'Write reg entry to we don't redisplay
