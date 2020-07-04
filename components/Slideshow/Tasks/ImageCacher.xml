@@ -48,10 +48,12 @@
                         httpObj.AsyncGetToFile( fname )
 
                         msg = wait(0, port)
-
-                        'print "  -- download result ["; fname; "] - Result ["; msg.GetResponseCode(); "]"
+    
+                        'print "  -- download result ["; fname; "] - Result ["; msg.GetResponseCode(); "] - Text ["; msg.GetFailureReason(); "]"
                         if msg.GetResponseCode() = 403 then
                             response["ACCESS ERROR"] = "403"
+                        else if msg.GetResponseCode() < 0
+                            response["ACCESS ERROR"] = "400"
                         else
                             response[item.url] = fname
                         end if

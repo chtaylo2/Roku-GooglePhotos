@@ -434,12 +434,12 @@ Sub processDownloads(event as object)
     for each key in response
         tmpFS = response[key]
         
-        m.imageLocalCacheByURL[key] = tmpFS
-        m.imageLocalCacheByFS[tmpFS] = key
-        
         if (tmpFS = "403") and (m.URLRefreshTimer.control <> "start") then
             onURLRefreshTigger()
             m.URLRefreshTimer.control = "start"
+        else if tmpFS <> "403"
+            m.imageLocalCacheByURL[key] = tmpFS
+            m.imageLocalCacheByFS[tmpFS] = key
         end if
     end for
     
@@ -455,7 +455,7 @@ Sub contolCache(event as object)
     cacheArray = event.getdata()
     if type(cacheArray) = "roArray" then
         'print "Local FileSystem Count: "; cacheArray.Count()
-        if (cacheArray.Count() > keepImages) then
+        if (cacheArray.Count() >= keepImages) then
             for i = keepImages to cacheArray.Count()
                 oldImage = cacheArray.pop()
                 'print "Delete from FileSystem: "; oldImage
