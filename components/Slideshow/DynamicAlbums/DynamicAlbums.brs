@@ -148,10 +148,13 @@ Sub handleGetSearch(event as object)
                 tmp.timestamp   = media.GetTimestamp
                 tmp.description = media.GetDescription
                 tmp.filename    = media.GetFilename
+                tmp.width = media.GetWidth
         
                 if media.IsVideo then
+                    tmp.width    = media.GetWidth
                     m.albumActiveObject[albumid].videosMetaData.Push(tmp)
                     'print "VIDEO: "; tmp.url
+                    
                 else
                     m.albumActiveObject[albumid].imagesMetaData.Push(tmp)
                     'print "IMAGE: "; tmp.url
