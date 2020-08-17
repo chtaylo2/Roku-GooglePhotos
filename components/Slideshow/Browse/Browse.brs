@@ -306,7 +306,7 @@ Sub writeVideoPosition(position as integer)
 
     regStorage = RegRead(m.regStore, m.regSection)
 
-    if (m.VideoPlayer.state <> invalid) and (m.VideoPlayer.streamInfo.streamUrl <> invalid) then
+    if (m.VideoPlayer.state <> invalid) and (m.VideoPlayer.streamInfo <> invalid) then
         if (m.VideoPlayer.state <> "error") and (m.VideoPlayer.streamInfo.streamUrl <> "") then
     
             videoFile = m.VideoPlayer.streamInfo.streamUrl
