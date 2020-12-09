@@ -36,6 +36,13 @@ Sub showfocus()
         
         if itemcontent.title = "Reporting Bugs or Feature Requests" then
             m.qrCode.visible = "true"
+            m.qrCode.uri     = "pkg:/images/issues-qrcode.png" 
+        else if itemcontent.title = "Donations" then
+            m.qrCode.visible = "true"
+            m.qrCode.uri     = "pkg:/images/donations-qrcode.png"
+        else if itemcontent.title = "Additional FAQ's" then
+            m.qrCode.visible = "true"
+            m.qrCode.uri     = "pkg:/images/faq-qrcode.png"
         else
             m.qrCode.visible = "false"
         end if

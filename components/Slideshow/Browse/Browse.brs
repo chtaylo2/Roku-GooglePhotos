@@ -306,30 +306,32 @@ Sub writeVideoPosition(position as integer)
 
     regStorage = RegRead(m.regStore, m.regSection)
 
-    if (m.VideoPlayer.state <> "error") and (m.VideoPlayer.streamInfo.streamUrl <> invalid) and (m.VideoPlayer.streamInfo.streamUrl <> "") then
+    if (m.VideoPlayer.state <> invalid) and (m.VideoPlayer.streamInfo <> invalid) then
+        if (m.VideoPlayer.state <> "error") and (m.VideoPlayer.streamInfo.streamUrl <> "") then
     
-        videoFile = m.VideoPlayer.streamInfo.streamUrl
-        videoPath = CreateObject("roPath", videoFile)
-        videoObj  = videoPath.Split()
-        
-        if (videoObj.filename <> "") then
-            if (regStorage <> invalid) and (regStorage <> "") then
+            videoFile = m.VideoPlayer.streamInfo.streamUrl
+            videoPath = CreateObject("roPath", videoFile)
+            videoObj  = videoPath.Split()
             
-                'Only save last 20 video positions
-                parsedString = regStorage.Split("|")
-                i = 1
-                saveList = ""
-                for each item in parsedString
-                    keypair = item.Split(":")
-                    if keypair[0] <> videoObj.filename
-                        saveList = saveList + "|" + item
-                    end if
-                    i = i + 1
-                    if i = 20 EXIT FOR
-                end for
-                RegWrite(m.regStore, videoObj.filename + ":" + itostr(position) + saveList, m.regSection)
-            else
-                RegWrite(m.regStore, videoObj.filename + ":" + itostr(position), m.regSection)
+            if (videoObj.filename <> "") then
+                if (regStorage <> invalid) and (regStorage <> "") then
+                
+                    'Only save last 20 video positions
+                    parsedString = regStorage.Split("|")
+                    i = 1
+                    saveList = ""
+                    for each item in parsedString
+                        keypair = item.Split(":")
+                        if keypair[0] <> videoObj.filename
+                            saveList = saveList + "|" + item
+                        end if
+                        i = i + 1
+                        if i = 20 EXIT FOR
+                    end for
+                    RegWrite(m.regStore, videoObj.filename + ":" + itostr(position) + saveList, m.regSection)
+                else
+                    RegWrite(m.regStore, videoObj.filename + ":" + itostr(position), m.regSection)
+                end if
             end if
         end if
     end if
@@ -388,8 +390,10 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
                 m.VideoPlayer.control = "stop"
                 m.VideoPlayer.visible = false
                 m.ImageGrid.setFocus(true)
-                m.VideoPlayer.unobserveField("state")   
-                writeVideoPosition(m.VideoPlayer.position)
+                m.VideoPlayer.unobserveField("state")
+                if (m.VideoPlayer.position <> invalid)
+                    writeVideoPosition(m.VideoPlayer.position)
+                end if
                 return true
             else if (m.mediaPageList.visible = false) and (ceiling(m.metaData.Count() / m.itemsPerPage) > 1)
                 displayMediaPages()

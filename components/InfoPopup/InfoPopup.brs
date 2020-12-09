@@ -40,10 +40,11 @@ End Sub
 Sub setFeaturesText()
 
     m.itemLabelHeader.text = "New Channel Features"
-    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "1. New CLOCK functionality added in screensaver. Enable in screensaver settings menu"
-    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "2. Channel now supports higher resolution videos from Google."
-    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "3. Shared Album support is finally here!"
+    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "1. New 'Tips and Tricks' and FAQ's added."
+    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "2. New CLOCK functionality added in screensaver. Enable in screensaver settings menu"
+    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "3. Channel now supports higher resolution videos from Google."
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + chr(10) + "Bug fixes:"
+    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "   - Fixed video playback errors on dynamic albums"
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "   - Fixed an image download error seen by a few users"
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + chr(10) + "Thank you for using the PhotoView Channel."
 
