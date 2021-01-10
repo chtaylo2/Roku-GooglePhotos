@@ -17,7 +17,9 @@ Function loadCommon()
     m.gp_scope         = "https://photoslibrary.googleapis.com"
     m.gp_prefix        = m.gp_scope + "/v1"
     
-    'Moving m.register_prefix to HTTP (vs. HTTPS) during the domain name transition. Will be moved back in next release.
+    ' Change below to [true] to force user registration through the developer portal 
+    m.developerEnable  = false
+    
     m.register_prefix  = "https://www.photoviewapp.com"
     m.oauth_prefix     = "https://www.googleapis.com/oauth2/v4"
     m.oauth_scope      = ""

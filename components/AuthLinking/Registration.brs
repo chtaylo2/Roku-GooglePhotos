@@ -48,8 +48,15 @@ Sub doGenerateToken()
 
     params = "client_id="        + m.clientId
     params = params + "&scope="  + m.oauth_scope
-
-    makeRequest({}, m.register_prefix+"/cgi-bin/device/code", "POST", params, 4, [])
+    
+    if m.developerEnable = true then
+        uri = "/cgi-bin/dev/device"
+    else
+        uri = "/cgi-bin/device"
+    end if
+    
+    makeRequest({}, m.register_prefix + uri + "/code", "POST", params, 4, [])
+    
 End Sub
 
 
@@ -181,7 +188,13 @@ Sub onCheckAuth(event as object)
         params = "client_id="                 + m.clientId
         params = params + "&code="            + m.deviceCode
     
-        makeRequest({}, m.register_prefix+"/cgi-bin/device/token", "POST", params, 5, [])
+        if m.developerEnable = true then
+            uri = "/cgi-bin/dev/device"
+        else
+            uri = "/cgi-bin/device"
+        end if
+        
+        makeRequest({}, m.register_prefix + uri + "/token", "POST", params, 5, [])
 
         m.LoginTimer.repeat = true
         m.LoginTimer.control = "start"
@@ -217,6 +230,10 @@ Sub onStoreUser(event as object)
                 infoEmail = getString(json,"email")
                 infoPhoto = getString(json,"picture")
     
+                if m.developerEnable = true then
+                    infoName = "REGISTERED_WITH_DEVCODE"
+                end if
+                
                 'Special Charactor management
                 infoName  = infoName.Replace(".", "")
                 infoName  = strReplaceSpecial(infoName)
