@@ -132,7 +132,7 @@ Sub processAlbums()
     regStore  = "SSaverAlbums"
     regAlbums = RegRead(regStore, "Settings")
     album_cache_count = 0
-       
+    
     'Look for Time in History - We'll only allow 1 of these selections. Doesn't make sense to allow multiple as they are inclusive.
     c = 0    
     albumHistory = "Day|Daywithcurr|Week|Weekwithcurr|Month|Monthwithcurr".Split("|")
@@ -163,7 +163,6 @@ Sub processAlbums()
     end for
     
     if m.albumActiveObject["SearchResults"] = invalid then
-    
         'Handle GooglePhotos Library Albums
         if (regAlbums <> invalid) and (regAlbums <> "") and (m.userIndex <> 100)
             'User has selected albums for screensaver
@@ -225,16 +224,29 @@ Sub processAlbums()
                     albumUser = item.Split(":")
                     if albumUser[0] <> "GP_LIBRARY" then
                         m.predecessor = "null"
-                        m.albumActiveObject[albumUser[0]] = {}
-                        m.albumActiveObject[albumUser[0]].GetID = albumUser[0]
-                        m.albumActiveObject[albumUser[0]].GetUserIndex = Strtoi(albumUser[1])
-                        doGetAlbumImages(albumUser[0], Strtoi(albumUser[1]))
+                        if albumUser[0] = "favorites" then
+                            tmp                    = {}
+                            tmp.GetImageCount      = 0
+                            tmp.showCountStart     = 1
+                            tmp.showCountEnd       = 0
+                            tmp.apiCount           = 0
+                            tmp.previousPageTokens = []
+                            tmp.GetID              = "SearchResults"
+                            tmp.GetUserIndex       = Strtoi(albumUser[1])
+                            tmp.keyword            = "favorites"
+                            m.albumActiveObject[tmp.GetID] = tmp
+                            doGetSearch(tmp.GetID, Strtoi(albumUser[1]), searchStrings["favorites"])
+                        else
+                            m.albumActiveObject[albumUser[0]] = {}
+                            m.albumActiveObject[albumUser[0]].GetID = albumUser[0]
+                            m.albumActiveObject[albumUser[0]].GetUserIndex = Strtoi(albumUser[1])
+                            doGetAlbumImages(albumUser[0], Strtoi(albumUser[1]))
+                        end if
                     end if
                 end if
             end for
             
         else if m.albumsObject["albums"].Count()>0 then
-        
             for each album in m.albumsObject["albums"]
                 ' Randomly pull 5 additional albums and cache photos
                 album_idx = Rnd(m.albumsObject["albums"].Count())-1

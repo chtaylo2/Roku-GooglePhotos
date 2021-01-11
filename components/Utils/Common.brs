@@ -18,7 +18,7 @@ Function loadCommon()
     m.gp_prefix        = m.gp_scope + "/v1"
     
     ' Change below to [true] to force user registration through the developer portal 
-    m.developerEnable  = false
+    m.developerEnable  = true
     
     m.register_prefix  = "https://www.photoviewapp.com"
     m.oauth_prefix     = "https://www.googleapis.com/oauth2/v4"
