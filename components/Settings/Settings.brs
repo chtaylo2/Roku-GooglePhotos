@@ -750,6 +750,8 @@ Sub showalbumselected()
                 saveList = m.albumSelection.content.getChild(2).description + ":" + itostr(selectedUser) + "|"
             else if m.albumSelection.checkedState[1] = true then
                 saveList = m.albumSelection.content.getChild(1).description + ":" + itostr(selectedUser) + "|"
+            else if m.albumSelection.checkedState[0] = true then
+                saveList = m.albumSelection.content.getChild(0).description + ":" + itostr(selectedUser) + "|"
             else
                 'Control the number of API calls we make. Sorry but Google monitors this.
                 if selectCount < 5 then
@@ -759,9 +761,13 @@ Sub showalbumselected()
                     errorMsg = "You may select 5 albums max, for screensaver playback. Other album selections will not be saved."
                 end if
             end if
+
+            if (m.albumSelection.checkedState[0] and i > 0) then
+                errorMsg = "Favorites Album cannot be combined with any other at this time. NOTE: Plans are to address this in an upcoming release."
+            end if
             
-            if (m.albumSelection.checkedState[6] = true or m.albumSelection.checkedState[5] = true or m.albumSelection.checkedState[4] = true or m.albumSelection.checkedState[3] = true or m.albumSelection.checkedState[2] = true or m.albumSelection.checkedState[1] = true) and (i = 1 or i > 6) then
-                errorMsg = "Time in history albums are currently mutually exclusive. Other album selections will not be saved."
+            if (m.albumSelection.checkedState[6] = true or m.albumSelection.checkedState[5] = true or m.albumSelection.checkedState[4] = true or m.albumSelection.checkedState[3] = true or m.albumSelection.checkedState[2] = true or m.albumSelection.checkedState[1] = true) and (i > 6) then
+                errorMsg = "Time in history albums are currently mutually exclusive. Other album selections will not be saved. NOTE: Plans are to address this in an upcoming release."
             end if
         end if
     end for

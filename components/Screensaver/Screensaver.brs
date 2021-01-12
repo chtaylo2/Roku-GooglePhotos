@@ -133,40 +133,65 @@ Sub processAlbums()
     regAlbums = RegRead(regStore, "Settings")
     album_cache_count = 0
     
-    'Look for Time in History - We'll only allow 1 of these selections. Doesn't make sense to allow multiple as they are inclusive.
-    c = 0    
-    albumHistory = "Day|Daywithcurr|Week|Weekwithcurr|Month|Monthwithcurr".Split("|")
-    albumHistoryTxt = "Day|Day|Week|Week|Month|Month".Split("|")
+    ' README: I realize this function is really ugly. This is legacy code and would like to redo this in the next release. Ideal state:
+    '   - Users can select "Searchable" albums (Favorites, Time in History *) + normal albums.
+    '   - The tmp.GetID does not limit us to only a single "SearchResults" set
+    '   - Users are able to select albums from multiple accounts, including "searchable" for screensaver.
+   
+    parsedString = regAlbums.Split("|")
     searchStrings = doSearchGenerate()
-    for each album in albumHistory
-        if (regAlbums <> invalid) and (regAlbums <> "")
-            parsedString = regAlbums.Split("|")
-            for each item in parsedString
-                albumUser = item.Split(":")
-                if albumUser[0] = album then
-                    m.predecessor = "This "+albumHistoryTxt[c]+" in History"
-                    tmp                    = {}
-                    tmp.GetImageCount      = 0
-                    tmp.showCountStart     = 1
-                    tmp.showCountEnd       = 0
-                    tmp.apiCount           = 0
-                    tmp.previousPageTokens = []
-                    tmp.GetID              = "SearchResults"
-                    tmp.GetUserIndex       = Strtoi(albumUser[1])
-                    tmp.keyword            = album
-                    m.albumActiveObject[tmp.GetID] = tmp
-                    doGetSearch(tmp.GetID, Strtoi(albumUser[1]), searchStrings[album])
-                end if
-            end for
+    
+    'Look for Favorites album selection
+    for each item in parsedString
+        albumUser = item.Split(":")
+        if albumUser[0] = "favorites" then
+            tmp                    = {}
+            tmp.GetImageCount      = 0
+            tmp.showCountStart     = 1
+            tmp.showCountEnd       = 0
+            tmp.apiCount           = 0
+            tmp.previousPageTokens = []
+            tmp.GetID              = "SearchResults"
+            tmp.GetUserIndex       = Strtoi(albumUser[1])
+            tmp.keyword            = "favorites"
+            m.albumActiveObject[tmp.GetID] = tmp
+            doGetSearch(tmp.GetID, Strtoi(albumUser[1]), searchStrings["favorites"])
         end if
-        c = c + 1
     end for
+    
+    if m.albumActiveObject["SearchResults"] = invalid then
+        'Look for Time in History - We'll only allow 1 of these selections. Doesn't make sense to allow multiple as they are inclusive.
+        c = 0    
+        albumHistory = "Day|Daywithcurr|Week|Weekwithcurr|Month|Monthwithcurr".Split("|")
+        albumHistoryTxt = "Day|Day|Week|Week|Month|Month".Split("|")
+        for each album in albumHistory
+            if (regAlbums <> invalid) and (regAlbums <> "")
+                for each item in parsedString
+                    albumUser = item.Split(":")
+                    if albumUser[0] = album then
+                        m.predecessor = "This "+albumHistoryTxt[c]+" in History"
+                        tmp                    = {}
+                        tmp.GetImageCount      = 0
+                        tmp.showCountStart     = 1
+                        tmp.showCountEnd       = 0
+                        tmp.apiCount           = 0
+                        tmp.previousPageTokens = []
+                        tmp.GetID              = "SearchResults"
+                        tmp.GetUserIndex       = Strtoi(albumUser[1])
+                        tmp.keyword            = album
+                        m.albumActiveObject[tmp.GetID] = tmp
+                        doGetSearch(tmp.GetID, Strtoi(albumUser[1]), searchStrings[album])
+                    end if
+                end for
+            end if
+            c = c + 1
+        end for
+    end if
     
     if m.albumActiveObject["SearchResults"] = invalid then
         'Handle GooglePhotos Library Albums
         if (regAlbums <> invalid) and (regAlbums <> "") and (m.userIndex <> 100)
             'User has selected albums for screensaver
-            parsedString = regAlbums.Split("|")
             for each item in parsedString
                 albumUser = item.Split(":")
                 if albumUser[0] = "GP_LIBRARY" then
@@ -180,9 +205,6 @@ Sub processAlbums()
                     tmp.GetID              = "GP_LIBRARY_" + albumUser[1]
                     tmp.GetUserIndex       = Strtoi(albumUser[1])
                     m.albumActiveObject[tmp.GetID] = tmp
-                    
-                    print "TEMP: "; tmp.GetID
-                    
                     doGetLibraryImages(tmp.GetID, Strtoi(albumUser[1]))
                 end if
             end for
@@ -218,30 +240,15 @@ Sub processAlbums()
     
         'User has selected albums for screensaver
         if (regAlbums <> invalid) and (regAlbums <> "") and (m.userIndex <> 100)
-            parsedString = regAlbums.Split("|")
             for each item in parsedString
                 if item <> "" then
                     albumUser = item.Split(":")
                     if albumUser[0] <> "GP_LIBRARY" then
                         m.predecessor = "null"
-                        if albumUser[0] = "favorites" then
-                            tmp                    = {}
-                            tmp.GetImageCount      = 0
-                            tmp.showCountStart     = 1
-                            tmp.showCountEnd       = 0
-                            tmp.apiCount           = 0
-                            tmp.previousPageTokens = []
-                            tmp.GetID              = "SearchResults"
-                            tmp.GetUserIndex       = Strtoi(albumUser[1])
-                            tmp.keyword            = "favorites"
-                            m.albumActiveObject[tmp.GetID] = tmp
-                            doGetSearch(tmp.GetID, Strtoi(albumUser[1]), searchStrings["favorites"])
-                        else
-                            m.albumActiveObject[albumUser[0]] = {}
-                            m.albumActiveObject[albumUser[0]].GetID = albumUser[0]
-                            m.albumActiveObject[albumUser[0]].GetUserIndex = Strtoi(albumUser[1])
-                            doGetAlbumImages(albumUser[0], Strtoi(albumUser[1]))
-                        end if
+                        m.albumActiveObject[albumUser[0]] = {}
+                        m.albumActiveObject[albumUser[0]].GetID = albumUser[0]
+                        m.albumActiveObject[albumUser[0]].GetUserIndex = Strtoi(albumUser[1])
+                        doGetAlbumImages(albumUser[0], Strtoi(albumUser[1]))
                     end if
                 end if
             end for
