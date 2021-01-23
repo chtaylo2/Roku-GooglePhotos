@@ -246,6 +246,7 @@ Function doSearchGenerate() As Object
     searchStrings.daywithcurr   = "{'dateFilter': {'dates': [{'day': "+cDay+",'month': "+cMonth+"}]}}"
     searchStrings.weekwithcurr  = "{'dateFilter': {'ranges': [{'startDate': {'day': "+pDay+",'month': "+pMonth+"},'endDate': {'day': "+cDay+",'month': "+cMonth+"}}]}}"
     searchStrings.monthwithcurr = "{'dateFilter': {'dates': [{'month': "+cMonth+"}]}}"
+    searchStrings.favorites     = "{'featureFilter': {'includedFeatures': ['FAVORITES']}}"
 
     return searchStrings
 End Function

@@ -60,7 +60,7 @@ Function addRequest(request as Object) as Boolean
                 method = parameters.method
                 uri = parameters.uri
                 params = parameters.params
-                'print parameters
+                print parameters
                 
                 if type(uri) = "roString"
                     urlXfer = createObject("roUrlTransfer")

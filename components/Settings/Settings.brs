@@ -186,10 +186,27 @@ Sub printAlbumSelection(albumList As Object)
     
     m.loadingSpinner.visible = "false"
     
+    'Display Favorites Album
+    addItem(m.albumContent, "• Favorites", "favorites", "")
+    saved = 0
+    if (regAlbums <> invalid) and (regAlbums <> "")
+        parsedString = regAlbums.Split("|")
+        for each item in parsedString
+            albumUser = item.Split(":")
+            if albumUser[0] = "favorites" then
+                'Check selected album
+                saved = 1
+            end if
+        end for
+    end if
+    if saved = 1 checkedObj.Push(true)
+    if saved = 0 checkedObj.Push(false)
+    
     'Display Time in History selections
     c = 0    
     albumHistory = "Day|Daywithcurr|Week|Weekwithcurr|Month|Monthwithcurr".Split("|")
     albumHistoryTxt = "Day|Day|Week|Week|Month|Month".Split("|")
+    
     for each album in albumHistory
         if album.Instr("withcurr") >= 0 then
             addItem(m.albumContent, "• "+albumHistoryTxt[c]+" in History including " + cYear.ToStr(), album, "")
@@ -719,8 +736,11 @@ Sub showalbumselected()
     for i = 0 to albumsTotal
         itemcontent  = m.albumSelection.content.getChild(i)
         checkState   = m.albumSelection.checkedState[i]
+
         if checkState = true then
-            if m.albumSelection.checkedState[5] = true then
+            if m.albumSelection.checkedState[6] = true then
+                saveList = m.albumSelection.content.getChild(6).description + ":" + itostr(selectedUser) + "|"
+            else if m.albumSelection.checkedState[5] = true then
                 saveList = m.albumSelection.content.getChild(5).description + ":" + itostr(selectedUser) + "|"
             else if m.albumSelection.checkedState[4] = true then
                 saveList = m.albumSelection.content.getChild(4).description + ":" + itostr(selectedUser) + "|"
@@ -741,9 +761,13 @@ Sub showalbumselected()
                     errorMsg = "You may select 5 albums max, for screensaver playback. Other album selections will not be saved."
                 end if
             end if
+
+            if (m.albumSelection.checkedState[0] and i > 0) then
+                errorMsg = "Favorites Album cannot be combined with any other at this time. NOTE: Plans are to address this in an upcoming release."
+            end if
             
-            if (m.albumSelection.checkedState[5] = true or m.albumSelection.checkedState[4] = true or m.albumSelection.checkedState[3] = true or m.albumSelection.checkedState[2] = true or m.albumSelection.checkedState[1] = true or m.albumSelection.checkedState[0] = true) and (i > 5) then
-                errorMsg = "Time in history albums are currently mutually exclusive. Other album selections will not be saved."
+            if (m.albumSelection.checkedState[6] = true or m.albumSelection.checkedState[5] = true or m.albumSelection.checkedState[4] = true or m.albumSelection.checkedState[3] = true or m.albumSelection.checkedState[2] = true or m.albumSelection.checkedState[1] = true) and (i > 6) then
+                errorMsg = "Time in history albums are currently mutually exclusive. Other album selections will not be saved. NOTE: Plans are to address this in an upcoming release."
             end if
         end if
     end for

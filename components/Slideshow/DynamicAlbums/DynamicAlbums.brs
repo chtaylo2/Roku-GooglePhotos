@@ -55,12 +55,13 @@ Sub loadListContent()
 
     m.content = createObject("RoSGNode","ContentNode")
     'addItem(m.content, "Shuffle All Photos", "3", "junk")
-    addItem(m.content, "Rediscover this Day in History", "day", "Rediscover this Day in History")
-    addItem(m.content, "Rediscover this Week in History", "week", "Rediscover this Week in History")
-    addItem(m.content, "Rediscover this Month in History", "month", "Rediscover this Month in History")
-    addItem(m.content, "Rediscover this Day in History - Including " + cYear.ToStr(), "daywithcurr", "Rediscover this Day in History")
-    addItem(m.content, "Rediscover this Week in History - Including " + cYear.ToStr(), "weekwithcurr", "Rediscover this Week in History")
-    addItem(m.content, "Rediscover this Month in History - Including " + cYear.ToStr(), "monthwithcurr", "Rediscover this Month in History")
+    addItem(m.content, " • Favorites Media Album", "favorites", "Favorites!")
+    addItem(m.content, " • Rediscover this Day in History", "day", "Rediscover this Day in History")
+    addItem(m.content, " • Rediscover this Week in History", "week", "Rediscover this Week in History")
+    addItem(m.content, " • Rediscover this Month in History", "month", "Rediscover this Month in History")
+    addItem(m.content, " • Rediscover this Day in History - Including " + cYear.ToStr(), "daywithcurr", "Rediscover this Day in History")
+    addItem(m.content, " • Rediscover this Week in History - Including " + cYear.ToStr(), "weekwithcurr", "Rediscover this Week in History")
+    addItem(m.content, " • Rediscover this Month in History - Including " + cYear.ToStr(), "monthwithcurr", "Rediscover this Month in History")
 
     'Store content node and current registry selection
     m.dynamicAlbumList.content = m.content
