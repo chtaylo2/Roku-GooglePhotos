@@ -45,6 +45,8 @@ Sub init()
     m.imageOnScreen             = ""
     m.apiPending                = 0
     m.albumActiveObject         = invalid
+    m.cacheKeepImages           = 20
+    m.hasRefreshed              = 0
     
     m.pauseImageCount.font.size   = 29
     m.pauseImageDetail.font.size  = 29
@@ -398,16 +400,14 @@ Sub onDownloadTigger(event as object)
     tmpDownload = []
     
     'Download Next 5 images - Only when needed
-    for i = 1 to 5
+    for i = 0 to 4
         nextID = GetNextImage(m.imageDisplay, m.imageTracker+i)
-        
+
         if m.imageDisplay.Count()-1 >= nextID
-        nextURL = m.imageDisplay[nextID].url
-        
-        if not m.imageLocalCacheByURL.DoesExist(nextURL) then
-            tmpDownload.push(m.imageDisplay[nextID])
-        end if
-        
+            nextURL = m.imageDisplay[nextID].url
+            if not m.imageLocalCacheByURL.DoesExist(nextURL) then
+                tmpDownload.push(m.imageDisplay[nextID])
+            end if
         end if
     end for
     
@@ -437,6 +437,9 @@ Sub processDownloads(event as object)
         if (tmpFS = "403") and (m.URLRefreshTimer.control <> "start") then
             onURLRefreshTigger()
             m.URLRefreshTimer.control = "start"
+
+            'Track that we have refreshed. If so, we won't allow indefinite loop
+            m.hasRefreshed = 1
         else if tmpFS <> "403"
             m.imageLocalCacheByURL[key] = tmpFS
             m.imageLocalCacheByFS[tmpFS] = key
@@ -449,16 +452,15 @@ End Sub
 Sub contolCache(event as object)
     'Free channel, no CASH here! -- Not funny? Ok..
     
-    keepImages = 20
-    
-    'Control the filesystem download cache - After 'keepImages' downloads start removing
+    'Control the filesystem download cache - After 'm.cacheKeepImages' downloads start removing
     cacheArray = event.getdata()
+
     if type(cacheArray) = "roArray" then
         'print "Local FileSystem Count: "; cacheArray.Count()
-        if (cacheArray.Count() >= keepImages) then
-            for i = keepImages to cacheArray.Count()
+        if (cacheArray.Count() > m.cacheKeepImages) then
+            for i = m.cacheKeepImages to cacheArray.Count()
                 oldImage = cacheArray.pop()
-                'print "Delete from FileSystem: "; oldImage
+                print "Delete from FileSystem: "; oldImage
                 DeleteFile("tmp:/"+oldImage)
                 
                 urlLookup = m.imageLocalCacheByFS.Lookup("tmp:/"+oldImage)
@@ -574,7 +576,7 @@ Sub sendNextImage(direction=invalid)
         url = m.imageLocalCacheByURL[url]
     end if
     
-    print "Next Image: "; url
+    print "INFO :: Next Image: "; url
     
     'Controls the background blur
     rxBlur = CreateObject("roRegex", "YesBlur", "i")
@@ -668,26 +670,32 @@ Sub onDisplayTimer()
     ' ** Why the hell is this here you ask? **
     '  Screensaver will now expire after 4 (now 12) hours due to the API and download limitations Google has set. I don't want all API usage going to people not sitting in front of thier device. Sorry, but that's the way it is right now, plan and simple.
     '  In months to come, I'll review how this channel is doing on the API usage and see if this can be extended or removed.
-    '  Last review: July, 2019
+    '  Last review: Jan, 2021
 
-    m.RotationTimer.control    = "stop"
-    m.DownloadTimer.control    = "stop"
-    
-    generic1            = {}
-    generic1.timestamp  = "284040000"
-    generic1.url        = "pkg:/images/black_pixel.png"
-    generic1.filename   = "black_pixel.png"
-    m.imageTracker      = 0
-    m.imageDisplay      = []
-    m.imageDisplay.Push(generic1)
-    
-    sendNextImage()
-    if m.top.id = "DisplayScreensaver" then
-        m.RediscoverDetail.text    = "Screensaver has expired after 12 hours"
+    ' UPDATE PER ISSUE: #358 - If slideshow count is under the m.cacheKeepImages threshold, then disable the timeout. Since the slideshow is only pulling from cached images,there's no API hit and no need to timeout.
+
+    if (m.hasRefreshed = 0) and (m.imageDisplay.Count() <= m.cacheKeepImages) then
+        print "DEBUG :: Ignoring timeout"
     else
-        m.RediscoverDetail.text    = "Slideshow has expired after 12 hours"
+        m.RotationTimer.control    = "stop"
+        m.DownloadTimer.control    = "stop"
+        
+        generic1            = {}
+        generic1.timestamp  = "284040000"
+        generic1.url        = "pkg:/images/black_pixel.png"
+        generic1.filename   = "black_pixel.png"
+        m.imageTracker      = 0
+        m.imageDisplay      = []
+        m.imageDisplay.Push(generic1)
+        
+        sendNextImage()
+        if m.top.id = "DisplayScreensaver" then
+            m.RediscoverDetail.text    = "Screensaver has expired after 12 hours"
+        else
+            m.RediscoverDetail.text    = "Slideshow has expired after 12 hours"
+        end if
+        m.RediscoverScreen.visible = "true"
     end if
-    m.RediscoverScreen.visible = "true"
 End Sub
 
 
