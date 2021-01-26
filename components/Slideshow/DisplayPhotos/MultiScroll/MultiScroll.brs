@@ -451,14 +451,14 @@ Function GetNextImage()
         end if
     end if
 
-    print "NEXT: "; m.imageTracker
-
     if m.imageDisplay.Count()-1 = m.imageTracker then
         m.imageTracker = 0
         url = m.imageDisplay[m.imageTracker].url
+        'print "NEXT: "; m.imageTracker; " - "; m.imageDisplay[m.imageTracker].url
     else
         m.imageTracker = m.imageTracker + 1
         url = m.imageDisplay[m.imageTracker].url
+        'print "NEXT: "; m.imageTracker; " - "; m.imageDisplay[m.imageTracker].url
     end if
     
     return url
