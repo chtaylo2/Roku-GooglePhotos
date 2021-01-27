@@ -13,7 +13,7 @@
 Function loadCommon()
     ' Common varables for needed for Oauth and GooglePhotos API
     
-    m.releaseVersion   = "3.6"
+    m.releaseVersion   = "3.7"
     m.gp_scope         = "https://photoslibrary.googleapis.com"
     m.gp_prefix        = m.gp_scope + "/v1"
     

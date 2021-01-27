@@ -40,12 +40,12 @@ End Sub
 Sub setFeaturesText()
 
     m.itemLabelHeader.text = "New Channel Features"
-    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "1. New 'Tips and Tricks' and FAQ's added."
-    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "2. New CLOCK functionality added in screensaver. Enable in screensaver settings menu"
-    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "3. Channel now supports higher resolution videos from Google."
+    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "1. Media tagged as 'Favorites' in the Google Photos app now have its own album!"
+    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "2. Albums with under 20 images are no longer subject to the 12 hour timeout. See more details in FAQ."
+    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "3. Device registration system has been redesigned."
+    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "4. Backend optimization to increase efficiency and security."
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + chr(10) + "Bug fixes:"
-    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "   - Fixed video playback errors on dynamic albums"
-    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "   - Fixed an image download error seen by a few users"
+    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "   - No bugs identified"
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + chr(10) + "Thank you for using the PhotoView Channel."
 
     'Write reg entry to we don't redisplay
