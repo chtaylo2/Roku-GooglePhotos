@@ -25,7 +25,7 @@ Sub showGooglePhotosScreensaver()
     scene     = screen.CreateScene("GooglePhotosScreensaver")
     m.global  = screen.getGlobalNode()
  
-    m.global.addFields( {SlideshowRes: "", SlideshowDisplay: "", SlideshowDelay: "", SlideshowOrder: "", VideoContinuePlay: ""} )
+    m.global.addFields( {SlideshowRes: "", SlideshowDisplay: "", SlideshowDelay: "", SlideshowOrder: "", SlideshowMeta: "", VideoContinuePlay: ""} )
     m.global.addFields( {selectedUser: -1, CECStatus: true} )
     
     cecstatus.SetMessagePort(port)
@@ -74,8 +74,8 @@ Sub showGooglePhotosScreensaverSettings()
     scene    = screen.CreateScene("GooglePhotosScreensaverSettings")
     m.global = screen.getGlobalNode()
  
-    m.global.addFields( {SSaverUser: "", SSaverRes: "", SSaverMethod: "", SSaverDelay: "", SSaverOrder: "", SSaverTime: "", SSaverVideo: "", SSaverCEC: ""} )
-    m.global.addFields( {SlideshowRes: "", SlideshowDisplay: "", SlideshowDelay: "", SlideshowOrder: "", VideoContinuePlay: ""} )
+    m.global.addFields( {SSaverUser: "", SSaverRes: "", SSaverMethod: "", SSaverDelay: "", SSaverOrder: "", SSSaverMeta: "", SSaverTime: "", SSaverVideo: "", SSaverCEC: ""} )
+    m.global.addFields( {SlideshowRes: "", SlideshowDisplay: "", SlideshowDelay: "", SlideshowOrder: "", SlideshowMeta: "", VideoContinuePlay: ""} )
     m.global.addFields( {selectedUser: -1} )
     
     screen.setMessagePort(port)    
