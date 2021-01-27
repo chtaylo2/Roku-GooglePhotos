@@ -47,6 +47,7 @@ Sub init()
     m.albumActiveObject         = invalid
     m.cacheKeepImages           = 20
     m.hasRefreshed              = 0
+    m.persistMeta               = 0
     
     m.pauseImageCount.font.size   = 29
     m.pauseImageDetail.font.size  = 29
@@ -63,6 +64,7 @@ Sub init()
     m.showRes       = RegRead("SlideshowRes", "Settings")
     m.showDisplay   = RegRead("SlideshowDisplay", "Settings")
     m.showOrder     = RegRead("SlideshowOrder", "Settings")
+    m.showMeta      = RegRead("SlideshowMeta", "Settings")
     showDelay       = RegRead("SlideshowDelay", "Settings")
     m.settingCEC    = ""
     
@@ -70,11 +72,13 @@ Sub init()
     if m.global.SlideshowRes <> "" m.showRes = m.global.SlideshowRes
     if m.global.SlideshowDisplay <> "" m.showDisplay = m.global.SlideshowDisplay
     if m.global.SlideshowOrder <> "" m.showOrder = m.global.SlideshowOrder
+    if m.global.SlideshowMeta <> "" m.showMeta = m.global.SlideshowMeta
     if m.global.SlideshowDelay <> "" showDelay = m.global.SlideshowDelay
     
     print "GooglePhotos Show Res:     "; m.showRes
     print "GooglePhotos Show Delay:   "; showDelay
     print "GooglePhotos Show Order:   "; m.showOrder
+    print "GooglePhotos Show Meta:    "; m.showMeta
     print "GooglePhotos Show Display: "; m.showDisplay
     
     if showDelay<>invalid
@@ -117,16 +121,18 @@ Sub loadImageList()
         m.showRes       = RegRead("SSaverRes", "Settings")
         m.showDisplay   = RegRead("SSaverMethod", "Settings")
         m.showOrder     = RegRead("SSaverOrder", "Settings")
+        m.showMeta      = RegRead("SSaverMeta", "Settings")
         m.showTime      = RegRead("SSaverTime", "Settings")
         showDelay       = RegRead("SSaverDelay", "Settings")
         m.settingCEC    = RegRead("SSaverCEC", "Settings")
     
         m.RotationTimer.duration = showDelay
         
-        print "GooglePhotos Screensaver Res:     "; m.showRes
-        print "GooglePhotos Screensaver Delay:   "; showDelay
-        print "GooglePhotos Screensaver Order:   "; m.showOrder
-        print "GooglePhotos Screensaver Display: "; m.showDisplay
+        print "GooglePhotos Screensaver Res:      "; m.showRes
+        print "GooglePhotos Screensaver Delay:    "; showDelay
+        print "GooglePhotos Screensaver Order:    "; m.showOrder
+        print "GooglePhotos Screensaver Meta:     "; m.showMeta
+        print "GooglePhotos Screensaver Display:  "; m.showDisplay
         print "GooglePhotos Screensaver ShowTime: "; m.showTime
         
         'Show watermark on screensaver - Stop bitching, we need some advertisment!
@@ -138,22 +144,18 @@ Sub loadImageList()
             m.Watermark.uri = "pkg:/images/PhotoViewWatermark_HD.png"
         end if
         m.Watermark.visible = true
-        
-        m.MoveTimer.observeField("fire","onMoveTrigger")
-        m.MoveTimer.control        = "start"
-        m.DisplayTimer.duration    = "43200"  '12 hours
-        
-        
+
         if m.showTime = "Enabled" then
             m.DateTimer.observeField("fire","onDateTimerTrigger")
             m.DateTimer.control = "start"
             m.currentTime.text  = getLocalTime()
         end if
+    end if
 
-    else
-        m.DisplayTimer.duration    = "43200"  '12 hours
-    end if    
+    m.MoveTimer.observeField("fire","onMoveTrigger")
+    m.MoveTimer.control        = "start"
     
+    m.DisplayTimer.duration    = "43200"  '12 hours
     m.DisplayTimer.observeField("fire","onDisplayTimer")
     m.DisplayTimer.control     = "start"
     
@@ -192,10 +194,15 @@ Sub loadImageList()
     'Enable RediscoverScreen to display photo date on Rediscovery section
     m.rxHistory = CreateObject("roRegex", "History", "i")
     rxNoFound = CreateObject("roRegex", "No images found", "i")
-    if m.rxHistory.IsMatch(m.top.predecessor) then
-        m.RediscoverScreen.visible = "true"
+    if m.rxHistory.IsMatch(m.top.predecessor) or (m.showMeta = "Metadata Overlay Enabled") then
+        m.persistMeta = 1
     else if rxNoFound.IsMatch(m.top.predecessor) then
-        m.RediscoverDetail.text    = m.top.predecessor
+        m.RediscoverDetail.text = m.top.predecessor
+        m.persistMeta = 1
+    end if
+    
+    'Allow for tracking if pause overlay enabled.
+    if m.persistMeta = 1 then
         m.RediscoverScreen.visible = "true"
     end if
     
@@ -613,10 +620,13 @@ Sub sendNextImage(direction=invalid)
     
     m.pauseImageCount.text   = itostr(nextID+1)+" of "+itostr(m.imageDisplay.Count())
     m.pauseImageDetail.text  = friendlyDate(m.imageDisplay[nextID].timestamp)
-
-    'RediscoverScreen text change if needed      
+      
     if m.rxHistory.IsMatch(m.top.predecessor) and (m.RediscoverDetail.text <> "Screensaver Paused") then
+        'RediscoverScreen text change if needed
         m.RediscoverDetail.text  = m.top.predecessor.Replace("Rediscover this", "This")+" - "+ friendlyDateShort(m.imageDisplay[nextID].timestamp)
+    else if m.persistMeta = 1
+        'Metadata overlay requested
+        m.RediscoverDetail.text  = friendlyDateShort(m.imageDisplay[nextID].timestamp)+" - "+ m.imageDisplay[nextID].filename
     end if
     
     if m.imageDisplay[nextID].description <> invalid and m.imageDisplay[nextID].description <> "" then
@@ -659,7 +669,7 @@ Sub onMoveTrigger()
         m.currentTime.translation      = "[0,970]"
     else
         m.Watermark.translation        = "[1700,1010]"
-        m.RediscoverScreen.translation = "[0,1010]"
+        m.RediscoverScreen.translation = "[0,1020]"
         m.currentTime.translation      = "[0,25]"
     end if
 End Sub
@@ -789,25 +799,28 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
             sendNextImage("next")
             onDownloadTigger({})
             if m.RotationTimer.control = "start"
-                m.RotationTimer.control = "stop"
-                m.DownloadTimer.control = "stop"
-                m.PauseScreen.visible   = "true"
+                m.RotationTimer.control     = "stop"
+                m.DownloadTimer.control     = "stop"
+                m.PauseScreen.visible       = "true"
+                m.RediscoverScreen.visible  = "false"
             end if
             return true
         else if key = "left" or key = "rewind"
             print "LEFT"
             sendNextImage("previous")
             if m.RotationTimer.control = "start"
-                m.RotationTimer.control = "stop"
-                m.DownloadTimer.control = "stop"
-                m.PauseScreen.visible   = "true"
+                m.RotationTimer.control     = "stop"
+                m.DownloadTimer.control     = "stop"
+                m.PauseScreen.visible       = "true"
+                m.RediscoverScreen.visible  = "false"
             end if
             return true
         else if (key = "play" or key = "OK") and m.RotationTimer.control = "start"
             print "PAUSE"
-            m.RotationTimer.control = "stop"
-            m.DownloadTimer.control = "stop"
-            m.PauseScreen.visible   = "true"
+            m.RotationTimer.control     = "stop"
+            m.DownloadTimer.control     = "stop"
+            m.PauseScreen.visible       = "true"
+            m.RediscoverScreen.visible  = "false"
             return true
         else if (key = "play" or key = "OK") and m.RotationTimer.control = "stop"
             print "PLAY"
@@ -815,14 +828,21 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
             m.RotationTimer.control = "start"
             m.DownloadTimer.control = "start"
             m.PauseScreen.visible   = "false"
+            if m.persistMeta = 1 then
+                m.RediscoverScreen.visible = "true"
+            end if
             return true
         else if ((key = "up") or (key = "down")) and m.PauseScreen.visible = false
             print "OPTIONS - SHOW"
-            m.PauseScreen.visible   = "true"
+            m.PauseScreen.visible       = "true"
+            m.RediscoverScreen.visible  = "false"
             return true
         else if ((key = "up") or (key = "down")) and m.PauseScreen.visible = true
             print "OPTIONS - HIDE"
             m.PauseScreen.visible   = "false"
+            if m.persistMeta = 1 then
+                m.RediscoverScreen.visible = "true"
+            end if            
             return true
         end if
     end if
