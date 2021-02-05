@@ -6,11 +6,14 @@
 '*************************************************************
 
 Sub init()
+
+    'HTTP/S Handler setup
     m.UriHandler = createObject("roSGNode","Content UrlHandler")
     m.UriHandler.observeField("albumImages","handleGetAlbumImages")
     m.UriHandler.observeField("searchResult","handleGetSearch")
     m.UriHandler.observeField("refreshToken","handleRefreshToken")
     
+    'Main Displays
     m.scroll_node_1     = m.top.findNode("scroll_node_1")
     m.scroll_node_2     = m.top.findNode("scroll_node_2")
     m.scroll_node_3     = m.top.findNode("scroll_node_3")
@@ -19,22 +22,24 @@ Sub init()
     m.scroll_node_6     = m.top.findNode("scroll_node_6")
     m.scroll_node_7     = m.top.findNode("scroll_node_7")
     m.scroll_node_8     = m.top.findNode("scroll_node_8")
-
-    m.WaveTimer         = m.top.findNode("waveTimer")
-    m.RefreshTimer      = m.top.findNode("refreshTimer")
     m.Watermark         = m.top.findNode("Watermark")
-    m.DateTimer         = m.top.findNode("DateTimer")
-    m.MoveTimer         = m.top.findNode("moveWatermark")
     m.RediscoverScreen  = m.top.findNode("RediscoverScreen")
     m.RediscoverDetail  = m.top.findNode("RediscoverDetail")
-    m.DownloadTimer     = m.top.findNode("DownloadTimer")
-    m.URLRefreshTimer   = m.top.findNode("URLRefreshTimer")
     m.noticeDialog      = m.top.findNode("noticeDialog")
-    m.apiTimer          = m.top.findNode("apiTimer")
-    m.DisplayTimer      = m.top.findNode("DisplayTimer")
     m.currentTime       = m.top.findNode("currentTime")
     m.confirmDialog     = m.top.findNode("confirmDialog")
     
+    'Timers
+    m.WaveTimer         = m.top.findNode("waveTimer")
+    m.RefreshTimer      = m.top.findNode("refreshTimer")
+    m.DateTimer         = m.top.findNode("DateTimer")
+    m.MoveTimer         = m.top.findNode("moveWatermark")
+    m.DownloadTimer     = m.top.findNode("DownloadTimer")
+    m.URLRefreshTimer   = m.top.findNode("URLRefreshTimer")
+    m.apiTimer          = m.top.findNode("apiTimer")
+    m.DisplayTimer      = m.top.findNode("DisplayTimer")
+    
+    'Setup observatories
     m.WaveTimer.observeField("fire","onWaveTigger")
     m.RefreshTimer.observeField("fire","onRefreshTigger")
     m.top.observeField("loaded","loadImageList")
@@ -47,19 +52,23 @@ Sub init()
     m.scroll_node_6.observeField("loadStatus","onLoadMonitor")
     m.scroll_node_7.observeField("loadStatus","onLoadMonitor")
     m.scroll_node_8.observeField("loadStatus","onLoadMonitor")
-
-    m.DownloadTimer.repeat   = true
-    m.URLRefreshTimer.repeat = false
-    m.DisplayTimer.repeat    = false
     
+    'Preload select variables
     m.imageLocalCacheByURL   = {}
     m.imageLocalCacheByFS    = {}
     m.WaveStep               = 0
     m.imageTracker           = -1
     m.apiPending             = 0
     m.albumActiveObject      = invalid
-    
+ 
+    'Font control   
     m.RediscoverDetail.font.size  = 25
+
+    'Setup timer repeat
+    m.DownloadTimer.repeat   = true
+    m.URLRefreshTimer.repeat = false
+    m.DisplayTimer.repeat    = false
+    
     endPoint=-600
     
     'Node 1 adjustments
@@ -280,10 +289,7 @@ Sub onRefreshTigger()
     if (m.scroll_node_8.imageTranslation[1] = endPoint) then
         m.scroll_node_8.imageUri = GetNextImage()
         m.scroll_node_8.control  = "start"
-    end if       
-    
-    m.keyResetTask = createObject("roSGNode", "KeyReset")
-    m.keyResetTask.control = "RUN"
+    end if
     
 End Sub
 

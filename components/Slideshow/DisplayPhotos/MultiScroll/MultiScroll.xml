@@ -120,6 +120,17 @@
             title       = "Slideshow Paused"
             visible     = "false"
         />
+
+         <!-- Screensaver control node -->
+         <!-- We don't actually need this node w/underlying DisplayPhotos.xml. Adding in for consistency -->
+        <Video
+            id                 = "ScreensaverControl"
+            translation        = "[0, 0]"
+            width              = "1"
+            height             = "1"
+            visible            = "false"
+            disableScreenSaver = "true"
+        />
         
     </children>
 </component>
