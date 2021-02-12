@@ -6,23 +6,32 @@
 '*************************************************************
 
 Sub init()
-    m.buttongroup       = m.top.findNode("buttonGroup")
-    m.Row1              = m.top.findNode("Row1")
-    m.Row2              = m.top.findNode("Row2")
-    m.Row3              = m.top.findNode("Row3")
-    m.Row4              = m.top.findNode("Row4")
-    m.Row5              = m.top.findNode("Row5")
-    m.Row6              = m.top.findNode("Row6")
-    m.LoginTimer        = m.top.findNode("LoginTimer")
-    m.stopScanning      = m.top.findNode("stopScanning")
-    m.showRegistration  = m.top.findNode("showRegistration")
-    m.noticeDialog      = m.top.findNode("noticeDialog")
+
+    'Main Displays
+    m.buttongroup           = m.top.findNode("buttonGroup")
+    m.Row1                  = m.top.findNode("Row1")
+    m.Row2                  = m.top.findNode("Row2")
+    m.Row3                  = m.top.findNode("Row3")
+    m.Row4                  = m.top.findNode("Row4")
+    m.Row5                  = m.top.findNode("Row5")
+    m.Row6                  = m.top.findNode("Row6")
+    m.showRegistration      = m.top.findNode("showRegistration")
+    m.noticeDialog          = m.top.findNode("noticeDialog")
+    m.ScreensaverControl    = m.top.findNode("ScreensaverControl")
     
+    'Timers
+    m.LoginTimer            = m.top.findNode("LoginTimer")
+    m.stopScanning          = m.top.findNode("stopScanning")
+    
+    'Font control
     m.Row4.font.size = 65
     m.Row6.font.size = 25
     
+    'HTTP/S Handler setup
     m.UriHandler = createObject("roSGNode","Content UrlHandler")
     m.UriHandler.observeField("gen_token_response","onNewToken")
+    
+    'Setup observatories
     m.LoginTimer.observeField("fire","onCheckAuth")
     m.stopScanning.observeField("fire","onStopScanningTrigger")
 
@@ -119,8 +128,9 @@ Sub onCheckAuth(event as object)
     status = -1   ' 0 => Finished (got tokens), < 0 => Retry needed, > 0 => fatal error
 
     'Stop the screensaver from starting
-    m.keyResetTask = createObject("roSGNode", "KeyReset")
-    m.keyResetTask.control = "RUN"
+    m.ScreensaverControl.disableScreenSaver = "true"
+    'm.keyResetTask = createObject("roSGNode", "KeyReset")
+    'm.keyResetTask.control = "RUN"
 
     errorMsg = ""
     pollData = m.UriHandler.poll_token_response
@@ -205,6 +215,9 @@ End Sub
 Sub onStoreUser(event as object)
     print "Registration.brs [onStoreUser]"
     status = 0   ' 0 => Finished (got tokens), > 0 => Retry needed
+    
+    'Allow the screensaver to start
+    m.ScreensaverControl.disableScreenSaver = "false"
     
     errorMsg = ""
     userData = m.UriHandler.userinfo_response
@@ -325,6 +338,9 @@ Sub onStopScanningTrigger()
     m.noticeDialog.buttons = buttons
     m.noticeDialog.setFocus(true)
     m.noticeDialog.observeField("buttonSelected","noticeClose")
+
+    'Allow the screensaver to start
+    m.ScreensaverControl.disableScreenSaver = "false"
         
     'Stop watching for field changes
     m.UriHandler.unobserveField("gen_token_response")

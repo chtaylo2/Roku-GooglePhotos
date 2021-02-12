@@ -6,11 +6,14 @@
 '*************************************************************
 
 Sub init()
+
+    'HTTP/S Handler setup
     m.UriHandler = createObject("roSGNode","Content UrlHandler")
     m.UriHandler.observeField("albumImages","handleGetAlbumImages")
     m.UriHandler.observeField("searchResult","handleGetSearch")
     m.UriHandler.observeField("refreshToken","handleRefreshToken")
     
+    'Main Displays
     m.PrimaryImage              = m.top.findNode("PrimaryImage")
     m.SecondaryImage            = m.top.findNode("SecondaryImage")
     m.BlendedPrimaryImage       = m.top.findNode("BlendedPrimaryImage")
@@ -23,20 +26,24 @@ Sub init()
     m.pauseImageCount           = m.top.findNode("pauseImageCount")
     m.pauseImageDetail          = m.top.findNode("pauseImageDetail")
     m.pauseImageDetail2         = m.top.findNode("pauseImageDetail2")
-    m.RotationTimer             = m.top.findNode("RotationTimer")
-    m.DownloadTimer             = m.top.findNode("DownloadTimer")
-    m.URLRefreshTimer           = m.top.findNode("URLRefreshTimer")
-    m.DisplayTimer              = m.top.findNode("DisplayTimer")
-    m.DateTimer                 = m.top.findNode("DateTimer")
     m.Watermark                 = m.top.findNode("Watermark")
-    m.MoveTimer                 = m.top.findNode("moveWatermark")
     m.RediscoverScreen          = m.top.findNode("RediscoverScreen")
     m.RediscoverDetail          = m.top.findNode("RediscoverDetail")
     m.currentTime               = m.top.findNode("currentTime")
     m.noticeDialog              = m.top.findNode("noticeDialog")
     m.confirmDialog             = m.top.findNode("confirmDialog")
-    m.apiTimer                  = m.top.findNode("apiTimer")
+    m.ScreensaverControl        = m.top.findNode("ScreensaverControl")
 
+    'Timers
+    m.RotationTimer             = m.top.findNode("RotationTimer")
+    m.DownloadTimer             = m.top.findNode("DownloadTimer")
+    m.URLRefreshTimer           = m.top.findNode("URLRefreshTimer")
+    m.DisplayTimer              = m.top.findNode("DisplayTimer")
+    m.DateTimer                 = m.top.findNode("DateTimer")
+    m.apiTimer                  = m.top.findNode("apiTimer")
+    m.MoveTimer                 = m.top.findNode("moveWatermark")
+
+    'Preload select variables
     m.fromBrowse                = false
     m.imageLocalCacheByURL      = {}
     m.imageLocalCacheByFS       = {}
@@ -49,11 +56,13 @@ Sub init()
     m.hasRefreshed              = 0
     m.persistMeta               = 0
     
+    'Font control
     m.pauseImageCount.font.size   = 29
     m.pauseImageDetail.font.size  = 29
     m.pauseImageDetail2.font.size = 25
     m.RediscoverDetail.font.size  = 25
 
+    'Setup observatories
     m.PrimaryImage.observeField("loadStatus","onPrimaryLoadedTrigger")
     m.SecondaryImage.observeField("loadStatus","onSecondaryLoadedTrigger")
     m.RotationTimer.observeField("fire","onRotationTigger")
@@ -96,6 +105,7 @@ Sub init()
         m.DownloadTimer.duration = 2
     end if
     
+    'Setup timer repeat
     m.RotationTimer.repeat   = true
     m.DownloadTimer.repeat   = true
     m.URLRefreshTimer.repeat = false
@@ -425,9 +435,6 @@ Sub onDownloadTigger(event as object)
         m.cacheImageTask.remotearray = tmpDownload
         m.cacheImageTask.control = "RUN"
     end if
-     
-    m.keyResetTask = createObject("roSGNode", "KeyReset")
-    m.keyResetTask.control = "RUN"
     
 End Sub
 
@@ -547,6 +554,8 @@ End Sub
 
 Sub sendNextImage(direction=invalid)
     print "DisplayPhotos.brs [sendNextImage]"
+
+    print "DEBUG :: SCREENSAVER CONTROL :: "; m.ScreensaverControl.disableScreenSaver
 
     'Check HDMI-CEC status for TV's which support this
     'For some reason, Roku TV's do not properly support this method.
@@ -799,35 +808,39 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
             sendNextImage("next")
             onDownloadTigger({})
             if m.RotationTimer.control = "start"
-                m.RotationTimer.control     = "stop"
-                m.DownloadTimer.control     = "stop"
-                m.PauseScreen.visible       = "true"
-                m.RediscoverScreen.visible  = "false"
+                m.RotationTimer.control                 = "stop"
+                m.DownloadTimer.control                 = "stop"
+                m.PauseScreen.visible                   = "true"
+                m.RediscoverScreen.visible              = "false"
+                m.ScreensaverControl.disableScreenSaver = "false"
             end if
             return true
         else if key = "left" or key = "rewind"
             print "LEFT"
             sendNextImage("previous")
             if m.RotationTimer.control = "start"
-                m.RotationTimer.control     = "stop"
-                m.DownloadTimer.control     = "stop"
-                m.PauseScreen.visible       = "true"
-                m.RediscoverScreen.visible  = "false"
+                m.RotationTimer.control                 = "stop"
+                m.DownloadTimer.control                 = "stop"
+                m.PauseScreen.visible                   = "true"
+                m.RediscoverScreen.visible              = "false"
+                m.ScreensaverControl.disableScreenSaver = "false"
             end if
             return true
         else if (key = "play" or key = "OK") and m.RotationTimer.control = "start"
             print "PAUSE"
-            m.RotationTimer.control     = "stop"
-            m.DownloadTimer.control     = "stop"
-            m.PauseScreen.visible       = "true"
-            m.RediscoverScreen.visible  = "false"
+            m.RotationTimer.control                 = "stop"
+            m.DownloadTimer.control                 = "stop"
+            m.PauseScreen.visible                   = "true"
+            m.RediscoverScreen.visible              = "false"
+            m.ScreensaverControl.disableScreenSaver = "false"
             return true
         else if (key = "play" or key = "OK") and m.RotationTimer.control = "stop"
             print "PLAY"
             sendNextImage()
-            m.RotationTimer.control = "start"
-            m.DownloadTimer.control = "start"
-            m.PauseScreen.visible   = "false"
+            m.RotationTimer.control                 = "start"
+            m.DownloadTimer.control                 = "start"
+            m.PauseScreen.visible                   = "false"
+            m.ScreensaverControl.disableScreenSaver = "true"
             if m.persistMeta = 1 then
                 m.RediscoverScreen.visible = "true"
             end if
