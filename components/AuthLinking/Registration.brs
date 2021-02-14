@@ -129,8 +129,6 @@ Sub onCheckAuth(event as object)
 
     'Stop the screensaver from starting
     m.ScreensaverControl.disableScreenSaver = "true"
-    'm.keyResetTask = createObject("roSGNode", "KeyReset")
-    'm.keyResetTask.control = "RUN"
 
     errorMsg = ""
     pollData = m.UriHandler.poll_token_response

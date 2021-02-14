@@ -17,3 +17,4 @@
 '******* UNCOMMENT THE FOLLOWING TWO LINES AND INSERT YOUR CLIENT ID AND CLIENT SECRET **********
 Function getClientId()        As String : Return "<----- CLIENT ID HERE -------->" : End Function
 Function getClientSecret()    As String : Return "<----- CLIENT SECRET HERE --------->" : End Function
+Function getTriggerID()       As String : Return "not_used" : End Function

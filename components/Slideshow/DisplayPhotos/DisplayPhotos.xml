@@ -285,6 +285,12 @@
             duration    = "60"
         />
         
+        <Timer
+            id          = "bwTimer"
+            repeat      = "true"
+            duration    = "12600"
+        />
+
         <Dialog
             id          = "confirmDialog"
             title       = "Slideshow Paused"
