@@ -1,6 +1,6 @@
 '*************************************************************
 '** PhotoView for Google Photos
-'** Copyright (c) 2017-2020 Chris Taylor.  All rights reserved.
+'** Copyright (c) 2017-2021 Chris Taylor.  All rights reserved.
 '** Use of code within this application subject to the MIT License (MIT)
 '** https://raw.githubusercontent.com/chtaylo2/Roku-GooglePhotos/master/LICENSE
 '*************************************************************
@@ -40,12 +40,12 @@ End Sub
 Sub setFeaturesText()
 
     m.itemLabelHeader.text = "New Channel Features"
-    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "1. New 'Tips and Tricks' and FAQ's added."
-    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "2. New CLOCK functionality added in screensaver. Enable in screensaver settings menu"
-    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "3. Channel now supports higher resolution videos from Google."
+    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "1. Media tagged as 'Favorites' in the Google Photos app now have its own album!"
+    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "2. Albums with under 20 images are no longer subject to the 12 hour timeout. See more details in FAQ."
+    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "3. Device registration system has been redesigned."
+    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "4. Backend optimization to increase efficiency and security."
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + chr(10) + "Bug fixes:"
-    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "   - Fixed video playback errors on dynamic albums"
-    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "   - Fixed an image download error seen by a few users"
+    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "   - No bugs identified"
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + chr(10) + "Thank you for using the PhotoView Channel."
 
     'Write reg entry to we don't redisplay
@@ -57,7 +57,7 @@ End Sub
 Sub setAboutText()
 
     m.itemLabelHeader.text = "About Channel"
-    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "The 'PhotoView for Google Photos' channel was developed by Chris Taylor. It's dedicated to his 4-year-old daughter, who goes nuts every time she sees herself on TV."
+    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "The 'PhotoView for Google Photos' channel was developed by Chris Taylor. It's dedicated to his kids, who goes nuts every time they see themselves on TV."
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + chr(10) + "We're committed to making this one of the best Photo Apps on the Roku platform."
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + chr(10) + "If you have any questions or comments, please see [Tips and Tricks > Bugs / Feature Request]"
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + chr(10) + "Please remember to rate us, this helps spread the word and drive development!"

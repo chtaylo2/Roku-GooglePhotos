@@ -1,6 +1,6 @@
 '*************************************************************
 '** PhotoView for Google Photos
-'** Copyright (c) 2017-2020 Chris Taylor.  All rights reserved.
+'** Copyright (c) 2017-2021 Chris Taylor.  All rights reserved.
 '** Use of code within this application subject to the MIT License (MIT)
 '** https://raw.githubusercontent.com/chtaylo2/Roku-GooglePhotos/master/LICENSE
 '*************************************************************
@@ -13,11 +13,13 @@
 Function loadCommon()
     ' Common varables for needed for Oauth and GooglePhotos API
     
-    m.releaseVersion   = "3.6"
+    m.releaseVersion   = "3.7"
     m.gp_scope         = "https://photoslibrary.googleapis.com"
     m.gp_prefix        = m.gp_scope + "/v1"
     
-    'Moving m.register_prefix to HTTP (vs. HTTPS) during the domain name transition. Will be moved back in next release.
+    ' Change below to [true] to force user registration through the developer portal 
+    m.developerEnable  = false
+    
     m.register_prefix  = "https://www.photoviewapp.com"
     m.oauth_prefix     = "https://www.googleapis.com/oauth2/v4"
     m.oauth_scope      = ""

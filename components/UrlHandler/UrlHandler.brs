@@ -1,6 +1,6 @@
 '*************************************************************
 '** PhotoView for Google Photos
-'** Copyright (c) 2017-2020 Chris Taylor.  All rights reserved.
+'** Copyright (c) 2017-2021 Chris Taylor.  All rights reserved.
 '** Use of code within this application subject to the MIT License (MIT)
 '** https://raw.githubusercontent.com/chtaylo2/Roku-GooglePhotos/master/LICENSE
 '*************************************************************
@@ -56,11 +56,12 @@ Function addRequest(request as Object) as Boolean
             parameters = context.parameters
             'print parameters
             if type(parameters)="roAssociativeArray"
+            
                 headers = parameters.headers
                 method = parameters.method
                 uri = parameters.uri
                 params = parameters.params
-                'print parameters
+                print parameters
                 
                 if type(uri) = "roString"
                     urlXfer = createObject("roUrlTransfer")
@@ -162,6 +163,8 @@ Sub processResponse(msg as Object)
             m.top.userinfo_response   = job.context.context.response
         else if result.num = 7
             m.top.appstatus_response  = job.context.context.response
+        else if result.num = 8
+            m.top.null_response       = job.context.context.response
         end if
     else
         print "Error: event for unknown job "; idkey

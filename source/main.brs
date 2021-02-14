@@ -19,7 +19,7 @@ Sub showGooglePhotosScreen()
     scene     = screen.CreateScene("GooglePhotosMainScene")
     m.global  = screen.getGlobalNode()
  
-    m.global.addFields( {SlideshowRes: "", SlideshowDisplay: "", SlideshowDelay: "", SlideshowOrder: "", VideoContinuePlay: ""} )
+    m.global.addFields( {SlideshowRes: "", SlideshowDisplay: "", SlideshowDelay: "", SlideshowOrder: "", SlideshowMeta: "", VideoContinuePlay: ""} )
     m.global.addFields( {selectedUser: -1, CECStatus: true} )
 
     cecstatus.SetMessagePort(port)

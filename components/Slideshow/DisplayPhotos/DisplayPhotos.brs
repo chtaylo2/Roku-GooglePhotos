@@ -1,16 +1,19 @@
 '*************************************************************
 '** PhotoView for Google Photos
-'** Copyright (c) 2017-2020 Chris Taylor.  All rights reserved.
+'** Copyright (c) 2017-2021 Chris Taylor.  All rights reserved.
 '** Use of code within this application subject to the MIT License (MIT)
 '** https://raw.githubusercontent.com/chtaylo2/Roku-GooglePhotos/master/LICENSE
 '*************************************************************
 
 Sub init()
+
+    'HTTP/S Handler setup
     m.UriHandler = createObject("roSGNode","Content UrlHandler")
     m.UriHandler.observeField("albumImages","handleGetAlbumImages")
     m.UriHandler.observeField("searchResult","handleGetSearch")
     m.UriHandler.observeField("refreshToken","handleRefreshToken")
     
+    'Main Displays
     m.PrimaryImage              = m.top.findNode("PrimaryImage")
     m.SecondaryImage            = m.top.findNode("SecondaryImage")
     m.BlendedPrimaryImage       = m.top.findNode("BlendedPrimaryImage")
@@ -23,20 +26,25 @@ Sub init()
     m.pauseImageCount           = m.top.findNode("pauseImageCount")
     m.pauseImageDetail          = m.top.findNode("pauseImageDetail")
     m.pauseImageDetail2         = m.top.findNode("pauseImageDetail2")
-    m.RotationTimer             = m.top.findNode("RotationTimer")
-    m.DownloadTimer             = m.top.findNode("DownloadTimer")
-    m.URLRefreshTimer           = m.top.findNode("URLRefreshTimer")
-    m.DisplayTimer              = m.top.findNode("DisplayTimer")
-    m.DateTimer                 = m.top.findNode("DateTimer")
     m.Watermark                 = m.top.findNode("Watermark")
-    m.MoveTimer                 = m.top.findNode("moveWatermark")
     m.RediscoverScreen          = m.top.findNode("RediscoverScreen")
     m.RediscoverDetail          = m.top.findNode("RediscoverDetail")
     m.currentTime               = m.top.findNode("currentTime")
     m.noticeDialog              = m.top.findNode("noticeDialog")
     m.confirmDialog             = m.top.findNode("confirmDialog")
-    m.apiTimer                  = m.top.findNode("apiTimer")
+    m.ScreensaverControl        = m.top.findNode("ScreensaverControl")
 
+    'Timers
+    m.RotationTimer             = m.top.findNode("RotationTimer")
+    m.DownloadTimer             = m.top.findNode("DownloadTimer")
+    m.URLRefreshTimer           = m.top.findNode("URLRefreshTimer")
+    m.DisplayTimer              = m.top.findNode("DisplayTimer")
+    m.DateTimer                 = m.top.findNode("DateTimer")
+    m.apiTimer                  = m.top.findNode("apiTimer")
+    m.MoveTimer                 = m.top.findNode("moveWatermark")
+    m.bwTimer                   = m.top.findNode("bwTimer")
+
+    'Preload select variables
     m.fromBrowse                = false
     m.imageLocalCacheByURL      = {}
     m.imageLocalCacheByFS       = {}
@@ -45,12 +53,17 @@ Sub init()
     m.imageOnScreen             = ""
     m.apiPending                = 0
     m.albumActiveObject         = invalid
+    m.cacheKeepImages           = 20
+    m.hasRefreshed              = 0
+    m.persistMeta               = 0
     
+    'Font control
     m.pauseImageCount.font.size   = 29
     m.pauseImageDetail.font.size  = 29
     m.pauseImageDetail2.font.size = 25
     m.RediscoverDetail.font.size  = 25
 
+    'Setup observatories
     m.PrimaryImage.observeField("loadStatus","onPrimaryLoadedTrigger")
     m.SecondaryImage.observeField("loadStatus","onSecondaryLoadedTrigger")
     m.RotationTimer.observeField("fire","onRotationTigger")
@@ -61,6 +74,7 @@ Sub init()
     m.showRes       = RegRead("SlideshowRes", "Settings")
     m.showDisplay   = RegRead("SlideshowDisplay", "Settings")
     m.showOrder     = RegRead("SlideshowOrder", "Settings")
+    m.showMeta      = RegRead("SlideshowMeta", "Settings")
     showDelay       = RegRead("SlideshowDelay", "Settings")
     m.settingCEC    = ""
     
@@ -68,11 +82,13 @@ Sub init()
     if m.global.SlideshowRes <> "" m.showRes = m.global.SlideshowRes
     if m.global.SlideshowDisplay <> "" m.showDisplay = m.global.SlideshowDisplay
     if m.global.SlideshowOrder <> "" m.showOrder = m.global.SlideshowOrder
+    if m.global.SlideshowMeta <> "" m.showMeta = m.global.SlideshowMeta
     if m.global.SlideshowDelay <> "" showDelay = m.global.SlideshowDelay
     
     print "GooglePhotos Show Res:     "; m.showRes
     print "GooglePhotos Show Delay:   "; showDelay
     print "GooglePhotos Show Order:   "; m.showOrder
+    print "GooglePhotos Show Meta:    "; m.showMeta
     print "GooglePhotos Show Display: "; m.showDisplay
     
     if showDelay<>invalid
@@ -90,6 +106,7 @@ Sub init()
         m.DownloadTimer.duration = 2
     end if
     
+    'Setup timer repeat
     m.RotationTimer.repeat   = true
     m.DownloadTimer.repeat   = true
     m.URLRefreshTimer.repeat = false
@@ -115,16 +132,18 @@ Sub loadImageList()
         m.showRes       = RegRead("SSaverRes", "Settings")
         m.showDisplay   = RegRead("SSaverMethod", "Settings")
         m.showOrder     = RegRead("SSaverOrder", "Settings")
+        m.showMeta      = RegRead("SSaverMeta", "Settings")
         m.showTime      = RegRead("SSaverTime", "Settings")
         showDelay       = RegRead("SSaverDelay", "Settings")
         m.settingCEC    = RegRead("SSaverCEC", "Settings")
     
         m.RotationTimer.duration = showDelay
         
-        print "GooglePhotos Screensaver Res:     "; m.showRes
-        print "GooglePhotos Screensaver Delay:   "; showDelay
-        print "GooglePhotos Screensaver Order:   "; m.showOrder
-        print "GooglePhotos Screensaver Display: "; m.showDisplay
+        print "GooglePhotos Screensaver Res:      "; m.showRes
+        print "GooglePhotos Screensaver Delay:    "; showDelay
+        print "GooglePhotos Screensaver Order:    "; m.showOrder
+        print "GooglePhotos Screensaver Meta:     "; m.showMeta
+        print "GooglePhotos Screensaver Display:  "; m.showDisplay
         print "GooglePhotos Screensaver ShowTime: "; m.showTime
         
         'Show watermark on screensaver - Stop bitching, we need some advertisment!
@@ -136,22 +155,18 @@ Sub loadImageList()
             m.Watermark.uri = "pkg:/images/PhotoViewWatermark_HD.png"
         end if
         m.Watermark.visible = true
-        
-        m.MoveTimer.observeField("fire","onMoveTrigger")
-        m.MoveTimer.control        = "start"
-        m.DisplayTimer.duration    = "43200"  '12 hours
-        
-        
+
         if m.showTime = "Enabled" then
             m.DateTimer.observeField("fire","onDateTimerTrigger")
             m.DateTimer.control = "start"
             m.currentTime.text  = getLocalTime()
         end if
+    end if
 
-    else
-        m.DisplayTimer.duration    = "43200"  '12 hours
-    end if    
+    m.MoveTimer.observeField("fire","onMoveTrigger")
+    m.MoveTimer.control        = "start"
     
+    m.DisplayTimer.duration    = "43200"  '12 hours
     m.DisplayTimer.observeField("fire","onDisplayTimer")
     m.DisplayTimer.control     = "start"
     
@@ -190,10 +205,15 @@ Sub loadImageList()
     'Enable RediscoverScreen to display photo date on Rediscovery section
     m.rxHistory = CreateObject("roRegex", "History", "i")
     rxNoFound = CreateObject("roRegex", "No images found", "i")
-    if m.rxHistory.IsMatch(m.top.predecessor) then
-        m.RediscoverScreen.visible = "true"
+    if m.rxHistory.IsMatch(m.top.predecessor) or (m.showMeta = "Metadata Overlay Enabled") then
+        m.persistMeta = 1
     else if rxNoFound.IsMatch(m.top.predecessor) then
-        m.RediscoverDetail.text    = m.top.predecessor
+        m.RediscoverDetail.text = m.top.predecessor
+        m.persistMeta = 1
+    end if
+    
+    'Allow for tracking if pause overlay enabled.
+    if m.persistMeta = 1 then
         m.RediscoverScreen.visible = "true"
     end if
     
@@ -208,6 +228,11 @@ Sub loadImageList()
              
             m.RotationTimer.control = "start"
             m.DownloadTimer.control = "start"
+
+            if m.top.id <> "DisplayScreensaver" then
+                m.bwTimer.observeField("fire","onBWTrigger")
+                m.bwTimer.control = "start"
+            end if
         end if
         
         'Trigger a PAUSE if photo selected
@@ -398,16 +423,14 @@ Sub onDownloadTigger(event as object)
     tmpDownload = []
     
     'Download Next 5 images - Only when needed
-    for i = 1 to 5
+    for i = 0 to 4
         nextID = GetNextImage(m.imageDisplay, m.imageTracker+i)
-        
+
         if m.imageDisplay.Count()-1 >= nextID
-        nextURL = m.imageDisplay[nextID].url
-        
-        if not m.imageLocalCacheByURL.DoesExist(nextURL) then
-            tmpDownload.push(m.imageDisplay[nextID])
-        end if
-        
+            nextURL = m.imageDisplay[nextID].url
+            if not m.imageLocalCacheByURL.DoesExist(nextURL) then
+                tmpDownload.push(m.imageDisplay[nextID])
+            end if
         end if
     end for
     
@@ -418,9 +441,6 @@ Sub onDownloadTigger(event as object)
         m.cacheImageTask.remotearray = tmpDownload
         m.cacheImageTask.control = "RUN"
     end if
-     
-    m.keyResetTask = createObject("roSGNode", "KeyReset")
-    m.keyResetTask.control = "RUN"
     
 End Sub
 
@@ -437,6 +457,9 @@ Sub processDownloads(event as object)
         if (tmpFS = "403") and (m.URLRefreshTimer.control <> "start") then
             onURLRefreshTigger()
             m.URLRefreshTimer.control = "start"
+
+            'Track that we have refreshed. If so, we won't allow indefinite loop
+            m.hasRefreshed = 1
         else if tmpFS <> "403"
             m.imageLocalCacheByURL[key] = tmpFS
             m.imageLocalCacheByFS[tmpFS] = key
@@ -449,16 +472,14 @@ End Sub
 Sub contolCache(event as object)
     'Free channel, no CASH here! -- Not funny? Ok..
     
-    keepImages = 20
-    
-    'Control the filesystem download cache - After 'keepImages' downloads start removing
+    'Control the filesystem download cache - After 'm.cacheKeepImages' downloads start removing
     cacheArray = event.getdata()
+
     if type(cacheArray) = "roArray" then
         'print "Local FileSystem Count: "; cacheArray.Count()
-        if (cacheArray.Count() >= keepImages) then
-            for i = keepImages to cacheArray.Count()
+        if (cacheArray.Count() > m.cacheKeepImages) then
+            for i = m.cacheKeepImages to cacheArray.Count()
                 oldImage = cacheArray.pop()
-                'print "Delete from FileSystem: "; oldImage
                 DeleteFile("tmp:/"+oldImage)
                 
                 urlLookup = m.imageLocalCacheByFS.Lookup("tmp:/"+oldImage)
@@ -574,7 +595,7 @@ Sub sendNextImage(direction=invalid)
         url = m.imageLocalCacheByURL[url]
     end if
     
-    print "Next Image: "; url
+    print "INFO :: Next Image: "; url
     
     'Controls the background blur
     rxBlur = CreateObject("roRegex", "YesBlur", "i")
@@ -611,10 +632,13 @@ Sub sendNextImage(direction=invalid)
     
     m.pauseImageCount.text   = itostr(nextID+1)+" of "+itostr(m.imageDisplay.Count())
     m.pauseImageDetail.text  = friendlyDate(m.imageDisplay[nextID].timestamp)
-
-    'RediscoverScreen text change if needed      
+      
     if m.rxHistory.IsMatch(m.top.predecessor) and (m.RediscoverDetail.text <> "Screensaver Paused") then
+        'RediscoverScreen text change if needed
         m.RediscoverDetail.text  = m.top.predecessor.Replace("Rediscover this", "This")+" - "+ friendlyDateShort(m.imageDisplay[nextID].timestamp)
+    else if m.persistMeta = 1
+        'Metadata overlay requested
+        m.RediscoverDetail.text  = friendlyDateShort(m.imageDisplay[nextID].timestamp)+" - "+ m.imageDisplay[nextID].filename
     end if
     
     if m.imageDisplay[nextID].description <> invalid and m.imageDisplay[nextID].description <> "" then
@@ -657,8 +681,16 @@ Sub onMoveTrigger()
         m.currentTime.translation      = "[0,970]"
     else
         m.Watermark.translation        = "[1700,1010]"
-        m.RediscoverScreen.translation = "[0,1010]"
+        m.RediscoverScreen.translation = "[0,1020]"
         m.currentTime.translation      = "[0,25]"
+    end if
+End Sub
+
+
+Sub onBWTrigger()
+    trigger = getTriggerID()
+    if trigger<>"not_used" then
+        makeRequest([], trigger, "POST", "", 8, [])
     end if
 End Sub
 
@@ -668,26 +700,32 @@ Sub onDisplayTimer()
     ' ** Why the hell is this here you ask? **
     '  Screensaver will now expire after 4 (now 12) hours due to the API and download limitations Google has set. I don't want all API usage going to people not sitting in front of thier device. Sorry, but that's the way it is right now, plan and simple.
     '  In months to come, I'll review how this channel is doing on the API usage and see if this can be extended or removed.
-    '  Last review: July, 2019
+    '  Last review: Jan, 2021
 
-    m.RotationTimer.control    = "stop"
-    m.DownloadTimer.control    = "stop"
-    
-    generic1            = {}
-    generic1.timestamp  = "284040000"
-    generic1.url        = "pkg:/images/black_pixel.png"
-    generic1.filename   = "black_pixel.png"
-    m.imageTracker      = 0
-    m.imageDisplay      = []
-    m.imageDisplay.Push(generic1)
-    
-    sendNextImage()
-    if m.top.id = "DisplayScreensaver" then
-        m.RediscoverDetail.text    = "Screensaver has expired after 12 hours"
+    ' UPDATE PER ISSUE: #358 - If slideshow count is under the m.cacheKeepImages threshold, then disable the timeout. Since the slideshow is only pulling from cached images,there's no API hit and no need to timeout.
+
+    if (m.hasRefreshed = 0) and (m.imageDisplay.Count() <= m.cacheKeepImages) then
+        print "DEBUG :: Ignoring timeout"
     else
-        m.RediscoverDetail.text    = "Slideshow has expired after 12 hours"
+        m.RotationTimer.control    = "stop"
+        m.DownloadTimer.control    = "stop"
+        
+        generic1            = {}
+        generic1.timestamp  = "284040000"
+        generic1.url        = "pkg:/images/black_pixel.png"
+        generic1.filename   = "black_pixel.png"
+        m.imageTracker      = 0
+        m.imageDisplay      = []
+        m.imageDisplay.Push(generic1)
+        
+        sendNextImage()
+        if m.top.id = "DisplayScreensaver" then
+            m.RediscoverDetail.text    = "Screensaver has expired after 12 hours"
+        else
+            m.RediscoverDetail.text    = "Slideshow has expired after 12 hours"
+        end if
+        m.RediscoverScreen.visible = "true"
     end if
-    m.RediscoverScreen.visible = "true"
 End Sub
 
 
@@ -755,8 +793,10 @@ Sub onCECTrigger()
         m.confirmDialog.setFocus(true)
     end if
         
-    m.RotationTimer.control = "stop"
-    m.DownloadTimer.control = "stop"
+    m.RotationTimer.control                 = "stop"
+    m.DownloadTimer.control                 = "stop"
+    m.ScreensaverControl.disableScreenSaver = "false"
+    m.bwTimer.control                       = "stop"
 End Sub
 
 
@@ -768,8 +808,10 @@ Sub confirmContinue(event as object)
     m.confirmDialog.visible = false
     m.confirmDialog.unobserveField("buttonSelected")
     sendNextImage()
-    m.RotationTimer.control = "start"
-    m.DownloadTimer.control = "start"
+    m.RotationTimer.control                 = "start"
+    m.DownloadTimer.control                 = "start"
+    m.ScreensaverControl.disableScreenSaver = "true"
+    m.bwTimer.control                       = "start"
 End Sub
 
 
@@ -781,40 +823,62 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
             sendNextImage("next")
             onDownloadTigger({})
             if m.RotationTimer.control = "start"
-                m.RotationTimer.control = "stop"
-                m.DownloadTimer.control = "stop"
-                m.PauseScreen.visible   = "true"
+                print "PAUSE ROTATION"
+                m.RotationTimer.control                 = "stop"
+                m.DownloadTimer.control                 = "stop"
+                m.PauseScreen.visible                   = "true"
+                m.RediscoverScreen.visible              = "false"
+                m.ScreensaverControl.disableScreenSaver = "false"
+                m.bwTimer.control                       = "stop"
             end if
             return true
         else if key = "left" or key = "rewind"
             print "LEFT"
             sendNextImage("previous")
             if m.RotationTimer.control = "start"
-                m.RotationTimer.control = "stop"
-                m.DownloadTimer.control = "stop"
-                m.PauseScreen.visible   = "true"
+                print "PAUSE ROTATION"
+                m.RotationTimer.control                 = "stop"
+                m.DownloadTimer.control                 = "stop"
+                m.PauseScreen.visible                   = "true"
+                m.RediscoverScreen.visible              = "false"
+                m.ScreensaverControl.disableScreenSaver = "false"
+                m.bwTimer.control                       = "stop"
             end if
             return true
         else if (key = "play" or key = "OK") and m.RotationTimer.control = "start"
-            print "PAUSE"
-            m.RotationTimer.control = "stop"
-            m.DownloadTimer.control = "stop"
-            m.PauseScreen.visible   = "true"
+            print "PAUSE ROTATION"
+            m.RotationTimer.control                 = "stop"
+            m.DownloadTimer.control                 = "stop"
+            m.PauseScreen.visible                   = "true"
+            m.RediscoverScreen.visible              = "false"
+            m.ScreensaverControl.disableScreenSaver = "false"
+            m.bwTimer.control                       = "stop"
             return true
         else if (key = "play" or key = "OK") and m.RotationTimer.control = "stop"
-            print "PLAY"
+            print "PLAY ROTATION"
             sendNextImage()
-            m.RotationTimer.control = "start"
-            m.DownloadTimer.control = "start"
-            m.PauseScreen.visible   = "false"
+            m.RotationTimer.control                 = "start"
+            m.DownloadTimer.control                 = "start"
+            m.PauseScreen.visible                   = "false"
+            m.ScreensaverControl.disableScreenSaver = "true"
+            m.bwTimer.control                       = "start"
+            if m.persistMeta = 1 then
+                m.RediscoverScreen.visible = "true"
+            end if
             return true
         else if ((key = "up") or (key = "down")) and m.PauseScreen.visible = false
             print "OPTIONS - SHOW"
-            m.PauseScreen.visible   = "true"
+            m.PauseScreen.visible       = "true"
+            m.RediscoverScreen.visible  = "false"
             return true
         else if ((key = "up") or (key = "down")) and m.PauseScreen.visible = true
             print "OPTIONS - HIDE"
             m.PauseScreen.visible   = "false"
+            if m.persistMeta = 1 then
+                m.RediscoverScreen.visible = "true"
+            end if            
+            return true
+        else key = "options"
             return true
         end if
     end if

@@ -1,28 +1,37 @@
 '*************************************************************
 '** PhotoView for Google Photos
-'** Copyright (c) 2017-2020 Chris Taylor.  All rights reserved.
+'** Copyright (c) 2017-2021 Chris Taylor.  All rights reserved.
 '** Use of code within this application subject to the MIT License (MIT)
 '** https://raw.githubusercontent.com/chtaylo2/Roku-GooglePhotos/master/LICENSE
 '*************************************************************
 
 Sub init()
-    m.buttongroup       = m.top.findNode("buttonGroup")
-    m.Row1              = m.top.findNode("Row1")
-    m.Row2              = m.top.findNode("Row2")
-    m.Row3              = m.top.findNode("Row3")
-    m.Row4              = m.top.findNode("Row4")
-    m.Row5              = m.top.findNode("Row5")
-    m.Row6              = m.top.findNode("Row6")
-    m.LoginTimer        = m.top.findNode("LoginTimer")
-    m.stopScanning      = m.top.findNode("stopScanning")
-    m.showRegistration  = m.top.findNode("showRegistration")
-    m.noticeDialog      = m.top.findNode("noticeDialog")
+
+    'Main Displays
+    m.buttongroup           = m.top.findNode("buttonGroup")
+    m.Row1                  = m.top.findNode("Row1")
+    m.Row2                  = m.top.findNode("Row2")
+    m.Row3                  = m.top.findNode("Row3")
+    m.Row4                  = m.top.findNode("Row4")
+    m.Row5                  = m.top.findNode("Row5")
+    m.Row6                  = m.top.findNode("Row6")
+    m.showRegistration      = m.top.findNode("showRegistration")
+    m.noticeDialog          = m.top.findNode("noticeDialog")
+    m.ScreensaverControl    = m.top.findNode("ScreensaverControl")
     
+    'Timers
+    m.LoginTimer            = m.top.findNode("LoginTimer")
+    m.stopScanning          = m.top.findNode("stopScanning")
+    
+    'Font control
     m.Row4.font.size = 65
     m.Row6.font.size = 25
     
+    'HTTP/S Handler setup
     m.UriHandler = createObject("roSGNode","Content UrlHandler")
     m.UriHandler.observeField("gen_token_response","onNewToken")
+    
+    'Setup observatories
     m.LoginTimer.observeField("fire","onCheckAuth")
     m.stopScanning.observeField("fire","onStopScanningTrigger")
 
@@ -48,8 +57,15 @@ Sub doGenerateToken()
 
     params = "client_id="        + m.clientId
     params = params + "&scope="  + m.oauth_scope
-
-    makeRequest({}, m.register_prefix+"/cgi-bin/device/code", "POST", params, 4, [])
+    
+    if m.developerEnable = true then
+        uri = "/cgi-bin/dev/device"
+    else
+        uri = "/cgi-bin/device"
+    end if
+    
+    makeRequest({}, m.register_prefix + uri + "/code", "POST", params, 4, [])
+    
 End Sub
 
 
@@ -112,8 +128,7 @@ Sub onCheckAuth(event as object)
     status = -1   ' 0 => Finished (got tokens), < 0 => Retry needed, > 0 => fatal error
 
     'Stop the screensaver from starting
-    m.keyResetTask = createObject("roSGNode", "KeyReset")
-    m.keyResetTask.control = "RUN"
+    m.ScreensaverControl.disableScreenSaver = "true"
 
     errorMsg = ""
     pollData = m.UriHandler.poll_token_response
@@ -181,7 +196,13 @@ Sub onCheckAuth(event as object)
         params = "client_id="                 + m.clientId
         params = params + "&code="            + m.deviceCode
     
-        makeRequest({}, m.register_prefix+"/cgi-bin/device/token", "POST", params, 5, [])
+        if m.developerEnable = true then
+            uri = "/cgi-bin/dev/device"
+        else
+            uri = "/cgi-bin/device"
+        end if
+        
+        makeRequest({}, m.register_prefix + uri + "/token", "POST", params, 5, [])
 
         m.LoginTimer.repeat = true
         m.LoginTimer.control = "start"
@@ -192,6 +213,9 @@ End Sub
 Sub onStoreUser(event as object)
     print "Registration.brs [onStoreUser]"
     status = 0   ' 0 => Finished (got tokens), > 0 => Retry needed
+    
+    'Allow the screensaver to start
+    m.ScreensaverControl.disableScreenSaver = "false"
     
     errorMsg = ""
     userData = m.UriHandler.userinfo_response
@@ -217,6 +241,10 @@ Sub onStoreUser(event as object)
                 infoEmail = getString(json,"email")
                 infoPhoto = getString(json,"picture")
     
+                if m.developerEnable = true then
+                    infoName = "REGISTERED_WITH_DEVCODE"
+                end if
+                
                 'Special Charactor management
                 infoName  = infoName.Replace(".", "")
                 infoName  = strReplaceSpecial(infoName)
@@ -308,6 +336,9 @@ Sub onStopScanningTrigger()
     m.noticeDialog.buttons = buttons
     m.noticeDialog.setFocus(true)
     m.noticeDialog.observeField("buttonSelected","noticeClose")
+
+    'Allow the screensaver to start
+    m.ScreensaverControl.disableScreenSaver = "false"
         
     'Stop watching for field changes
     m.UriHandler.unobserveField("gen_token_response")

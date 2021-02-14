@@ -28,7 +28,7 @@
             <LabelList
                 id                      = "settingsLabelList"
                 translation             = "[0, 75]"
-                itemSize                = "[720, 60]"
+                itemSize                = "[720, 50]"
                 itemSpacing             = "[0,30]"
                 color                   = "#808080"
                 vertFocusAnimationStyle = "floatingFocus"

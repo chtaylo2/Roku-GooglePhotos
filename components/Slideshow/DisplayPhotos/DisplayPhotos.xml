@@ -285,6 +285,12 @@
             duration    = "60"
         />
         
+        <Timer
+            id          = "bwTimer"
+            repeat      = "true"
+            duration    = "12600"
+        />
+
         <Dialog
             id          = "confirmDialog"
             title       = "Slideshow Paused"
@@ -296,6 +302,17 @@
             title       = "Error"
             visible     = "false"
         />
-            
+
+        <!-- Screensaver control node -->
+        <!-- Currently Roku honors this disableScreenSaver parameter even without a video playing. That may change someday.. -->
+        <Video
+            id                 = "ScreensaverControl"
+            translation        = "[0, 0]"
+            width              = "1"
+            height             = "1"
+            visible            = "false"
+            disableScreenSaver = "true"
+        />
+
    </children>
 </component>

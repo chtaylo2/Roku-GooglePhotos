@@ -110,7 +110,7 @@
             basePosterSize        = "[300,225]"
             posterDisplayMode     = "scaleToFit"
             translation           = "[150, 300]"
-            wrapDividerBitmapUri = "pkg:/images/wrapBitmap.png"
+            wrapDividerBitmapUri  = "pkg:/images/wrapBitmap.png"
         />
         
         <!-- Playback node -->
