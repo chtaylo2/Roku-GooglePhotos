@@ -12,6 +12,7 @@
         <field id = "poll_token_response" type = "assocarray" alwaysNotify = "true"/>
         <field id = "userinfo_response"   type = "assocarray" alwaysNotify = "true"/>
         <field id = "appstatus_response"  type = "assocarray" alwaysNotify = "true"/>
+        <field id = "null_response"       type = "assocarray" alwaysNotify = "true"/>
         
     </interface>
   

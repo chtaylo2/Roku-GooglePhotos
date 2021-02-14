@@ -56,6 +56,7 @@ Function addRequest(request as Object) as Boolean
             parameters = context.parameters
             'print parameters
             if type(parameters)="roAssociativeArray"
+            
                 headers = parameters.headers
                 method = parameters.method
                 uri = parameters.uri
@@ -162,6 +163,8 @@ Sub processResponse(msg as Object)
             m.top.userinfo_response   = job.context.context.response
         else if result.num = 7
             m.top.appstatus_response  = job.context.context.response
+        else if result.num = 8
+            m.top.null_response       = job.context.context.response
         end if
     else
         print "Error: event for unknown job "; idkey

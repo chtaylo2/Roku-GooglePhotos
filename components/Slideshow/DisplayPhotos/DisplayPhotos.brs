@@ -42,6 +42,7 @@ Sub init()
     m.DateTimer                 = m.top.findNode("DateTimer")
     m.apiTimer                  = m.top.findNode("apiTimer")
     m.MoveTimer                 = m.top.findNode("moveWatermark")
+    m.bwTimer                   = m.top.findNode("bwTimer")
 
     'Preload select variables
     m.fromBrowse                = false
@@ -227,6 +228,11 @@ Sub loadImageList()
              
             m.RotationTimer.control = "start"
             m.DownloadTimer.control = "start"
+
+            if m.top.id <> "DisplayScreensaver" then
+                m.bwTimer.observeField("fire","onBWTrigger")
+                m.bwTimer.control = "start"
+            end if
         end if
         
         'Trigger a PAUSE if photo selected
@@ -474,7 +480,6 @@ Sub contolCache(event as object)
         if (cacheArray.Count() > m.cacheKeepImages) then
             for i = m.cacheKeepImages to cacheArray.Count()
                 oldImage = cacheArray.pop()
-                print "Delete from FileSystem: "; oldImage
                 DeleteFile("tmp:/"+oldImage)
                 
                 urlLookup = m.imageLocalCacheByFS.Lookup("tmp:/"+oldImage)
@@ -554,8 +559,6 @@ End Sub
 
 Sub sendNextImage(direction=invalid)
     print "DisplayPhotos.brs [sendNextImage]"
-
-    print "DEBUG :: SCREENSAVER CONTROL :: "; m.ScreensaverControl.disableScreenSaver
 
     'Check HDMI-CEC status for TV's which support this
     'For some reason, Roku TV's do not properly support this method.
@@ -684,6 +687,14 @@ Sub onMoveTrigger()
 End Sub
 
 
+Sub onBWTrigger()
+    trigger = getTriggerID()
+    if trigger<>"not_used" then
+        makeRequest([], trigger, "POST", "", 8, [])
+    end if
+End Sub
+
+
 Sub onDisplayTimer()
 
     ' ** Why the hell is this here you ask? **
@@ -782,8 +793,10 @@ Sub onCECTrigger()
         m.confirmDialog.setFocus(true)
     end if
         
-    m.RotationTimer.control = "stop"
-    m.DownloadTimer.control = "stop"
+    m.RotationTimer.control                 = "stop"
+    m.DownloadTimer.control                 = "stop"
+    m.ScreensaverControl.disableScreenSaver = "false"
+    m.bwTimer.control                       = "stop"
 End Sub
 
 
@@ -795,8 +808,10 @@ Sub confirmContinue(event as object)
     m.confirmDialog.visible = false
     m.confirmDialog.unobserveField("buttonSelected")
     sendNextImage()
-    m.RotationTimer.control = "start"
-    m.DownloadTimer.control = "start"
+    m.RotationTimer.control                 = "start"
+    m.DownloadTimer.control                 = "start"
+    m.ScreensaverControl.disableScreenSaver = "true"
+    m.bwTimer.control                       = "start"
 End Sub
 
 
@@ -808,39 +823,45 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
             sendNextImage("next")
             onDownloadTigger({})
             if m.RotationTimer.control = "start"
+                print "PAUSE ROTATION"
                 m.RotationTimer.control                 = "stop"
                 m.DownloadTimer.control                 = "stop"
                 m.PauseScreen.visible                   = "true"
                 m.RediscoverScreen.visible              = "false"
                 m.ScreensaverControl.disableScreenSaver = "false"
+                m.bwTimer.control                       = "stop"
             end if
             return true
         else if key = "left" or key = "rewind"
             print "LEFT"
             sendNextImage("previous")
             if m.RotationTimer.control = "start"
+                print "PAUSE ROTATION"
                 m.RotationTimer.control                 = "stop"
                 m.DownloadTimer.control                 = "stop"
                 m.PauseScreen.visible                   = "true"
                 m.RediscoverScreen.visible              = "false"
                 m.ScreensaverControl.disableScreenSaver = "false"
+                m.bwTimer.control                       = "stop"
             end if
             return true
         else if (key = "play" or key = "OK") and m.RotationTimer.control = "start"
-            print "PAUSE"
+            print "PAUSE ROTATION"
             m.RotationTimer.control                 = "stop"
             m.DownloadTimer.control                 = "stop"
             m.PauseScreen.visible                   = "true"
             m.RediscoverScreen.visible              = "false"
             m.ScreensaverControl.disableScreenSaver = "false"
+            m.bwTimer.control                       = "stop"
             return true
         else if (key = "play" or key = "OK") and m.RotationTimer.control = "stop"
-            print "PLAY"
+            print "PLAY ROTATION"
             sendNextImage()
             m.RotationTimer.control                 = "start"
             m.DownloadTimer.control                 = "start"
             m.PauseScreen.visible                   = "false"
             m.ScreensaverControl.disableScreenSaver = "true"
+            m.bwTimer.control                       = "start"
             if m.persistMeta = 1 then
                 m.RediscoverScreen.visible = "true"
             end if
@@ -856,6 +877,8 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
             if m.persistMeta = 1 then
                 m.RediscoverScreen.visible = "true"
             end if            
+            return true
+        else key = "options"
             return true
         end if
     end if

@@ -138,26 +138,28 @@ Sub processAlbums()
     '   - The tmp.GetID does not limit us to only a single "SearchResults" set
     '   - Users are able to select albums from multiple accounts, including "searchable" for screensaver.
    
-    parsedString = regAlbums.Split("|")
-    searchStrings = doSearchGenerate()
-    
-    'Look for Favorites album selection
-    for each item in parsedString
-        albumUser = item.Split(":")
-        if albumUser[0] = "favorites" then
-            tmp                    = {}
-            tmp.GetImageCount      = 0
-            tmp.showCountStart     = 1
-            tmp.showCountEnd       = 0
-            tmp.apiCount           = 0
-            tmp.previousPageTokens = []
-            tmp.GetID              = "SearchResults"
-            tmp.GetUserIndex       = Strtoi(albumUser[1])
-            tmp.keyword            = "favorites"
-            m.albumActiveObject[tmp.GetID] = tmp
-            doGetSearch(tmp.GetID, Strtoi(albumUser[1]), searchStrings["favorites"])
-        end if
-    end for
+    if (regAlbums <> invalid) and (regAlbums <> "") then
+        parsedString = regAlbums.Split("|")
+        searchStrings = doSearchGenerate()
+        
+        'Look for Favorites album selection
+        for each item in parsedString
+            albumUser = item.Split(":")
+            if albumUser[0] = "favorites" then
+                tmp                    = {}
+                tmp.GetImageCount      = 0
+                tmp.showCountStart     = 1
+                tmp.showCountEnd       = 0
+                tmp.apiCount           = 0
+                tmp.previousPageTokens = []
+                tmp.GetID              = "SearchResults"
+                tmp.GetUserIndex       = Strtoi(albumUser[1])
+                tmp.keyword            = "favorites"
+                m.albumActiveObject[tmp.GetID] = tmp
+                doGetSearch(tmp.GetID, Strtoi(albumUser[1]), searchStrings["favorites"])
+            end if
+        end for
+    end if
     
     if m.albumActiveObject["SearchResults"] = invalid then
         'Look for Time in History - We'll only allow 1 of these selections. Doesn't make sense to allow multiple as they are inclusive.
