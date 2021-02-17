@@ -878,7 +878,7 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
                 m.RediscoverScreen.visible = "true"
             end if            
             return true
-        else key = "options"
+        else if key = "options"
             return true
         end if
     end if
