@@ -46,7 +46,7 @@ Sub setFeaturesText()
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "4. Device registration system has been redesigned."
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "5. Backend optimization to increase efficiency and security."
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + chr(10) + "Bug fixes:"
-    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "   - No bugs identified"
+    m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + "   - Resolved timeout bug impacting some Roku TVs"
     m.itemLabelMain.text = m.itemLabelMain.text + chr(10) + chr(10) + "Thank you for using the PhotoView Channel."
 
     'Write reg entry to we don't redisplay
