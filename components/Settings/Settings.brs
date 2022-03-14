@@ -702,7 +702,7 @@ Sub showselected()
             'UNREGISTER USER
             m.confirmDialog.visible = true
             buttons                 =  [ "Confirm", "Cancel" ]
-            m.confirmDialog.message = "Are you sure you want to unregister "  + m.userInfoEmail[m.global.selectedUser] + " from this device?"
+            m.confirmDialog.message = "Are you sure you want to disconnect "  + m.userInfoEmail[m.global.selectedUser] + " from this device?"
             m.confirmDialog.buttons = buttons
             m.confirmDialog.setFocus(true)        
         end if    
