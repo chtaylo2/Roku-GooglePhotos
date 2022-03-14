@@ -27,7 +27,7 @@
                 height      = "150"
                 width       = "1200"
                 wrap        = "true"
-                text        = "To link this Roku device to your Google account, go to:"
+                text        = "To connect this Roku device to Google Photos, go to:"
                 translation = "[225,300]"
             />
     
