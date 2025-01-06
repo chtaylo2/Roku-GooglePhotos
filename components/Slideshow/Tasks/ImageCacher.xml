@@ -3,6 +3,7 @@
 <component name = "ImageCacher" extends = "Task" >
  
     <script type = "text/brightscript" uri = "pkg:/components/Utils/Common.brs" />
+    <script type = "text/brightscript" uri = "pkg:/components/Utils/private-git.brs" />
   
     <interface>
         <field id = "remotearray" type = "array" />

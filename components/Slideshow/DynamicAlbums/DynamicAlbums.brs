@@ -1,6 +1,6 @@
 '*************************************************************
 '** PhotoView for Google Photos
-'** Copyright (c) 2017-2021 Chris Taylor.  All rights reserved.
+'** Copyright (c) 2017-2025 Chris Taylor.  All rights reserved.
 '** Use of code within this application subject to the MIT License (MIT)
 '** https://raw.githubusercontent.com/chtaylo2/Roku-GooglePhotos/master/LICENSE
 '*************************************************************
@@ -137,7 +137,7 @@ Sub handleGetSearch(event as object)
         else if type(rsp) <> "roAssociativeArray"
             errorMsg = "Json response is not an associative array: handleGetSearch"
         else if rsp.DoesExist("error")
-            errorMsg = "Json error response: [handleGetSearch] " + json.error
+            errorMsg = "Json error response: [handleGetSearch] " + rsp.error
         else
 
             imageList = googleImageListing(rsp)

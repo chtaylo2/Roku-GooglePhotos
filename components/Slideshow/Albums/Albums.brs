@@ -1,6 +1,6 @@
 '*************************************************************
 '** PhotoView for Google Photos
-'** Copyright (c) 2017-2021 Chris Taylor.  All rights reserved.
+'** Copyright (c) 2017-2025 Chris Taylor.  All rights reserved.
 '** Use of code within this application subject to the MIT License (MIT)
 '** https://raw.githubusercontent.com/chtaylo2/Roku-GooglePhotos/master/LICENSE
 '*************************************************************
@@ -105,7 +105,7 @@ Sub handleGetAlbumList(event as object)
         else if type(rsp) <> "roAssociativeArray"
             errorMsg = "Json response is not an associative array: handleGetAlbumList"
         else if rsp.DoesExist("error")
-            errorMsg = "Json error response: [handleGetAlbumList] " + json.error
+            errorMsg = "Json error response: [handleGetAlbumList] " + rsp.error
         else
             albumList = googleAlbumListing(rsp)         
             
@@ -165,7 +165,7 @@ Sub handleGetAlbumImages(event as object)
         else if type(rsp) <> "roAssociativeArray"
             errorMsg = "Json response is not an associative array: handleGetAlbumImages"
         else if rsp.DoesExist("error")
-            errorMsg = "Json error response: [handleGetAlbumImages] " + json.error
+            errorMsg = "Json error response: [handleGetAlbumImages] " + rsp.error
         else
             imageList = googleImageListing(rsp)
 

@@ -1,6 +1,6 @@
 '*************************************************************
 '** PhotoView for Google Photos
-'** Copyright (c) 2017-2021 Chris Taylor.  All rights reserved.
+'** Copyright (c) 2017-2025 Chris Taylor.  All rights reserved.
 '** Use of code within this application subject to the MIT License (MIT)
 '** https://raw.githubusercontent.com/chtaylo2/Roku-GooglePhotos/master/LICENSE
 '*************************************************************
@@ -14,9 +14,9 @@ Sub init()
     m.tipsInfo.font.size = 30
       
     'Read in content
-    m.readContentTask = createObject("roSGNode", "Local ContentReader")
+    m.readContentTask = createObject("roSGNode", "LocalContentReader")
     m.readContentTask.observeField("content", "setlist")
-    m.readContentTask.file = "pkg:/data/TipsAndTricks/tipsContent.xml"
+    m.readContentTask.file = "pkg:/source/data/TipsAndTricks/tipsContent.xml"
     m.readContentTask.control = "RUN"
 End Sub
 

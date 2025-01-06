@@ -6,6 +6,6 @@
         <field id = "loaded" type = "boolean" onChange = "loadingComplete"/>
     </interface>
     
-    <script type = "text/brightscript" uri = "pkg:/components/SlideShow/SharedAlbums/SharedAlbums.brs" />
+    <script type = "text/brightscript" uri = "pkg:/components/Slideshow/SharedAlbums/SharedAlbums.brs" />
     
 </component>

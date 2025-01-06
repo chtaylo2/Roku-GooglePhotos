@@ -13,8 +13,9 @@
         <field id = "itemFocused"    type = "node" alias = "ImageGrid.itemFocused"  onChange = "onItemFocused" />
     </interface>
   
-    <script type = "text/brightscript" uri = "pkg:/components/SlideShow/Browse/Browse.brs" />
+    <script type = "text/brightscript" uri = "pkg:/components/Slideshow/Browse/Browse.brs" />
     <script type = "text/brightscript" uri = "pkg:/components/Utils/Common.brs" />
+    <script type = "text/brightscript" uri = "pkg:/components/Utils/private-git.brs" />
    
     <children>
 

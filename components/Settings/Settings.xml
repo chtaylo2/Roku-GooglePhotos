@@ -13,7 +13,7 @@
 
     <script type = "text/brightscript" uri = "pkg:/components/Settings/Settings.brs" />
     <script type = "text/brightscript" uri = "pkg:/components/Utils/Common.brs" />
-    <script type = "text/brightscript" uri = "pkg:/components/SlideShow/SlideshowHelper.brs" />
+    <script type = "text/brightscript" uri = "pkg:/components/Slideshow/SlideshowHelper.brs" />
     <script type = "text/brightscript" uri = "pkg:/components/Utils/private-git.brs" />
   
     <children>

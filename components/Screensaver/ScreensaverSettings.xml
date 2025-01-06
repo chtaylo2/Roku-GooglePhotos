@@ -4,6 +4,7 @@
 
     <script type = "text/brightscript" uri = "pkg:/components/Screensaver/ScreensaverSettings.brs" />
     <script type = "text/brightscript" uri = "pkg:/components/Utils/Common.brs" />
+    <script type = "text/brightscript" uri = "pkg:/components/Utils/private-git.brs" />
     
     <children>
 

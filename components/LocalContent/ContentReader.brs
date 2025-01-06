@@ -1,6 +1,6 @@
 '*************************************************************
 '** PhotoView for Google Photos
-'** Copyright (c) 2017-2021 Chris Taylor.  All rights reserved.
+'** Copyright (c) 2017-2025 Chris Taylor.  All rights reserved.
 '** Use of code within this application subject to the MIT License (MIT)
 '** https://raw.githubusercontent.com/chtaylo2/Roku-GooglePhotos/master/LICENSE
 '*************************************************************
@@ -14,6 +14,7 @@ End Sub
 Sub getContent()
     content = createObject("roSGNode", "ContentNode")
     contentxml = createObject("roXMLElement")
+    print "FILE: "; m.top.file
     xmlstring = ReadAsciiFile(m.top.file)
     contentxml.parse(xmlstring)
 

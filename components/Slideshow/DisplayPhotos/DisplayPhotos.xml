@@ -9,8 +9,8 @@
         <field id = "startIndex"     type = "integer" value="-1" />
     </interface>
   
-    <script type = "text/brightscript" uri = "pkg:/components/SlideShow/DisplayPhotos/DisplayPhotos.brs" />
-    <script type = "text/brightscript" uri = "pkg:/components/SlideShow/SlideshowHelper.brs" />
+    <script type = "text/brightscript" uri = "pkg:/components/Slideshow/DisplayPhotos/DisplayPhotos.brs" />
+    <script type = "text/brightscript" uri = "pkg:/components/Slideshow/SlideshowHelper.brs" />
     <script type = "text/brightscript" uri = "pkg:/components/Utils/Common.brs" />
     <script type = "text/brightscript" uri = "pkg:/components/Utils/private-git.brs" />
    

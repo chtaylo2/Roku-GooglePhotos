@@ -1,6 +1,6 @@
 <?xml version = "1.0" encoding = "utf-8" ?>
 
-<component name = "Local ContentReader" extends = "Task" >
+<component name = "LocalContentReader" extends = "Task" >
 
     <interface>
         <field id = "file" type = "string" />

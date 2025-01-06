@@ -1,6 +1,6 @@
 '*************************************************************
 '** PhotoView for Google Photos
-'** Copyright (c) 2017-2021 Chris Taylor.  All rights reserved.
+'** Copyright (c) 2017-2025 Chris Taylor.  All rights reserved.
 '** Use of code within this application subject to the MIT License (MIT)
 '** https://raw.githubusercontent.com/chtaylo2/Roku-GooglePhotos/master/LICENSE
 '*************************************************************
@@ -64,9 +64,9 @@ Sub loadListContent()
     end if
 
     'Read in Content
-    m.readContentTask = createObject("roSGNode", "Local ContentReader")
+    m.readContentTask = createObject("roSGNode", "LocalContentReader")
     m.readContentTask.observeField("content", "setLists")
-    m.readContentTask.file = "pkg:/data/Settings/" + m.top.contentFile + ".xml"
+    m.readContentTask.file = "pkg:/source/data/Settings/" + m.top.contentFile + ".xml"
     m.readContentTask.control = "RUN"
 End Sub
 
@@ -116,7 +116,7 @@ Sub handleGetAlbumSelection(event as object)
         else if type(rsp) <> "roAssociativeArray"
             errorMsg = "Json response is not an associative array: handleGetAlbumSelection"
         else if rsp.DoesExist("error")
-            errorMsg = "Json error response: [handleGetAlbumSelection] " + json.error
+            errorMsg = "Json error response: [handleGetAlbumSelection] " + rsp.error
         else
             albumList = googleAlbumListing(rsp)         
             

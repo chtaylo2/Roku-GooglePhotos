@@ -25,6 +25,7 @@ Sub showGooglePhotosScreen()
     cecstatus.SetMessagePort(port)
     screen.setMessagePort(port)    
     screen.show()
+    ' vscode_rdb_on_device_component_entry
 
     scene.signalBeacon("AppLaunchComplete")
 

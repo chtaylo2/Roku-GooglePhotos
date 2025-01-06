@@ -2,8 +2,8 @@
 
 <component name = "Shuffle Photos" extends = "Group" >
     
-    <script type = "text/brightscript" uri = "pkg:/components/SlideShow/ShufflePhotos/ShufflePhotos.brs" />
-    <script type = "text/brightscript" uri = "pkg:/components/SlideShow/SlideshowHelper.brs" />
+    <script type = "text/brightscript" uri = "pkg:/components/Slideshow/ShufflePhotos/ShufflePhotos.brs" />
+    <script type = "text/brightscript" uri = "pkg:/components/Slideshow/SlideshowHelper.brs" />
     <script type = "text/brightscript" uri = "pkg:/components/Utils/Common.brs" />
     <script type = "text/brightscript" uri = "pkg:/components/Utils/private-git.brs" />
 

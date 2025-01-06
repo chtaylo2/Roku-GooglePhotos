@@ -2,8 +2,9 @@
 
 <component name = "GooglePhotosMainScene" extends = "Scene" >
 
-    <script type = "text/brightscript" uri = "pkg:/components/GooglePhotosMainScene.brs" />
+    <script type = "text/brightscript" uri = "pkg:/components/GooglephotosMainScene.brs" />
     <script type = "text/brightscript" uri = "pkg:/components/Utils/Common.brs" />
+    <script type = "text/brightscript" uri = "pkg:/components/Utils/private-git.brs" />
     
     <children>
 
